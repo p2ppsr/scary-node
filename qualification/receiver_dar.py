@@ -3,6 +3,7 @@
 import argparse
 import contextlib
 import hashlib
+import gzip
 import json
 import os
 from pathlib import Path
@@ -133,10 +134,13 @@ class NativeFeed(LabFeed):
             return json.load(r)
 
 
-def measure(binary, dir):
-    with Reference().running(peer=True) as n, contextlib.ExitStack() as life:
+def measure(binary, dir, *, retain_history=False):
+    with (
+        Reference().running(peer=True, fast_rpc=retain_history) as n,
+        contextlib.ExitStack() as life,
+    ):
         f = NativeFeed(n, dir, life)
-        result = run(n, f, dir, binary)
+        result = run(n, f, dir, binary, retain_history=retain_history)
 
         def field(b):
             assert len(b) < 253
@@ -291,6 +295,18 @@ def measure(binary, dir):
                 (ROOT / ".native/receiver-lab").read_bytes()
             ).hexdigest(),
         }
+        if retain_history:
+            tip = n.rpc("getblockchaininfo")
+            if tip["chain"] != "regtest":
+                raise ValueError("the lab can export only regtest fixture history")
+            result["active_history_from_height_one"] = [
+                n.rpc("getblock", n.rpc("getblockhash", height), 0)
+                for height in range(1, tip["blocks"] + 1)
+            ]
+            result["sv_final_active_tip"] = tip["bestblockhash"]
+            result["node_binary_sha256"] = hashlib.sha256(
+                binary.read_bytes()
+            ).hexdigest()
         return result
 
 
@@ -298,10 +314,15 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("receipt", type=Path)
     p.add_argument("--binary", type=Path, default=ROOT / "target/release/scary-node")
+    p.add_argument(
+        "--retain-history",
+        action="store_true",
+        help="Export both exact regtest branches and the independent SV maturity response.",
+    )
     a = p.parse_args()
     with tempfile.TemporaryDirectory() as td:
         try:
-            r = measure(a.binary, Path(td))
+            r = measure(a.binary, Path(td), retain_history=a.retain_history)
         except Exception:
             for name in [
                 "receiver-process.log",
@@ -313,4 +334,7 @@ if __name__ == "__main__":
                 if path.exists():
                     print(path.read_text()[-700:])
             raise
-    a.receipt.write_text(json.dumps(r, indent=2) + "\n")
+    raw = (json.dumps(r, indent=2) + "\n").encode()
+    tmp = a.receipt.with_suffix(a.receipt.suffix + ".next")
+    tmp.write_bytes(gzip.compress(raw, mtime=0) if a.receipt.suffix == ".gz" else raw)
+    tmp.replace(a.receipt)

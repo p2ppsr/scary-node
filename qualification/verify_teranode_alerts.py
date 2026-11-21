@@ -23,13 +23,36 @@ def message_digest(payload):
     return dsha(b"\x18Bitcoin Signed Message:\n" + length + text)
 
 
+REGTEST_GENESIS = "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"
+
+
+def require_lab_signers(payload, compact, keys):
+    if len(compact) != 195 or len(keys) != 5:
+        raise ValueError(
+            "expected three compact signatures and five trusted public keys"
+        )
+    signers = set()
+    for off in range(0, len(compact), 65):
+        header = compact[off] - 27
+        if not 4 <= header <= 5:
+            raise ValueError(
+                "unexpected signature recovery header for compressed lab keys"
+            )
+        recovered = VerifyingKey.from_public_key_recovery_with_digest(
+            compact[off + 1 : off + 65], message_digest(payload), curve=SECP256k1
+        )
+        signers.add(recovered[header & 1].to_string("compressed").hex())
+    if len(signers) != 3 or not signers <= keys:
+        raise ValueError("three distinct lab signers required")
+
+
 def verify_funding(record):
     if len(bytes.fromhex(record["node_binary_sha256"])) != 32:
         raise ValueError("missing release binary digest")
     history = record["history_from_height_one"]
     if len(history) != record["parent"]["height"]:
         raise ValueError("common funding chain length differs")
-    previous = "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"
+    previous = REGTEST_GENESIS
     funding_seen = False
     for raw in history:
         body = bytes.fromhex(raw)
@@ -60,19 +83,7 @@ def verify(record, *, full_history=True):
             or not row["processed"]
         ):
             raise ValueError("signed prefix differs from stock application receipt")
-        signers = set()
-        for off in range(0, len(compact), 65):
-            header = compact[off] - 27
-            if not 4 <= header <= 5:
-                raise ValueError(
-                    "unexpected signature recovery header for compressed lab keys"
-                )
-            recovered = VerifyingKey.from_public_key_recovery_with_digest(
-                compact[off + 1 : off + 65], message_digest(payload), curve=SECP256k1
-            )
-            signers.add(recovered[header & 1].to_string("compressed").hex())
-        if len(signers) != 3 or not signers <= keys:
-            raise ValueError("three distinct lab signers required")
+        require_lab_signers(payload, compact, keys)
         if kind == 1:
             notice = b"isolated positive interoperability observation"
             if payload[20:] != bytes([len(notice)]) + notice:

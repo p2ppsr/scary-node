@@ -15,7 +15,7 @@ cat .native/provenance.json
 
 The node reports native build provenance and linked runtime versions under `/status` → `mining.interpreter`. GoBDK v1.4.0 uses the pinned release archive as the independent binding oracle. Rust BDK and SV Node v1.2.3 supply the ordinary-script and DAR references respectively. Teranode v0.16.1 supplies the native gossip reference. [BDK](https://github.com/bitcoin-sv/bdk/tree/8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9) · [SV Node](https://github.com/bitcoin-sv/bitcoin-sv/tree/6504a3aff65ba97c0f6c80962b033e35ecbfed4b) · [Teranode](https://github.com/bsv-blockchain/teranode/tree/807f1bea39f52797c72fd157a543e8bb64622510)
 
-To identify an exact source build, run the following from a Git checkout with Docker and Python 3.12 or later. The builder archives the committed Docker inputs, builds the compiler and runtime stages, starts the executable on an isolated loopback network, and checks its reported identity against the binary and native archive on disk. The receipt includes the source tree, Cargo lock digest, Rust compiler, linked interpreter versions and executable digest. Docker image identifiers describe the local build and can vary with the builder and package mirror. [Linux ARM64 build receipt](evidence/chronicle-linux-release.json)
+To identify an exact source build, run the following from a Git checkout with Docker and Python 3.12 or later. The builder archives the committed Docker inputs, builds the compiler and runtime stages, starts the executable on an isolated loopback network, and checks its reported identity against the binary and native archive on disk. The receipt includes the source tree, Cargo lock digest, Rust compiler, linked interpreter versions and executable digest. Current Docker builds give each compilation a fresh Cargo target directory and cache downloaded registry and Git dependencies. BuildKit can reuse a completed stage for identical inputs. Docker image identifiers describe the local build and can vary with the builder and package mirror. [Linux ARM64 build receipt](evidence/chronicle-linux-release.json)
 
 ```sh
 python3 qualification/release_build.py 781ddd73ac78bd1887138fad331eeace21488509 .native/release-build.json
@@ -54,6 +54,8 @@ cargo build --locked --release
 ./regtest/mixed.sh > .native/mixed.json
 python3 regtest/verify_receipt.py .native/mixed.json
 python3 qualification/capacity_recovery.py .native/capacity-recovery.json
+.native/py/bin/python qualification/capacity_recovery.py --undo .native/undo-capacity.json
+.native/py/bin/python qualification/candidate_capacity.py --binary target/release/scary-node .native/candidate-capacity.json
 .native/py/bin/python qualification/peer_loss.py .native/peer-loss.json
 .native/py/bin/python qualification/large_body.py .native/large-wire.json
 ./regtest/mixed.sh --down
@@ -108,6 +110,15 @@ Build the v0.3.5 synchronization harness from its pinned source. Its Go overlay 
 ```sh
 python3 qualification/receiver/build.py
 python3 qualification/receiver_dar.py --binary ./target/release/scary-node .native/receiver-dar.json
+```
+
+To keep an exact replayable fixture, export the full signed lifecycle and its two block histories before the reference volume closes. The offline verifier checks the funding chain, rotation and signatures, original and replacement branches, and the recipient signature. The optional fresh SV replay re-applies the signed UTXO intervals and authorization using Bitcoin SV Node v1.2.3's administrative RPC and submits the archived byte strings.
+
+```sh
+.native/py/bin/python qualification/receiver_dar.py --retain-history \
+  --binary target/release/scary-node .native/receiver-dar-history.json.gz
+.native/py/bin/python qualification/verify_dar_history.py .native/receiver-dar-history.json.gz
+.native/py/bin/python qualification/verify_dar_history.py --replay-sv .native/receiver-dar-history.json.gz
 ```
 
 Use the stock Teranode Alert Service fixture to compare signed notice, freeze, unfreeze and ordinary payment admission on two Teranodes, SV Node and Scary Node. The independent verification uses the pinned Python test environment. [Stock Teranode alert fixture and evidence](teranode-alert-interoperability.md)

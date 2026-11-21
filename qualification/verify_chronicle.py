@@ -16,6 +16,7 @@ from relay_comparison import paired_report
 from verify_native_workers import verify as verify_workers, verify_retained
 from shadow import audit
 from verify_stream import verify as verify_stream
+from verify_peer_intake import verify as verify_peer_intake
 from verify_retained_delivery import verify as verify_retained_delivery
 
 
@@ -229,6 +230,28 @@ def verify(directory):
         repeat["signed-receiver"],
         repeat["directive-race"],
     )
+    for name in (
+        "chronicle-sv-transaction-intake.json",
+        "chronicle-teranode-subtree-intake.json",
+    ):
+        verify_peer_intake(json.loads((directory / name).read_text()))
+    bounded = json.loads((directory / "chronicle-candidate-capacity.json").read_text())
+    body = bytes.fromhex(bounded["block_hex"])
+    check_header(body[:80], bounded["block"], bounded["parent"])
+    _, transactions, _ = decode_block(body, bounded["block"])
+    assert [txid(tx) for tx in transactions[1:]] == bounded["accepted_txids"]
+    assert bounded["wire_bytes"] == len(body) <= bounded["body_limit"] == 1024
+    assert (
+        bounded["declined"]
+        and len(bounded["accepted_txids"]) + len(bounded["declined"]) == 8
+    )
+    assert all(
+        len(body) + row["bytes"] > bounded["body_limit"] for row in bounded["declined"]
+    )
+    assert bounded["receiver_wire_sha256"] == [hashlib.sha256(body).hexdigest()] * 2
+    successor = bytes.fromhex(bounded["successor_header"])
+    check_header(successor, txid(successor), bounded["block"])
+    assert bounded["p2sh_mining_payout_refused"]
     signed = json.loads(
         (directory / "chronicle-signed-body-throughput.json").read_text()
     )[1:]
