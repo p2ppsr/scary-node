@@ -111,11 +111,11 @@ async fn clean_stop_saves_recent_eligible_payments_and_fences_late_offers() {
     state.observe(151, &child).unwrap();
     state.save().unwrap();
     state.peer_tx(TxSource::Sv, &raw);
-    assert!(state.pending_dirty);
+    assert!(state.offers_dirty);
     state.flush_on_shutdown().unwrap();
     assert!(!state.observation_window_ready());
     assert!(state.submit_tx(&raw).is_err());
-    assert!(!state.pending_dirty);
+    assert!(!state.offers_dirty);
 
     let mut restored = Mining::new(true, vec![0x51]).unwrap();
     restored.open_store(directory.path()).unwrap();
@@ -166,6 +166,174 @@ async fn native_payment_waits_for_endorsed_funding_and_rechecks_the_selected_spe
             miner.sv_intake.discarded_after_recheck,
             u64::from(already_mined)
         );
+    }
+}
+
+#[tokio::test]
+async fn controlled_stop_restores_waiting_order_source_and_first_eligible_conflict() {
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcde701").unwrap());
+    let lock = signer.lock().unwrap();
+    let source = tx(&"74".repeat(32), 100_000, lock.clone());
+    let funding = make_block([8; 32], 251, &[source.to_bytes().unwrap()]);
+    let mut payments = Vec::new();
+    for value in [91_000, 90_000] {
+        let mut payment = tx(&source.id().unwrap(), value, lock.clone());
+        payment
+            .sign(0, &signer, 0x41, 100_000, &lock)
+            .await
+            .unwrap();
+        payments.push(payment.to_bytes().unwrap());
+    }
+    let directory = tempfile::tempdir().unwrap();
+    let mut original = Mining::new(true, vec![0x51]).unwrap();
+    original.open_store(directory.path()).unwrap();
+    original.observe(251, &funding).unwrap();
+    original.save().unwrap();
+
+    // The empty checkpoint uses exactly the earlier format, without this field.
+    let file = directory.path().join("witness.state");
+    let before = std::fs::read(&file).unwrap();
+    let fields: HashMap<String, serde::de::IgnoredAny> =
+        rmp_serde::from_slice(&before[8..before.len() - 32]).unwrap();
+    assert!(!fields.contains_key("waiting"));
+    let mut old = Mining::new(true, vec![0x51]).unwrap();
+    old.open_store(directory.path()).unwrap();
+    assert!(old.waiting.is_empty());
+    assert_eq!(old.tip(), original.tip());
+
+    for (source, raw) in [TxSource::Subtree, TxSource::Sv].into_iter().zip(&payments) {
+        original.peer_tx(source, raw);
+    }
+    assert!(original.offers_dirty);
+    assert!(original.pending.is_empty());
+    original.flush_on_shutdown().unwrap();
+    original.reconsider_waiting();
+    assert_eq!(original.waiting.len(), 2);
+    assert!(!original.offers_dirty);
+    #[derive(serde::Deserialize)]
+    struct Stored {
+        waiting: Vec<(String, serde_bytes::ByteBuf)>,
+    }
+    let flushed = std::fs::read(file).unwrap();
+    let stored: Stored = rmp_serde::from_slice(&flushed[8..flushed.len() - 32]).unwrap();
+    assert_eq!(
+        stored.waiting,
+        vec![
+            (
+                "subtree".to_string(),
+                serde_bytes::ByteBuf::from(payments[0].clone())
+            ),
+            (
+                "sv".to_string(),
+                serde_bytes::ByteBuf::from(payments[1].clone())
+            ),
+        ]
+    );
+    let mut restored = Mining::new(true, vec![0x51]).unwrap();
+    restored.open_store(directory.path()).unwrap();
+    assert_eq!(
+        restored.waiting.bytes(),
+        payments.iter().map(Vec::len).sum::<usize>()
+    );
+    restored.reconsider_waiting();
+    assert!(restored.pending.is_empty());
+    assert!(!restored.offers_dirty);
+    for raw in &payments {
+        assert!(restored.knows_offer(&hash256(raw)));
+        restored.peer_tx(TxSource::Sv, raw);
+    }
+    assert_eq!(restored.sv_intake.duplicate, 2);
+    assert_eq!(restored.waiting.len(), 2);
+
+    restored
+        .observe(252, &make_block(hash256(&funding[..80]), 252, &[]))
+        .unwrap();
+    assert!(restored.waiting.is_empty());
+    assert_eq!(restored.pending.len(), 1);
+    assert!(restored.pending.contains_key(&hash256(&payments[0])));
+    assert_eq!(restored.subtree_intake.promoted_after_successor, 1);
+    assert_eq!(restored.sv_intake.discarded_after_recheck, 1);
+    restored.flush_on_shutdown().unwrap();
+    let mut again = Mining::new(true, vec![0x51]).unwrap();
+    again.open_store(directory.path()).unwrap();
+    let admitted = hash256(&payments[0]);
+    assert!(again.waiting.is_empty() && again.pending.contains_key(&admitted));
+
+    // Even an internally checksummed snapshot must have disjoint offer pools.
+    original
+        .pending
+        .insert(admitted, again.pending[&admitted].clone());
+    original.save().unwrap();
+    let mut malformed = Mining::new(true, vec![0x51]).unwrap();
+    let error = malformed.open_store(directory.path()).unwrap_err();
+    assert!(error
+        .to_string()
+        .contains("both eligible and waiting pools"));
+    assert!(malformed.height.is_none() && malformed.waiting.is_empty());
+}
+
+#[tokio::test]
+async fn restored_waiting_offer_requires_selected_funding_and_current_directives() {
+    use crate::alerts::tests::{keys, public, signed};
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcde702").unwrap());
+    let lock = signer.lock().unwrap();
+    let source = tx(&"75".repeat(32), 100_000, lock.clone());
+    let mut payment = tx(&source.id().unwrap(), 90_000, lock.clone());
+    payment
+        .sign(0, &signer, 0x41, 100_000, &lock)
+        .await
+        .unwrap();
+    let raw = payment.to_bytes().unwrap();
+    let common = make_block([8; 32], 250, &[]);
+    let common_id = hash256(&common[..80]);
+    let funding = make_block(common_id, 251, &[source.to_bytes().unwrap()]);
+    let signing = keys(12);
+    for freeze in [false, true] {
+        let directory = tempfile::tempdir().unwrap();
+        let mut original = Mining::new(true, vec![0x51]).unwrap();
+        original.open_store(directory.path()).unwrap();
+        original.observe(250, &common).unwrap();
+        original.observe(251, &funding).unwrap();
+        original.peer_tx(TxSource::Subtree, &raw);
+        original.flush_on_shutdown().unwrap();
+
+        let mut restored = Mining::new(true, vec![0x51]).unwrap();
+        restored.directives = crate::alerts::Book::new(&public(&signing), false).unwrap();
+        restored.open_store(directory.path()).unwrap();
+        assert_eq!(restored.waiting.len(), 1);
+        assert!(restored.pending.is_empty());
+        let selected = if freeze {
+            let mut payload = hex::decode(source.id().unwrap()).unwrap();
+            payload.extend(0u64.to_le_bytes());
+            payload.extend(252u64.to_le_bytes());
+            payload.extend(300u64.to_le_bytes());
+            payload.push(1);
+            let alerts = directory.path().join("alerts");
+            std::fs::create_dir(&alerts).unwrap();
+            std::fs::write(
+                alerts.join("0000000001.signed"),
+                signed(1, 2, &payload, &signing),
+            )
+            .unwrap();
+            crate::alerts::recover(&alerts, &mut restored).unwrap();
+            assert_eq!(restored.durable_sequence(), 1);
+            assert!(restored.waiting.is_empty());
+            hash256(&funding[..80])
+        } else {
+            let competitor = make_block(common_id, 251, &[]);
+            restored.observe(251, &competitor).unwrap();
+            assert_eq!(restored.waiting.len(), 1);
+            assert_eq!(restored.tip(), Some(hash256(&funding[..80])));
+            hash256(&competitor[..80])
+        };
+        let child = make_block(selected, 252, &[]);
+        restored.observe(252, &child).unwrap();
+        assert_eq!(restored.tip(), Some(hash256(&child[..80])));
+        assert_eq!(restored.waiting.len(), 0);
+        assert!(restored.pending.is_empty());
+        assert_eq!(restored.subtree_intake.promoted_after_successor, 0);
+        assert_eq!(restored.subtree_intake.discarded_after_recheck, 1);
+        assert!(restored.submit_tx(&raw).is_err());
     }
 }
 

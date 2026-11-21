@@ -132,7 +132,8 @@ struct IntakeCounts {
     discarded_after_recheck: u64,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub(crate) enum TxSource {
     Sv,
     Subtree,
@@ -183,10 +184,10 @@ pub struct Mining {
     coins: HashMap<Outpoint, Coin>,
     pending: BTreeMap<Hash, Entry>,
     #[serde(skip)]
-    pending_dirty: bool,
+    offers_dirty: bool,
     #[serde(skip)]
     shutting_down: bool,
-    #[serde(skip)]
+    #[serde(default, skip_serializing_if = "waiting::WaitingOffers::is_empty")]
     waiting: waiting::WaitingOffers,
     #[serde(skip)]
     pending_inputs: HashSet<Outpoint>,
@@ -295,7 +296,7 @@ impl Mining {
             headers: VecDeque::new(),
             coins: HashMap::new(),
             pending: BTreeMap::new(),
-            pending_dirty: false,
+            offers_dirty: false,
             shutting_down: false,
             waiting: waiting::WaitingOffers::default(),
             pending_inputs: HashSet::new(),
@@ -410,6 +411,7 @@ impl Mining {
         self.headers.clear();
         self.active_since_entry.clear();
         self.coins.clear();
+        self.offers_dirty |= !self.waiting.is_empty();
         self.waiting = waiting::WaitingOffers::default();
         self.spent = validation::Spent::default();
         self.validation_window.clear();
@@ -735,7 +737,7 @@ impl Mining {
         );
         let previous_count = self.pending.len();
         let id = self.admit(raw)?;
-        self.pending_dirty |= previous_count != self.pending.len();
+        self.offers_dirty |= previous_count != self.pending.len();
         Ok(id)
     }
 

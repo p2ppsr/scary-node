@@ -108,6 +108,14 @@ impl Mining {
                     }
                 }
             }
+            ensure!(
+                restored.waiting.is_empty()
+                    || !restored
+                        .pending
+                        .keys()
+                        .any(|id| restored.waiting.contains(id)),
+                "checkpoint payment appears in both eligible and waiting pools"
+            );
             restored.verify_restored_boundary()?;
             if restored
                 .height
@@ -140,14 +148,14 @@ impl Mining {
         }
         Ok(())
     }
-    /// Fence workers and retain payments admitted since the last complete snapshot.
+    /// Fence workers and retain both eligible and waiting offers since the last complete snapshot.
     pub(crate) fn flush_on_shutdown(&mut self) -> Result<()> {
         self.shutting_down = true;
         ensure!(
             self.storage_failure.is_none(),
             "cannot finalize a failed durable boundary"
         );
-        if self.pending_dirty {
+        if self.offers_dirty {
             self.save()?;
         }
         Ok(())
@@ -186,7 +194,7 @@ impl Mining {
             self.parent_epoch += 1;
             self.revision += 1;
         } else {
-            self.pending_dirty = false;
+            self.offers_dirty = false;
         }
         result
     }
