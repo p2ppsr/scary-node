@@ -1,0 +1,20 @@
+{
+  "binary_sha256": "6bf3d90b8333945ded503e57dc594a6915a63b612434a76e67ccb7f6aaca8b29",
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "wire_bytes": 12583268,
+  "body_sha256": "4cd944d871f8c92d454b6d2d385a1921e50eb4518f17f79a61ba60bd88f025d5",
+  "header_hex": "00000020fcd33b78a1cb469fc3d4c0eef5274f811c689bfc7a704069ba52f97e74f2605b930abfc3732b7b599d86d3393720a3ee7eb6893f223fe0ff9407abdc427834f43906016bffff7f2000000000",
+  "hash": "72c7a690c45878f44cffdf06d2a357589b75d13e71f55ce8b7ad2fa3b9cbc799",
+  "known_signature_checks": 1,
+  "mapped_bytes": 12583268,
+  "restored_tip": "72c7a690c45878f44cffdf06d2a357589b75d13e71f55ce8b7ad2fa3b9cbc799",
+  "restored_mapped_bytes": 12583268,
+  "successor": "2f03e90a013a522d490dccb9bcdd07fa8b0e473bbe422bc0eb5ec8950e2692c5",
+  "reference_tip": "2f03e90a013a522d490dccb9bcdd07fa8b0e473bbe422bc0eb5ec8950e2692c5",
+  "rollback": {
+    "binary_sha256": "2a19c25294d42fb70a6b6a864c25ddc345249f273fbdd460a3f9a7d73eb61019",
+    "restored_tip": "2f03e90a013a522d490dccb9bcdd07fa8b0e473bbe422bc0eb5ec8950e2692c5",
+    "next_active_tip": "537ce4996aff81beef6ddfa01fe6a3a5cbd5488534ce5290fcd18de0921be9a4",
+    "reference_tip": "537ce4996aff81beef6ddfa01fe6a3a5cbd5488534ce5290fcd18de0921be9a4"
+  }
+}

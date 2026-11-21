@@ -1,4 +1,5 @@
 mod alerts;
+mod body;
 mod difficulty;
 mod mining;
 mod peer;
@@ -45,6 +46,9 @@ struct Args {
     /// Current-tip SV Node TCP peer. Repeat for independent paths.
     #[arg(long)]
     sv_peer: Vec<SocketAddr>,
+    /// Discover contemporary SV peers using the reference mainnet DNS seeds.
+    #[arg(long)]
+    sv_discovery: bool,
     /// Native P2P listen multiaddr.
     #[arg(long, default_value = "/ip4/0.0.0.0/tcp/0")]
     listen: String,
@@ -282,7 +286,7 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
             } => {
                 let mut m = app.mining.lock().await;
                 let previous = m.tip();
-                let result = m.observe(height, &raw);
+                let result = m.observe_body(height, raw.clone());
                 m.save().context("committing witnessed branch")?;
                 if result.is_ok() && m.tip() != previous {
                     if let Some(ref file) = app.shadow {
@@ -382,6 +386,7 @@ async fn main() -> Result<()> {
     );
     let dir = args.data_dir.join(network);
     tokio::fs::create_dir_all(&dir).await?;
+    body::configure(&dir);
     let lock = std::fs::OpenOptions::new()
         .create(true)
         .truncate(false)
@@ -404,6 +409,7 @@ async fn main() -> Result<()> {
             None => alerts::MAIN_KEYS.map(String::from).to_vec(),
         };
         mining.directives = alerts::Book::new(&keys, true)?;
+        mining.directives.require_peer_sync = !regtest;
     }
     mining.set_min_observed_blocks(args.min_observed_blocks as usize)?;
     mining.open_store(&dir)?;
@@ -490,6 +496,17 @@ async fn main() -> Result<()> {
             token,
             dir.join("alerts"),
             app.mining.clone(),
+        ));
+    }
+    ensure!(
+        !regtest || !args.sv_discovery,
+        "SV DNS discovery is mainnet only"
+    );
+    if !regtest && (args.sv_discovery || (fetch_bodies && args.sv_peer.is_empty())) {
+        tasks.spawn(sv_peer::discover(
+            app.mining.clone(),
+            events.clone(),
+            args.sv_peer.clone(),
         ));
     }
     for addr in args.sv_peer {

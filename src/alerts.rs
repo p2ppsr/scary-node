@@ -72,6 +72,8 @@ pub struct Book {
     pub connected: bool,
     pub reported_sequence: Option<u32>,
     pub supervised: bool,
+    pub require_peer_sync: bool,
+    peer_sync: Option<(u32, u64)>,
     genesis_verified: bool,
     frozen: HashMap<Outpoint, Freeze>,
     confiscated: HashSet<Outpoint>,
@@ -93,6 +95,8 @@ impl Book {
             connected: false,
             reported_sequence: None,
             supervised,
+            require_peer_sync: false,
+            peer_sync: None,
             genesis_verified: false,
             frozen: HashMap::new(),
             confiscated: HashSet::new(),
@@ -105,16 +109,31 @@ impl Book {
     pub fn applied(&self) -> u32 {
         self.sealed.len() as u32
     }
+    fn fresh_sync(&self, current: u64) -> bool {
+        !self.require_peer_sync
+            || self.peer_sync.is_some_and(|(seq, at)| {
+                self.reported_sequence == Some(seq)
+                    && current.checked_sub(at).is_some_and(|age| age <= 1200)
+            })
+    }
     pub fn ready(&self) -> bool {
         !self.supervised
             || (self.genesis_verified
                 && self.connected
+                && self.fresh_sync(
+                    std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap_or_default()
+                        .as_secs(),
+                )
                 && self.pending.is_none()
                 && self.reported_sequence == Some(self.applied())
                 && self.verified == self.applied())
     }
     pub fn status(&self) -> Value {
         json!({"last_verified":self.verified,"last_applied":self.applied(),
+        "peer_sync_required":self.require_peer_sync,
+        "last_peer_sync":self.peer_sync.map(|(sequence,unix_s)|json!({"sequence":sequence,"unix_s":unix_s})),
         "genesis_verified":self.genesis_verified,"reported_sequence":self.reported_sequence,"connected":self.connected,"supervised":self.supervised,
         "outstanding_action":self.pending,"ready":self.ready(),"last_notice":self.last_notice,
         "frozen_records":self.frozen.len(),"authorized_confiscations":self.whitelist.len(),
@@ -492,6 +511,11 @@ pub async fn follow(
                 .context("receiver active peer count")?;
             let mut s = state.lock().await;
             let was_ready = s.directives.ready();
+            let sync = &health["peer_sync"];
+            s.directives.peer_sync = sync["sequence"]
+                .as_u64()
+                .and_then(|n| u32::try_from(n).ok())
+                .zip(sync["unix_s"].as_u64());
             s.directives.reported_sequence = Some(seq);
             s.directives.connected = peers > 0;
             if was_ready != s.directives.ready() {
@@ -591,6 +615,20 @@ pub(crate) mod tests {
         }
         data
     }
+    #[test]
+    fn peer_sync_requires_the_signed_tip_and_a_recent_clock() {
+        let mut book = unconfigured();
+        book.require_peer_sync = true;
+        book.reported_sequence = Some(5);
+        assert!(!book.fresh_sync(10000));
+        book.peer_sync = Some((5, 10000));
+        assert!(!book.fresh_sync(9999));
+        assert!(book.fresh_sync(11200));
+        assert!(!book.fresh_sync(11201));
+        book.reported_sequence = Some(6);
+        assert!(!book.fresh_sync(10000));
+    }
+
     #[test]
     fn signed_actions_bind_receipts_and_effective_intervals() {
         let signing = keys(18);

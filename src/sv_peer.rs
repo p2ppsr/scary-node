@@ -63,11 +63,20 @@ async fn send(
     .await??;
     Ok(())
 }
+#[derive(Debug)]
+struct IncompleteBody(String);
+impl std::fmt::Display for IncompleteBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+impl std::error::Error for IncompleteBody {}
+
 async fn receive(
     r: &mut (impl AsyncRead + Unpin),
     regtest: bool,
     limit: usize,
-) -> Result<(String, Vec<u8>)> {
+) -> Result<(String, crate::body::BlockBody)> {
     let mut h = [0u8; 24];
     r.read_exact(&mut h).await?;
     ensure!(h[..4] == magic(regtest), "SV peer network mismatch");
@@ -91,9 +100,36 @@ async fn receive(
     } else {
         limit.min(32 << 20)
     };
+    if cmd == "block" && n > cap as u64 {
+        return Err(IncompleteBody(format!(
+            "SV body of {n} bytes exceeds configured capacity {cap}"
+        ))
+        .into());
+    }
     ensure!(n <= cap as u64, "SV peer message exceeds local capacity");
-    let mut body = Vec::new();
-    (&mut *r).take(n).read_to_end(&mut body).await?;
+    let mut spool = crate::body::Spool::new(cap);
+    let mut input = (&mut *r).take(n);
+    let mut chunk = vec![0; 64 << 10];
+    loop {
+        let received = input.read(&mut chunk).await?;
+        if received == 0 {
+            break;
+        }
+        if let Err(error) = spool.append(&chunk[..received]) {
+            return Err(if cmd == "block" {
+                IncompleteBody(format!("SV body spool failed: {error}")).into()
+            } else {
+                error
+            });
+        }
+    }
+    let body = spool.finish().map_err(|e| {
+        if cmd == "block" {
+            anyhow::Error::new(IncompleteBody(format!("SV body spool failed: {e}")))
+        } else {
+            e
+        }
+    })?;
     ensure!(body.len() as u64 == n, "truncated SV peer message");
     if !ext {
         ensure!(hash256(&body)[..4] == h[20..24], "SV message checksum");
@@ -164,6 +200,55 @@ fn block_height(raw: &[u8]) -> Result<u32> {
     );
     Ok(height)
 }
+/// Keep a bounded set of live SV paths. Each failed session frees its slot;
+/// the next dial uses another address supplied by the pinned reference seeds.
+pub async fn discover(
+    state: Arc<Mutex<Mining>>,
+    events: mpsc::Sender<Event>,
+    explicit: Vec<SocketAddr>,
+) -> Result<()> {
+    const SEEDS: [&str; 3] = [
+        "seed.bitcoinsv.io",
+        "seed.satoshisvision.network",
+        "seed.bitcoinseed.directory",
+    ];
+    let mut pool = tokio::task::JoinSet::new();
+    let mut in_use: std::collections::HashSet<_> = explicit.into_iter().collect();
+    let mut remaining = std::collections::VecDeque::new();
+    let mut refresh = tokio::time::interval(Duration::from_secs(300));
+    let mut dial = tokio::time::interval(Duration::from_secs(3));
+    for timer in [&mut refresh, &mut dial] {
+        timer.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+    }
+    loop {
+        tokio::select! {
+            _=events.closed()=>return Ok(()),
+            _=refresh.tick()=>{
+                let results=futures::future::join_all(SEEDS.map(|seed|tokio::time::timeout(Duration::from_secs(6),tokio::net::lookup_host((seed,8333))))).await;
+                let mut unique=std::collections::HashSet::new();
+                for peers in results.into_iter().flatten().flatten(){
+                    unique.extend(peers.filter(|addr|crate::peer::public_ip(addr.ip()) && !in_use.contains(addr)));
+                }
+                remaining=unique.into_iter().take(128).collect();
+            }
+            _=dial.tick(), if pool.len()<4 && !remaining.is_empty()=>{
+                let addr=remaining.pop_front().expect("pending seed address");
+                if state.lock().await.directives.peer_banned(&addr.ip()) || !in_use.insert(addr){continue;}
+                let (s,e)=(state.clone(),events.clone());
+                pool.spawn(async move{(addr,session(addr,false,&s,&e).await)});
+            }
+            Some(outcome)=pool.join_next(),if !pool.is_empty()=>{
+                let (addr,result)=outcome?;
+                in_use.remove(&addr);
+                if let Err(e)=result{
+                    if e.downcast_ref::<IncompleteBody>().is_some(){events.send(Event::Gap(e.to_string())).await?;}
+                    eprintln!("discovered SV peer {addr} disconnected: {e}");
+                }
+            }
+        }
+    }
+}
+
 pub async fn run(
     addr: SocketAddr,
     regtest: bool,
@@ -173,6 +258,9 @@ pub async fn run(
     loop {
         if !state.lock().await.directives.peer_banned(&addr.ip()) {
             if let Err(e) = session(addr, regtest, &state, &events).await {
+                if e.downcast_ref::<IncompleteBody>().is_some() {
+                    events.send(Event::Gap(e.to_string())).await?;
+                }
                 eprintln!("SV peer {addr} disconnected: {e}");
             }
         }
@@ -249,7 +337,7 @@ async fn session(
                     "verack"=>{ensure!(saw_version && !handshake && body.is_empty(),"unexpected verack");handshake=true;events.send(Event::Connected(format!("sv:{addr}"))).await?;}
                     "sendheaders" if handshake && body.is_empty()=>{prefers_headers=true;}
                     "getheaders" if handshake=>{
-                        let mut locator=body.as_slice();wire::take(&mut locator,4)?;
+                        let mut locator=&body[..];wire::take(&mut locator,4)?;
                         let n=wire::varint(&mut locator)?;ensure!(n<=101 && locator.len()==32*(n+1),"invalid header locator");
                         let s=state.lock().await;
                         let mut reply=vec![0];
@@ -263,7 +351,7 @@ async fn session(
                         send(&mut w,regtest,"headers",&reply).await?;
                     }
                     "headers" if handshake=>{
-                        let mut input=body.as_slice();let n=wire::varint(&mut input)?;ensure!(n<=2000,"too many peer headers");
+                        let mut input=&body[..];let n=wire::varint(&mut input)?;ensure!(n<=2000,"too many peer headers");
                         let mut req=vec![];
                         for _ in 0..n {
                             let h=wire::take(&mut input,80)?;ensure!(wire::varint(&mut input)?==0,"headers has transactions");

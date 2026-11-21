@@ -2,6 +2,7 @@
 mod assets;
 mod fetch;
 use assets::{AssetService, Assets};
+pub(crate) use fetch::public_ip;
 use fetch::valid_base;
 use fetch::Request;
 
@@ -61,7 +62,7 @@ pub enum Event {
     Block {
         source: String,
         height: u32,
-        raw: Vec<u8>,
+        raw: crate::body::BlockBody,
         validated: tokio::sync::oneshot::Sender<bool>,
     },
     Notice {

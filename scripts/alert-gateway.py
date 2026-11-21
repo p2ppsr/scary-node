@@ -3,9 +3,57 @@
 import argparse
 import base64
 import hmac
+import datetime
+import json
+import re
+import threading
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+
+class ReceiverSync:
+    """Read the maintained receiver's confirmed peer-sync events from its UTC log."""
+
+    event = re.compile(
+        rb"(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}).*successfully synced up to (\d+) from peer ([A-Za-z0-9]+)"
+    )
+
+    def __init__(self, path):
+        self.path = path
+        self.position = 0
+        self.inode = None
+        self.latest = {}
+        self.lock = threading.Lock()
+
+    def read(self):
+        with self.lock:
+            try:
+                with self.path.open("rb") as stream:
+                    stat = self.path.stat()
+                    identity = (stat.st_dev, stat.st_ino)
+                    if self.inode != identity or stat.st_size < self.position:
+                        self.position = max(0, stat.st_size - (2 << 20))
+                        self.inode = identity
+                        self.latest = {}
+                    stream.seek(self.position)
+                    for line in stream:
+                        if not line.endswith(b"\n"):
+                            break
+                        self.position += len(line)
+                        hit = self.event.search(line)
+                        if hit:
+                            when = datetime.datetime.strptime(
+                                hit[1].decode(), "%Y/%m/%d %H:%M:%S"
+                            ).replace(tzinfo=datetime.timezone.utc)
+                            self.latest = {
+                                "sequence": int(hit[2]),
+                                "unix_s": int(when.timestamp()),
+                                "peer": hit[3].decode(),
+                            }
+            except OSError:
+                return {}
+            return dict(self.latest)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -20,6 +68,10 @@ class Handler(BaseHTTPRequestHandler):
             request = urllib.request.Request(target, data=data, headers=headers)
             with urllib.request.urlopen(request, timeout=6) as reply:
                 result = reply.read()
+                if self.path == "/health" and self.server.sync:
+                    payload = json.loads(result)
+                    payload["peer_sync"] = self.server.sync.read()
+                    result = json.dumps(payload).encode()
         except OSError:
             self.send_error(503, "local service unavailable")
             return
@@ -58,11 +110,19 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--receiver", required=True)
     p.add_argument("--node", required=True)
+    p.add_argument(
+        "--receiver-sync-log",
+        type=Path,
+        help="upstream UTC log containing successful peer synchronization events",
+    )
     p.add_argument("--token-file", type=Path, required=True)
     p.add_argument("--operator-token-file", type=Path, required=True)
     p.add_argument("--port", type=int, default=19366)
     args = p.parse_args()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    server.sync = (
+        ReceiverSync(args.receiver_sync_log) if args.receiver_sync_log else None
+    )
     server.receiver = args.receiver.rstrip("/")
     server.node = args.node.rstrip("/")
     server.operator_token = args.operator_token_file.read_text().strip()

@@ -122,6 +122,24 @@ def verify(directory):
         recovery["repaired"]["witnessed_outputs"] == 3
         and recovery["repaired"]["observation_window_ready"]
     )
+    large = json.loads((directory / "chronicle-large-body.json").read_text())
+    assert (
+        txid(bytes.fromhex(large["header_hex"]))
+        == large["hash"]
+        == large["restored_tip"]
+    )
+    assert (
+        large["wire_bytes"] == large["mapped_bytes"] == large["restored_mapped_bytes"]
+        and large["wire_bytes"] > 12 << 20
+    )
+    assert (
+        large["known_signature_checks"] == 1
+        and large["reference_tip"] == large["successor"]
+    )
+    assert (
+        large["rollback"]["restored_tip"] == large["successor"]
+        and large["rollback"]["reference_tip"] == large["rollback"]["next_active_tip"]
+    )
     print(
         f"Verified {len(rows)} differential cases, both solved DAR bodies, reorg dispositions and both directive orderings."
     )

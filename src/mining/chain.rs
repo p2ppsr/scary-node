@@ -10,8 +10,7 @@ const UNDO_ITEMS: usize = 2_000_000;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub(super) struct AppliedBlock {
     pub height: u32,
-    #[serde(with = "store::arc_bytes")]
-    pub raw: Arc<[u8]>,
+    pub raw: crate::body::BlockBody,
     pub applied: validation::Applied,
     #[serde(with = "store::optional_header")]
     pub previous_header: Option<[u8; 80]>,
@@ -23,8 +22,7 @@ struct Body {
     hash: Hash,
     #[serde(with = "serde_bytes")]
     header: [u8; 80],
-    #[serde(with = "store::arc_bytes")]
-    raw: Arc<[u8]>,
+    raw: crate::body::BlockBody,
 }
 
 impl Body {
@@ -41,6 +39,16 @@ pub(super) struct RecentChain {
 }
 
 impl RecentChain {
+    pub fn mapped_bodies(&self) -> (usize, usize) {
+        let retained = self
+            .applied
+            .iter()
+            .map(|b| &b.raw)
+            .chain(self.buffered.iter().map(|b| &b.raw));
+        retained
+            .filter(|b| matches!(b, crate::body::BlockBody::File(_)))
+            .fold((0, 0), |(count, bytes), b| (count + 1, bytes + b.len()))
+    }
     pub fn buffered_len(&self) -> usize {
         self.buffered.len()
     }
@@ -142,11 +150,18 @@ impl Mining {
         Ok(false)
     }
 
+    #[cfg(test)]
     pub fn observe(&mut self, height: u32, raw: &[u8]) -> Result<()> {
+        self.observe_body(
+            height,
+            crate::body::BlockBody::Memory(Arc::new(raw.to_vec())),
+        )
+    }
+    pub fn observe_body(&mut self, height: u32, raw: crate::body::BlockBody) -> Result<()> {
         if height < interpreter::activation(self.regtest) {
             return Ok(());
         }
-        let header = self.inspect_header(raw)?;
+        let header = self.inspect_header(&raw)?;
         let hash = hash256(&header);
         let previous: Hash = header[4..36].try_into().unwrap();
         if self.directives.invalid.contains(&hash)
@@ -184,14 +199,14 @@ impl Mining {
             }
         }
         let direct = old_tip.is_none() || old_tip == Some(previous);
-        let quarantined = self.soft_frozen(raw, height)?;
+        let quarantined = self.soft_frozen(&raw, height)?;
         if direct && !quarantined {
-            if let Err(error) = self.connect(height, Arc::from(raw), header) {
+            if let Err(error) = self.connect(height, raw, header) {
                 self.wait_for_body(error.to_string());
                 return Err(error);
             }
         } else {
-            let (_, coinbase_error) = self.inspect_body(height, &header, raw)?;
+            let (_, coinbase_error) = self.inspect_body(height, &header, &raw)?;
             ensure!(
                 coinbase_error.is_none(),
                 "invalid competing coinbase framing"
@@ -203,7 +218,7 @@ impl Mining {
                 height,
                 header,
                 hash,
-                raw: Arc::from(raw),
+                raw,
             };
             if deep_gap && !quarantined {
                 let anchor = self
@@ -377,7 +392,7 @@ impl Mining {
         block
     }
 
-    fn rollback(&mut self, mut block: AppliedBlock) -> (u32, Arc<[u8]>) {
+    fn rollback(&mut self, mut block: AppliedBlock) -> (u32, crate::body::BlockBody) {
         for undo in block.applied.spends.into_iter().rev() {
             self.spent.undo(undo);
         }

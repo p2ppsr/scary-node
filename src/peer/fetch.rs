@@ -110,7 +110,7 @@ pub(super) fn valid_base(url: &Url) -> bool {
 
 // Mainnet gossip can come from any publisher. Resolve once, reject local/special
 // addresses, pin the validated result to this request and disable redirects/proxies.
-fn public_ip(ip: IpAddr) -> bool {
+pub(crate) fn public_ip(ip: IpAddr) -> bool {
     match ip {
         IpAddr::V4(v) => {
             let [a, b, c, _] = v.octets();
@@ -134,7 +134,7 @@ fn public_ip(ip: IpAddr) -> bool {
     }
 }
 
-async fn fetch(network: &str, r: &Request) -> Result<Vec<u8>> {
+async fn fetch(network: &str, r: &Request) -> Result<crate::body::BlockBody> {
     let mut url = Url::parse(&r.base)?;
     ensure!(valid_base(&url), "invalid advertised Asset base URL");
     let host = url
@@ -158,7 +158,7 @@ async fn fetch(network: &str, r: &Request) -> Result<Vec<u8>> {
         .no_proxy()
         .redirect(Policy::none())
         .resolve_to_addrs(&host, &addresses)
-        .timeout(Duration::from_secs(45))
+        .read_timeout(Duration::from_secs(45))
         .connect_timeout(Duration::from_secs(8))
         .build()?;
     let path = format!(
@@ -174,16 +174,13 @@ async fn fetch(network: &str, r: &Request) -> Result<Vec<u8>> {
         res.content_length().unwrap_or(0) <= body_limit() as u64,
         "block exceeds the alpha download limit"
     );
-    let mut bytes = Vec::new();
+    let mut spool = crate::body::Spool::new(body_limit());
     let mut chunks = res.bytes_stream();
     while let Some(chunk) = chunks.next().await {
         let chunk = chunk?;
-        ensure!(
-            chunk.len() <= body_limit() - bytes.len(),
-            "block exceeds the alpha download limit"
-        );
-        bytes.extend_from_slice(&chunk);
+        spool.append(&chunk)?;
     }
+    let bytes = spool.finish()?;
     ensure!(bytes.len() > 80, "truncated Asset block");
     ensure!(
         display_hash(hash256(&bytes[..80])) == r.hash,
@@ -212,7 +209,11 @@ async fn worker(
                 .expect("download schedule lock")
                 .next_source(&hash);
             let Some(r) = next else { break };
-            let result = tokio::time::timeout(Duration::from_secs(55), fetch(&network, &r)).await;
+            let result = tokio::time::timeout(
+                Duration::from_secs(55 + (body_limit() as u64 >> 20)),
+                fetch(&network, &r),
+            )
+            .await;
             match result {
                 Ok(Ok(raw)) => {
                     let (validated, result) = tokio::sync::oneshot::channel();

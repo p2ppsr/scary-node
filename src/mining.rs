@@ -313,7 +313,12 @@ impl Mining {
         Ok(header)
     }
 
-    fn connect(&mut self, height: u32, raw: Arc<[u8]>, header: [u8; 80]) -> Result<()> {
+    fn connect(
+        &mut self,
+        height: u32,
+        raw: crate::body::BlockBody,
+        header: [u8; 80],
+    ) -> Result<()> {
         let hash = hash256(&header);
         let target = bits(&header);
         if let (Some(prev), Some(h)) = (self.headers.back(), self.height) {
@@ -763,8 +768,9 @@ impl Mining {
             .height
             .and_then(|h| h.checked_sub(self.headers.len().saturating_sub(1) as u32));
 
+        let (mapped_count, mapped_bytes) = self.chain.mapped_bodies();
         json!({
-            "capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
+            "mapped_bodies":mapped_count,"mapped_body_bytes":mapped_bytes,"capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
             "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
             "observation_window_ready": self.observation_window_ready(), "headers": self.headers.len(), "awaiting_height": self.awaiting_height,
             "witnessed_outputs": self.coins.len(), "omitted_outputs": self.omitted_outputs,
