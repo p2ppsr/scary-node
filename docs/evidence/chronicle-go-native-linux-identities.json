@@ -1,0 +1,74 @@
+{
+  "source_checkout": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+  "member": "version_cgo.cpp.o",
+  "archives": {
+    "libGoBDK_linux_aarch64.a": {
+      "archive_sha256": "3167d77e84633ea5547aed3e04adf40bebb79cd79fbca5a6237f997ef0fdc6fd",
+      "object_sha256": "80f63b42c97733fb80423d504ff5f71ec35f81ba804758061105b5da63e0bf2f",
+      "symbols": {
+        "CGO_SOURCE_GIT_COMMIT_HASH": {
+          "address": "0x18",
+          "relocation": "R_AARCH64_ABS64",
+          "string_section": ".rodata.str1.8",
+          "string_offset": "0x40",
+          "value": "9d34cf2"
+        },
+        "CGO_BSV_GIT_COMMIT_HASH": {
+          "address": "0x38",
+          "relocation": "R_AARCH64_ABS64",
+          "string_section": ".rodata.str1.8",
+          "string_offset": "0x78",
+          "value": "6504a3aff"
+        },
+        "CGO_BDK_VERSION_STRING": {
+          "address": "0x28",
+          "relocation": "R_AARCH64_ABS64",
+          "string_section": ".rodata.str1.8",
+          "string_offset": "0x0",
+          "value": "1.4.0"
+        },
+        "CGO_BSV_VERSION_STRING": {
+          "address": "0x48",
+          "relocation": "R_AARCH64_ABS64",
+          "string_section": ".rodata.str1.8",
+          "string_offset": "0x90",
+          "value": "1.2.3"
+        }
+      }
+    },
+    "libGoBDK_linux_x86_64.a": {
+      "archive_sha256": "007521611932f70d8c826a7006e7de0177d2d939a179a544136e11b1cd301c8e",
+      "object_sha256": "78a487668010bfb1f77e101c9440ae1c9a7d52b9c1298c7d7429a40087884a67",
+      "symbols": {
+        "CGO_SOURCE_GIT_COMMIT_HASH": {
+          "address": "0x18",
+          "relocation": "R_X86_64_64",
+          "string_section": ".rodata.str1.1",
+          "string_offset": "0x34",
+          "value": "9d34cf2"
+        },
+        "CGO_BSV_GIT_COMMIT_HASH": {
+          "address": "0x38",
+          "relocation": "R_X86_64_64",
+          "string_section": ".rodata.str1.1",
+          "string_offset": "0x65",
+          "value": "6504a3aff"
+        },
+        "CGO_BDK_VERSION_STRING": {
+          "address": "0x28",
+          "relocation": "R_X86_64_64",
+          "string_section": ".rodata.str1.1",
+          "string_offset": "0x0",
+          "value": "1.4.0"
+        },
+        "CGO_BSV_VERSION_STRING": {
+          "address": "0x48",
+          "relocation": "R_X86_64_64",
+          "string_section": ".rodata.str1.1",
+          "string_offset": "0x76",
+          "value": "1.2.3"
+        }
+      }
+    }
+  }
+}

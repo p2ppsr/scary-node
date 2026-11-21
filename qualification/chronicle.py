@@ -6,6 +6,7 @@ import os
 import struct
 import subprocess
 import sys
+from decimal import Decimal
 from pathlib import Path
 from sv_reference import Reference, RpcError, IMAGE
 
@@ -49,6 +50,20 @@ def block(node, tx):
     return active, candidate.hash, result
 
 
+def funding_coin(node, committed_satoshis):
+    # The wallet can return a small confirmed payment before its mature subsidies.
+    spendable = [out for out in node.rpc("listunspent") if out.get("spendable", True)]
+    if not spendable:
+        raise ValueError("fixture wallet has no spendable confirmed outputs")
+    coin = max(spendable, key=lambda out: Decimal(str(out["amount"])))
+    value = int(Decimal(str(coin["amount"])) * 100_000_000)
+    if value <= committed_satoshis:
+        raise ValueError(
+            "fixture wallet has no single output covering funding and change"
+        )
+    return coin, value - committed_satoshis
+
+
 def compare(node, rust, go, *, entrant=None):
     remaining = 105 - node.rpc("getblockcount")
     if remaining > 0:
@@ -61,19 +76,17 @@ def compare(node, rust, go, *, entrant=None):
     if len(vectors) != 10:
         raise RuntimeError("pinned Chronicle opcode corpus changed")
     vectors += [("false-result", b"\x00", b"")]
+    value = 50000
     funding = CTransaction()
-    coin = node.rpc("listunspent")[0]
+    coin, change_value = funding_coin(node, len(vectors) * value + 10000)
     funding.vin = [
         CTxIn(COutPoint(int(coin["txid"], 16), coin["vout"]), b"", 0xFFFFFFFF)
     ]
-    value = 50000
     funding.vout = [CTxOut(value, locking) for _, locking, _ in vectors]
     change = bytes.fromhex(
         node.rpc("validateaddress", node.rpc("getnewaddress"))["scriptPubKey"]
     )
-    funding.vout.append(
-        CTxOut(round(coin["amount"] * 100000000) - len(vectors) * value - 10000, change)
-    )
+    funding.vout.append(CTxOut(change_value, change))
     signed = node.rpc("signrawtransaction", ToHex(funding))
     if not signed["complete"]:
         raise RuntimeError("failed to sign fixture funding")

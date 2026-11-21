@@ -1,0 +1,38 @@
+{
+  "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+  "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+  "source_dependency_bundle_sha256": "50696015ff6b77d452bbd5098969e80ed562fe82eb5f8826651f3075d3538ce8",
+  "platform": "darwin_arm64",
+  "go": "go1.26.0",
+  "go_launcher": "go version go1.22.2 darwin/arm64",
+  "source_native_compiler": "Apple clang version 17.0.0 (clang-1700.6.4.2)",
+  "source_native_cmake": "cmake version 3.29.5",
+  "source_native_build_type": "Release",
+  "source_native_cxx_flags": "-O3 -g0 -DNDEBUG",
+  "variants": {
+    "distributed": {
+      "linked": {
+        "bdk_version": "1.4.0",
+        "network": "main",
+        "source": "9d34cf2",
+        "sv_source": "6504a3aff",
+        "sv_version": "1.2.3"
+      },
+      "native_archive_sha256": "ba574372509cf478dcca290f7ca1c205c84de24ed2e969fe6b8c3a159a1366d3",
+      "corpus_oracle_sha256": "1e26410d34baad06a61b40329f1c6cc839325ce65b516b7dea32f1f1e0c81783",
+      "mainnet_oracle_sha256": "2d60f539c8e78c4764afeb32b09a2fcfde477064388d0fbbaf0d548090fd4574"
+    },
+    "source": {
+      "linked": {
+        "bdk_version": "1.4.0",
+        "network": "main",
+        "source": "8a4e1d3",
+        "sv_source": "6504a3a",
+        "sv_version": "1.2.3"
+      },
+      "native_archive_sha256": "9bbc1844ff6ca9a85ddf185c9e2326e25348e93c698e1adc8eb3509d68d3a9d1",
+      "corpus_oracle_sha256": "60f9a5df922898862c3d0753cd9636a3cdd65449cbc01eab6a4555894537a216",
+      "mainnet_oracle_sha256": "b03970a4550961ba32d1c3533a093f865925bdd8992f9ba8ef74cb9e535edbc3"
+    }
+  }
+}

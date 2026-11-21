@@ -1,0 +1,13 @@
+{
+  "experiment": "fresh source-built Go versus Rust BDK, Scary and SV Node",
+  "stage": "constructing a confirmed funding transaction for a signature family",
+  "reference": "SV Node v1.2.3",
+  "reference_rpc": "sendrawtransaction",
+  "reference_error_code": -26,
+  "reference_error": "16: bad-txns-vout-negative",
+  "scary_sha256": "da0703697a1974574fddcbf54d5c1dfcec74f53bb93313a90b352a3ad764e882",
+  "go_corpus_sha256": "60f9a5df922898862c3d0753cd9636a3cdd65449cbc01eab6a4555894537a216",
+  "old_funding_fixture_git_blob": "72a9cfdaeddd6d5b4de0cd2ddb0bc2d03f4f5b83",
+  "complete_corpus_receipt": false,
+  "cases_counted_from_attempt": 0
+}

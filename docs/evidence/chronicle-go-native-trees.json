@@ -1,0 +1,41 @@
+{
+  "upstream": "https://github.com/bitcoin-sv/bdk",
+  "reported_shipped_build": "9d34cf20a727185286a686a7800f964c34a55525",
+  "pinned_rust_bdk": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+  "entries": [
+    272,
+    272
+  ],
+  "changed_entries": {
+    "module/gobdk/bdkcgo/libGoBDK_darwin_arm64.a": [
+      [
+        "715c80a8efea634759e5bfa4f8fec718b3426442",
+        "100644"
+      ],
+      [
+        "7b8f618c944ebd4880a429b03173c9214b6ddbbf",
+        "100644"
+      ]
+    ],
+    "module/gobdk/bdkcgo/libGoBDK_linux_aarch64.a": [
+      [
+        "667fe05d88c708fbfb332b5f0915e95b67f59503",
+        "100644"
+      ],
+      [
+        "b65d4ae6ec0aa5d193421c3931ad611f77db9270",
+        "100644"
+      ]
+    ],
+    "module/gobdk/bdkcgo/libGoBDK_linux_x86_64.a": [
+      [
+        "11b8db2d7860d6d47878e78574c82315fc49df97",
+        "100644"
+      ],
+      [
+        "7e3f48f2680850ff34be08cc63564403ec4c7d28",
+        "100644"
+      ]
+    ]
+  }
+}

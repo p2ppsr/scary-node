@@ -13,7 +13,7 @@ cargo test --locked
 cat .native/provenance.json
 ```
 
-The node reports native build provenance and linked runtime versions under `/status` → `mining.interpreter`. GoBDK v1.4.0 uses the pinned release archive as the independent binding oracle. Rust BDK and SV Node v1.2.3 supply the ordinary-script and DAR references respectively. Teranode v0.16.1 supplies the native gossip reference. [BDK](https://github.com/bitcoin-sv/bdk/tree/8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9) · [SV Node](https://github.com/bitcoin-sv/bitcoin-sv/tree/6504a3aff65ba97c0f6c80962b033e35ecbfed4b) · [Teranode](https://github.com/bsv-blockchain/teranode/tree/807f1bea39f52797c72fd157a543e8bb64622510)
+The node reports native build provenance and linked runtime versions under `/status` → `mining.interpreter`. The distributed GoBDK v1.4.0 archive and a native Go archive rebuilt from the Rust BDK source pin provide separately identified binding oracles. Rust BDK and SV Node v1.2.3 supply the ordinary-script and DAR references respectively. Teranode v0.16.1 supplies the native gossip reference. [BDK](https://github.com/bitcoin-sv/bdk/tree/8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9) · [SV Node](https://github.com/bitcoin-sv/bitcoin-sv/tree/6504a3aff65ba97c0f6c80962b033e35ecbfed4b) · [Teranode](https://github.com/bsv-blockchain/teranode/tree/807f1bea39f52797c72fd157a543e8bb64622510)
 
 To identify an exact source build, run the following from a Git checkout with Docker and Python 3.12 or later. The builder archives the committed Docker inputs, builds the compiler and runtime stages, starts the executable on an isolated loopback network, and checks its reported identity against the binary and native archive on disk. The receipt includes the source tree, Cargo lock digest, Rust compiler, linked interpreter versions and executable digest. Current Docker builds give each compilation a fresh Cargo target directory and cache downloaded registry and Git dependencies. BuildKit can reuse a completed stage for identical inputs. Docker image identifiers describe the local build and can vary with the builder and package mirror. [Linux ARM64 build receipt](evidence/chronicle-linux-release.json)
 
@@ -207,3 +207,26 @@ Build the release and run `python3 qualification/mining_lease.py .native/mining-
 The node compares the host wall clock with elapsed monotonic time and with the UTC timestamps of completed native SV protocol handshakes. The network comparison takes a median within each IPv4 /16 or IPv6 /32 prefix, then a median across groups. A mainnet comparison needs three groups. An isolated regtest can compare against its single stock peer. A majority of group representatives must agree within 120 seconds of their median. A discrepancy exceeding 120 seconds suspends work. Losing a connection preserves the last corroborated comparison until new evidence replaces it. Candidate timestamps and worker time rolls use the earlier of local and corroborated peer time for the two-hour limit.
 
 Operator status exposes the endpoint and group counts, the last corroborated offset from the current wall clock, and disagreement. With insufficient samples the initial offset is null. A Teranode-only connection supplies no version-message UTC sample. Synchronize the host independently before starting it. This check provides corroboration from reachable peers and does not authenticate UTC. Reproduce the isolated startup and running-clock checks using the clock fault command above.
+
+## Compare distributed and freshly compiled GoBDK
+
+Use the pinned BDK prerequisites from the build steps above. The following command builds four executables. Each of the two native archives gets a regtest corpus oracle and a mainnet stdin oracle. The source build uses upstream `MergeGoBDK`. Its CMake build tree and link inputs are separate from the Rust build and the distributed archive. The manifest records the linked native and SV revisions, compiler, flags, dependency and archive hashes and the four executable digests.
+
+```sh
+scripts/build-go-oracles.sh
+python3 qualification/go_native_parity.py \
+  docs/evidence/chronicle-waiting-entrant-corpus.json.gz \
+  .native/go-oracles/manifest.json .native/go-native-parity.json.gz \
+  --capture .native/go-oracles
+python3 qualification/go_native_parity.py \
+  docs/evidence/chronicle-waiting-entrant-corpus.json.gz \
+  .native/go-oracles/manifest.json .native/go-native-parity.json.gz
+python3 qualification/shadow_bdk.py \
+  docs/evidence/chronicle-shadow-native-fee-warmup.json.gz \
+  --go-oracle .native/go-oracles/source-mainnet
+python3 qualification/shadow_bdk.py \
+  docs/evidence/chronicle-shadow-native-fee-warmup.json.gz \
+  --native distributed --go-oracle .native/go-oracles/distributed-mainnet
+```
+
+The corpus reader rebuilds all extended transactions and input heights from the exact confirmed funding bodies of the live SV comparison. It runs both Go variants on those same bytes. To repeat the full live comparison, run `qualification/entrant_chronicle.py` as above, passing `--go-oracle .native/go-oracles/source-corpus` or `--go-oracle .native/go-oracles/distributed-corpus`. The regtest mode uses the original corpus configuration. The mainnet runner initializes GoBDK with `main`, keeps upstream mainnet policy defaults and accepts extended transactions only over local standard input. To check the original passive candidate once its successor and native funding proofs exist, replace the warm-up receipt with the private `first.json.gz` from the [shadow reader](mainnet-shadow.md). The script reports policy and consensus at their respective heights, resolves earlier same-template outputs in order and counts confiscations separately for signed authorization review.

@@ -7,6 +7,7 @@ import struct
 from pathlib import Path
 from chronicle import (
     binding,
+    funding_coin,
     block,
     Reference,
     RpcError,
@@ -34,7 +35,7 @@ FAMILIES = {
 def evaluate(node, family, klass, *, entrant=None, rust=None, go=None):
     case = klass()
     size = case._NUMBER_OF_UTXOS_PER_HEIGHT
-    coin = node.rpc("listunspent")[0]
+    coin, change_value = funding_coin(node, size * 200000 + 10000)
     parent = CTransaction()
     parent.vin = [
         CTxIn(COutPoint(int(coin["txid"], 16), coin["vout"]), b"", 0xFFFFFFFF)
@@ -44,9 +45,7 @@ def evaluate(node, family, klass, *, entrant=None, rust=None, go=None):
     change = bytes.fromhex(
         node.rpc("validateaddress", node.rpc("getnewaddress"))["scriptPubKey"]
     )
-    parent.vout.append(
-        CTxOut(round(coin["amount"] * 100000000) - size * 200000 - 10000, change)
-    )
+    parent.vout.append(CTxOut(change_value, change))
     signed = node.rpc("signrawtransaction", ToHex(parent))
     assert signed["complete"]
     parent = FromHex(CTransaction(), signed["hex"])

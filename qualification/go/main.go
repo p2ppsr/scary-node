@@ -41,7 +41,7 @@ func main() {
 	}
 	v.SetRequireStandard(false)
 	v.SetAcceptNonStandardOutput(true)
-	result := map[string]any{"sv_source": gobdk.BSV_GIT_COMMIT_HASH(), "bdk_version": gobdk.BDK_VERSION_STRING()}
+	result := map[string]any{"sv_source": gobdk.BSV_GIT_COMMIT_HASH(), "bdk_version": gobdk.BDK_VERSION_STRING(), "source": gobdk.SOURCE_GIT_COMMIT_HASH(), "sv_version": gobdk.BSV_VERSION_STRING()}
 	for i, mode := range []string{"policy", "consensus"} {
 		err = v.ValidateTransaction(tx, prev, heights[i], i == 1)
 		result[mode] = err == nil
