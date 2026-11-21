@@ -27,3 +27,27 @@ python3 qualification/live_cadence_body.py verify workload/sustained-signed cade
 The raw body is deterministic. The driver stores its digest, the chosen parent, per-peer observations and the resource trace. The local study files and valid block can be reconstructed from the signed release.
 
 The verified fixture occupies 359,090,376 bytes. Independent replay checked all 1,800,001 distinct transaction IDs, 360,000,000 satoshis in fees, and the final Merkle root. The 130-byte coinbase pays a 67-byte locking script. [Verified body manifest](evidence/chronicle-live-cadence-body.json)
+
+## Recorded four-node result
+
+On November 21, 2026, the four-node regtest selected the 359,090,376-byte block and both direct successors. The final independent tip observation for the payment block took **86.9335 seconds** from native inventory announcement, giving **20,705.48 payments/s** for single-block adoption. Each full node returned the same 359,090,376 bytes with SHA-256 `0862f9980261b5f5c55020c31a0fd620d28acd186c90855cd9b98fc7cfc6c737`. Scary reported all 1,800,000 ordinary transactions determinate, zero deferred script or amount checks, and the expected subsidy and fees. Its accounting found exactly 1,734,464 inputs whose creating transaction was earlier in this block. [Native observation and resource receipt](evidence/chronicle-live-cadence-result.json.gz)
+
+| Node | Selected payment block | Finished independent body read | Selected second successor |
+|---|---:|---:|---:|
+| SV Node | 25.72 s | 92.40 s | 93.78 s |
+| Teranode 1 | 86.93 s | 92.40 s | 93.65 s |
+| Teranode 2 | 82.79 s | 92.41 s | 93.65 s |
+| Scary Node | 86.10 s | 1,800,000 witnessed checks | 107.61 s |
+
+All times use the same origin at inventory announcement. SV requested the block within 2 ms, the publisher wrote its last bytes after 2.43 seconds, and SV returned the matching pong after 9.06 seconds. All four selected the payment block at height 485 and finished on the height-487 hash `21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e`. The external regtest publisher assembled the block from the presigned corpus. This measures native receipt, verification, accounting, storage and propagation over a single block on one machine. The separate wallet trials measure continuous ingress and work availability. [Sustained wallet evidence](sustained-native-replication.md)
+
+The 108 resource samples recorded peak container memory of 3.00 GiB for Scary, 2.89 GiB for SV, 5.57 and 5.95 GiB for Teranode, and 4.07 and 4.26 GiB for their independent Aerospike processes. The workstation reached **6.39 MiB above its 20 GiB free-space floor**. The Docker backing filesystem retained at least 31.81 GiB. The sampler recorded no resource stop. The generic setup recorder inherited a 9 GiB label from the previous wallet trial. A direct query to both running namespaces and an independent file-size check on each dedicated volume found exactly 5,368,709,120 bytes, matching the registered configuration. The receipt retains the original setup label and the independent readbacks. The current setup driver reads the effective configuration and file size before enrollment.
+
+Two setup checks preceded the measured handoff. The first space estimate charged the already built fixture against free space a second time. Crediting only the verified bytes already allocated to that file kept both reserve floors intact. The normal stock startup also briefly lacked its RPC cookie. The setup waited for the stock service and its native peer, then replayed the common history. No payment block had been announced during those checks.
+
+Verify the shipped receipt offline, or export the evidence for a new completed run with the following commands.
+
+```sh
+.native/py/bin/python qualification/verify_live_cadence.py docs/evidence/chronicle-live-cadence-result.json.gz
+.native/py/bin/python qualification/verify_live_cadence.py cadence-run --export my-cadence-result.json.gz
+```

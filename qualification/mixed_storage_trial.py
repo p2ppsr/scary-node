@@ -158,7 +158,47 @@ def topology():
             )
             result[name]["backing_size_bytes"] = int(df[1]) * 1024
             result[name]["backing_available_bytes"] = int(df[3]) * 1024
-            result[name]["registered_datafile_bytes"] = 9 * 1024**3
+            properties = dict(
+                item.split("=", 1)
+                for item in docker(
+                    "exec", info["Id"], "asinfo", "-v", "namespace/test"
+                ).split(";")
+                if "=" in item
+            )
+            configured = int(properties["storage-engine.filesize"])
+            size = int(
+                docker(
+                    "exec",
+                    info["Id"],
+                    "stat",
+                    "-c",
+                    "%s",
+                    properties["storage-engine.file[0]"],
+                )
+            )
+            expected = (5 if LIVE_CADENCE else 9) * 1024**3
+            if (
+                configured != expected
+                or size != expected
+                or int(properties["data_total_bytes"]) != expected
+            ):
+                raise ValueError(
+                    f"{name} namespace and data file differ from the registered capacity"
+                )
+            result[name]["registered_datafile_bytes"] = expected
+            result[name]["measured_datafile_bytes"] = size
+            result[name]["namespace_readback"] = {
+                "namespace": "test",
+                "file": properties["storage-engine.file[0]"],
+                "configured_file_bytes": configured,
+                "namespace_total_bytes": int(properties["data_total_bytes"]),
+                "stat_file_bytes": size,
+                "volume": next(
+                    m["volume"]
+                    for m in result[name]["mounts"]
+                    if m["target"] == "/opt/aerospike/data"
+                ),
+            }
         if name in ("tn1", "tn2"):
             result[name]["utxo_store"] = next(
                 x.split("=", 1)[1]

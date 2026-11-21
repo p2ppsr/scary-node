@@ -3,13 +3,13 @@
 import argparse
 import concurrent.futures
 import hashlib
-from http.client import HTTPException
 import json
 import os
 import shutil
 import subprocess
 import threading
 import time
+from http.client import HTTPException
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -80,13 +80,20 @@ def prepare(history, payments, directory, image, prepared_body=None):
         # Credit only the allocated bytes of the independently verified fixture.
         allocated_body = 0
         if prepared_body is not None:
-            fixture = json.loads((ROOT / "docs/evidence/chronicle-live-cadence-body.json").read_bytes())
+            fixture = json.loads(
+                (ROOT / "docs/evidence/chronicle-live-cadence-body.json").read_bytes()
+            )
             details = prepared_body.stat()
             with prepared_body.open("rb") as stream:
-                valid = (details.st_size == fixture["wire_bytes"]
-                         and hashlib.file_digest(stream, "sha256").hexdigest() == fixture["wire_sha256"])
+                valid = (
+                    details.st_size == fixture["wire_bytes"]
+                    and hashlib.file_digest(stream, "sha256").hexdigest()
+                    == fixture["wire_sha256"]
+                )
             if not valid:
-                raise ValueError("prepared cadence body differs from the registered fixture")
+                raise ValueError(
+                    "prepared cadence body differs from the registered fixture"
+                )
             if details.st_dev == directory.stat().st_dev:
                 allocated_body = min(details.st_size, details.st_blocks * 512)
         if shutil.disk_usage(directory).free < MIN_FREE + 14 * GIB - allocated_body:
@@ -257,7 +264,13 @@ def measure(directory, body, fixture, image):
             ):
                 try:
                     value = read()
-                except (OSError, HTTPException, subprocess.SubprocessError, RuntimeError, ValueError) as exc:
+                except (
+                    OSError,
+                    HTTPException,
+                    subprocess.SubprocessError,
+                    RuntimeError,
+                    ValueError,
+                ) as exc:
                     stamp("peer_poll_error", peer=name, error=type(exc).__name__)
                 else:
                     if value == expected:
@@ -442,7 +455,11 @@ if __name__ == "__main__":
     pre = sub.add_parser("prepare")
     pre.add_argument("history", type=Path)
     pre.add_argument("payments", type=Path)
-    pre.add_argument("--prepared-body", type=Path, help="already allocated verified fixture on this filesystem")
+    pre.add_argument(
+        "--prepared-body",
+        type=Path,
+        help="already allocated verified fixture on this filesystem",
+    )
     run = sub.add_parser("run")
     run.add_argument("body", type=Path)
     run.add_argument("manifest", type=Path)
@@ -457,7 +474,13 @@ if __name__ == "__main__":
     args.directory.mkdir(parents=True, exist_ok=True)
     with session_lock():
         if args.action == "prepare":
-            prepare(args.history, args.payments, args.directory, args.image, args.prepared_body)
+            prepare(
+                args.history,
+                args.payments,
+                args.directory,
+                args.image,
+                args.prepared_body,
+            )
         else:
             measure(
                 args.directory,
