@@ -1,0 +1,16 @@
+{
+  "active_blocks": 1115,
+  "detached_blocks": 3,
+  "signed_directives": 10,
+  "funding_height": 106,
+  "authorization_and_inclusion_height": 108,
+  "maturity_minus_one": 1107,
+  "mature_recipient_height": 1108,
+  "recipient_reinclusion_height": 1112,
+  "sv_final_active_tip": "2b7765e3595b6d5f2eebc8048db80a58aa0a9bffdec6e1ed574ee0a8ca38f711",
+  "independent_replay": {
+    "fresh_sv_active_tip": "2b7765e3595b6d5f2eebc8048db80a58aa0a9bffdec6e1ed574ee0a8ca38f711",
+    "confirmed_detached_blocks": 3,
+    "confirmed_active_blocks": 1115
+  }
+}
