@@ -7,7 +7,7 @@ from pathlib import Path
 
 from restore_witness_archive import docker, restored_status
 from run_cohort import session_lock
-from shadow_pending_restore import inventory
+from shadow_pending_restore import snapshot_inventory, waiting_summary
 
 
 def require(condition, message):
@@ -16,7 +16,8 @@ def require(condition, message):
 
 
 def restore(checkpoint, ledger, build):
-    boundary, checksum, payments = inventory(checkpoint)
+    boundary, checksum, payments, waiting_offers = snapshot_inventory(checkpoint)
+    waiting = waiting_summary(waiting_offers)
     release = json.loads(build.read_text())
     image = release["image_id"]
     with checkpoint.open("rb") as source:
@@ -107,7 +108,15 @@ def restore(checkpoint, ledger, build):
             m["pending_transactions"] == len(payments),
             "eligible payment loss during restore",
         )
+        require(
+            (m["waiting_for_successor"], m["waiting_for_successor_bytes"])
+            == (waiting["count"], waiting["bytes"]),
+            "unendorsed native offer inventory differs after isolated restore",
+        )
         return {
+            "checkpoint_waiting": waiting,
+            "restored_waiting_count": m["waiting_for_successor"],
+            "restored_waiting_bytes": m["waiting_for_successor_bytes"],
             "network": "mainnet",
             "docker_network_mode": "none",
             "source_commit": release["source_commit"],

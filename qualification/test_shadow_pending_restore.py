@@ -8,6 +8,15 @@ from unittest.mock import patch
 from shadow_pending_restore import compare, dsha, inventory
 
 
+def sample_raw(tag):
+    # These small, framed payments exercise only source and arrival-order commitments.
+    return bytes.fromhex(
+        "0100000001"
+        + f"{tag:02x}" * 32
+        + "0000000000ffffffff010100000000000000015100000000"
+    )
+
+
 class Checkpoint:
     def open(self, _mode):
         return io.BytesIO()
@@ -38,11 +47,11 @@ class StopComparison(unittest.TestCase):
         self.closed["_checkpoint_sha256"] = "ff" * 32
         self.closed["pending"][dsha(self.next_tx)] = {"raw": self.next_tx}
 
-    def compare(self):
+    def compare(self, *, awaiting_successor=False):
         with patch(
             "shadow_pending_restore.unpack_state", side_effect=(self.first, self.closed)
         ):
-            return compare(self.path, self.path)
+            return compare(self.path, self.path, awaiting_successor=awaiting_successor)
 
     def test_same_branch_preserves_old_and_adds_new(self):
         result = self.compare()
@@ -51,6 +60,25 @@ class StopComparison(unittest.TestCase):
         )
         self.assertEqual(result["removed_eligible"], 0)
         self.assertNotEqual(result["earlier_ids_sha256"], result["closed_ids_sha256"])
+
+    def test_waiting_only_stop_preserves_attribution_and_order(self):
+        first, last = sample_raw(1), sample_raw(2)
+        self.first["waiting"] = [("sv", first)]
+        self.closed["pending"] = self.first["pending"]
+        self.closed["waiting"] = [("sv", first), ("subtree", last)]
+        result = self.compare(awaiting_successor=True)
+        self.assertEqual(result["added_eligible"], 0)
+        self.assertEqual(result["closed_waiting"]["sources"], {"sv": 1, "subtree": 1})
+        self.closed["waiting"].reverse()
+        with self.assertRaisesRegex(ValueError, "earlier ordered offers changed"):
+            self.compare(awaiting_successor=True)
+
+    def test_duplicate_across_offer_pools_is_rejected(self):
+        payment = sample_raw(1)
+        self.closed["pending"][dsha(payment)] = {"raw": payment}
+        self.closed["waiting"] = [("sv", payment)]
+        with self.assertRaisesRegex(ValueError, "duplicate payment"):
+            self.compare(awaiting_successor=True)
 
     def test_substitution_is_detected_even_when_the_pool_grows(self):
         del self.closed["pending"][dsha(self.tx)]

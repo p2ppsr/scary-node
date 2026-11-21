@@ -22,10 +22,23 @@ def verify(rows, baseline):
         funding = bytes.fromhex(row["funding_hex"])
         payment = bytes.fromhex(row["payment_hex"])
         verify_p2pk_signature(funding, payment)
-        assert (
-            txid(payment) == row["payment_id"]
-            and row["before_pending"] == row["sender_native_admissions"] == 1
-        )
+        assert txid(payment) == row["payment_id"]
+        if "before_waiting" in row:
+            assert row["before_waiting"] == row["sender_waiting_events"] == 1
+            assert row["before_pending"] == row["sender_native_admissions"] == 0
+            assert row["restored_waiting"] == int(not baseline)
+            assert row["restored_before_endorsement_pending"] == 0
+            idle = row["pre_endorsement_worker"]
+            assert idle["authorized"] and idle["notifications"] == 0
+            intake = row["after_endorsement_intake"]
+            assert (
+                intake["sv"]["admitted"]
+                == intake["sv"]["promoted_after_successor"]
+                == int(not baseline)
+            )
+            assert all(n == 0 for n in intake["teranode_subtree"].values())
+        else:
+            assert row["before_pending"] == row["sender_native_admissions"] == 1
         assert row["new_peer_tx_bytes"] == 0
         funding_hash = txid(bytes.fromhex(row["funding_block_header"]))
         header(row["parent_header"], row["parent"], funding_hash)

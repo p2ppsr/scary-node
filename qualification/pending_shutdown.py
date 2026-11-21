@@ -15,7 +15,7 @@ from sv_reference import IMAGE, Reference
 from sv_transaction_intake import worker_without_job
 
 
-def scenario(binary, sig, baseline, directory):
+def scenario(binary, sig, baseline, directory, *, awaiting_successor=False):
     with (
         Reference().running(peer=True, fast_rpc=True) as sender,
         Reference().running(peer=True, fast_rpc=True) as fresh,
@@ -48,15 +48,15 @@ def scenario(binary, sig, baseline, directory):
                 sender.rpc("sendrawtransaction", funding)
                 fund = sender.rpc("generate", 1)[0]
                 until(lambda: mining()["tip_hash"] == fund, "creation witnessed")
-                parent = sender.rpc("generate", 1)[0]
+                parent = fund if awaiting_successor else sender.rpc("generate", 1)[0]
                 until(
                     lambda: (
                         mining()["tip_hash"] == parent
                         and mining()["observation_window_ready"]
                     ),
-                    "funding endorsed",
+                    "entrant selected the intended stop boundary",
                 )
-                for height in range(1, 108):
+                for height in range(1, mining()["height"] + 1):
                     block = sender.rpc(
                         "getblock", sender.rpc("getblockhash", height), 0
                     )
@@ -67,15 +67,19 @@ def scenario(binary, sig, baseline, directory):
                 )
                 ident = sender.rpc("sendrawtransaction", payment.hex())
                 assert ident == dsha(payment)[::-1].hex()
+                pool = (
+                    "waiting_for_successor"
+                    if awaiting_successor
+                    else "pending_transactions"
+                )
+                count = "awaiting_successor" if awaiting_successor else "admitted"
                 until(
-                    lambda: mining()["pending_transactions"] == 1,
-                    "native signed payment admitted",
+                    lambda: mining()[pool] == 1,
+                    "native payment reached the intended pool",
                 )
                 before = mining()
-                assert (
-                    before["peer_transaction_intake"]["sv"]["admitted"] == 1
-                    and before["job_preconditions_met"]
-                )
+                assert before["peer_transaction_intake"]["sv"][count] == 1
+                assert before["job_preconditions_met"] == (not awaiting_successor)
             with entrant(binary, fresh, feed, directory, api_port, worker) as api:
                 until(
                     lambda: (
@@ -85,16 +89,45 @@ def scenario(binary, sig, baseline, directory):
                     "restored parent reconfirmed",
                 )
                 restored = mining()
+                waiting = {}
+                if awaiting_successor:
+                    # The second stock node never received the unconfirmed payment.
+                    # Its empty successor endorses the creation while the sender stays separate.
+                    assert restored["pending_transactions"] == 0
+                    assert restored["waiting_for_successor"] == int(not baseline)
+                    assert fresh.rpc("getrawmempool") == []
+                    waiting = {
+                        "before_waiting": before[pool],
+                        "restored_waiting": restored[pool],
+                        "restored_before_endorsement_pending": restored[
+                            "pending_transactions"
+                        ],
+                        "pre_endorsement_worker": worker_without_job(worker),
+                        "sender_waiting_events": before["peer_transaction_intake"][
+                            "sv"
+                        ][count],
+                    }
+                    parent = fresh.rpc("generate", 1)[0]
+                    until(
+                        lambda: mining()["tip_hash"] == parent,
+                        "stock endorsed the creation",
+                    )
+                    restored = mining()
+                    assert restored["waiting_for_successor"] == 0
+                    waiting["after_endorsement_intake"] = restored[
+                        "peer_transaction_intake"
+                    ]
                 record = {
                     "release": release,
                     "reference": IMAGE,
                     "exit": exit_receipt,
-                    "height": before["height"],
+                    **waiting,
+                    "height": restored["height"],
                     "parent": parent,
                     "funding_hex": funding,
                     "funding_block_hex": sender.rpc("getblock", fund, 0),
                     "funding_block_header": sender.rpc("getblockheader", fund, False),
-                    "parent_header": sender.rpc("getblockheader", parent, False),
+                    "parent_header": fresh.rpc("getblockheader", parent, False),
                     "payment_hex": payment.hex(),
                     "payment_id": ident,
                     "before_pending": before["pending_transactions"],
@@ -146,6 +179,11 @@ if __name__ == "__main__":
     p.add_argument("binary", type=Path)
     p.add_argument("output", type=Path)
     p.add_argument("--baseline", action="store_true")
+    p.add_argument(
+        "--awaiting-successor",
+        action="store_true",
+        help="stop before the funding block is endorsed",
+    )
     args = p.parse_args()
     if args.output.exists():
         p.error("choose a fresh output")
@@ -153,7 +191,15 @@ if __name__ == "__main__":
     # Each signal runs with a separate chain, two independent full nodes and one offer.
     for sig in (signal.SIGINT, signal.SIGTERM):
         with session_lock(), tempfile.TemporaryDirectory() as tmp:
-            rows.append(scenario(args.binary.resolve(), sig, args.baseline, Path(tmp)))
+            rows.append(
+                scenario(
+                    args.binary.resolve(),
+                    sig,
+                    args.baseline,
+                    Path(tmp),
+                    awaiting_successor=args.awaiting_successor,
+                )
+            )
     with args.output.open("x") as f:
         json.dump(rows, f, indent=2)
         f.write("\n")
