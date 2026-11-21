@@ -1,0 +1,15 @@
+{
+  "registered_utc": "2026-11-21T18:33:02.597729+00:00",
+  "design": {
+    "study": "immediate",
+    "binary_sha256": "2d3a2d351ad55ce203a2c50d7394e9d6353e9136b0f4cf9179f9b961274b80b7",
+    "pilot_sessions": 16,
+    "first_seeds": {
+      "pilot": 71001,
+      "evaluation": 81001
+    },
+    "opportunities_per_session": 32,
+    "offer_delay_ms": 1200,
+    "target_half_width": 0.01
+  }
+}

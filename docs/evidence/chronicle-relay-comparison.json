@@ -1,0 +1,437 @@
+{
+  "timer": {
+    "sessions": 4,
+    "binary_sha256": "6ef1ce37208fcb33a762b1cbe6702c06ed11b51126af2533c6135c8ad04de9c9",
+    "arms": {
+      "witnessed/full": [
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 8,
+            "tie_discoveries": 21,
+            "tie_settled": 2,
+            "solo_discoveries": 21,
+            "solo_settled": 21
+          },
+          "first_active_median_ms": {
+            "solo": 539.5315,
+            "tie": 90.016229
+          },
+          "first_active_observations": {
+            "solo": 21,
+            "tie": 2
+          },
+          "submission_to_first_active_median_ms": {
+            "solo": 532.660166,
+            "tie": 77.2184585
+          },
+          "successful_native_ack_median_ms": {
+            "tie": 14.130167,
+            "solo": 11.841084
+          }
+        },
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 0,
+            "solo_discoveries": 22,
+            "solo_settled": 22,
+            "tie_discoveries": 21,
+            "tie_settled": 19
+          },
+          "first_active_median_ms": {
+            "solo": 143.851146,
+            "tie": 148.686375
+          },
+          "first_active_observations": {
+            "solo": 22,
+            "tie": 19
+          },
+          "submission_to_first_active_median_ms": {
+            "solo": 129.8036665,
+            "tie": 136.035
+          },
+          "successful_native_ack_median_ms": {
+            "solo": 6.7384585,
+            "tie": 17.3005
+          }
+        }
+      ],
+      "full/full": [
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 0,
+            "solo_discoveries": 26,
+            "solo_settled": 26,
+            "tie_discoveries": 22,
+            "tie_settled": 10
+          },
+          "first_active_median_ms": {
+            "solo": 136.6321245,
+            "tie": 140.785167
+          },
+          "first_active_observations": {
+            "solo": 26,
+            "tie": 21
+          },
+          "submission_to_first_active_median_ms": {
+            "solo": 123.950875,
+            "tie": 128.087291
+          },
+          "successful_native_ack_median_ms": {
+            "solo": 5.873188000000001,
+            "tie": 6.9929795
+          }
+        },
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 0,
+            "solo_discoveries": 16,
+            "solo_settled": 16,
+            "tie_discoveries": 22,
+            "tie_settled": 12
+          },
+          "first_active_median_ms": {
+            "solo": 139.5700205,
+            "tie": 140.621521
+          },
+          "first_active_observations": {
+            "solo": 16,
+            "tie": 22
+          },
+          "submission_to_first_active_median_ms": {
+            "solo": 123.820146,
+            "tie": 128.3865
+          },
+          "successful_native_ack_median_ms": {
+            "solo": 7.3423125,
+            "tie": 7.114583
+          }
+        }
+      ]
+    },
+    "estimates": {
+      "witnessed/full": {
+        "roles": [
+          {
+            "scheduled": 64,
+            "ready": 56,
+            "hashes": 76,
+            "discovered": 42,
+            "stale": 19,
+            "settled": 23
+          },
+          {
+            "scheduled": 64,
+            "ready": 64,
+            "hashes": 94,
+            "discovered": 43,
+            "settled": 41,
+            "stale": 2
+          }
+        ],
+        "stale_rates": [
+          0.4523809523809524,
+          0.046511627906976744
+        ],
+        "stale_difference": 0.4058693244739756,
+        "session_influence_sd": 0.25654169366389507,
+        "confidence_interval_95": [
+          -0.0023457581019673546,
+          0.8140844070499186
+        ],
+        "half_width": 0.40821508257594297,
+        "achieved_one_point_precision": false,
+        "per_scheduled_opportunity": {
+          "ready": [
+            0.875,
+            1.0
+          ],
+          "discovered": [
+            0.65625,
+            0.671875
+          ],
+          "settled": [
+            0.359375,
+            0.640625
+          ]
+        }
+      },
+      "full/full": {
+        "roles": [
+          {
+            "scheduled": 64,
+            "ready": 64,
+            "hashes": 89,
+            "discovered": 48,
+            "stale": 12,
+            "settled": 36
+          },
+          {
+            "scheduled": 64,
+            "ready": 64,
+            "hashes": 89,
+            "discovered": 38,
+            "stale": 10,
+            "settled": 28
+          }
+        ],
+        "stale_rates": [
+          0.25,
+          0.2631578947368421
+        ],
+        "stale_difference": -0.01315789473684209,
+        "session_influence_sd": 0.3574712927261724,
+        "confidence_interval_95": [
+          -0.58197449212754,
+          0.5556587026538558
+        ],
+        "half_width": 0.5688165973906979,
+        "achieved_one_point_precision": false,
+        "per_scheduled_opportunity": {
+          "ready": [
+            1.0,
+            1.0
+          ],
+          "discovered": [
+            0.75,
+            0.59375
+          ],
+          "settled": [
+            0.5625,
+            0.4375
+          ]
+        }
+      }
+    }
+  },
+  "immediate": {
+    "sessions": 4,
+    "binary_sha256": "2d3a2d351ad55ce203a2c50d7394e9d6353e9136b0f4cf9179f9b961274b80b7",
+    "arms": {
+      "witnessed/full": [
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 8,
+            "tie_discoveries": 11,
+            "tie_settled": 11,
+            "solo_discoveries": 26,
+            "solo_settled": 26
+          },
+          "first_active_median_ms": {
+            "tie": 36.443292,
+            "solo": 59.2368755
+          },
+          "first_active_observations": {
+            "tie": 11,
+            "solo": 26
+          },
+          "submission_to_first_active_median_ms": {
+            "tie": 22.440042,
+            "solo": 46.4820005
+          },
+          "successful_native_ack_median_ms": {
+            "tie": 15.42475,
+            "solo": 12.352374999999999
+          }
+        },
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 0,
+            "solo_discoveries": 27,
+            "solo_settled": 27,
+            "tie_discoveries": 11,
+            "tie_settled": 0
+          },
+          "first_active_median_ms": {
+            "solo": 132.019041,
+            "tie": 36.692625
+          },
+          "first_active_observations": {
+            "solo": 27,
+            "tie": 1
+          },
+          "submission_to_first_active_median_ms": {
+            "solo": 121.183208,
+            "tie": 23.781208
+          },
+          "successful_native_ack_median_ms": {
+            "solo": 8.275375,
+            "tie": 19.542584
+          }
+        }
+      ],
+      "full/full": [
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 0,
+            "solo_discoveries": 19,
+            "solo_settled": 19,
+            "tie_discoveries": 19,
+            "tie_settled": 10
+          },
+          "first_active_median_ms": {
+            "solo": 134.7505,
+            "tie": 135.02225
+          },
+          "first_active_observations": {
+            "solo": 19,
+            "tie": 17
+          },
+          "submission_to_first_active_median_ms": {
+            "solo": 124.33975,
+            "tie": 120.166833
+          },
+          "successful_native_ack_median_ms": {
+            "solo": 5.935709,
+            "tie": 6.509125
+          }
+        },
+        {
+          "counts": {
+            "scheduled": 64,
+            "unready": 0,
+            "tie_discoveries": 19,
+            "tie_settled": 9,
+            "solo_discoveries": 26,
+            "solo_settled": 26
+          },
+          "first_active_median_ms": {
+            "tie": 132.5592915,
+            "solo": 136.9543955
+          },
+          "first_active_observations": {
+            "tie": 18,
+            "solo": 26
+          },
+          "submission_to_first_active_median_ms": {
+            "tie": 117.98225,
+            "solo": 120.92164600000001
+          },
+          "successful_native_ack_median_ms": {
+            "tie": 6.82875,
+            "solo": 6.4154165
+          }
+        }
+      ]
+    },
+    "estimates": {
+      "witnessed/full": {
+        "roles": [
+          {
+            "scheduled": 64,
+            "ready": 56,
+            "hashes": 72,
+            "discovered": 37,
+            "settled": 37
+          },
+          {
+            "scheduled": 64,
+            "ready": 64,
+            "hashes": 89,
+            "discovered": 38,
+            "stale": 11,
+            "settled": 27
+          }
+        ],
+        "stale_rates": [
+          0.0,
+          0.2894736842105263
+        ],
+        "stale_difference": -0.2894736842105263,
+        "session_influence_sd": 0.07474092832815535,
+        "confidence_interval_95": [
+          -0.4084031798162323,
+          -0.17054418860482037
+        ],
+        "half_width": 0.11892949560570595,
+        "achieved_one_point_precision": false,
+        "per_scheduled_opportunity": {
+          "ready": [
+            0.875,
+            1.0
+          ],
+          "discovered": [
+            0.578125,
+            0.59375
+          ],
+          "settled": [
+            0.578125,
+            0.421875
+          ]
+        }
+      },
+      "full/full": {
+        "roles": [
+          {
+            "scheduled": 64,
+            "ready": 64,
+            "hashes": 84,
+            "discovered": 38,
+            "stale": 9,
+            "settled": 29
+          },
+          {
+            "scheduled": 64,
+            "ready": 64,
+            "hashes": 84,
+            "discovered": 45,
+            "stale": 10,
+            "settled": 35
+          }
+        ],
+        "stale_rates": [
+          0.23684210526315788,
+          0.2222222222222222
+        ],
+        "stale_difference": 0.014619883040935672,
+        "session_influence_sd": 0.1833410147116241,
+        "confidence_interval_95": [
+          -0.27711658439705067,
+          0.30635635047892207
+        ],
+        "half_width": 0.29173646743798637,
+        "achieved_one_point_precision": false,
+        "per_scheduled_opportunity": {
+          "ready": [
+            1.0,
+            1.0
+          ],
+          "discovered": [
+            0.59375,
+            0.703125
+          ],
+          "settled": [
+            0.453125,
+            0.546875
+          ]
+        }
+      }
+    }
+  },
+  "immediate_minus_timer": {
+    "witnessed/full": {
+      "difference_of_stale_differences": -0.6953430086845019,
+      "session_influence_sd": 0.3085772303459724,
+      "confidence_interval_95": [
+        -1.1863582419891108,
+        -0.20432777537989322
+      ],
+      "half_width": 0.4910152333046087
+    },
+    "full/full": {
+      "difference_of_stale_differences": 0.027777777777777762,
+      "session_influence_sd": 0.2945489513409345,
+      "confidence_interval_95": [
+        -0.44091533318229503,
+        0.4964708887378506
+      ],
+      "half_width": 0.4686931109600728
+    }
+  }
+}

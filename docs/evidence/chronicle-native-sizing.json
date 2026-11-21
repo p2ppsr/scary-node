@@ -1,5 +1,56 @@
 {
   "phase": "pilot",
+  "study": "original",
+  "availability_by_parent": {
+    "first_four_parents": {
+      "full/full": {
+        "full-left": {
+          "scheduled": 38,
+          "ready": 38
+        },
+        "full-right": {
+          "scheduled": 38,
+          "ready": 38
+        }
+      },
+      "witnessed/full": {
+        "witnessed": {
+          "scheduled": 26,
+          "ready": 18,
+          "no eligible common-payment job": 7,
+          "missing newer announced bodies": 1
+        },
+        "full-right": {
+          "scheduled": 26,
+          "ready": 26
+        }
+      }
+    },
+    "remaining_parents": {
+      "full/full": {
+        "full-left": {
+          "scheduled": 218,
+          "ready": 218
+        },
+        "full-right": {
+          "scheduled": 218,
+          "ready": 218
+        }
+      },
+      "witnessed/full": {
+        "witnessed": {
+          "scheduled": 230,
+          "ready": 208,
+          "missing newer announced bodies": 15,
+          "no eligible common-payment job": 7
+        },
+        "full-right": {
+          "scheduled": 230,
+          "ready": 230
+        }
+      }
+    }
+  },
   "sessions": 16,
   "binary_sha256": "c5b08e6fdec47e29ce03e36c3233f07e38f75c0fedfd229fe840a2d94d951127",
   "arms": {
@@ -33,7 +84,21 @@
         0.52506338747498
       ],
       "half_width": 0.11892509536449083,
-      "achieved_one_point_precision": false
+      "achieved_one_point_precision": false,
+      "per_scheduled_opportunity": {
+        "ready": [
+          0.8828125,
+          1.0
+        ],
+        "discovered": [
+          0.56640625,
+          0.74609375
+        ],
+        "settled": [
+          0.30078125,
+          0.69921875
+        ]
+      }
     },
     "full/full": {
       "roles": [
@@ -65,7 +130,21 @@
         0.13637828999556414
       ],
       "half_width": 0.13203555890023086,
-      "achieved_one_point_precision": false
+      "achieved_one_point_precision": false,
+      "per_scheduled_opportunity": {
+        "ready": [
+          1.0,
+          1.0
+        ],
+        "discovered": [
+          0.63671875,
+          0.6953125
+        ],
+        "settled": [
+          0.4765625,
+          0.5234375
+        ]
+      }
     }
   },
   "fresh_evaluation_sessions": 2263
