@@ -38,3 +38,15 @@ python3 qualification/verify_sustained_native.py .native/sustained-run/receipt.j
 ```
 
 The replay checks transaction identities and commitments. Signature evidence comes from the live nodes’ validation observations. CPU and memory figures use cgroup counters from the seven services. The host and Docker reserve checks use the filesystems on which the run and node data reside.
+
+## Verify the entire wallet source
+
+Funding and receipt files can be packaged independently of the live node stores. The packaging command checks 483 linked historical regtest bodies, the 65,536 outputs in the height-484 funding block, the original stock receipt, the native message checksum and the ordered ID of every payment. It writes only the named workload files and the project license into the two archives. A separate signature audit follows each funded output through its ordered transfers. It uses the pinned SV Node functional framework’s signature-hash calculation and validates the signature with the public key from the preceding output. It checks recipients, amounts and fees without assigning hypothetical block heights to unconfirmed payments.
+
+```sh
+python3 qualification/sustained_dataset.py pack .native/paired-corpus .native/sustained-signed .native/offer-assets
+python3 qualification/sustained_dataset.py unpack .native/offer-assets .native/replay --receipt .native/offer-assets/source-assets.json
+.native/py/bin/python qualification/verify_payment_signatures.py .native/replay/sustained-signed .native/source-signatures.json
+```
+
+A new funding run creates fresh ECDSA signatures. Reusing the exact archived funding and transfer wires makes the transaction IDs comparable across the two registered relay configurations.
