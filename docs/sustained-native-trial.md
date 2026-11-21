@@ -49,6 +49,8 @@ python3 qualification/sustained_dataset.py unpack .native/offer-assets .native/r
 .native/py/bin/python qualification/verify_payment_signatures.py .native/replay/sustained-signed .native/source-signatures.json
 ```
 
+The independent signature audit checked **all 5,529,600 transfers**, including those that missed confirmation. It followed the actual output references, eight pay-to-public-key scripts and signed amounts from the 65,536 funded outputs. Every signature verified under the pinned SV Node signature-hash calculation. The ordered source graph starts with 1,577,779,200 satoshis, leaves 471,859,200 and assigns 200 satoshis per payment to fees. This is an accounting of the offered graph. Only the workload’s active-block readbacks establish which transfers confirmed. [Full signature and value receipt](evidence/chronicle-sustained-source-signatures.json) · [Archive commitments](evidence/chronicle-sustained-source-assets.json)
+
 A new funding run creates fresh ECDSA signatures. Reusing the exact archived funding and transfer wires makes the transaction IDs comparable across the two registered relay configurations.
 
 ## Direct-wallet result on November 21, 2026

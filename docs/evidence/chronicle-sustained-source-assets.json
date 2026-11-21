@@ -1,0 +1,26 @@
+{
+  "network": "regtest",
+  "assets": [
+    {
+      "filename": "paired-corpus.tar.gz",
+      "bytes": 87687216,
+      "sha256": "934a5a516a1c16df79760e3fc2be8cb32359993ffbb71426af8775c77d5d13d8",
+      "regular_members": 486
+    },
+    {
+      "filename": "sustained-signed.tar.gz",
+      "bytes": 812495315,
+      "sha256": "e9c16924e50a5c6d7b2ee1eff01f1f2580ea525423848dbdafd67f32eabbb939",
+      "regular_members": 6
+    }
+  ],
+  "content": {
+    "linked_regtest_history_blocks": 483,
+    "history_wire_bytes": 225186597,
+    "history_digest": "3d04e4fa099e49dbe556b9d7d83d06f44264507e54f62a0d9653a3a50833a0b3",
+    "ordinary_funding_outputs": 65536,
+    "funding_block": "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9",
+    "signed_native_envelopes": 5529600,
+    "ordered_internal_txids_sha256": "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2"
+  }
+}

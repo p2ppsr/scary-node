@@ -1,0 +1,71 @@
+{
+  "network": "regtest",
+  "sv_node_source": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+  "funding_block": "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9",
+  "ordered_source_sha256": "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2",
+  "signed_transfers": 5529600,
+  "funded_rails": 65536,
+  "distinct_recipients": 8,
+  "sighash_byte": "41",
+  "opening_satoshis": 1577779200,
+  "final_satoshis": 471859200,
+  "fees_satoshis": 1105920000,
+  "rail_groups": [
+    {
+      "rail_group": 0,
+      "first_rail": 0,
+      "funded_rails": 8192,
+      "signatures": 696320,
+      "remaining_satoshis": 57958400
+    },
+    {
+      "rail_group": 1,
+      "first_rail": 8192,
+      "funded_rails": 8192,
+      "signatures": 696320,
+      "remaining_satoshis": 57958400
+    },
+    {
+      "rail_group": 2,
+      "first_rail": 16384,
+      "funded_rails": 8192,
+      "signatures": 696320,
+      "remaining_satoshis": 57958400
+    },
+    {
+      "rail_group": 3,
+      "first_rail": 24576,
+      "funded_rails": 8192,
+      "signatures": 688128,
+      "remaining_satoshis": 59596800
+    },
+    {
+      "rail_group": 4,
+      "first_rail": 32768,
+      "funded_rails": 8192,
+      "signatures": 688128,
+      "remaining_satoshis": 59596800
+    },
+    {
+      "rail_group": 5,
+      "first_rail": 40960,
+      "funded_rails": 8192,
+      "signatures": 688128,
+      "remaining_satoshis": 59596800
+    },
+    {
+      "rail_group": 6,
+      "first_rail": 49152,
+      "funded_rails": 8192,
+      "signatures": 688128,
+      "remaining_satoshis": 59596800
+    },
+    {
+      "rail_group": 7,
+      "first_rail": 57344,
+      "funded_rails": 8192,
+      "signatures": 688128,
+      "remaining_satoshis": 59596800
+    }
+  ]
+}
