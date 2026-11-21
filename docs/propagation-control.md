@@ -48,6 +48,12 @@ On the frozen Chronicle executable `8f99871b`, both stock receivers returned the
 
 In the independent continuation check, each receiving stock node took a turn mining an unopposed three-block branch. The gate fetched all six complete blocks using ordinary native `getdata`, checked the body commitments and relayed them over the existing isolated links. Both producers and both receivers selected the same final hash, `2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e`. The receiver rosters stayed unchanged. This exercised the post-deadline transfer path before the first competing opportunity. [Six native continuation bodies and four-stock readbacks](evidence/chronicle-matched-native-continuation.json) · [Published fixed pilot registration](evidence/chronicle-matched-registration.json)
 
+### Interrupted first pilot and replacement observer
+
+The first registered sizing pilot stopped during the third offered parent of its first session. A stock HTTP observer returned an incomplete chunked reply to a block lookup. The first two parents had complete ledgers. The third had no recoverable gate outcome after the ephemeral stores and connections closed. Of the 576 originally scheduled parents, three were offered, two were fully recorded, one offered parent remained unresolved and 573 were never offered. No complete session, sizing estimate or stale-rate estimate was obtained. The first registration and its partial session remain available for audit. [Interruption accounting](evidence/chronicle-matched-interruption.json) · [Preserved partial ledger](evidence/chronicle-matched-interrupted-session.json.gz)
+
+The replacement observer makes a single current-tip query per stock receiver and at most two identical by-hash body lookups. Each attempt uses a 200 ms socket timeout and its own host-clock interval. A recognized stock RPC error returns immediately. A malformed or interrupted body read gets one retry against the same hash. Exhaustion leaves that site's observation unknown. Both the receiver and the scheduled parent remain in the ledger. The observed hash is checked against the requested header before a body can count as stored. Raw readiness and discoveries are checkpointed before dispatch, and native receipts are checkpointed before the monitor consumes the deadline probe. The public archive also reports per-site readback attempts and unavailability for parents with no discovery. The common horizon is a minimum. A slow observation can delay continuation and the report records the overrun. Fresh registration uses a separate nonce-seed namespace and the original full/full control, zero offset and both signed-offset arms. The two earlier observed outcomes supply no sizing data. [Bounded receiver readback](../qualification/matched_continuation.py) · [Incomplete-response regressions](../qualification/test_matched_observer.py)
+
 The prospective registration pins the calibrated executable, both release manifests’ source identity, the measurement code, the timing rule and distinct pilot/evaluation seed ranges. Each session has 36 scheduled parents, six per combination of producer pair and signed delay. The runner requests both jobs 1.2 seconds after offering the same payment. Jobs arriving beyond the next 1.5 seconds count as unavailable. It retains all offered payments and every hash attempt, including worker template bytes for replaying earlier nonces. [Study driver and fixed-phase checker](../qualification/matched_study.py)
 
 Each receiver independently records its current active hash and whether it can supply each discovered full body. One probe starts 100 milliseconds before the common horizon. A second starts after gate closure and before the continuation. Query start and finish bracket each observation on the gate clock. A slow query can finish after the scheduled deadline. Only a completed on-time readback proves storage by that deadline. Native transport, storage, active selection and subsequent settlement have separate receipts. Receivers never compete to become the continuation miner. The preregistered receiver generates the successors after both gate intervals have ended. [Native continuation and timed readbacks](../qualification/matched_continuation.py)
@@ -62,22 +68,23 @@ mkdir -p "$STATE"
 .native/py/bin/python qualification/matched_fixture.py "$STATE/calibration.json" \
   --binary "$BINARY" --build-manifest "$MAC_MANIFEST"
 python3 qualification/verify_matched_calibration.py "$STATE/calibration.json"
-REGISTRATION=docs/evidence/chronicle-matched-registration.json
+REGISTRATION=docs/evidence/chronicle-matched-observer-v2-registration.json
 python3 qualification/matched_study.py register --binary "$BINARY" \
   --manifest "$MAC_MANIFEST" --linux-manifest "$LINUX_MANIFEST" \
-  --calibration "$STATE/calibration.json" --output "$REGISTRATION"
+  --calibration "$STATE/calibration.json" --output "$REGISTRATION" \
+  --preceding-interruption docs/evidence/chronicle-matched-interruption.json
 # Publish the registration before the pilot.
 .native/py/bin/python qualification/matched_study.py run "$STATE" "$REGISTRATION" \
   --binary "$BINARY" --phase pilot
 python3 qualification/matched_study.py export "$STATE" "$REGISTRATION" --phase pilot \
-  --output docs/evidence/chronicle-matched-pilot
-SIZING=docs/evidence/chronicle-matched-pilot/summary.json
+  --output docs/evidence/chronicle-matched-observer-v2-pilot
+SIZING=docs/evidence/chronicle-matched-observer-v2-pilot/summary.json
 # Publish the complete pilot before the independently seeded evaluation.
 .native/py/bin/python qualification/matched_study.py run "$STATE" "$REGISTRATION" \
   --binary "$BINARY" --phase evaluation --pilot-summary "$SIZING"
 python3 qualification/matched_study.py export "$STATE" "$REGISTRATION" --phase evaluation \
-  --pilot-summary "$SIZING" --output docs/evidence/chronicle-matched-evaluation
-python3 qualification/matched_study.py check docs/evidence/chronicle-matched-evaluation \
+  --pilot-summary "$SIZING" --output docs/evidence/chronicle-matched-observer-v2-evaluation
+python3 qualification/matched_study.py check docs/evidence/chronicle-matched-observer-v2-evaluation \
   "$REGISTRATION" --phase evaluation --pilot-summary "$SIZING"
 ```
 

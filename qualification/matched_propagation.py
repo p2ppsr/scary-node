@@ -3,6 +3,7 @@
 import argparse
 import concurrent.futures
 import hashlib
+import http.client
 import json
 import secrets
 import struct
@@ -277,6 +278,7 @@ def sample_jobs(plan, offer_monotonic_ns, providers):
             job, reason = provider()
         except (
             OSError,
+            http.client.HTTPException,
             RuntimeError,
             ValueError,
             AssertionError,
@@ -311,6 +313,7 @@ def opportunity(
     height,
     payment_txid,
     receiver_probe=None,
+    record_progress=None,
 ):
     """Measure one preplanned opportunity on two input and four receiver-native connections.
 
@@ -409,6 +412,8 @@ def opportunity(
         "pong_timeout_ns": pong_timeout_ns,
         "lanes": lanes,
     }
+    if record_progress is not None:
+        record_progress(row, "discovery_scored")
     ready = threading.Event()
     origin = 0
 
@@ -419,6 +424,7 @@ def opportunity(
             disp = {"ack": jobs[idx].submit_native(lanes[idx]["discovery"]["nonce"])}
         except (
             OSError,
+            http.client.HTTPException,
             RuntimeError,
             ValueError,
             AssertionError,
@@ -475,6 +481,9 @@ def opportunity(
         for idx, sent, relayed in in_flight:
             lanes[idx]["native_submit"] = sent.result()
             lanes[idx].update(relayed.result())
+        if record_progress is not None:
+            row["discovery_tick_monotonic_ns"] = origin
+            record_progress(row, "native_submission_and_gate_receipts")
         if receiver_probe is not None:
             row["predeadline_readbacks"] = observation.result()
     # Hold continuation to the same observation horizon on every scheduled

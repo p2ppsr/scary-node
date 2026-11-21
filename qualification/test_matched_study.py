@@ -117,6 +117,18 @@ class ProspectiveStudyTests(unittest.TestCase):
                 "z": {"body_sha256": "z-digest", "query_ns": [53, 56]},
             },
         }
+        sample["active_receipt"] = {
+            "active_hash": "p",
+            "query_ns": [50, 51],
+            "attempts": [{"result": "observed", "query_ns": [50, 51]}],
+        }
+        for body in sample["bodies"].values():
+            result = (
+                {"result": "observed"}
+                if "body_sha256" in body
+                else {"result": "rpc_error", "code": -5}
+            )
+            body["attempts"] = [{**result, "query_ns": body["query_ns"]}]
         row = {
             "capture_window_ns": 50,
             "pong_timeout_ns": 10,
@@ -130,6 +142,11 @@ class ProspectiveStudyTests(unittest.TestCase):
         }
         verify_reads(row, "predeadline_readbacks")
         row["predeadline_readbacks"][1]["active_query_ns"] = [49, 50]
+        row["predeadline_readbacks"][1]["active_receipt"]["query_ns"] = [49, 50]
+        row["predeadline_readbacks"][1]["active_receipt"]["attempts"][0]["query_ns"] = [
+            49,
+            50,
+        ]
         with self.assertRaisesRegex(ValueError, "assigned times"):
             verify_reads(row, "predeadline_readbacks")
 

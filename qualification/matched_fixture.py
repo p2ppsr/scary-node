@@ -4,6 +4,7 @@ import argparse
 import concurrent.futures
 import contextlib
 import hashlib
+import http.client
 import json
 import math
 import os
@@ -191,7 +192,7 @@ def begin_offer(f, tx, pool):
                 "accepted": result == ident,
                 "elapsed_ns": time.monotonic_ns() - start,
             }
-        except (OSError, ValueError, RuntimeError) as exc:
+        except (OSError, http.client.HTTPException, ValueError, RuntimeError) as exc:
             return {
                 "accepted": False,
                 "reason": str(exc) or type(exc).__name__,

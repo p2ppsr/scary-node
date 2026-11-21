@@ -62,7 +62,9 @@ def atom(path, payload):
         os.close(fd)
 
 
-def registration(binary, manifest, linux_manifest, calibration, output):
+def registration(
+    binary, manifest, linux_manifest, calibration, output, interruption=None
+):
     cal = read(calibration)
     timing = verify_calibration(cal)
     mac, linux = read(manifest), read(linux_manifest)
@@ -128,6 +130,12 @@ def registration(binary, manifest, linux_manifest, calibration, output):
         "pong_timeout_ns": fence,
         "capture_window_ns": hold + delta + fence,
         "probe_lead_ns": 100_000_000,
+        "observer_transport": {
+            "per_attempt_socket_timeout_ms": 200,
+            "by_hash_attempts": 2,
+            "active_tip_attempts": 1,
+            "on_exhaustion": "retain per-receiver unknown, include scheduled parent and all discoveries",
+        },
         "offer_delay_ms": 1200,
         "job_response_window_ns": 1_500_000_000,
         "target_half_width": 0.01,
@@ -138,6 +146,15 @@ def registration(binary, manifest, linux_manifest, calibration, output):
         "phase_seeds": "Pilot base+1..16 inclusive. Evaluation base+17 onward; fixed pilot-derived size, no reuse.",
         "interruptions": "Retain every attempt. A failed setup before the first offered payment may restart the seed. A measured interruption must be preserved; unresolved slots prevent a complete phase.",
     }
+    if interruption is not None:
+        prior = read(interruption)
+        check(
+            int(prior["seed_decimal"]) >> 32 != base >> 32
+            and prior["complete_sessions"] == 0
+            and prior["sizing_calculated"] is False,
+            "replacement requires a nonoverlapping namespace and the original interruption receipt",
+        )
+        design["preceding_interruption_sha256"] = sha(interruption)
     if output.exists():
         check(read(output)["design"] == design, "different registration already exists")
     else:
@@ -248,6 +265,14 @@ def run_session(path, binary, d, seed):
                 )
                 right = partial(stock_job, b, "matched-full-right")
                 samples = sample_jobs(plan, start, [left, right])
+
+                def checkpoint(row, stage, payment=payment, before=before):
+                    row["common_payment_hex"] = payment.hex()
+                    row["receiver_peers_before_offer"] = before
+                    rec["pending_measurement"] = row
+                    rec["stage"] = stage
+                    save()
+
                 row = opportunity(
                     plan,
                     samples,
@@ -256,6 +281,7 @@ def run_session(path, binary, d, seed):
                     parent=parent,
                     height=height,
                     payment_txid=txid(payment),
+                    record_progress=checkpoint,
                     receiver_probe=lambda hashes, t, due: stock_readbacks(
                         receivers, hashes, t, due
                     ),
@@ -266,6 +292,7 @@ def run_session(path, binary, d, seed):
                 common_payment_hex=payment.hex(),
             )
             rec["rows"].append(row)
+            rec.pop("pending_measurement", None)
             rec["stage"] = "native_gate_closed"
             save()
             hashes = [v["discovery"]["hash"] for v in row["lanes"] if v["discovery"]]
@@ -290,6 +317,48 @@ def run_session(path, binary, d, seed):
     return rec
 
 
+def verify_attempts(entry, limit):
+    attempts = entry["attempts"]
+    check(1 <= len(attempts) <= limit, "readback retry bound exceeded")
+    previous = 0
+    for i, a in enumerate(attempts):
+        begin, end = a["query_ns"]
+        check(
+            previous <= begin <= end
+            and a["result"] in ("observed", "rpc_error", "transport_or_encoding_error"),
+            "invalid receiver attempt timestamps or outcome",
+        )
+        if i < len(attempts) - 1:
+            check(
+                a["result"] == "transport_or_encoding_error",
+                "only failed transport reads may be retried",
+            )
+        previous = end
+    check(
+        entry["query_ns"] == [attempts[0]["query_ns"][0], previous],
+        "readback interval differs from its attempts",
+    )
+    last = attempts[-1]["result"]
+    check(
+        (entry.get("readback_unavailable") is True)
+        == (last == "transport_or_encoding_error")
+        and ("rpc_code" in entry) == (last == "rpc_error"),
+        "contradictory receiver disposition",
+    )
+    if last == "rpc_error":
+        check(
+            type(entry.get("rpc_code")) is int
+            and entry["rpc_code"] == attempts[-1]["code"],
+            "missing RPC failure",
+        )
+    if last == "transport_or_encoding_error":
+        check(
+            len(attempts) == limit and entry.get("readback_unavailable") is True,
+            "missing exhausted site disposition",
+        )
+    return last
+
+
 def verify_reads(row, key):
     sample = row[key]
     check(len(sample) == 2, "missing independently timed stock readback")
@@ -300,8 +369,17 @@ def verify_reads(row, key):
     }
     for r in sample:
         a, b = r["active_query_ns"]
+        active = r["active_receipt"]
+        state = verify_attempts(active, 1)
         check(
-            0 <= a <= b and r["active_hash"] in {*possible, row["parent"]},
+            0 <= a <= b
+            and r["active_query_ns"] == active["query_ns"]
+            and (
+                r["active_hash"] == active.get("active_hash")
+                and r["active_hash"] in {*possible, row["parent"]}
+                if state == "observed"
+                else r["active_hash"] is None
+            ),
             "invalid observed active tip",
         )
         start = (
@@ -319,11 +397,13 @@ def verify_reads(row, key):
             r["bodies"].items(), key=lambda item: item[1]["query_ns"][0]
         ):
             s, e = body["query_ns"]
+            state = verify_attempts(body, 2)
             check(
                 b <= s <= e
                 and (
                     body.get("body_sha256") == possible[h]
-                    or body.get("rpc_code") in (-1, -5)
+                    if state == "observed"
+                    else "body_sha256" not in body
                 ),
                 "invalid stock body readback",
             )
@@ -393,6 +473,23 @@ def verify_session(rec, d, seed):
         offsets = row["offsets_ns"]
         group = totals[f"{arm}:{offsets[0] - offsets[1]}ns"]
         horizon = row["capture_window_ns"] + row["pong_timeout_ns"]
+        observer = group.setdefault("observer", Counter())
+        observer["scheduled_parents"] += 1
+        observer["common_horizon_overrun_ns_sum"] += row["gate_complete_ns"] - horizon
+        for rx in (0, 1):
+            for stage in ("predeadline", "postdeadline"):
+                site = row[stage + "_readbacks"][rx]
+                name = f"receiver_{rx}_{stage}_"
+                observer[name + "active_lookups"] += 1
+                observer[name + "active_unknown"] += int(site["active_hash"] is None)
+                for entry in site["bodies"].values():
+                    observer[name + "hash_lookups"] += 1
+                    observer[name + "hash_readback_exhausted"] += int(
+                        entry.get("readback_unavailable", False)
+                    )
+                    observer[name + "hash_rpc_disposition"] += int("rpc_code" in entry)
+                    observer[name + "hash_verified_body"] += int("body_sha256" in entry)
+                    observer[name + "hash_retries"] += len(entry["attempts"]) - 1
         for lane, metrics in zip(row["lanes"], group["lanes"]):
             discovery = lane["discovery"]
             if discovery is None:
@@ -404,6 +501,18 @@ def verify_session(rec, d, seed):
                 leg = lane.get("legs", [{}, {}])[rx]
                 bp = before["bodies"][h]
                 prefix = f"receiver_{rx}_"
+                metrics[prefix + "predeadline_body_readback_exhausted"] += int(
+                    bp.get("readback_unavailable", False)
+                )
+                metrics[prefix + "postdeadline_body_readback_exhausted"] += int(
+                    after["bodies"][h].get("readback_unavailable", False)
+                )
+                metrics[prefix + "predeadline_active_unavailable"] += int(
+                    before["active_hash"] is None
+                )
+                metrics[prefix + "postdeadline_active_unavailable"] += int(
+                    after["active_hash"] is None
+                )
                 metrics[prefix + "ingress_proven_by_horizon"] += int(
                     leg.get("pong_ns", horizon + 1) <= horizon
                 )
@@ -453,6 +562,7 @@ def summarize(counts, d, phase):
                 k,
                 {"parents": 0, "alignment": Counter(), "lanes": [Counter(), Counter()]},
             )
+            g.setdefault("observer", Counter()).update(v.get("observer", {}))
             g["parents"] += v["parents"]
             g["alignment"].update(v["alignment"])
             for lane, agg in zip(v["lanes"], g["lanes"]):
@@ -670,6 +780,7 @@ if __name__ == "__main__":
     p = sub.add_parser("register")
     for v in ("binary", "manifest", "linux-manifest", "calibration", "output"):
         p.add_argument("--" + v, required=True, type=Path)
+    p.add_argument("--preceding-interruption", type=Path)
     for op in ("run", "export", "check"):
         p = sub.add_parser(op)
         p.add_argument("directory", type=Path)
@@ -683,7 +794,14 @@ if __name__ == "__main__":
             p.add_argument("--output", type=Path, required=True)
     a = cli.parse_args()
     if a.action == "register":
-        registration(a.binary, a.manifest, a.linux_manifest, a.calibration, a.output)
+        registration(
+            a.binary,
+            a.manifest,
+            a.linux_manifest,
+            a.calibration,
+            a.output,
+            a.preceding_interruption,
+        )
     elif a.action == "run":
         run_phase(
             a.directory,
