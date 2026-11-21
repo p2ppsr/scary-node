@@ -8,11 +8,12 @@ import tarfile
 import tempfile
 from pathlib import Path
 
+from sustained_block_archive import pack
 from sustained_outcomes import HASH, digest
 from verify_sustained_native import observed_bodies, verify, verify_wires
 
 
-def replay(assets, corpus, receipt_path, manifest_path):
+def replay(assets, corpus, receipt_path, manifest_path, compact=None):
     manifest = json.loads(manifest_path.read_bytes())
     with gzip.open(receipt_path, "rt") as f:
         receipt = json.load(f)
@@ -74,15 +75,20 @@ def replay(assets, corpus, receipt_path, manifest_path):
         if blocks or expected_wallet:
             raise ValueError("incomplete download")
         measured = verify_wires(receipt, corpus, root / "blocks")
-    if (
-        measured != manifest["local_wire_verification"]
-        or len(receipt["blocks"]) != manifest["selected_blocks"]
-        or summary["distinct_confirmed"] != manifest["distinct_payments"]
-        or sum(b["wire_bytes"] for b in receipt["blocks"])
-        != manifest["total_selected_wire_bytes"]
-    ):
-        raise ValueError("manifest and independently reconstructed outcome differ")
-    return {"verified": measured, "result": summary}
+        if (
+            measured != manifest["local_wire_verification"]
+            or len(receipt["blocks"]) != manifest["selected_blocks"]
+            or summary["distinct_confirmed"] != manifest["distinct_payments"]
+            or sum(b["wire_bytes"] for b in receipt["blocks"])
+            != manifest["total_selected_wire_bytes"]
+        ):
+            raise ValueError("manifest and independently reconstructed outcome differ")
+        result = {"verified": measured, "result": summary}
+        if compact is not None:
+            result["compact_archive"] = pack(
+                receipt_path, corpus, root / "blocks", compact
+            )
+        return result
 
 
 if __name__ == "__main__":
@@ -91,9 +97,15 @@ if __name__ == "__main__":
     parser.add_argument("corpus", type=Path, help="unpacked signed source directory")
     parser.add_argument("receipt", type=Path, help="published compressed study receipt")
     parser.add_argument("manifest", type=Path, help="published outcome asset manifest")
+    parser.add_argument(
+        "--compact",
+        type=Path,
+        help="save a byte-verified source ordinal archive to a fresh path",
+    )
     args = parser.parse_args()
     print(
         json.dumps(
-            replay(args.assets, args.corpus, args.receipt, args.manifest), indent=2
+            replay(args.assets, args.corpus, args.receipt, args.manifest, args.compact),
+            indent=2,
         )
     )

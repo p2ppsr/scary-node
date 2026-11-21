@@ -1,0 +1,26 @@
+# These stores exist only in guest memory for an independent consensus replay.
+services:
+  svref:
+    volumes: !override
+      - type: tmpfs
+        target: /data
+        tmpfs: {size: 8589934592}
+  tn2:
+    environment: {p2p_static_peers: ""}
+    volumes: !override
+      - type: tmpfs
+        target: /app/data
+        tmpfs: {size: 10737418240}
+  as2:
+    volumes: !override
+      - ./aerospike-qualification.conf:/etc/aerospike/qualification.conf:ro
+      - type: tmpfs
+        target: /opt/aerospike/data
+        tmpfs: {size: 11811160064}
+      - type: tmpfs
+        target: /opt/aerospike/smd
+        tmpfs: {size: 33554432}
+  ingress:
+    ports: !override ["127.0.0.1::19442", "127.0.0.1::19452"]
+  wallet-ingress:
+    ports: !override ["127.0.0.1::21444"]

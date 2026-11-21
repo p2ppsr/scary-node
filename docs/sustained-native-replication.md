@@ -90,3 +90,20 @@ gh release download native-workload-regtest-v1 --repo p2ppsr/scary-node --dir in
 python3 qualification/replay_sustained_assets.py inventory-assets workload/sustained-signed \
   docs/evidence/chronicle-sustained-inventory.json.gz docs/evidence/chronicle-sustained-inventory-assets.json
 ```
+
+### Replay the confirmed ledger on a new SV Node
+
+A new stock SV Node v1.2.3 started at regtest genesis with an empty 8 GiB RAM filesystem and zero peers. It accepted all 483 common history blocks, the signed split funding at height 484 and all 77 subsequent blocks in the measured active chain. It returned all 1,103,139,534 bytes of those 77 bodies identically to the three original stock readers. Its final height was 561, with hash `73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599`, an empty mempool and an empty validation queue. This reconstruction took 360.06 seconds. The original handoff independently recorded the same four tips and zero outstanding SV transactions. The replay checks the confirmed ledger. The original intake, eligibility, mining and timing observations remain in the measured receipt. [Fresh SV Node receipt](evidence/chronicle-sustained-inventory-fresh-stock.json)
+
+With the common history, signed source and measured raw inventory bodies unpacked from the release, repeat the independent node run and verify its result. `--archive inventory.zip` can replace `--blocks inventory/blocks` when using the compact signed-source ordinal archive. The driver checks every reconstructed wire against its digest from the three original readers. Run from the repository root with the qualification Python environment and the pinned stock Docker image.
+
+```bash
+python3 qualification/recover_sustained_chain.py run \
+  docs/evidence/chronicle-sustained-inventory.json.gz \
+  docs/evidence/chronicle-sustained-inventory-handoff.json fresh-stock.json \
+  --history workload/paired-corpus --corpus workload/sustained-signed --blocks inventory/blocks
+python3 qualification/recover_sustained_chain.py verify \
+  docs/evidence/chronicle-sustained-inventory.json.gz \
+  docs/evidence/chronicle-sustained-inventory-handoff.json \
+  docs/evidence/chronicle-sustained-inventory-fresh-stock.json
+```

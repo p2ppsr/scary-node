@@ -9,10 +9,34 @@ from pathlib import Path
 from unittest import mock
 
 import verify_sustained_native as audit
+from sustained_block_archive import assemble, checked
 from sustained_resources import DOCKER_MIN, HOST_MIN, fields
 
 
 class SustainedVerifierTests(unittest.TestCase):
+    def test_compact_block_reconstruction_requires_the_recorded_source_ordinal(self):
+        prefix = self.body[: -len(self.payment)]
+        frames = bytes(24) + self.payment + bytes(24) + bytes(len(self.payment))
+        positions = (0, 24 + len(self.payment), len(frames))
+        restored = assemble(prefix, bytes(4), frames, positions, len(self.body))
+        self.assertEqual(restored, self.body)
+        row = {
+            **self.block,
+            "independent_wire_sha256": dict.fromkeys(
+                ("tn1", "tn2", "sv"), self.block["wire_sha256"]
+            ),
+        }
+        checked(restored, row)
+        wrong = assemble(
+            prefix, (1).to_bytes(4, "little"), frames, positions, len(self.body)
+        )
+        with self.assertRaisesRegex(ValueError, "original independent stock reads"):
+            checked(wrong, row)
+        with self.assertRaisesRegex(ValueError, "ordinal out of range"):
+            assemble(
+                prefix, (2).to_bytes(4, "little"), frames, positions, len(self.body)
+            )
+
     def setUp(self):
         receipt = (
             Path(__file__).resolve().parents[1]
