@@ -8,14 +8,11 @@ import subprocess
 import time
 from pathlib import Path
 
+from sustained_profiles import PROJECTS, REGISTRATIONS
 from sustained_stock import snapshot
-from verify_sustained_native import REGISTRATION, REPLICATION, stock_activity, verify
+from verify_sustained_native import REPLICATION, stock_activity, verify
 
 PROJECT = "scary-node-throughput"
-PROFILES = {
-    REGISTRATION: (PROJECT, 2000),
-    REPLICATION: ("scary-node-sustained-production", 3000),
-}
 SERVICES = {
     "svref",
     "tn1",
@@ -43,9 +40,12 @@ def quiesce(directory):
     first = time.time_ns()
     with gzip.open(receipt, "rt") as f:
         result = json.load(f)
-    if result["registration"] not in PROFILES:
+    arm = result.get(
+        "arm", "production" if result["registration"] == REPLICATION else "direct"
+    )
+    if result["registration"] != REGISTRATIONS.get(arm):
         raise ValueError("unknown sustained trial")
-    project, shift = PROFILES[result["registration"]]
+    project, shift = PROJECTS[arm]
     summary = verify(result)
     if not result["completion"]["primary_complete"] and not (
         result["completion"]["resource_stop"] or result["completion"]["audit_failure"]
@@ -257,10 +257,12 @@ def verify_handoff(receipt, stock_log, handoff, frozen=None):
     ]
     if times != sorted(times):
         raise ValueError("handoff precedes the primary completion boundary")
+    arm = result.get(
+        "arm", "production" if result["registration"] == REPLICATION else "direct"
+    )
     if not (
-        marker["registration"] == result["registration"]
-        and result["registration"] in PROFILES
-        and marker["project"] == PROFILES[result["registration"]][0]
+        marker["registration"] == result["registration"] == REGISTRATIONS.get(arm)
+        and marker["project"] == PROJECTS[arm][0]
         and marker["paused_services"] == dict.fromkeys(SERVICES, True)
         and marker["confirmed_payments"] == summary["distinct_confirmed"]
         and marker["audited_blocks"] == len(result["blocks"])

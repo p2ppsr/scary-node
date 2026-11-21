@@ -1,0 +1,11 @@
+services:
+  ingress:
+    ports: !override
+      - "127.0.0.1:${SCARY_WITNESSED_PREFIX:?set from registered arm}41:19441"
+      - "127.0.0.1:${SCARY_WITNESSED_PREFIX:?set from registered arm}42:19442"
+      - "127.0.0.1:${SCARY_WITNESSED_PREFIX:?set from registered arm}51:19451"
+      - "127.0.0.1:${SCARY_WITNESSED_PREFIX:?set from registered arm}52:19452"
+      - "127.0.0.1:${SCARY_WITNESSED_PREFIX:?set from registered arm}80:19480"
+      - "127.0.0.1:${SCARY_WITNESSED_PREFIX:?set from registered arm}33:19433"
+  wallet-ingress:
+    ports: !override ["127.0.0.1:${SCARY_WITNESSED_PREFIX:?set from registered arm}44:21444"]

@@ -14,6 +14,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "regtest"))
 from prove import decode_block, dsha
 from verify_receipt import check_header, require
 from sustained_resources import DOCKER_MIN, HOST_MIN, SERVICES
+from sustained_profiles import (
+    COLD,
+    CHANGED_RELEASE,
+    ENDORSED_HASH,
+    ENDORSED_SHA,
+    ENDORSEMENT,
+    PROJECTS,
+    REGISTRATIONS,
+    WITNESSED,
+    WITNESSED_ARMS,
+    REORDERED_IDS,
+    batch_order,
+    cohort_by_batch,
+)
 
 BATCH_SIZE = 512
 BATCHES = 10_800
@@ -236,9 +250,11 @@ def stock_activity(rows, start_wall):
 
 def replication_setup(record):
     setup = record["setup"]
+    arm = record.get("arm", "production")
+    project, _ = PROJECTS[arm]
     require(
-        setup["registration"] == REPLICATION
-        and setup["project"] == PROJECT
+        setup["registration"] == REGISTRATIONS[arm]
+        and setup["project"] == project
         and setup["source_ids_sha256"]
         == record["source"]["offered_id_sha256"]
         == ORDERED_SOURCE
@@ -246,11 +262,30 @@ def replication_setup(record):
         "replication identity differs",
     )
     require(
-        setup["funding"] == record["baseline"]
-        and setup["funding"]["height"] == 484
-        and setup["funding"]["hash"] == FUNDING,
+        setup["funding"]["height"] == 484 and setup["funding"]["hash"] == FUNDING,
         "replication funding differs",
     )
+    if arm in WITNESSED_ARMS:
+        expected_ids = REORDERED_IDS if arm == "reordered" else ORDERED_SOURCE
+        require(
+            setup["arm"] == arm and setup["scheduled_order_id_sha256"] == expected_ids,
+            "offered schedule differs",
+        )
+    if arm == "endorsed":
+        require(
+            bytes.fromhex(setup["endorsement_hex"]) == ENDORSEMENT,
+            "endorsing wire differs",
+        )
+        check_header(ENDORSEMENT[:80], ENDORSED_HASH, FUNDING)
+        _, txs, _ = decode_block(ENDORSEMENT, ENDORSED_HASH)
+        require(
+            len(txs) == 1
+            and record["baseline"]
+            == {"height": 485, "hash": ENDORSED_HASH, "wire_sha256": ENDORSED_SHA},
+            "endorsed starting state differs",
+        )
+    else:
+        require(setup["funding"] == record["baseline"], "cold starting state differs")
     flags = {
         "-checkmempool": "0",
         "-checkblockindex": "0",
@@ -277,7 +312,7 @@ def replication_setup(record):
             len(mounts) == 1
             and mounts[0]["type"] == "volume"
             and mounts[0]["read_write"]
-            and mounts[0]["volume"].startswith(PROJECT + "_"),
+            and mounts[0]["volume"].startswith(project + "_"),
             "unexpected replication data mount",
         )
         data_volumes.add(mounts[0]["volume"])
@@ -289,17 +324,28 @@ def replication_setup(record):
     )
 
 
-def verify(record, executable=REFERENCE_RELEASE):
+def verify(record, executable=None):
+    arm = record.get(
+        "arm", "production" if record["registration"] == REPLICATION else "direct"
+    )
+    require(
+        arm in REGISTRATIONS and REGISTRATIONS[arm] == record["registration"],
+        "unregistered arm",
+    )
+    pinned = CHANGED_RELEASE if arm == "cold" else REFERENCE_RELEASE
+    require(
+        executable is None or executable == pinned, "binary differs from registration"
+    )
     require(record["schema"] == 1, "unsupported sustained receipt")
     require(
-        record["registration"] in (REGISTRATION, REPLICATION)
+        record["registration"] in (REGISTRATION, REPLICATION, WITNESSED, COLD)
         and record["network"] == "regtest",
         "unexpected trial or network",
     )
     require(
-        record["release_sha256"] == executable, "release differs from the build receipt"
+        record["release_sha256"] == pinned, "release differs from the build receipt"
     )
-    replication = record["registration"] == REPLICATION
+    replication = arm != "direct"
     inventory = None
     if replication:
         require(
@@ -326,6 +372,7 @@ def verify(record, executable=REFERENCE_RELEASE):
     require(elapsed > 0, "missing measurement interval")
     offers = [r for r in record["producer"] if r["phase"] == "offer"]
     ids = set()
+    order = batch_order(arm)
     for r in record["producer"]:
         require(
             r["phase"] in ("offer", "rebroadcast")
@@ -338,7 +385,9 @@ def verify(record, executable=REFERENCE_RELEASE):
             require(
                 r["count"] == BATCH_SIZE
                 and r["batch"] not in ids
-                and r["scheduled_ns"] == r["batch"] * NS // 6
+                and r.get("position", r["batch"]) == len(ids)
+                and r["batch"] == order[len(ids)]
+                and r["scheduled_ns"] == len(ids) * NS // 6
                 and r["sender"] == r["batch"] % 4,
                 "changed or repeated scheduled batch",
             )
@@ -503,7 +552,45 @@ def verify(record, executable=REFERENCE_RELEASE):
     }
     coverage_observed = all(b["entrant_hash"] == b["hash"] for b in record["blocks"])
     unready = sum(s.get("scary", {}).get("ready") is False for s in sampled)
+    origin = {}
+    if arm in WITNESSED_ARMS:
+        intervals = [{"selected_nonempty": 0, "payments": 0} for _ in range(6)]
+        for i, slot in slots.items():
+            body = block_map.get(slot.get("hash"))
+            if body and slot["miner"] == "scary" and body["scheduled_payments"]:
+                require(
+                    "solution_header" in slot
+                    and slot["solution_header"] == body["header_hex"],
+                    "entrant body differs from worker solution",
+                )
+                intervals[i // 50]["selected_nonempty"] += 1
+                intervals[i // 50]["payments"] += body["scheduled_payments"]
+        regular = all(x["selected_nonempty"] for x in intervals)
+        origin = {
+            "arm": arm,
+            "entrant_primary_by_five_minute_slot_interval": intervals,
+            "regular_entrant_origin": regular,
+            "entrant_primary_payments_per_total_second": signed_by_miner["scary"]
+            * NS
+            / elapsed,
+        }
+    if origin:
+        origin["witnessed_miner_target_met"] = bool(
+            regular
+            and done["primary_complete"]
+            and done["all_accounted"]
+            and settled
+            and totals["entrant_script_checks"] == PAYMENTS
+            and not totals["foreign_payments"]
+            and not totals["duplicate_scheduled"]
+            and not done["resource_stop"]
+            and not done["audit_failure"]
+            and rate >= 3000
+            and len(record["inventory_final"] or {})
+            and inventory["unique_served"] == PAYMENTS
+        )
     return {
+        **origin,
         "registered_payments": PAYMENTS,
         "observed_offer_batches": len(offers),
         "registration": record["registration"],
@@ -644,7 +731,9 @@ def read_source(corpus, source, *, funding=None):
     return ordinals
 
 
-def verify_block_membership(raw, block, ordinals, seen, cohort_size, *, heights=None):
+def verify_block_membership(
+    raw, block, ordinals, seen, cohort_size, *, heights=None, source_cohorts=None
+):
     require(
         raw[:80].hex() == block["header_hex"]
         and len(raw) == block["wire_bytes"]
@@ -664,7 +753,12 @@ def verify_block_membership(raw, block, ordinals, seen, cohort_size, *, heights=
             seen[ordinal] = 1
             if heights is not None:
                 heights[ordinal] = block["height"]
-            counts[ordinal // cohort_size] += 1
+            cohort = (
+                ordinal // cohort_size
+                if source_cohorts is None
+                else source_cohorts[ordinal // BATCH_SIZE]
+            )
+            counts[cohort] += 1
     require(
         len(txs) - 1 == block["ordinary_transactions"]
         and counts == block["confirmed_by_source_cohort"]
@@ -700,12 +794,27 @@ def parent_ages(heights, funding_height, miners, rails=65_536):
 
 def verify_wires(record, corpus, blocks, *, parent_graph=False):
     funding = heights = None
+    arm = record.get(
+        "arm", "production" if record["registration"] == REPLICATION else "direct"
+    )
+    source_cohorts = cohort_by_batch(arm) if arm == "reordered" else None
+    if arm in WITNESSED_ARMS:
+        signed_order = hashlib.sha256()
+        with (corpus / "ids.bin").open("rb") as f:
+            for batch in batch_order(arm):
+                f.seek(batch * BATCH_SIZE * 32)
+                signed_order.update(f.read(BATCH_SIZE * 32))
+        require(
+            signed_order.hexdigest() == record["setup"]["scheduled_order_id_sha256"],
+            "raw offered ID order differs",
+        )
+    registered_funding = record.get("setup", {}).get("funding", record["baseline"])
     if parent_graph:
         raw = (corpus / "funding.block").read_bytes()
         require(
-            record["baseline"]["hash"] == FUNDING
-            and record["baseline"]["height"] == 484
-            and hashlib.sha256(raw).hexdigest() == record["baseline"]["wire_sha256"],
+            registered_funding["hash"] == FUNDING
+            and registered_funding["height"] == 484
+            and hashlib.sha256(raw).hexdigest() == registered_funding["wire_sha256"],
             "registered funding receipt differs",
         )
         _, txs, outputs = decode_block(raw, FUNDING)
@@ -725,13 +834,14 @@ def verify_wires(record, corpus, blocks, *, parent_graph=False):
             seen,
             PAYMENTS // COHORTS,
             heights=heights,
+            source_cohorts=source_cohorts,
         )
     require(
         sum(seen) == record["completion"]["unique_confirmed"],
         "final distinct membership differs",
     )
     wallet = {}
-    if record["registration"] == REPLICATION and record["inventory_final"]:
+    if arm != "direct" and record["inventory_final"]:
         wallet = inventory_membership(blocks.parent, record["inventory_final"], seen)
     graph = {}
     if parent_graph:
@@ -740,7 +850,7 @@ def verify_wires(record, corpus, blocks, *, parent_graph=False):
             b["height"]: hashes.get(b["hash"], "unattributed") for b in record["blocks"]
         }
         graph["source_parent_ages"] = parent_ages(
-            heights, record["baseline"]["height"], miners
+            heights, registered_funding["height"], miners
         )
     return {
         **wallet,
@@ -771,17 +881,22 @@ def main():
         parser.error("--parent-ages requires the original --corpus and --blocks")
     if bool(args.corpus) != bool(args.blocks):
         parser.error("--corpus and --blocks must be supplied together")
-    expected = REFERENCE_RELEASE
+    with (gzip.open if args.receipt.suffix == ".gz" else open)(args.receipt, "rt") as f:
+        record = json.load(f)
+    expected = CHANGED_RELEASE if record.get("arm") == "cold" else REFERENCE_RELEASE
     if args.build_receipt:
         b = json.loads(args.build_receipt.read_text())
         require(
-            b["source_commit"] == "af9b605ad8da96d041a540111d46a7c0105209f7"
+            b["source_commit"]
+            == (
+                "c2a36d5c6a83f2262dffd596f5eecb421db6b132"
+                if record.get("arm") == "cold"
+                else "af9b605ad8da96d041a540111d46a7c0105209f7"
+            )
             and b["platform"] == "linux/arm64",
             "unexpected reproduction source or target",
         )
         expected = b["release"]["executable_sha256"]
-    with (gzip.open if args.receipt.suffix == ".gz" else open)(args.receipt, "rt") as f:
-        record = json.load(f)
     summary = verify(record, expected)
     if args.corpus:
         summary["local_wire_replay"] = verify_wires(

@@ -28,3 +28,20 @@ The regular-origin criterion requires at least one independently selected, nonem
 Sample the existing resource gauges about once per second and stock queue/mempool/peer activity about every five seconds. Preserve at least 20 GiB of host capacity and 12 GiB in the Docker filesystem. Record source and terminal free capacity, sample minima and any reserve stop. Hold the workstation's measurement lock through the run. Check available *allocated* storage and projected peak usage before setup. Freeze earlier cohorts after terminal observations. Preserve their independently restorable, checksum-verified evidence and source, separating compact chain replay from any full service-state archive. Do not enroll a replacement timed session for a missed target. Report incomplete enrollment or interrupted results explicitly.
 
 A future changed-core cold run requires a separate registration that pins its executable and preserves the original cold offer order.
+
+## Reproduction
+
+Restore the published source and funding as described in the [inventory control](sustained-native-replication.md). Use a new output directory for each arm. The driver checks its own Docker namespace, the software identities, the pre-offer tip and actual available storage before opening the wallet sessions. Its preflight adds the previous four-store allocation of approximately 25 GiB to each free-space reserve. The measured period still uses the original stop floor.
+
+```sh
+SCARY_SUSTAINED_PROFILE=endorsed .native/py/bin/python qualification/sustained_replication.py \
+  .native/paired-corpus .native/sustained-signed .native/endorsed-run
+SCARY_SUSTAINED_PROFILE=reordered .native/py/bin/python qualification/sustained_replication.py \
+  .native/paired-corpus .native/sustained-signed .native/reordered-run
+.native/py/bin/python qualification/verify_sustained_native.py .native/endorsed-run/receipt.json.gz \
+  --corpus .native/sustained-signed --blocks .native/endorsed-run/blocks --parent-ages
+.native/py/bin/python qualification/verify_sustained_native.py .native/reordered-run/receipt.json.gz \
+  --corpus .native/sustained-signed --blocks .native/reordered-run/blocks --parent-ages
+```
+
+Override the image with `--image` and `--image-id` for an independent local build. The driver checks the registered executable again on the running node. Each compact receipt records the setup funding wire, timed starting boundary, actual batch position, source batch identity, service allocation, body and slot results, and live wallet/stock telemetry. Offline verification checks the ID commitment in actual offer order, the output spent by every source transaction, and each observed block's contents against the three stock digests.

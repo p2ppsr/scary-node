@@ -11,6 +11,7 @@ import threading
 import time
 
 from sustained_corpus import BATCH, COUNT
+from sustained_profiles import PROJECTS, WITNESSED_ARMS, batch_order, profile
 from sustained_wallet import Wallet, wait_until
 
 TX = struct.pack("<I", 1)
@@ -130,9 +131,11 @@ def produce_inventory(corpus, directory, start_value, ready, stop, retries):
     sessions = []
     with contextlib.ExitStack() as stack:
         source = Inventory(corpus, stack)
+        arm = profile()
+        port = 19444 + PROJECTS[arm][1]
 
         def connect(i):
-            wallet = Wallet(i, port=22444, on_getdata=source.serve)
+            wallet = Wallet(i, port=port, on_getdata=source.serve)
             sessions.append(wallet)
             return wallet
 
@@ -159,7 +162,7 @@ def produce_inventory(corpus, directory, start_value, ready, stop, retries):
                         emit(progress, {"elapsed_ns": elapsed, **source.snapshot()})
                         logged_s = sec
 
-                def offer(batch, ordinals, phase, due):
+                def offer(batch, ordinals, phase, due, position=None):
                     i = batch % 4
                     begin = time.monotonic_ns() - start
                     try:
@@ -174,6 +177,7 @@ def produce_inventory(corpus, directory, start_value, ready, stop, retries):
                         primary if phase == "offer" else drain,
                         {
                             "phase": phase,
+                            **({"position": position} if arm in WITNESSED_ARMS else {}),
                             "batch": batch,
                             "count": len(ordinals),
                             "sender": i,
@@ -185,13 +189,17 @@ def produce_inventory(corpus, directory, start_value, ready, stop, retries):
                     )
                     sample()
 
-                for batch in range(COUNT // BATCH):
-                    due = batch * 1_000_000_000 // 6
+                for position, batch in enumerate(batch_order(arm)):
+                    due = position * 1_000_000_000 // 6
                     wait_until(start + due, stop)
                     if stop.is_set():
                         break
                     offer(
-                        batch, range(batch * BATCH, (batch + 1) * BATCH), "offer", due
+                        batch,
+                        range(batch * BATCH, (batch + 1) * BATCH),
+                        "offer",
+                        due,
+                        position,
                     )
                 while not stop.is_set():
                     sample()

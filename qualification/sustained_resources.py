@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import threading
 import time
+from sustained_profiles import PROJECTS
 from pathlib import Path
 
 SERVICES = ("as1", "as2", "tn1", "tn2", "svref", "scary-node", "ingress")
@@ -45,11 +46,7 @@ done
 
 def service_ids():
     project = os.getenv("COMPOSE_PROJECT_NAME", "scary-node-throughput")
-    if project not in (
-        "scary-node-throughput",
-        "scary-node-sustained-production",
-        "scary-node-live-cadence",
-    ):
+    if project not in {name for name, _ in PROJECTS.values()}:
         raise ValueError("unexpected sustained regtest project")
     lines = subprocess.check_output(
         [

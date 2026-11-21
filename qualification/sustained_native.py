@@ -1,7 +1,6 @@
 """Run the prospectively registered 30-minute peer-fed mixed regtest and retain all opportunities."""
 
 import argparse
-import collections
 import concurrent.futures
 import contextlib
 import gzip
@@ -20,19 +19,23 @@ from native_workload import FromHex, ToHex, CTransaction, solve
 from native_workers import Worker
 from prove import PORT_SHIFT, decode_block, dsha, request, txid
 from run_cohort import session_lock
+from sustained_profiles import (
+    CHANGED_RELEASE,
+    FROZEN_RELEASE,
+    REGISTRATIONS,
+    WITNESSED_ARMS,
+    cohort_by_batch,
+    profile,
+)
 from sustained_corpus import BATCH, COUNT
 from sustained_wallet import produce, wait_until, Wallet
 from verify_native_workers import previous_hash
 
-RELEASE = "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528"
+RELEASE = CHANGED_RELEASE if profile() == "cold" else FROZEN_RELEASE
 DURATION = 1800
 INTERVAL = 6
-COHORT = 3072 * 300
-REGISTRATION = (
-    "3ec961ef81881b83d4cc1ecc646250a2d8d200f9"
-    if PRODUCTION_REPLICATION
-    else "11e60074fbdde9587e1652d4de272a24bd4ac68b"
-)
+ARM = profile()
+REGISTRATION = REGISTRATIONS.get(ARM)
 
 
 def append(log, row):
@@ -254,6 +257,7 @@ def audit_loop(ids, seen, directory, live, start, stop, abort):
     blocks.mkdir()
     active = []
     base = live.base
+    source_cohorts = cohort_by_batch(ARM)
     next_height = base["height"] + 1
     try:
         with (
@@ -330,7 +334,7 @@ def audit_loop(ids, seen, directory, live, start, stop, abort):
                         duplicates += 1
                     else:
                         seen[ordinal] = 1
-                        counts[ordinal // COHORT] += 1
+                        counts[source_cohorts[ordinal // BATCH]] += 1
                         indices.extend(struct.pack("<I", ordinal))
                 (blocks / (h + ".block")).write_bytes(sv_body)
                 (blocks / (h + ".index")).write_bytes(indices)
@@ -441,16 +445,16 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
     from sustained_resources import sample_resources
 
     src = json.loads((corpus / "manifest.json").read_text())
-    directory.mkdir(parents=True, exist_ok=resume_genesis)
+    directory.mkdir(parents=True, exist_ok=True)
     start_ns = 0
     with session_lock():
+        if not resume_genesis and any(directory.iterdir()):
+            raise ValueError("timed workload requires an empty output directory")
         if resume_genesis and (
             not setup or {item.name for item in directory.iterdir()} != {"setup.json"}
         ):
             raise ValueError("cannot repeat or resume a timed sustained workload")
-        if setup:
-            setup(directory)
-        base = prepare_funding(corpus)
+        base = setup(directory) if setup else prepare_funding(corpus)
         if status()["release"]["executable_sha256"] != RELEASE:
             raise ValueError("running Linux image differs")
         ids = load_ids(corpus, src)
@@ -500,6 +504,7 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
             json.dumps(
                 {
                     "registration": REGISTRATION,
+                    **({"arm": ARM} if ARM in WITNESSED_ARMS else {}),
                     "start_wall_ns": start_wall,
                     "baseline": base,
                     "release_sha256": RELEASE,
@@ -626,6 +631,7 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
         result = {
             "schema": 1,
             "registration": REGISTRATION,
+            **({"arm": ARM} if ARM in WITNESSED_ARMS else {}),
             "network": "regtest",
             "release_sha256": RELEASE,
             "source": src,
@@ -662,6 +668,10 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
             gzip.compress(json.dumps(result, separators=(",", ":")).encode(), mtime=0)
         )
         tmp.replace(directory / "receipt.json.gz")
+        if ARM in WITNESSED_ARMS:
+            from quiesce_sustained import quiesce
+
+            quiesce(directory)
         return complete
 
 

@@ -1,13 +1,29 @@
 """Initialize separate independent stores, replay the common signed funding and run the inventory cohort."""
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
 import time
 from pathlib import Path
 
-os.environ["SCARY_SUSTAINED_PROFILE"] = "production"
+from sustained_profiles import (
+    PROJECTS,
+    WITNESSED_ARMS,
+    ENDORSEMENT,
+    ENDORSED_HASH,
+    ENDORSED_SHA,
+    ORIGINAL_IDS,
+    REORDERED_IDS,
+    batch_order,
+    profile,
+)
+
+os.environ.setdefault("SCARY_SUSTAINED_PROFILE", "production")
+ARM = profile()
+if ARM not in ("production", *WITNESSED_ARMS):
+    raise ValueError("choose a registered inventory profile")
 from mixed_storage_trial import (
     NODES,
     compose,
@@ -26,9 +42,13 @@ from sustained_resources import GIB
 
 IMAGE = "scary-node:throughput-af9b605-5d3fe94e"
 IMAGE_ID = "sha256:5d3fe94ee11ed4170cc39a074967c220757ed6078b0df623d7054b35afc55f4a"
+if ARM == "cold":
+    IMAGE = IMAGE_ID = (
+        "sha256:12e959a8368b5f4cc561eb754d1588e62f6a5f68bbc38d238174eaa40b8b827a"
+    )
 FUNDING = "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9"
 SOURCE = "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2"
-PROJECT = "scary-node-sustained-production"
+PROJECT, SHIFT = PROJECTS[ARM]
 
 
 def setup(
@@ -42,7 +62,7 @@ def setup(
         logfile.write_text(json.dumps(record, indent=2) + "\n")
 
     if (
-        NODES != [(22441, 22451), (22442, 22452)]
+        NODES != [(19441 + SHIFT, 19451 + SHIFT), (19442 + SHIFT, 19452 + SHIFT)]
         or os.environ["COMPOSE_PROJECT_NAME"] != PROJECT
     ):
         raise ValueError("replication routed outside its registered local ports")
@@ -79,6 +99,34 @@ def setup(
         history["funding_height"],
     ) != (483, 451):
         raise ValueError("original funds or signed corpus differ")
+    if ARM in WITNESSED_ARMS:
+        host_free = shutil.disk_usage(directory).free
+        vm_free = (
+            int(
+                docker(
+                    "run",
+                    "--rm",
+                    "--pull=never",
+                    "--network",
+                    "none",
+                    "--read-only",
+                    "--entrypoint",
+                    "df",
+                    "nginx:1.27.4",
+                    "-Pk",
+                    "/",
+                )
+                .splitlines()[-1]
+                .split()[3]
+            )
+            * 1024
+        )
+        # The inventory control used approximately 25 GiB of allocated storage.
+        if host_free < 45 * GIB or vm_free < 37 * GIB:
+            raise ValueError(
+                f"prospective capacity unavailable: host {host_free} bytes, Docker {vm_free} bytes; "
+                "reserve plus prior four-store allocation is 45 GiB host / 37 GiB Docker"
+            )
     if shutil.disk_usage(directory).free < 20 * GIB:
         raise ValueError("host reserve unavailable before setup")
     if docker("image", "inspect", "--format", "{{.Id}}", image) != image_id:
@@ -152,7 +200,44 @@ def setup(
         executable_sha256=RELEASE,
         source_ids_sha256=SOURCE,
     )
-    event("four_stores_ready", selected_height=484, selected_hash=FUNDING)
+    if ARM in WITNESSED_ARMS:
+        digest = hashlib.sha256()
+        with (payments / "ids.bin").open("rb") as ids:
+            for batch in batch_order(ARM):
+                ids.seek(batch * 512 * 32)
+                data = ids.read(512 * 32)
+                if len(data) != 512 * 32:
+                    raise ValueError("scheduled input digest is incomplete")
+                digest.update(data)
+        expected = REORDERED_IDS if ARM == "reordered" else ORIGINAL_IDS
+        if digest.hexdigest() != expected:
+            raise ValueError("offered inventory order differs from registration")
+        record.update(arm=ARM, scheduled_order_id_sha256=expected)
+    if ARM == "endorsed":
+        if hashlib.sha256(ENDORSEMENT).hexdigest() != ENDORSED_SHA:
+            raise ValueError("funding successor wire differs")
+        if sv("submitblock", ENDORSEMENT.hex()) is not None:
+            raise ValueError("stock SV refused registered ordinary successor")
+
+        def every_peer():
+            return (
+                sv("getbestblockhash") == ENDORSED_HASH
+                and all(
+                    rpc(n, "getblockchaininfo")["bestblockhash"] == ENDORSED_HASH
+                    for n in NODES
+                )
+                and status()["mining"]["tip_hash"] == ENDORSED_HASH
+            )
+
+        wait(
+            "all peers selected the initial funding successor", every_peer, seconds=180
+        )
+        base = {"height": 485, "hash": ENDORSED_HASH, "wire_sha256": ENDORSED_SHA}
+        record["endorsement_hex"] = ENDORSEMENT.hex()
+    event(
+        "four_stores_ready", selected_height=base["height"], selected_hash=base["hash"]
+    )
+    return base
 
 
 if __name__ == "__main__":

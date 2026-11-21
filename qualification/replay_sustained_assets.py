@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 from sustained_outcomes import HASH, digest
-from verify_sustained_native import REPLICATION, verify, verify_wires
+from verify_sustained_native import verify, verify_wires
 
 
 def replay(assets, corpus, receipt_path, manifest_path):
@@ -28,7 +28,7 @@ def replay(assets, corpus, receipt_path, manifest_path):
         raise ValueError("invalid selected block hash")
     blocks = {"blocks/" + b["hash"] + ".block": b for b in receipt["blocks"]}
     expected_wallet = {}
-    if receipt["registration"] == REPLICATION and receipt["inventory_final"]:
+    if receipt.get("inventory_final"):
         expected_wallet = {
             name + ".bits": receipt["inventory_final"][name + "_bits_sha256"]
             for name in ("requested", "served")

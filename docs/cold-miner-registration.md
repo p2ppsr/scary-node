@@ -5,3 +5,14 @@ Arm C uses source `c2a36d5c6a83f2262dffd596f5eecb421db6b132`, Linux executable S
 Use the original 5,529,600 signed payments and the exact original order. The stock nodes independently replay h1–483 and select h484 funding `3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9`. The entrant starts empty at h449, witnesses h451 and h484, and starts the first native inventory announcement with zero successors of h484. The SHA-256 of concatenated internal IDs in arrival order is `243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2`. Use fresh independent stores in Compose project `scary-node-sustained-cold`, port shift 7000. Freeze the same four native wallet connections, stock reference options, two independent disk-backed 9 GiB Aerospike stores, route, resource floor, readbacks and stopping criteria as the two earlier registrations.
 
 The primary period is 1,800 seconds at six 512-payment advertisements per second, with 225 entrant and 75 full-state work opportunities in the same six-second schedule. Keep all offers, losses, misses, reannouncements, primary and drain slots, same exact body readbacks, source membership, full-time denominator and two-successor termination. Do not resend before the registered incomplete-payment drain at 1,818 seconds. The stop deadline is 2,100 seconds. Enroll this single C arm after E and R individually or after recording their independent provisioning blockers. Preserve all completed outcomes. The regular-origin criterion requires a nonempty entrant block on the independently audited chain at least once in each of the six consecutive sets of 50 primary opportunities. Report the number of included payments the entrant originated and the number originated by stock SV with all system-wide throughput figures. The joint target additionally requires complete verified source membership, full entrant checks, no duplicate or foreign payment, two selected successors and at least 3,000 confirmed payments per complete observation second. Include retained, promoted, rejected or expired native admissions when this release exposes them, along with measured work readiness and source-to-settlement time. A qualifying result establishes a single observed operating point on isolated regtest.
+
+## Reproduction
+
+Use the same restored history and signed payments as the [native inventory control](sustained-native-replication.md). Supply the registered image by local ID, or specify both `--image` and `--image-id` for a build that produces the registered ELF.
+
+```sh
+SCARY_SUSTAINED_PROFILE=cold .native/py/bin/python qualification/sustained_replication.py \
+  .native/paired-corpus .native/sustained-signed .native/cold-changed-run
+.native/py/bin/python qualification/verify_sustained_native.py .native/cold-changed-run/receipt.json.gz \
+  --corpus .native/sustained-signed --blocks .native/cold-changed-run/blocks --parent-ages
+```

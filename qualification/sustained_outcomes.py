@@ -38,7 +38,9 @@ def pack_assets(directory, out, corpus):
     summary = verify(result)
     local_wires = verify_wires(result, corpus, directory / "blocks")
     out.mkdir(parents=True, exist_ok=False)
-    label = "direct" if result["registration"] == REGISTRATION else "inventory"
+    label = result.get(
+        "arm", "direct" if result["registration"] == REGISTRATION else "inventory"
+    )
     prefix = "native-sustained-" + label
     parts = []
     group = []
@@ -100,7 +102,7 @@ def pack_assets(directory, out, corpus):
             last_height=group[-1]["height"],
             blocks=len(group),
         )
-    if label == "inventory" and result.get("inventory_final"):
+    if result.get("inventory_final"):
         for name in ("requested", "served"):
             original = directory / (name + ".bits")
             expected = result["inventory_final"][name + "_bits_sha256"]
