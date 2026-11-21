@@ -139,6 +139,65 @@ class SustainedVerifierTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "release"):
             audit.verify(altered)
 
+    def test_native_request_and_serve_memberships_are_counted_independently(self):
+        requested = bytes([1, 1, 0, 1])
+        served = bytes([0, 1, 0, 1])
+        counters = dict(
+            requests=5,
+            served=2,
+            unknown_requests=1,
+            unique_requested=3,
+            unique_served=2,
+            served_wire_bytes=450,
+        )
+        final = dict(
+            counters,
+            requested_bits_sha256=hashlib.sha256(requested).hexdigest(),
+            served_bits_sha256=hashlib.sha256(served).hexdigest(),
+        )
+        self.assertEqual(
+            audit.inventory_evidence([dict(counters, elapsed_ns=100)], final)[
+                "requests"
+            ],
+            5,
+        )
+        with self.assertRaisesRegex(ValueError, "regressed"):
+            audit.inventory_evidence(
+                [dict(counters, elapsed_ns=100)], dict(final, requests=4)
+            )
+        with tempfile.TemporaryDirectory() as name:
+            d = Path(name)
+            for k, v in (("requested", requested), ("served", served)):
+                (d / (k + ".bits")).write_bytes(v)
+            summary = audit.inventory_membership(d, final, bytes([1, 1, 0, 0]))
+            self.assertEqual(
+                summary,
+                {
+                    "confirmed_and_wallet_served": 1,
+                    "confirmed_without_recorded_wallet_serve": 1,
+                },
+            )
+            (d / "served.bits").write_bytes(bytes([0, 1, 1, 0]))
+            with self.assertRaisesRegex(ValueError, "differs"):
+                audit.inventory_membership(d, final, bytes(4))
+
+    def test_stock_gauges_keep_queue_separate_from_pool_and_show_actual_coverage(self):
+        rows = [
+            {
+                "wall_ns": 1000,
+                "elapsed_ns": 200,
+                "finished_wall_ns": 1030,
+                "getmempoolinfo": {"size": 16},
+                "getblockchainactivity": {"transactions": 900},
+                "getorphaninfo": {"size": 0},
+            }
+        ]
+        s = audit.stock_activity(rows, 800)
+        self.assertEqual(s["getblockchainactivity.transactions"]["maximum"], 900)
+        self.assertEqual(s["getmempoolinfo.size"]["last"], 16)
+        with self.assertRaisesRegex(ValueError, "timestamps"):
+            audit.stock_activity(rows, 0)
+
     def test_resource_samples_preserve_read_time_and_floor_crossing(self):
         sample = fields("110 2048 3072 200 18 4096", 5)
         self.assertEqual(

@@ -15,10 +15,10 @@ import struct
 import threading
 import time
 
-from mixed_storage_trial import NODES, ROOT, compose, rpc, status, sv, wait
+from mixed_storage_trial import NODES, PRODUCTION_REPLICATION, rpc, status, sv, wait
 from native_workload import FromHex, ToHex, CTransaction, solve
 from native_workers import Worker
-from prove import decode_block, dsha, request, txid
+from prove import PORT_SHIFT, decode_block, dsha, request, txid
 from run_cohort import session_lock
 from sustained_corpus import BATCH, COUNT
 from sustained_wallet import produce, wait_until, Wallet
@@ -28,6 +28,11 @@ RELEASE = "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528"
 DURATION = 1800
 INTERVAL = 6
 COHORT = 3072 * 300
+REGISTRATION = (
+    "3ec961ef81881b83d4cc1ecc646250a2d8d200f9"
+    if PRODUCTION_REPLICATION
+    else "11e60074fbdde9587e1652d4de272a24bd4ac68b"
+)
 
 
 def append(log, row):
@@ -86,7 +91,7 @@ def prepare_funding(corpus):
 
 def stratum(parent):
     with (
-        socket.create_connection(("127.0.0.1", 21433), timeout=4) as conn,
+        socket.create_connection(("127.0.0.1", 19433 + PORT_SHIFT), timeout=4) as conn,
         conn.makefile("rwb") as stream,
     ):
         conn.settimeout(4)
@@ -432,13 +437,15 @@ def load_ids(corpus, source):
     return ids
 
 
-def run(corpus, directory):
+def run(corpus, directory, *, setup=None):
     from sustained_resources import sample_resources
 
     src = json.loads((corpus / "manifest.json").read_text())
     directory.mkdir(parents=True, exist_ok=False)
     start_ns = 0
     with session_lock():
+        if setup:
+            setup(directory)
         base = prepare_funding(corpus)
         if status()["release"]["executable_sha256"] != RELEASE:
             raise ValueError("running Linux image differs")
@@ -449,10 +456,17 @@ def run(corpus, directory):
         start_value = ctx.Value("Q", 0)
         peer_ready = ctx.Event()
         wallet_stop = ctx.Event()
-        wallet = ctx.Process(
-            target=produce,
-            args=(corpus, directory, start_value, peer_ready, wallet_stop),
-        )
+        wallet_args = (corpus, directory, start_value, peer_ready, wallet_stop)
+        if PRODUCTION_REPLICATION:
+            from sustained_inventory import produce_inventory, request_reannouncement
+            from sustained_stock import capture
+
+            retry_channel = ctx.Queue(maxsize=32)
+            wallet = ctx.Process(
+                target=produce_inventory, args=(*wallet_args, retry_channel)
+            )
+        else:
+            wallet = ctx.Process(target=produce, args=wallet_args)
         wallet.start()
         if not peer_ready.wait(55) or not wallet.is_alive():
             raise ValueError("wallets failed preflight")
@@ -481,7 +495,7 @@ def run(corpus, directory):
         (directory / "attempt.json").write_text(
             json.dumps(
                 {
-                    "registration": "11e60074fbdde9587e1652d4de272a24bd4ac68b",
+                    "registration": REGISTRATION,
                     "start_wall_ns": start_wall,
                     "baseline": base,
                     "release_sha256": RELEASE,
@@ -490,6 +504,8 @@ def run(corpus, directory):
             )
             + "\n"
         )
+        if PRODUCTION_REPLICATION:
+            launch(capture, directory, sv, stop)
         settle_slots = 0
         try:
             with (
@@ -526,7 +542,16 @@ def run(corpus, directory):
                         and not done
                         and not retry_started
                     ):
-                        launch(rebroadcast, corpus, directory, seen, start_ns, stop)
+                        if PRODUCTION_REPLICATION:
+                            launch(
+                                request_reannouncement,
+                                seen,
+                                start_ns,
+                                stop,
+                                retry_channel,
+                            )
+                        else:
+                            launch(rebroadcast, corpus, directory, seen, start_ns, stop)
                         retry_started = True
                     due = (next_slot + 1) * INTERVAL * 1_000_000_000
                     if now < due:
@@ -596,7 +621,7 @@ def run(corpus, directory):
         }
         result = {
             "schema": 1,
-            "registration": "11e60074fbdde9587e1652d4de272a24bd4ac68b",
+            "registration": REGISTRATION,
             "network": "regtest",
             "release_sha256": RELEASE,
             "source": src,
@@ -613,6 +638,21 @@ def run(corpus, directory):
             if (directory / "wallet-outcomes.json").exists()
             else [],
         }
+        if PRODUCTION_REPLICATION:
+            result["source_protocol"] = "inv-getdata-tx"
+            result["inventory_progress"] = readlines(
+                directory / "inventory-progress.jsonl"
+            )
+            final_inventory = directory / "inventory-final.json"
+            result["inventory_final"] = (
+                json.loads(final_inventory.read_text())
+                if final_inventory.exists()
+                else None
+            )
+            result["stock"] = readlines(directory / "stock.jsonl")
+            result["setup"] = json.loads((directory / "setup.json").read_text())
+            retry_channel.cancel_join_thread()
+            retry_channel.close()
         tmp = directory / "receipt.next"
         tmp.write_bytes(
             gzip.compress(json.dumps(result, separators=(",", ":")).encode(), mtime=0)

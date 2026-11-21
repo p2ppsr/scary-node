@@ -9,8 +9,13 @@ import subprocess
 import time
 
 # Use only the dedicated loopback ports and named Docker project.
-os.environ["COMPOSE_PROJECT_NAME"] = "scary-node-throughput"
-os.environ["SCARY_LAB_PORT_SHIFT"] = "2000"
+PRODUCTION_REPLICATION = os.getenv("SCARY_SUSTAINED_PROFILE") == "production"
+os.environ["COMPOSE_PROJECT_NAME"] = (
+    "scary-node-sustained-production"
+    if PRODUCTION_REPLICATION
+    else "scary-node-throughput"
+)
+os.environ["SCARY_LAB_PORT_SHIFT"] = "3000" if PRODUCTION_REPLICATION else "2000"
 from mixed_corpus import inspect, path_at
 from mixed_native_load import NODES, measure, rpc, status, sv, wait
 from run_cohort import ROOT, session_lock
@@ -23,12 +28,15 @@ def docker(*args):
 
 def compose(*args):
     command = ["compose", "-p", os.environ["COMPOSE_PROJECT_NAME"]]
-    for name in [
+    layers = [
         "compose.yaml",
         "mixed.compose.yaml",
         "mixed-native.compose.yaml",
         "mixed-aerospike.compose.yaml",
-    ]:
+    ]
+    if PRODUCTION_REPLICATION:
+        layers += ["sustained-wallet.compose.yaml", "sustained-production.compose.yaml"]
+    for name in layers:
         command += ["-f", str(ROOT / "regtest" / name)]
     return docker(*command, *args)
 
@@ -56,7 +64,7 @@ def start_references():
     )
 
 
-def seed(directory, receipt, last, entrant=False):
+def seed(directory, receipt, last, entrant=False, on_redial=None):
     first = int(sv("getblockcount"))
     if first > last:
         raise ValueError(
@@ -83,6 +91,8 @@ def seed(directory, receipt, last, entrant=False):
                     p for p in sv("getpeerinfo") if "teranode" in p["subver"].lower()
                 )
                 sv("disconnectnode", peer["addr"])
+                if on_redial:
+                    on_redial(height)
             wait(
                 f"stock nodes selected setup block {height}",
                 lambda: all(

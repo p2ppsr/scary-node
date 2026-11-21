@@ -1,0 +1,27 @@
+services:
+  svref:
+    command:
+      - -regtest
+      - -datadir=/data
+      - -listen=1
+      - -dnsseed=0
+      - -discover=0
+      - -server=1
+      - -txindex=1
+      - -minminingtxfee=0.00000500
+      - -genesisactivationheight=1
+      - -chronicleactivationheight=2
+      - -excessiveblocksize=4000000000
+      - -maxstackmemoryusageconsensus=100000000
+      - -checkmempool=0
+      - -checkblockindex=0
+  ingress:
+    ports: !override
+      - 127.0.0.1:22441:19441
+      - 127.0.0.1:22442:19442
+      - 127.0.0.1:22451:19451
+      - 127.0.0.1:22452:19452
+      - 127.0.0.1:22480:19480
+      - 127.0.0.1:22433:19433
+  wallet-ingress:
+    ports: !override ["127.0.0.1:22444:21444"]

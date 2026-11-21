@@ -24,6 +24,18 @@ REFERENCE_RELEASE = "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a20831
 MAGIC = bytes.fromhex("dab5bffa")
 TX_COMMAND = b"tx".ljust(12, b"\x00")
 REGISTRATION = "11e60074fbdde9587e1652d4de272a24bd4ac68b"
+REPLICATION = "3ec961ef81881b83d4cc1ecc646250a2d8d200f9"
+ORDERED_SOURCE = "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2"
+FUNDING = "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9"
+PROJECT = "scary-node-sustained-production"
+COUNTERS = (
+    "requests",
+    "served",
+    "unknown_requests",
+    "unique_requested",
+    "unique_served",
+    "served_wire_bytes",
+)
 
 
 def sha256_hex(text):
@@ -119,15 +131,184 @@ def intake_delta(samples):
     }
 
 
+def inventory_evidence(progress, final):
+    last = dict.fromkeys(COUNTERS, 0)
+    timestamp = None
+    for r in progress + ([final] if final else []):
+        if "elapsed_ns" in r:
+            require(
+                timestamp is None or timestamp <= r["elapsed_ns"],
+                "inventory clock moved backwards",
+            )
+            timestamp = r["elapsed_ns"]
+        require(
+            all(type(r[k]) is int and r[k] >= last[k] for k in COUNTERS),
+            "inventory counter regressed",
+        )
+        require(
+            0
+            <= r["unique_served"]
+            <= r["unique_requested"]
+            <= min(PAYMENTS, r["requests"])
+            and r["unique_served"] <= r["served"] <= r["requests"],
+            "inconsistent inventory counts",
+        )
+        last = r
+    if final:
+        require(
+            all(sha256_hex(final[k + "_bits_sha256"]) for k in ("requested", "served")),
+            "missing inventory membership commitment",
+        )
+    return {
+        "progress_samples": len(progress),
+        "durable_final": bool(final),
+        **{k: last[k] for k in COUNTERS},
+    }
+
+
+def inventory_membership(directory, final, confirmed):
+    memberships = {}
+    for name in ("requested", "served"):
+        bits = (directory / (name + ".bits")).read_bytes()
+        require(
+            len(bits) == len(confirmed) and bits.count(0) + bits.count(1) == len(bits),
+            "invalid local wallet membership bitmap",
+        )
+        require(
+            hashlib.sha256(bits).hexdigest() == final[name + "_bits_sha256"]
+            and bits.count(1) == final["unique_" + name],
+            "local wallet membership differs from final digest or count",
+        )
+        memberships[name] = bits
+    require(
+        all(
+            s <= r
+            for s, r in zip(
+                memberships["served"], memberships["requested"], strict=True
+            )
+        ),
+        "served transaction was never requested",
+    )
+    return {
+        "confirmed_and_wallet_served": sum(
+            bool(c and s) for c, s in zip(confirmed, memberships["served"], strict=True)
+        ),
+        "confirmed_without_recorded_wallet_serve": sum(
+            bool(c and not s)
+            for c, s in zip(confirmed, memberships["served"], strict=True)
+        ),
+    }
+
+
+def stock_activity(rows, start_wall):
+    fields = (
+        ("getmempoolinfo", "size"),
+        ("getmempoolinfo", "bytes"),
+        ("getblockchainactivity", "transactions"),
+        ("getblockchainactivity", "blocks"),
+        ("getorphaninfo", "size"),
+    )
+    for r in rows:
+        require(
+            r["wall_ns"] <= r["finished_wall_ns"]
+            and r["wall_ns"] - start_wall == r["elapsed_ns"],
+            "stock gauge timestamps differ",
+        )
+    summary = {}
+    for call, key in fields:
+        values = [
+            (r["elapsed_ns"], r[call][key])
+            for r in rows
+            if isinstance(r.get(call, {}).get(key), int)
+        ]
+        if values:
+            summary[call + "." + key] = {
+                "count": len(values),
+                "first": values[0][1],
+                "last": values[-1][1],
+                "maximum": max(v for t, v in values),
+                "first_elapsed_s": values[0][0] / NS,
+                "last_elapsed_s": values[-1][0] / NS,
+            }
+    return summary
+
+
+def replication_setup(record):
+    setup = record["setup"]
+    require(
+        setup["registration"] == REPLICATION
+        and setup["project"] == PROJECT
+        and setup["source_ids_sha256"]
+        == record["source"]["offered_id_sha256"]
+        == ORDERED_SOURCE
+        and setup["executable_sha256"] == record["release_sha256"],
+        "replication identity differs",
+    )
+    require(
+        setup["funding"] == record["baseline"]
+        and setup["funding"]["height"] == 484
+        and setup["funding"]["hash"] == FUNDING,
+        "replication funding differs",
+    )
+    flags = {
+        "-checkmempool": "0",
+        "-checkblockindex": "0",
+        "-excessiveblocksize": "4000000000",
+    }
+    for key, value in flags.items():
+        require(
+            [a for a in setup["stock_arguments"] if a.split("=")[0] == key]
+            == [key + "=" + value],
+            "stock parameters differ from registration",
+        )
+    data_volumes = set()
+    targets = {
+        "as1": "/opt/aerospike/data",
+        "as2": "/opt/aerospike/data",
+        "tn1": "/app/data",
+        "tn2": "/app/data",
+        "svref": "/data",
+        "scary-node": "/data",
+    }
+    for role, target in targets.items():
+        mounts = [m for m in setup["topology"][role]["mounts"] if m["target"] == target]
+        require(
+            len(mounts) == 1
+            and mounts[0]["type"] == "volume"
+            and mounts[0]["read_write"]
+            and mounts[0]["volume"].startswith(PROJECT + "_"),
+            "unexpected replication data mount",
+        )
+        data_volumes.add(mounts[0]["volume"])
+    require(len(data_volumes) == len(targets), "two roles shared a data volume")
+    names = [e["event"] for e in setup["events"]]
+    require(
+        names[0] == "fresh_project_verified" and names[-1] == "four_stores_ready",
+        "missing fresh project or independent funding observations",
+    )
+
+
 def verify(record, executable=REFERENCE_RELEASE):
     require(record["schema"] == 1, "unsupported sustained receipt")
     require(
-        record["registration"] == REGISTRATION and record["network"] == "regtest",
+        record["registration"] in (REGISTRATION, REPLICATION)
+        and record["network"] == "regtest",
         "unexpected trial or network",
     )
     require(
         record["release_sha256"] == executable, "release differs from the build receipt"
     )
+    replication = record["registration"] == REPLICATION
+    inventory = None
+    if replication:
+        require(
+            record["source_protocol"] == "inv-getdata-tx",
+            "replication did not follow requested native transaction delivery",
+        )
+        replication_setup(record)
+        inventory = inventory_evidence(
+            record["inventory_progress"], record["inventory_final"]
+        )
     source = record["source"]
     require(
         (source["scheduled"], source["batch_size"], source["batches"])
@@ -161,6 +342,11 @@ def verify(record, executable=REFERENCE_RELEASE):
                 "changed or repeated scheduled batch",
             )
             ids.add(r["batch"])
+        elif replication:
+            require(
+                r["sender"] == r["batch"] % 4 and r["scheduled_ns"] >= 1818 * NS,
+                "rebroadcast departed from registered drain and lane",
+            )
     slots = {}
     counts = {"scary": Counter(), "sv": Counter()}
     for r in record["slots"]:
@@ -319,6 +505,17 @@ def verify(record, executable=REFERENCE_RELEASE):
     return {
         "registered_payments": PAYMENTS,
         "observed_offer_batches": len(offers),
+        "registration": record["registration"],
+        "wallet_delivery_protocol": record.get("source_protocol", "direct-tx"),
+        "requested_inventory": inventory,
+        "wallet_recorded_every_requested_transfer": (
+            inventory["durable_final"] and inventory["unique_served"] == PAYMENTS
+            if replication
+            else None
+        ),
+        "stock_gauges": stock_activity(
+            record.get("stock", []), record.get("start_wall_ns", 0)
+        ),
         "source_batch_outcomes": dict(source_outcomes),
         "source_batches_by_lane": dict(Counter(r["sender"] for r in offers)),
         "offer_start_lag_ms": distribution(
@@ -471,7 +668,11 @@ def verify_wires(record, corpus, blocks):
         sum(seen) == record["completion"]["unique_confirmed"],
         "final distinct membership differs",
     )
+    wallet = {}
+    if record["registration"] == REPLICATION and record["inventory_final"]:
+        wallet = inventory_membership(blocks.parent, record["inventory_final"], seen)
     return {
+        **wallet,
         "signed_source_envelopes": len(ordinals),
         "merkle_verified_bodies": len(record["blocks"]),
         "confirmed_distinct_memberships": sum(seen),

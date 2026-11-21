@@ -20,9 +20,10 @@ def wait_until(ns, stop):
 
 
 class Wallet:
-    def __init__(self, index):
+    def __init__(self, index, port=21444, on_getdata=None):
         self.index = index
-        self.sock = socket.create_connection(("127.0.0.1", 21444), timeout=8)
+        self.on_getdata = on_getdata
+        self.sock = socket.create_connection(("127.0.0.1", port), timeout=8)
         self.sock.settimeout(None)
         self.sock.setsockopt(
             socket.SOL_SOCKET, socket.SO_SNDTIMEO, struct.pack("ll", 8, 0)
@@ -81,6 +82,8 @@ class Wallet:
                         self.ready.set()
                     elif cmd == b"ping" and len(data) == 8:
                         self.control(b"pong", data)
+                    elif cmd == b"getdata" and self.on_getdata is not None:
+                        self.on_getdata(self, data)
                     elif cmd == b"reject":
                         n = data[0]
                         code = data[n + 1]

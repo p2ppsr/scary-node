@@ -44,12 +44,15 @@ done
 
 
 def service_ids():
+    project = os.getenv("COMPOSE_PROJECT_NAME", "scary-node-throughput")
+    if project not in ("scary-node-throughput", "scary-node-sustained-production"):
+        raise ValueError("unexpected sustained regtest project")
     lines = subprocess.check_output(
         [
             "docker",
             "ps",
             "--filter",
-            "label=com.docker.compose.project=scary-node-throughput",
+            f"label=com.docker.compose.project={project}",
             "--format",
             '{{.Label "com.docker.compose.service"}} {{.ID}}',
         ],
