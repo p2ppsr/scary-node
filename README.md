@@ -59,6 +59,12 @@ The race lab gives a Scary Node Stratum job and a full-state Teranode job one SH
 
 [Experimental design and reproduction](docs/races.md) · [Stale rates and uncertainty](docs/race-results.md)
 
+## Verify job and branch recovery
+
+The reliability proof submits an older Stratum job after a same-parent update, checks settlement on two Teranodes, and follows a short reorg while preserving the witnessed state it can still use. The larger matched-work sample also checks each locally solved block against its settlement ancestry.
+
+[Run the reliability proof and cohort](docs/reliability.md) · [Reliability results](docs/reliability-results.md)
+
 ## Point an ASIC at your node
 
 Set the payout locking script to an address you control. Run the node with a reachable advertised Asset URL so that peers can retrieve the block you announce. Enable the Stratum listener on a trusted mining LAN. The example expects the operator to supply the two environment variables.

@@ -1,0 +1,9 @@
+# Only used for the short-reorg fixture on freshly created regtest volumes.
+services:
+  tn1:
+    environment:
+      p2p_static_peers: ""
+  tn2:
+    environment:
+      p2p_static_peers: ""
+    networks: !override [second-cell]

@@ -61,12 +61,17 @@ pub enum Event {
         peer: String,
         height: u32,
         hash: String,
+        header: Vec<u8>,
     },
     Subtree {
         peer: String,
         hash: String,
     },
     Gap(String),
+    PublicationFailed {
+        hash: String,
+        error: String,
+    },
     Published {
         hash: String,
     },
@@ -236,6 +241,7 @@ async fn dispatch(
                 peer: author,
                 height: notice.height,
                 hash: hash.clone(),
+                header: header.clone(),
             })
             .await?;
         Request {
@@ -424,9 +430,10 @@ pub async fn run(
             work = solved.recv() => {
                 let Some((height, raw)) = work else { return Ok(()) };
                 let base = config.asset_url.as_deref().context("solved block requires an advertised Asset URL")?;
+                let hash = display_hash(hash256(&raw[..80]));
                 let event = match announce(&mut swarm, &topics, &assets, base, height, raw).await {
                     Ok(hash) => Event::Published { hash },
-                    Err(error) => Event::Gap(format!("solved-block announcement failed: {error}")),
+                    Err(error) => Event::PublicationFailed { hash, error: error.to_string() },
                 };
                 events.send(event).await?;
             }

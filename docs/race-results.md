@@ -1,5 +1,7 @@
 # Does witnessed-input mining add stale risk?
 
+This is the 256-opportunity alpha.2 experiment. The reliability release adds a separate 1,024-opportunity cohort and live branch recovery checks. [Updated evidence and interpretation](reliability-results.md)
+
 Across 256 regtest opportunities, Scary Node lost **44/175 (25.14%)** of its discovered blocks. The full-state Teranode miner lost **45/170 (26.47%)**. The estimated additional stale risk was **−1.33 percentage points**, with a paired 95% bootstrap interval of **−12.81 to +10.06 points**.
 
 ![Estimated stale-rate differences and 95% intervals by session and pooled](evidence/race-results.png)

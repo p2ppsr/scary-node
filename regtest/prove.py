@@ -190,6 +190,8 @@ def compose(*args, capture=False):
         base += ["-f", str(Path(__file__).with_name("scenario.compose.yaml"))]
     if os.environ.get("SCARY_LAB_RACES") == "1":
         base += ["-f", str(Path(__file__).with_name("races.compose.yaml"))]
+    if os.environ.get("SCARY_LAB_RELIABILITY") == "1":
+        base += ["-f", str(Path(__file__).with_name("reliability.compose.yaml"))]
     result = subprocess.run([*base, *args],
                             stdout=subprocess.PIPE if capture else sys.stderr, text=True, check=True)
     return result.stdout
@@ -199,7 +201,7 @@ def assert_tip(node, expected):
     return rpc(node, "getblockchaininfo")["bestblockhash"] == expected
 
 
-def solve(worker, parent, child):
+def solve(worker, parent, child, *, refresh_payment=None):
     with socket.create_connection(("127.0.0.1", 19433 + PORT_SHIFT), timeout=60) as sock, sock.makefile("rwb") as stream:
         def send(i, method, params):
             stream.write(json.dumps({"id": i, "method": method, "params": params}).encode() + b"\n")
@@ -256,13 +258,26 @@ def solve(worker, parent, child):
                 break
         else:
             raise RuntimeError("job nonce space exhausted")
+        if refresh_payment is not None:
+            replacement_txid = refresh_payment()
+            while True:
+                msg = receive()
+                if msg.get("method") == "mining.notify":
+                    replacement = msg["params"]
+                    break
+            if replacement[0] == job_id or replacement[1] != prev_words or replacement[8] is not False:
+                raise ValueError("same-parent refresh did not preserve old work")
+            expected = sorted((bytes.fromhex(t)[::-1] for t in [child, replacement_txid]))
+            if replacement[4] != [expected[0].hex(), dsha(expected[1] * 2).hex()]:
+                raise ValueError("refresh job does not commit to both independent payments")
         send(3, "mining.submit", [worker, job_id, extra, ntime, f"{nonce:08x}"])
         while True:
             msg = receive()
             if msg.get("id") == 3:
                 if msg.get("result") is not True:
                     raise RuntimeError(f"Stratum solution rejected: {msg}")
-                return job_id, header, coinbase
+                result = job_id, header, coinbase
+                return result if refresh_payment is None else (*result, job, replacement)
 
 
 def ready():

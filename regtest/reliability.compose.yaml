@@ -1,0 +1,35 @@
+services:
+  scary-node:
+    # The entrant has no transport link between the two reference miners.
+    command:
+      - --network
+      - regtest
+      - --peer
+      - /dns/tn1/tcp/9905/p2p/12D3KooWAFXWuxgdJoRsaA4J4RRRr8yu6WCrAPf8FaS7UfZg3ceG
+      - --listen
+      - /ip4/0.0.0.0/tcp/9905
+      - --asset-bind
+      - 0.0.0.0:9090
+      - --asset-url
+      - http://scary-node:9090/api/v1
+      - --api-bind
+      - 0.0.0.0:8080
+      - --stratum-bind
+      - 0.0.0.0:3333
+      - --payout-script
+      - "76a914751e76e8199196d454941c45d1b3a323f1433bd688ac"
+      - --data-dir
+      - /data
+  ingress:
+    ports: !override
+      - 127.0.0.1:19741:19441
+      - 127.0.0.1:19742:19442
+      - 127.0.0.1:19751:19451
+      - 127.0.0.1:19752:19452
+      - 127.0.0.1:19780:19480
+      - 127.0.0.1:19733:19433
+    networks: !override [regtest, host-access, second-cell]
+networks:
+  second-cell:
+    driver: bridge
+    internal: true

@@ -1,10 +1,13 @@
 //! In-memory witnessed-output chain view and conservative candidate policy.
+mod chain;
+mod lifecycle;
 mod stratum;
 mod validation;
 pub(crate) mod wire;
 pub use stratum::run_stratum;
 
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
+use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{ensure, Context, Result};
@@ -22,7 +25,9 @@ const MAX_MONEY: u64 = 21_000_000 * 100_000_000;
 const HEADER_WINDOW: usize = 147;
 
 type Outpoint = (Hash, u32);
+type ParsedBody<'a> = (Vec<(Hash, &'a [u8])>, Option<&'static str>);
 
+#[derive(Clone)]
 struct Coin {
     script: [u8; 25],
     value: u64,
@@ -32,20 +37,9 @@ struct Coin {
 
 #[derive(Clone)]
 struct Entry {
-    raw: Vec<u8>,
+    raw: Arc<[u8]>,
     inputs: Vec<Outpoint>,
     fee: u64,
-}
-
-// Inactive after a delivery/validation failure. Only an actual extension of
-// this exact validated header can restore its coins and spending evidence.
-struct RetiredPrefix {
-    height: u32,
-    awaiting_height: Option<u32>,
-    headers: VecDeque<[u8; 80]>,
-    coins: HashMap<Outpoint, Coin>,
-    spent: validation::Spent,
-    window: VecDeque<validation::Observation>,
 }
 
 pub struct Mining {
@@ -64,7 +58,10 @@ pub struct Mining {
     omitted_outputs: u64,
     spent: validation::Spent,
     recent_invalid: VecDeque<(Hash, u32, String)>,
-    retired: Option<RetiredPrefix>,
+    chain: chain::RecentChain,
+    lifecycle: lifecycle::Lifecycle,
+    parent_epoch: u64,
+    blocked: bool,
     validation_window: VecDeque<validation::Observation>,
     min_observed_blocks: usize,
 }
@@ -111,7 +108,10 @@ impl Mining {
             omitted_outputs: 0,
             spent: validation::Spent::default(),
             recent_invalid: VecDeque::new(),
-            retired: None,
+            chain: chain::RecentChain::default(),
+            lifecycle: lifecycle::Lifecycle::default(),
+            parent_epoch: 0,
+            blocked: false,
             validation_window: VecDeque::new(),
             min_observed_blocks: 1,
         })
@@ -127,17 +127,21 @@ impl Mining {
     }
 
     fn observation_window_ready(&self) -> bool {
-        self.awaiting_height.is_none()
+        !self.blocked
+            && self.awaiting_height.is_none()
             && self.headers.len() >= self.min_observed_blocks
             && (self.regtest || self.headers.len() >= HEADER_WINDOW)
     }
 
     pub fn suspend(&mut self) {
-        self.retired = None;
+        self.chain = chain::RecentChain::default();
+        self.lifecycle.lost_view();
         self.clear_active();
     }
 
     fn clear_active(&mut self) {
+        self.blocked = false;
+        self.parent_epoch += 1;
         self.height = None;
         self.awaiting_height = None;
         self.headers.clear();
@@ -152,12 +156,7 @@ impl Mining {
 
     /// Retire old work as soon as a peer reports a higher tip. Keep the witnessed
     /// coins until the arriving bodies either confirm continuity or reveal a gap.
-    pub fn announced_height(&mut self, height: u32) {
-        if let Some(prefix) = self.retired.as_mut() {
-            if height > prefix.height {
-                prefix.awaiting_height = Some(prefix.awaiting_height.unwrap_or(0).max(height));
-            }
-        }
+    fn announced_height(&mut self, height: u32) {
         if self.height.is_some_and(|tip| height > tip)
             && self.awaiting_height.is_none_or(|waiting| height > waiting)
         {
@@ -166,28 +165,10 @@ impl Mining {
         }
     }
 
-    pub fn observe(&mut self, height: u32, raw: &[u8]) -> Result<()> {
-        let mut preserve_tip = false;
-        let result = self.connect(height, raw, &mut preserve_tip);
-        if let Err(error) = &result {
-            if preserve_tip {
-                if let Some(h) = self.height {
-                    self.retired = Some(RetiredPrefix {
-                        height: h,
-                        awaiting_height: self.awaiting_height,
-                        headers: std::mem::take(&mut self.headers),
-                        coins: std::mem::take(&mut self.coins),
-                        spent: std::mem::take(&mut self.spent),
-                        window: std::mem::take(&mut self.validation_window),
-                    });
-                }
-                self.clear_active();
-            } else {
-                self.suspend();
-            }
-            self.suspended_reason = Some(error.to_string());
+    pub fn announced_header(&mut self, height: u32, header: &[u8]) {
+        if self.inspect_header(header).is_ok() {
+            self.announced_height(height);
         }
-        result
     }
 
     fn remember_invalid(&mut self, hash: Hash, height: u32, reason: String) {
@@ -197,7 +178,7 @@ impl Mining {
         self.recent_invalid.push_back((hash, height, reason));
     }
 
-    fn connect(&mut self, height: u32, raw: &[u8], preserve_tip: &mut bool) -> Result<()> {
+    fn inspect_header(&self, raw: &[u8]) -> Result<[u8; 80]> {
         ensure!(
             raw.len() <= MAX_BODY,
             "block exceeds the 64 MiB observation limit"
@@ -205,7 +186,6 @@ impl Mining {
         let mut r = raw;
         let header: [u8; 80] = wire::take(&mut r, 80)?.try_into()?;
         let hash = hash256(&header);
-        let previous: Hash = header[4..36].try_into()?;
         let target = bits(&header);
         let limit = if self.regtest { 0x207fffff } else { 0x1d00ffff };
         ensure!(
@@ -220,40 +200,16 @@ impl Mining {
             timestamp(&header) <= now()?.saturating_add(7200),
             "header time is too far in the future"
         );
-        if let Some((_, _, reason)) = self.recent_invalid.iter().find(|(id, _, _)| *id == hash) {
-            *preserve_tip = true;
-            anyhow::bail!("known rejected block: {reason}");
+        if self.regtest {
+            ensure!(target == limit, "wrong regtest target");
         }
-        if let Some((_, _, reason)) = self
-            .recent_invalid
-            .iter()
-            .find(|(id, _, _)| *id == previous)
-        {
-            let reason = reason.clone();
-            self.remember_invalid(hash, height, reason);
-            *preserve_tip = true;
-            anyhow::bail!("header extends known rejected block");
-        }
-        if let Some(prefix) = self.retired.as_ref() {
-            let old = prefix.headers.back().context("empty inactive prefix")?;
-            if height == prefix.height && old == &header {
-                return Ok(());
-            }
-            if prefix.height.checked_add(1) == Some(height) && hash256(old) == previous {
-                let prefix = self.retired.take().unwrap();
-                self.height = Some(prefix.height);
-                self.awaiting_height = prefix.awaiting_height;
-                self.headers = prefix.headers;
-                self.coins = prefix.coins;
-                self.spent = prefix.spent;
-                self.validation_window = prefix.window;
-                *preserve_tip = true;
-            }
-        }
+        Ok(header)
+    }
+
+    fn connect(&mut self, height: u32, raw: Arc<[u8]>, header: [u8; 80]) -> Result<()> {
+        let hash = hash256(&header);
+        let target = bits(&header);
         if let (Some(prev), Some(h)) = (self.headers.back(), self.height) {
-            if prev == &header && h == height {
-                return Ok(());
-            }
             ensure!(
                 h.checked_add(1) == Some(height) && header[4..36] == hash256(prev),
                 "block does not extend the observed tip"
@@ -271,10 +227,39 @@ impl Mining {
                 );
             }
         }
-        if self.regtest {
-            ensure!(target == limit, "wrong regtest target");
-        }
-        *preserve_tip = true;
+        let (txs, coinbase_error) = self.inspect_body(height, &header, &raw)?;
+        let applied = match coinbase_error {
+            Some(reason) => Err(anyhow::anyhow!("{reason}")),
+            None => self.apply_observed(height, hash, txs),
+        };
+        let applied = applied.inspect_err(|error| {
+            if self.height.is_some() {
+                self.remember_invalid(hash, height, error.to_string());
+            }
+        })?;
+        let previous_header = if self.headers.len() == HEADER_WINDOW {
+            self.headers.pop_front()
+        } else {
+            None
+        };
+        self.chain.record(chain::AppliedBlock {
+            height,
+            raw,
+            applied,
+            previous_header,
+        });
+        self.height = Some(height);
+        self.headers.push_back(header);
+        Ok(())
+    }
+
+    fn inspect_body<'a>(
+        &self,
+        height: u32,
+        header: &[u8; 80],
+        raw: &'a [u8],
+    ) -> Result<ParsedBody<'a>> {
+        let mut r = &raw[80..];
         let n = wire::varint(&mut r)?;
         ensure!(
             n != 0 && n <= r.len() / 60,
@@ -310,33 +295,7 @@ impl Mining {
         let (root, _) = wire::merkle(txs.iter().map(|(id, _)| *id).collect())?;
         ensure!(header[36..68] == root, "block merkle root mismatch");
 
-        let validation = match coinbase_error {
-            Some(reason) => Err(anyhow::anyhow!("{reason}")),
-            None => self.apply_observed(height, hash, txs),
-        };
-        if let Err(error) = validation {
-            // A later notice can retry a rejected body after the active window
-            // was retired. The same Merkle-committed block retains its verdict.
-            // At a fresh boundary the reported height has no trusted ancestor.
-            // Reevaluate that body's height-dependent rules on a corrected notice.
-            if self.height.is_some() {
-                self.remember_invalid(hash, height, error.to_string());
-            }
-            return Err(error);
-        }
-        self.pending
-            .retain(|_, e| e.inputs.iter().all(|p| self.coins.contains_key(p)));
-        self.retired = None;
-        self.height = Some(height);
-        self.awaiting_height = self.awaiting_height.filter(|waiting| *waiting > height);
-        if self.headers.len() == HEADER_WINDOW {
-            self.headers.pop_front();
-        }
-        self.headers.push_back(header);
-        self.suspended_reason = None;
-        self.solved_on_tip = false;
-        self.revision += 1;
-        Ok(())
+        Ok((txs, coinbase_error))
     }
 
     fn median_time(&self) -> u32 {
@@ -451,7 +410,7 @@ impl Mining {
         self.pending.insert(
             id,
             Entry {
-                raw: raw.to_vec(),
+                raw: Arc::from(raw),
                 inputs,
                 fee,
             },
@@ -463,11 +422,11 @@ impl Mining {
     pub fn status(&self) -> Value {
         json!({
             "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
-            "retired_prefix_height": self.retired.as_ref().map(|p| p.height), "recent_invalid_blocks": self.recent_invalid.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
+            "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
             "observation_window_ready": self.observation_window_ready(), "headers": self.headers.len(), "awaiting_height": self.awaiting_height,
             "witnessed_outputs": self.coins.len(), "omitted_outputs": self.omitted_outputs,
             "pending_transactions": self.pending.len(), "accepted_shares": self.accepted_shares,
-            "solved_blocks": self.solved_blocks, "suspended_reason": self.suspended_reason
+            "solved_blocks": self.solved_blocks, "suspended_reason": self.suspended_reason, "solutions": self.lifecycle.status()
         })
     }
 }

@@ -150,15 +150,20 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 log(json!({"event":"peer_connected","peer":id}));
             }
             Event::Status { peer, height, hash } => {
-                app.mining.lock().await.announced_height(height);
+                app.mining.lock().await.reported_tip(&peer, &hash, height);
                 let v = json!({"event":"peer_status","peer":peer,"height":height,"hash":hash});
                 let mut p = app.peer.lock().await;
                 p.statuses += 1;
                 p.last_status = Some(v.clone());
                 log(v);
             }
-            Event::Notice { peer, height, hash } => {
-                app.mining.lock().await.announced_height(height);
+            Event::Notice {
+                peer,
+                height,
+                hash,
+                header,
+            } => {
+                app.mining.lock().await.announced_header(height, &header);
                 let v = json!({"event":"block_notice","peer":peer,"height":height,"hash":hash});
                 let mut p = app.peer.lock().await;
                 p.notices += 1;
@@ -189,11 +194,18 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 }
             }
             Event::Gap(reason) => {
-                app.mining.lock().await.suspend();
                 app.peer.lock().await.gaps += 1;
                 log(json!({"event":"coverage_reset","reason":reason}));
             }
+            Event::PublicationFailed { hash, error } => {
+                app.mining
+                    .lock()
+                    .await
+                    .publication(&hash, Some(error.clone()));
+                log(json!({"event":"publication_failed","hash":hash,"reason":error}));
+            }
             Event::Published { hash } => {
+                app.mining.lock().await.publication(&hash, None);
                 app.peer.lock().await.last_published = Some(hash.clone());
                 log(json!({"event":"gossip_published","hash":hash}));
             }

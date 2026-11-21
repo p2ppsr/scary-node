@@ -47,23 +47,75 @@ pub(super) struct Spent {
     serial: u64,
 }
 
+pub(super) enum SpendUndo {
+    Record {
+        previous: Option<u64>,
+        evicted: Option<(Outpoint, u64, bool)>,
+    },
+    Forget(Outpoint, Option<u64>),
+}
+
+pub(super) struct Applied {
+    pub coins: Vec<(Outpoint, Option<Coin>)>,
+    pub spends: Vec<SpendUndo>,
+    pub previous_row: Option<Observation>,
+    pub omitted: u64,
+}
+
 impl Spent {
     pub fn has(&self, p: &Outpoint) -> bool {
         self.ids.contains_key(p)
     }
-    pub fn record(&mut self, p: Outpoint) {
-        if self.order.len() == MAX_WATCHED {
+    pub fn record(&mut self, p: Outpoint) -> SpendUndo {
+        let evicted = if self.order.len() == MAX_WATCHED {
             let (old, serial) = self.order.pop_front().unwrap();
-            if self.ids.get(&old) == Some(&serial) {
+            let present = self.ids.get(&old) == Some(&serial);
+            if present {
                 self.ids.remove(&old);
             }
-        }
+            Some((old, serial, present))
+        } else {
+            None
+        };
         self.serial = self.serial.wrapping_add(1);
-        self.ids.insert(p, self.serial);
+        let previous = self.ids.insert(p, self.serial);
         self.order.push_back((p, self.serial));
+        SpendUndo::Record { previous, evicted }
     }
-    pub fn forget(&mut self, p: &Outpoint) {
-        self.ids.remove(p);
+    pub fn forget(&mut self, p: &Outpoint) -> SpendUndo {
+        SpendUndo::Forget(*p, self.ids.remove(p))
+    }
+
+    pub fn undo(&mut self, undo: SpendUndo) {
+        match undo {
+            SpendUndo::Record { previous, evicted } => {
+                let (p, _) = self
+                    .order
+                    .pop_back()
+                    .expect("undoing an applied consumption");
+                restore_entry(&mut self.ids, p, previous);
+                self.serial = self.serial.wrapping_sub(1);
+                if let Some((old, serial, present)) = evicted {
+                    self.order.push_front((old, serial));
+                    if present {
+                        self.ids.insert(old, serial);
+                    }
+                }
+            }
+            SpendUndo::Forget(p, previous) => restore_entry(&mut self.ids, p, previous),
+        }
+    }
+}
+
+pub(super) fn restore_entry<K: std::hash::Hash + Eq, V>(
+    map: &mut HashMap<K, V>,
+    key: K,
+    previous: Option<V>,
+) {
+    if let Some(value) = previous {
+        map.insert(key, value);
+    } else {
+        map.remove(&key);
     }
 }
 
@@ -252,7 +304,7 @@ impl Mining {
         let Some(height) = self.height.and_then(|tip| tip.checked_add(1)) else {
             return Ok(json!({"outcome":"deferred","reason":"no observed tip"}));
         };
-        if self.awaiting_height.is_some() {
+        if self.blocked || self.awaiting_height.is_some() {
             return Ok(json!({"outcome":"deferred","reason":"awaiting complete peer body"}));
         }
         let mut budget = SCRIPT_BUDGET;
@@ -283,6 +335,7 @@ impl Mining {
         let eligible = self
             .height
             .is_some_and(|h| h > coin.height && (!coin.coinbase || h - coin.height >= 99))
+            && !self.blocked
             && self.awaiting_height.is_none()
             && !self.pending.values().any(|e| e.inputs.contains(&p));
         Ok(
@@ -296,7 +349,7 @@ impl Mining {
         height: u32,
         hash: Hash,
         txs: Vec<(Hash, &[u8])>,
-    ) -> Result<()> {
+    ) -> Result<Applied> {
         // Only touched coins enter the undo journal. Tombstones, diagnostics and
         // job state are committed after every transaction and the reward pass.
         let mut undo = Vec::new();
@@ -369,32 +422,38 @@ impl Mining {
             Ok(result) => result,
             Err(error) => {
                 for (p, previous) in undo.into_iter().rev() {
-                    if let Some(coin) = previous {
-                        self.coins.insert(p, coin);
-                    } else {
-                        self.coins.remove(&p);
-                    }
+                    restore_entry(&mut self.coins, p, previous);
                 }
                 return Err(error);
             }
         };
-        for (p, consumed) in spent_changes {
-            if consumed {
-                self.spent.record(p);
-            } else {
-                self.spent.forget(&p);
-            }
-        }
+        let spends = spent_changes
+            .into_iter()
+            .map(|(p, consumed)| {
+                if consumed {
+                    self.spent.record(p)
+                } else {
+                    self.spent.forget(&p)
+                }
+            })
+            .collect();
         self.omitted_outputs += omitted;
-        if self.validation_window.len() == HEADER_WINDOW {
-            self.validation_window.pop_front();
-        }
+        let previous_row = if self.validation_window.len() == HEADER_WINDOW {
+            self.validation_window.pop_front()
+        } else {
+            None
+        };
         self.validation_window.push_back(Observation {
             height,
             hash: wire::display_hash(hash),
             checks,
             coinbase_reward_checked: reward_checked,
         });
-        Ok(())
+        Ok(Applied {
+            coins: undo,
+            spends,
+            previous_row,
+            omitted,
+        })
     }
 }

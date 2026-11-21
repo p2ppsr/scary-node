@@ -83,11 +83,12 @@ async fn witness_requires_successor_signature_and_unspent_coverage() {
     state.observe(152, &mined).unwrap();
     assert_eq!(state.status()["pending_transactions"], 0);
     assert!(state.submit_tx(&bytes).is_err());
-    let mut damaged = make_block(hash256(&mined[..80]), 153, &[]);
-    damaged[36] ^= 1;
+    let mut damaged = make_block(hash256(&mined[..80]), 153, std::slice::from_ref(&bytes));
+    *damaged.last_mut().unwrap() ^= 1;
     assert!(state.observe(153, &damaged).is_err());
-    assert!(state.status()["height"].is_null());
-    assert_eq!(state.status()["witnessed_outputs"], 0);
+    assert_eq!(state.status()["height"], 152);
+    assert!(!state.observation_window_ready());
+    assert!(state.outpoint(&child.id().unwrap(), 0).unwrap()["known"] == true);
 }
 
 #[test]
@@ -210,9 +211,9 @@ async fn rejected_known_signature_retires_jobs_and_cannot_be_reanchored() {
     assert!(m.height.is_some());
     let invalid = make_block(hash256(&first[..80]), 156, &[different]);
     assert!(m.observe(156, &invalid).is_err());
-    assert!(m.height.is_none());
+    assert_eq!(m.height, Some(155));
     assert!(!m.observation_window_ready());
-    assert!(m.validation_window.is_empty());
+    assert_eq!(m.validation_window.len(), 1);
     assert!(m.observe(156, &invalid).is_err());
     assert!(m.observe(400, &invalid).is_err());
     let descendant = make_block(hash256(&invalid[..80]), 157, &[]);
@@ -407,4 +408,146 @@ async fn matched_parent_read_only_amount_check_depends_on_witnessed_source() {
     assert_eq!(cold.status(), cold_before);
     assert_eq!(mature.status(), mature_before);
     assert_eq!(mature.outpoint(&funding_id, 0).unwrap()["eligible"], true);
+}
+
+#[tokio::test]
+async fn honest_reorg_restores_witnessed_inputs_and_replaces_settlement_ancestry() {
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcdef08").unwrap());
+    let lock = signer.lock().unwrap();
+    let funded = tx(&"28".repeat(32), 100_000, lock.clone());
+    let first = make_block([3; 32], 155, &[funded.to_bytes().unwrap()]);
+    let anchor = hash256(&first[..80]);
+    let mut spend = tx(&funded.id().unwrap(), 98_000, lock.clone());
+    spend.sign(0, &signer, 0x41, 100_000, &lock).await.unwrap();
+    let spend_bytes = spend.to_bytes().unwrap();
+    let a = make_block(anchor, 156, std::slice::from_ref(&spend_bytes));
+    let a_id = hash256(&a[..80]);
+    let b = make_block(anchor, 156, &[]);
+    let b2 = make_block(hash256(&b[..80]), 157, &[]);
+    let b3 = make_block(hash256(&b2[..80]), 158, &[]);
+
+    // Rotate the order in which an honest replacement or its child arrives.
+    for child_first in [false, true] {
+        let mut m = Mining::new(true, lock.to_binary()).unwrap();
+        m.observe(155, &first).unwrap();
+        m.lifecycle.queue(a_id, anchor, 156, "first-branch".into());
+        m.observe(156, &a).unwrap();
+        assert_eq!(
+            m.outpoint(&funded.id().unwrap(), 0).unwrap()["consumed"],
+            true
+        );
+        assert_eq!(m.outpoint(&spend.id().unwrap(), 0).unwrap()["known"], true);
+        if child_first {
+            m.observe(157, &b2).unwrap();
+            assert_eq!(m.tip(), Some(a_id));
+            assert!(!m.observation_window_ready());
+            m.observe(156, &b).unwrap();
+        } else {
+            m.observe(156, &b).unwrap();
+            assert_eq!(m.tip(), Some(a_id));
+            m.observe(157, &b2).unwrap();
+        }
+        assert_eq!(m.chain.reorgs, 1);
+        assert_eq!(m.headers.len(), 3);
+        assert!(m.observation_window_ready());
+        assert_eq!(
+            m.outpoint(&funded.id().unwrap(), 0).unwrap()["eligible"],
+            true
+        );
+        assert_eq!(
+            m.outpoint(&funded.id().unwrap(), 0).unwrap()["consumed"],
+            false
+        );
+        assert_eq!(m.outpoint(&spend.id().unwrap(), 0).unwrap()["known"], false);
+        assert_eq!(m.submit_tx(&spend_bytes).unwrap(), spend.id().unwrap());
+        m.observe(158, &b3).unwrap();
+        assert_eq!(m.status()["solutions"][0]["chain_state"], "stale_at_depth");
+    }
+}
+
+#[test]
+fn reorganizes_a_full_difficulty_window_without_losing_older_headers() {
+    let mut state = Mining::new(true, vec![]).unwrap();
+    let mut parent = [1; 32];
+    for height in 1..=170 {
+        let raw = make_block(parent, height, &[]);
+        parent = hash256(&raw[..80]);
+        state.observe(height, &raw).unwrap();
+    }
+    let base = parent;
+    let mut left = make_block(base, 171, &[]);
+    state.observe(171, &left).unwrap();
+    // A second ordinary coinbase destination produces a different branch.
+    let alt = make_block(
+        base,
+        171,
+        &[tx(
+            &"39".repeat(32),
+            1000,
+            P2PKH::from_private_key(PrivateKey::from_hex("abcdef09").unwrap())
+                .lock()
+                .unwrap(),
+        )
+        .to_bytes()
+        .unwrap()],
+    );
+    for height in 172..=178 {
+        left = make_block(hash256(&left[..80]), height, &[]);
+        state.observe(height, &left).unwrap();
+    }
+    let mut right = alt;
+    state.observe(171, &right).unwrap();
+    for height in 172..=179 {
+        right = make_block(hash256(&right[..80]), height, &[]);
+        state.observe(height, &right).unwrap();
+    }
+    assert_eq!(state.tip(), Some(hash256(&right[..80])));
+    assert_eq!(state.chain.reorgs, 1);
+    assert_eq!(state.validation_window.len(), HEADER_WINDOW);
+    assert_eq!(state.headers.len(), HEADER_WINDOW);
+}
+
+#[test]
+fn branch_replay_across_depth_and_delivery_orders() {
+    for trial in 0..256u32 {
+        let start = 200 + trial * 16;
+        let depth = 1 + trial % 8;
+        let mut miner = Mining::new(true, vec![]).unwrap();
+        let anchor = make_block([0x35; 32], start, &[]);
+        miner.observe(start, &anchor).unwrap();
+        let parent = hash256(&anchor[..80]);
+        let mut left = parent;
+        for height in start + 1..=start + depth {
+            let body = make_block(left, height, &[]);
+            left = hash256(&body[..80]);
+            miner.observe(height, &body).unwrap();
+        }
+        let other_payment = tx(
+            &"41".repeat(32),
+            1000,
+            P2PKH::from_private_key(PrivateKey::from_hex("abcdef0a").unwrap())
+                .lock()
+                .unwrap(),
+        )
+        .to_bytes()
+        .unwrap();
+        let body = make_block(parent, start + 1, &[other_payment]);
+        let mut right = hash256(&body[..80]);
+        let mut alternate = vec![(start + 1, body)];
+        for height in start + 2..=start + depth + 1 {
+            let body = make_block(right, height, &[]);
+            right = hash256(&body[..80]);
+            alternate.push((height, body));
+        }
+        if (trial / 8) % 2 == 0 {
+            alternate.reverse();
+        }
+        for (height, body) in alternate {
+            miner.observe(height, &body).unwrap();
+        }
+        assert_eq!(miner.tip(), Some(right));
+        assert_eq!(miner.chain.reorgs, 1);
+        assert!(miner.observation_window_ready());
+        assert_eq!(miner.headers.len(), depth as usize + 2);
+    }
 }

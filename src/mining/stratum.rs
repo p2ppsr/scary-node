@@ -3,7 +3,7 @@ use super::{now, subsidy, wire, Hash, Mining};
 use anyhow::{bail, ensure, Context, Result};
 use bsv::primitives::hash::hash256;
 use serde_json::{json, Value};
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
@@ -17,6 +17,7 @@ const MAX_LINE: usize = 4096;
 
 struct Job {
     revision: u64,
+    parent_epoch: u64,
     height: u32,
     previous: Hash, // SHA digest order, as serialized into the header
     bits: u32,
@@ -24,7 +25,7 @@ struct Job {
     prefix: Vec<u8>,
     suffix: Vec<u8>,
     branches: Vec<Hash>,
-    txs: Vec<Vec<u8>>,
+    txs: Vec<Arc<[u8]>>,
 }
 
 impl Job {
@@ -67,6 +68,7 @@ impl Job {
         let (_, branches) = wire::merkle(leaves)?;
         Ok(Some(Self {
             revision: state.revision,
+            parent_epoch: state.parent_epoch,
             height,
             previous: hash256(parent),
             bits,
@@ -82,7 +84,7 @@ impl Job {
         format!("{:x}", self.revision)
     }
 
-    fn notification(&self) -> Value {
+    fn notification(&self, clean: bool) -> Value {
         // CGMiner concatenates these fields into its word-swapped work buffer.
         // The raw digest is therefore swapped *within* each 32-bit word here.
         let mut worker_prev = self.previous;
@@ -92,7 +94,7 @@ impl Job {
         json!({"id":null,"method":"mining.notify","params":[self.id(),hex::encode(worker_prev),
             hex::encode(&self.prefix),hex::encode(&self.suffix),
             self.branches.iter().map(hex::encode).collect::<Vec<_>>(),format!("{VERSION:08x}"),
-            format!("{:08x}",self.bits),format!("{:08x}",self.time),true]})
+            format!("{:08x}",self.bits),format!("{:08x}",self.time),clean]})
     }
 
     fn work(
@@ -125,7 +127,7 @@ impl Job {
         wire::put_varint(&mut raw, self.txs.len() + 1);
         raw.extend(coinbase);
         for tx in &self.txs {
-            raw.extend(tx);
+            raw.extend_from_slice(tx);
         }
         raw
     }
@@ -198,7 +200,9 @@ fn share(
     ensure!(params[0].as_str() == Some(worker), "unauthorized worker");
     ensure!(
         params[1].as_str() == Some(&job.id())
-            && state.revision == job.revision
+            && state.parent_epoch == job.parent_epoch
+            && state.tip() == Some(job.previous)
+            && state.observation_window_ready()
             && !state.solved_on_tip,
         "stale job"
     );
@@ -230,6 +234,9 @@ fn share(
         solved
             .try_send((job.height, job.block(&header, &coinbase)))
             .context("publication queue unavailable")?;
+        state
+            .lifecycle
+            .queue(digest, job.previous, job.height, job.id());
         state.solved_on_tip = true;
         state.solved_blocks += 1;
         state.revision += 1;
@@ -251,9 +258,9 @@ async fn session(
     let x1 = serial.to_be_bytes();
     let mut subscribed = false;
     let mut worker = None::<String>;
-    let mut job = None::<Job>;
+    const RETAINED_JOBS: usize = 8;
+    let mut jobs = VecDeque::<(Job, HashSet<_>)>::new();
     let mut announced_revision = None;
-    let mut seen = HashSet::new();
     let mut refresh = tokio::time::interval(Duration::from_millis(150));
     refresh.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
     loop {
@@ -317,9 +324,11 @@ async fn session(
                 }
                 "mining.extranonce.subscribe" => Ok(json!(true)),
                 "mining.submit" => {
-                    if let (Some(j), Some(w)) = (&job, &worker) {
+                    let id = args.get(1).and_then(Value::as_str);
+                    let job = jobs.iter_mut().find(|(j, _)| Some(j.id().as_str()) == id);
+                    if let (Some((j, seen)), Some(w)) = (job, &worker) {
                         let mut s = state.lock().await;
-                        let reply = share(&mut s, j, args, w, x1, &mut seen, &solved);
+                        let reply = share(&mut s, j, args, w, x1, seen, &solved);
                         if let Err(e) = &reply {
                             code = match e.to_string().as_str() {
                                 "stale job" => 21,
@@ -350,15 +359,18 @@ async fn session(
             let first = announced_revision.is_none();
             announced_revision = Some(s.revision);
             let next_job = Job::from_state(&s)?;
-            if job.is_some() && next_job.is_none() {
-                // There is no work-cancellation message in Stratum V1. Closing
-                // the idle session stops a miner hashing a retired candidate.
+            if !jobs.is_empty() && next_job.is_none() {
+                // Stratum V1 has no cancellation without a replacement job.
                 return Ok(());
             }
-            job = next_job;
+            let clean = jobs
+                .front()
+                .is_none_or(|(prior, _)| prior.parent_epoch != s.parent_epoch);
+            if clean {
+                jobs.clear();
+            }
             let regtest = s.regtest;
             drop(s);
-            seen.clear();
             if first {
                 let difficulty = if regtest {
                     65535.0 / 8_388_607.0 / 16_777_216.0
@@ -371,8 +383,12 @@ async fn session(
                 )
                 .await?;
             }
-            if let Some(j) = &job {
-                write_message(&mut output, j.notification()).await?;
+            if let Some(job) = next_job {
+                write_message(&mut output, job.notification(clean)).await?;
+                if jobs.len() == RETAINED_JOBS {
+                    jobs.pop_front();
+                }
+                jobs.push_back((job, HashSet::new()));
             }
         }
     }
@@ -419,12 +435,12 @@ mod tests {
         // verbatim into its word-flipped buffer and branches as raw SHA digests.
         // This expected header and digest were independently assembled using
         // Python's struct.pack('<III',...) and hashlib.sha256 twice.
-        let j=Job{revision:15,height:1,previous:std::array::from_fn(|i| i as u8),
+        let j=Job{revision:15,parent_epoch:0,height:1,previous:std::array::from_fn(|i| i as u8),
             bits:0x207fffff,time:1_700_000_000,
             prefix:hex::decode("01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff16510408070605").unwrap(),
             suffix:hex::decode("4558414d504c45ffffffff010100000000000000015100000000").unwrap(),
             branches:vec![hash256(b"child")],txs:vec![]};
-        let msg = j.notification();
+        let msg = j.notification(true);
         assert_eq!(
             msg["params"][1],
             "03020100070605040b0a09080f0e0d0c13121110171615141b1a19181f1e1d1c"
@@ -444,12 +460,14 @@ mod tests {
     #[test]
     fn only_network_target_share_enqueues_and_retires_the_regtest_job() {
         let mut state = Mining::new(true, vec![0x51]).unwrap();
+        state.headers.push_back([5; 80]);
         let (prefix, suffix) = coinbase_parts(26, 5_000_000_000, &[0x51]);
         let time = now().unwrap();
         let job = Job {
             revision: state.revision,
+            parent_epoch: state.parent_epoch,
             height: 26,
-            previous: [5; 32],
+            previous: state.tip().unwrap(),
             bits: 0x207fffff,
             time,
             prefix,
