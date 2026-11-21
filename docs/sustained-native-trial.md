@@ -13,3 +13,28 @@ After the 1,800-second offer window, continue the same six-second miner rotation
 A one-second sampler records independent SV/Teranode heights and hashes, the entrant’s selected parent, pending count, readiness and peer transaction acceptance counters. Container memory/CPU and free disk samples run alongside; Aerospike namespace and disk usage are recorded periodically. The receipt identifies the exact binaries, source corpus commitments, each block header and body digest, script checks, and distinct signed payment count. Full wires remain available in the local run directory. The prior SQLite and Aerospike observations used a 34.6-second or 501.9-second block-input burst and remain separate.
 
 Reserve at least 20 GiB on the workstation data volume and at least 12 GiB on the Docker backing filesystem throughout. A terminal resource stop is recorded as an incomplete attempt. At registration the two 9 GiB databases each reported 861,345 records and 631,733,024 used bytes after the paired trial.
+
+## Reproduction
+
+Keep the isolated Aerospike project at its paired workload's final active tip and retain that run's input corpus. Build the pinned Python test framework and Linux ARM64 node image from the [qualification runbook](chronicle-qualification.md). The wallet gateway publishes only a loopback port to the stock SV peer. The funding setup splits the 16,384 final outputs into 65,536 evidenced outputs. The same Scary Node participates through its existing native links and Stratum listener.
+
+```sh
+docker compose -p scary-node-throughput -f regtest/compose.yaml -f regtest/mixed.compose.yaml \
+  -f regtest/mixed-native.compose.yaml -f regtest/mixed-aerospike.compose.yaml \
+  -f regtest/sustained-wallet.compose.yaml up -d --no-build --pull never wallet-ingress
+.native/py/bin/python qualification/sustained_corpus.py .native/paired-corpus .native/sustained-signed
+.native/py/bin/python qualification/sustained_native.py .native/sustained-signed .native/sustained-run
+```
+
+Run the driver with a fresh output directory. It preserves the append-only source, opportunity, block, receiver and resource logs as well as the compressed summary. `frames.bin` contains complete regtest transaction messages in scheduled order, and `ids.bin` holds their 32-byte internal transaction IDs. Each active body is retained in `blocks/<hash>.block`. Counts of locally emitted wallet messages, native node intake and independently confirmed payments have distinct denominators.
+
+
+Replay the compact receipt to check the fixed offer and miner schedules, active header chain and work, branch payment accounting, readback digests, timestamps and observed resource floors. The second command also reads all 5,529,600 native envelopes and independently recomputes each archived block’s Merkle root, source membership and five-minute cohort. A completed audit of a partial run returns an explicit failed adoption target. A corrupt or inconsistent receipt terminates verification with an error.
+
+```sh
+python3 qualification/verify_sustained_native.py .native/sustained-run/receipt.json.gz
+python3 qualification/verify_sustained_native.py .native/sustained-run/receipt.json.gz \
+  --corpus .native/sustained-signed --blocks .native/sustained-run/blocks
+```
+
+The replay checks transaction identities and commitments. Signature evidence comes from the live nodes’ validation observations. CPU and memory figures use cgroup counters from the seven services. The host and Docker reserve checks use the filesystems on which the run and node data reside.

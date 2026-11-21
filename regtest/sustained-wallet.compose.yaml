@@ -1,0 +1,6 @@
+services:
+  wallet-ingress:
+    image: nginx:1.27.4@sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab
+    networks: [regtest, host-access]
+    volumes: [./sustained-wallet.conf:/etc/nginx/nginx.conf:ro]
+    ports: ["127.0.0.1:21444:21444"]
