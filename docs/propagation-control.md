@@ -91,3 +91,13 @@ python3 qualification/matched_study.py check docs/evidence/chronicle-matched-obs
 The export packs up to 64 individually hashed gzip members per shard. Standard gzip readers can stream each shard as newline-delimited JSON, and the member index allows independent per-session extraction. Its summary commits to every complete session and any zero-opportunity preflight failure. The checker regenerates each randomized schedule, verifies worker and native wire bytes, reconstructs eligible nonce attempts and three-header settlements, and recomputes the counters and paired intervals. It refuses a phase with missing registered sessions or an unresolved measured partial.
 
 A separate stock-node readback qualification observed one stored body and three expected unknown-hash answers on two independent live processes. Both selected-tip checks succeeded. The transport regression also covers a truncated stock response and exhausted retries on the same hash. [Stock observer receipt](evidence/chronicle-matched-stock-observer.json)
+
+
+The descriptive subgroup report first replays the entire fixed-phase archive and matches it to its registered summary. For each producer pairing and signed-delay assignment it tabulates all scheduled parents, every two-discovery race, ties certified at both independent receivers, and the remaining ties. Each table includes the two miners’ opportunities and discoveries, who settled at depth two, later ancestry, unavailable native bodies, and each stock site’s successful, unavailable or exhausted lookups. Signed stale-rate differences use whole independent sessions. Conditioning on actual discovery and measured timing can select different populations. The full/full controls and all-assigned results accompany each such comparison. These tables do not determine the evaluation sample size. [Descriptive replay](../qualification/matched_subgroups.py)
+
+```sh
+python3 qualification/matched_subgroups.py docs/evidence/chronicle-matched-observer-v2-pilot \
+  "$REGISTRATION"
+python3 qualification/matched_subgroups.py docs/evidence/chronicle-matched-observer-v2-evaluation \
+  "$REGISTRATION" --pilot-summary "$SIZING"
+```
