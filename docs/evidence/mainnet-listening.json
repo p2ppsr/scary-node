@@ -1,0 +1,48 @@
+{
+  "passive_listener": {
+    "observed_at_utc": "2026-11-21T00:28:28+00:00",
+    "network": "mainnet",
+    "mode": "listen",
+    "connected_peer_ids_seen": 4,
+    "status_messages": 57,
+    "block_notices": 0,
+    "subtree_notices": 69,
+    "last_reported_height": 976407,
+    "last_reported_hash": "00000000000000000e3e6799c6bbbe9e6ef2cd499e0184b2253d98a4b21fb32a"
+  },
+  "integration_observer": {
+    "observed_at_utc": "2026-11-21T00:31:54+00:00",
+    "network": "mainnet",
+    "mode": "body observer before duplicate-notice fix",
+    "connected_peer_ids_seen": 4,
+    "status_messages": 207,
+    "block_notices": 10,
+    "subtree_notices": 219,
+    "coverage_gaps": 8,
+    "last_verified_hash": "0000000000000000125a13c983c768c3645097d26aaa017822e86173799f73e3",
+    "last_verified_height": 976408,
+    "witnessed_outputs": 3285,
+    "retained_headers": 1
+  },
+  "release_observer": {
+    "observed_at_utc": "2026-11-21T00:34:53+00:00",
+    "network": "mainnet",
+    "mode": "body observer after duplicate-notice fix",
+    "connected_peer_ids_seen": 4,
+    "status_messages": 182,
+    "block_notices": 10,
+    "subtree_notices": 153,
+    "coverage_gaps": 0,
+    "last_verified_hash": "000000000000000019bd2934abadab51608889f0e6541ac9c6f2d9cb6b1bb63a",
+    "last_verified_height": 976409,
+    "witnessed_outputs": 3711,
+    "retained_headers": 2,
+    "stratum_enabled": false,
+    "solved_blocks": 0,
+    "verified_body_heights": [
+      976408,
+      976409
+    ],
+    "distinct_publishers_of_latest_block_notice": 10
+  }
+}

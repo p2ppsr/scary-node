@@ -1,0 +1,109 @@
+name: scary-node-regtest
+
+# Independent databases and event buses. The only path between nodes is P2P/Asset.
+x-teranode: &teranode
+  image: ghcr.io/bsv-blockchain/teranode:v0.16.1@sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a
+  command: ["-localTestStartFromState=RUNNING"]
+  networks: [regtest]
+  logging:
+    driver: json-file
+    options: {max-size: "12m", max-file: "2"}
+
+x-teranode-env: &teranode-env
+  SETTINGS_CONTEXT: test
+  network: regtest
+  startAlert: "false"
+  startLegacy: "false"
+  startValidator: "true"
+  startBlockPersister: "true"
+  KAFKA_SCHEMA: memory
+  blockstore: file:///app/data/blockstore
+  subtreestore: file:///app/data/subtreestore
+  txstore: file:///app/data/txstore
+  utxostore: sqlite:///utxostore
+  blockchain_store: sqlite:///blockchain
+  p2p_allow_private_ips: "true"
+  p2p_bootstrap_peers: ""
+  p2p_dht_mode: "off"
+  p2p_enable_nat: "false"
+  # The fixture bootstraps a mature coinbase in one session on the internal bridge.
+  asset_httpHeavyRateLimit: "64"
+  asset_httpHeavyRateBurst: "128"
+  rpc_user: regtest
+  rpc_pass: disposable-regtest-rpc
+  rpc_cache_enabled: "false"
+  grpc_admin_api_key: disposable-regtest-admin-key
+  logLevel: INFO
+
+services:
+  tn1:
+    <<: *teranode
+    environment:
+      <<: *teranode-env
+      clientName: tn1
+      asset_httpPublicAddress: http://tn1:8090/api/v1
+      # Public simulation keys, copied from Teranode v0.16.1 compose/cmd/gennodes/peer_keys.json.
+      # They exist solely to give isolated test peers predictable libp2p identities.
+      p2p_peer_id: 12D3KooWAFXWuxgdJoRsaA4J4RRRr8yu6WCrAPf8FaS7UfZg3ceG
+      p2p_private_key: c8a1b91ae120878d91a04c904e0d565aa44b2575c1bb30a729bd3e36e2a1d5e6067216fa92b1a1a7e30d0aaabe288e25f1efc0830f309152638b61d84be6b71d
+      p2p_static_peers: /dns/tn2/tcp/9905/p2p/12D3KooWG6aCkDmi5tqx4G4AvVDTQdSVvTSzzQvk1vh9CtSR8KEW
+    volumes: [tn1-data:/app/data]
+  tn2:
+    <<: *teranode
+    environment:
+      <<: *teranode-env
+      clientName: tn2
+      asset_httpPublicAddress: http://tn2:8090/api/v1
+      p2p_peer_id: 12D3KooWG6aCkDmi5tqx4G4AvVDTQdSVvTSzzQvk1vh9CtSR8KEW
+      p2p_private_key: 89a2d8acf5b2e60fd969914c326c63cde50675a47897c0eaacc02eb6ff8665585d4d059f977910472bcb75040617632019cc0749443fdc66d331b61c8cfb4b0f
+      p2p_static_peers: /dns/tn1/tcp/9905/p2p/12D3KooWAFXWuxgdJoRsaA4J4RRRr8yu6WCrAPf8FaS7UfZg3ceG
+    volumes: [tn2-data:/app/data]
+  scary-node:
+    build: ..
+    image: scary-node:local
+    networks: [regtest]
+    volumes: [scary-data:/data]
+    depends_on: [tn1, tn2]
+    command:
+      - --network
+      - regtest
+      - --peer
+      - /dns/tn1/tcp/9905/p2p/12D3KooWAFXWuxgdJoRsaA4J4RRRr8yu6WCrAPf8FaS7UfZg3ceG
+      - --peer
+      - /dns/tn2/tcp/9905/p2p/12D3KooWG6aCkDmi5tqx4G4AvVDTQdSVvTSzzQvk1vh9CtSR8KEW
+      - --listen
+      - /ip4/0.0.0.0/tcp/9905
+      - --asset-bind
+      - 0.0.0.0:9090
+      - --asset-url
+      - http://scary-node:9090/api/v1
+      - --api-bind
+      - 0.0.0.0:8080
+      - --stratum-bind
+      - 0.0.0.0:3333
+      - --payout-script
+      - "76a914751e76e8199196d454941c45d1b3a323f1433bd688ac"
+      - --data-dir
+      - /data
+  ingress:
+    image: nginx:1.27.4@sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab
+    networks: [regtest, host-access]
+    volumes: [./ingress.conf:/etc/nginx/nginx.conf:ro]
+    ports:
+      - 127.0.0.1:19441:19441
+      - 127.0.0.1:19442:19442
+      - 127.0.0.1:19451:19451
+      - 127.0.0.1:19452:19452
+      - 127.0.0.1:19480:19480
+      - 127.0.0.1:19433:19433
+
+volumes:
+  tn1-data:
+  tn2-data:
+  scary-data:
+networks:
+  regtest:
+    driver: bridge
+    internal: true
+  host-access:
+    driver: bridge
