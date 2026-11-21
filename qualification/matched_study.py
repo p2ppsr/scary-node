@@ -112,7 +112,7 @@ def registration(binary, manifest, linux_manifest, calibration, output):
             "linux": linux["source_archive_sha256"],
         },
         "binary_sha256": sha(binary),
-        "linux_executable_sha256": linux["executable_sha256"],
+        "linux_executable_sha256": linux["release"]["executable_sha256"],
         "python_minor": list(sys.version_info[:2]),
         "measurement_commit": harness,
         "measurement_file_sha256": pins,

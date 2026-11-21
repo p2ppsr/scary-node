@@ -1,0 +1,1855 @@
+{
+  "schema": 1,
+  "kind": "single-source mirrored native transport calibration",
+  "build": {
+    "source_commit": "8c41f89850ea906fb4ae43bd39a17a884bd0eb62",
+    "source_tree": "b4826a5a4efc44c85944a7da23ec1efafe96a0cf",
+    "source_archive_sha256": "48b7fdccc41765888e4dd70342676c47e2fcbbc1e9133e6e449c502231841355",
+    "executable_sha256": "8f99871ba04a9f0c234d1b9520fc021396689ac7924c02a28666db9c9f3b52c9",
+    "platform": "darwin_arm64"
+  },
+  "reference_image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "planned_sources": [
+    "scary",
+    "stock-right",
+    "scary",
+    "stock-right",
+    "scary",
+    "stock-right",
+    "scary",
+    "stock-right",
+    "scary",
+    "stock-right",
+    "scary",
+    "stock-right",
+    "scary",
+    "stock-right",
+    "scary",
+    "stock-right"
+  ],
+  "rows": [
+    {
+      "index": 0,
+      "source": "scary",
+      "parent": "1464cc2df684709f50c1004e305bb18f3759fd651381a31ff5648b73eaf84a69",
+      "solution": {
+        "hash": "65e61b7bc417a640fdb0344a882bf7919232d936885e92faa0dd7ebc12685681",
+        "body_sha256": "3d057082c49fd2bfb22eec7c604e556d3131d61c26592073527aaa874e3d0da5"
+      },
+      "payment_txid": "d8f19a69da475e818659daa37f3b170fed9aa67f5a2bbfd17341b399ea3f36d4",
+      "wire_hex": "00000020694af8ea738b64f51fa3811365fd59378fb15b304e00c1509f7084f62dcc6414047e08734ef54af5da7d4849fe767aa7c9b1c56384e17ae4c7c79f876c03f57b9b03026bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff39016c0800000001000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a47200000000484730440220017b9bc6e9a20a0d9fdf0424ff34d9171eaf4b7ea0bc8264f50ba2ee956ef6910220269c26ff7063097285ea29ed59805be155b7bc9b1cd79550a3e5493ab509d2e94100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 9918458,
+      "native_capture_ns": 28991833,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 109104667,
+            "write_begin_ns": 112534958,
+            "ping_nonce": "2a71e11c22b00e9c",
+            "write_end_ns": 112560417,
+            "pong_ns": 132581583,
+            "pong_nonce": "2a71e11c22b00e9c"
+          },
+          {
+            "planned_release_ns": 109104667,
+            "write_begin_ns": 112382292,
+            "ping_nonce": "1109ed59b645d862",
+            "write_end_ns": 112426500,
+            "pong_ns": 132057292,
+            "pong_nonce": "1109ed59b645d862"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 109104667,
+            "write_begin_ns": 113196750,
+            "ping_nonce": "596f7590cc97f600",
+            "write_end_ns": 113224542,
+            "pong_ns": 132638833,
+            "pong_nonce": "596f7590cc97f600"
+          },
+          {
+            "planned_release_ns": 109104667,
+            "write_begin_ns": 113179250,
+            "ping_nonce": "5eadb968c6db6f73",
+            "write_end_ns": 113212958,
+            "pong_ns": 132109708,
+            "pong_nonce": "5eadb968c6db6f73"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "3d057082c49fd2bfb22eec7c604e556d3131d61c26592073527aaa874e3d0da5",
+        "3d057082c49fd2bfb22eec7c604e556d3131d61c26592073527aaa874e3d0da5"
+      ],
+      "receiver_active_hashes": [
+        "65e61b7bc417a640fdb0344a882bf7919232d936885e92faa0dd7ebc12685681",
+        "65e61b7bc417a640fdb0344a882bf7919232d936885e92faa0dd7ebc12685681"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -20103875,
+          19384833
+        ],
+        [
+          -19727416,
+          18878042
+        ]
+      ]
+    },
+    {
+      "index": 1,
+      "source": "stock-right",
+      "parent": "65e61b7bc417a640fdb0344a882bf7919232d936885e92faa0dd7ebc12685681",
+      "solution": {
+        "hash": "5a34f6b56110b7764fe022ebdc81e52f80a22c4b1444c696002f591f1fb2f80f",
+        "body_sha256": "90bf7e23b58f0d9b29724366e8878d9c58ff1cc1acd47fa8b6de6c295c19ed65"
+      },
+      "payment_txid": "f57e14cef9d07f0c1e09fdcdc382ff9b70bd03fd129cff6b328c66ad1092330e",
+      "wire_hex": "0000002081566812bc7edda0fa925e8836d9329291f72b884a34b0fd40a617c47b1be6651bacb4d55474372e76721581cd3c25e34d0bd75b161b3e827ed4f7e080949ac49a03026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03016d00ffffffff014cf6052a01000000232102e8eeffcee3f753a9374bcf68e0b3a7fae4914c93c9aac043a3cda3ef7f44acaaac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a47201000000494830450221008897d4a0a9b0b1cef099bf19978aa09fabfa31680618ffb236889107f172caca022036f88b0f1ecd3c6f74f5ff92edc0c7fa699845d93401babe51e259e532fa842c4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 14144417,
+      "native_capture_ns": 117770708,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 197929208,
+            "write_begin_ns": 204370542,
+            "ping_nonce": "ff8de9d49c786eb3",
+            "write_end_ns": 204419583,
+            "pong_ns": 209887750,
+            "pong_nonce": "ff8de9d49c786eb3"
+          },
+          {
+            "planned_release_ns": 197929208,
+            "write_begin_ns": 204347042,
+            "ping_nonce": "50049414da0b8257",
+            "write_end_ns": 204465833,
+            "pong_ns": 208691833,
+            "pong_nonce": "50049414da0b8257"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 197929208,
+            "write_begin_ns": 204452750,
+            "ping_nonce": "8b9395273cb0ed2c",
+            "write_end_ns": 204532792,
+            "pong_ns": 209960625,
+            "pong_nonce": "8b9395273cb0ed2c"
+          },
+          {
+            "planned_release_ns": 197929208,
+            "write_begin_ns": 204325083,
+            "ping_nonce": "177b707a3632c57f",
+            "write_end_ns": 204470292,
+            "pong_ns": 208647292,
+            "pong_nonce": "177b707a3632c57f"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "90bf7e23b58f0d9b29724366e8878d9c58ff1cc1acd47fa8b6de6c295c19ed65",
+        "90bf7e23b58f0d9b29724366e8878d9c58ff1cc1acd47fa8b6de6c295c19ed65"
+      ],
+      "receiver_active_hashes": [
+        "5a34f6b56110b7764fe022ebdc81e52f80a22c4b1444c696002f591f1fb2f80f",
+        "5a34f6b56110b7764fe022ebdc81e52f80a22c4b1444c696002f591f1fb2f80f"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -5590083,
+          5435000
+        ],
+        [
+          -4300250,
+          4366750
+        ]
+      ]
+    },
+    {
+      "index": 2,
+      "source": "scary",
+      "parent": "5a34f6b56110b7764fe022ebdc81e52f80a22c4b1444c696002f591f1fb2f80f",
+      "solution": {
+        "hash": "770669b074388f73b03037c6ce441f0225f314d845171f3960b7dc68a0731019",
+        "body_sha256": "250a0491143e208f1f87e324a82c05bfaabca632c6deea56a24f58a6913cef4c"
+      },
+      "payment_txid": "191a8aa18e6321ecf8de0b4665eefab0c6b50384c9d09aca287e4522aa60d5d2",
+      "wire_hex": "000000200ff8b21f1f592f0096c644144b2ca2802fe581dceb22e04f76b71061b5f6345adc389ad2526eaf21b18a02b0e24848cee24145dd620f8140085ca4c0167f8a5e9b03026bffff7f20010000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff39016e0800000002000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720200000049483045022100ff4335d5d52f48cd79d0e44235e2764cf8f93d4f13967883107d1c7448c5d6d502202c720a523735ef6409782377fa728bb42fbdbfd89e87b4a941ebfea587cba7084100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 10053833,
+      "native_capture_ns": 20351375,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 100481916,
+            "write_begin_ns": 108592416,
+            "ping_nonce": "1db00cde1ac29fae",
+            "write_end_ns": 108649250,
+            "pong_ns": 111463125,
+            "pong_nonce": "1db00cde1ac29fae"
+          },
+          {
+            "planned_release_ns": 100481916,
+            "write_begin_ns": 104936291,
+            "ping_nonce": "aa1ea140946f8d59",
+            "write_end_ns": 104998041,
+            "pong_ns": 109000375,
+            "pong_nonce": "aa1ea140946f8d59"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 100481916,
+            "write_begin_ns": 110155916,
+            "ping_nonce": "b4ec70596c7480b4",
+            "write_end_ns": 110215791,
+            "pong_ns": 111926375,
+            "pong_nonce": "b4ec70596c7480b4"
+          },
+          {
+            "planned_release_ns": 100481916,
+            "write_begin_ns": 110178875,
+            "ping_nonce": "c095374fa3785b6a",
+            "write_end_ns": 110204750,
+            "pong_ns": 111689625,
+            "pong_nonce": "c095374fa3785b6a"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "250a0491143e208f1f87e324a82c05bfaabca632c6deea56a24f58a6913cef4c",
+        "250a0491143e208f1f87e324a82c05bfaabca632c6deea56a24f58a6913cef4c"
+      ],
+      "receiver_active_hashes": [
+        "770669b074388f73b03037c6ce441f0225f314d845171f3960b7dc68a0731019",
+        "770669b074388f73b03037c6ce441f0225f314d845171f3960b7dc68a0731019"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -3333959,
+          1307209
+        ],
+        [
+          -6753334,
+          -1178500
+        ]
+      ]
+    },
+    {
+      "index": 3,
+      "source": "stock-right",
+      "parent": "770669b074388f73b03037c6ce441f0225f314d845171f3960b7dc68a0731019",
+      "solution": {
+        "hash": "24ae439e8892f73111f7c5ece77f90303dc080c3c66dace8770c1e45812f0d5e",
+        "body_sha256": "f1658c5f8fdcebaf525841b0f2d35f1a07b54f25250319a211a4d82e8a220d09"
+      },
+      "payment_txid": "31bcff287a098ee9b71cbfd481f14f70ae1fea857477a7a9f8d4f9faa750ed02",
+      "wire_hex": "00000020191073a068dcb760391f1745d814f325021f44cec63730b0738f3874b0690677d66fa2bd4c3ac5bed72491e243d80209981b5c6400d72158074bdd7ec94e96de9b03026bffff7f20010000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03016f00ffffffff014cf6052a0100000023210339b37a91becd5d4e64ee4a7e179dcb1354a9eb70b477cc5964959d4a3c1c9d2fac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720300000049483045022100f17aaa3bc055bc7043a02c0aa6ae38bc651359f67db9c3644c65847d2b8c7bc2022053a3a15203aeddc565f99e6d13d170bb87652b51286298f70398e19f65640bb54100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 5424750,
+      "native_capture_ns": 107425375,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 187509750,
+            "write_begin_ns": 197584167,
+            "ping_nonce": "42e76f2c5a276428",
+            "write_end_ns": 197618083,
+            "pong_ns": 201724375,
+            "pong_nonce": "42e76f2c5a276428"
+          },
+          {
+            "planned_release_ns": 187509750,
+            "write_begin_ns": 197540375,
+            "ping_nonce": "be9884412925b121",
+            "write_end_ns": 197667375,
+            "pong_ns": 201812292,
+            "pong_nonce": "be9884412925b121"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 187509750,
+            "write_begin_ns": 197524875,
+            "ping_nonce": "43eaecb5667ac443",
+            "write_end_ns": 197677833,
+            "pong_ns": 201759792,
+            "pong_nonce": "43eaecb5667ac443"
+          },
+          {
+            "planned_release_ns": 187509750,
+            "write_begin_ns": 197562500,
+            "ping_nonce": "047ed98d4dc58545",
+            "write_end_ns": 197628750,
+            "pong_ns": 201850958,
+            "pong_nonce": "047ed98d4dc58545"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "f1658c5f8fdcebaf525841b0f2d35f1a07b54f25250319a211a4d82e8a220d09",
+        "f1658c5f8fdcebaf525841b0f2d35f1a07b54f25250319a211a4d82e8a220d09"
+      ],
+      "receiver_active_hashes": [
+        "24ae439e8892f73111f7c5ece77f90303dc080c3c66dace8770c1e45812f0d5e",
+        "24ae439e8892f73111f7c5ece77f90303dc080c3c66dace8770c1e45812f0d5e"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -4175625,
+          4199500
+        ],
+        [
+          -4310583,
+          4249792
+        ]
+      ]
+    },
+    {
+      "index": 4,
+      "source": "scary",
+      "parent": "24ae439e8892f73111f7c5ece77f90303dc080c3c66dace8770c1e45812f0d5e",
+      "solution": {
+        "hash": "530ad3860027c2a792a8decb8086a324976a8f9bfb461c42116010013bccf431",
+        "body_sha256": "8506ae83d4836ee19f5af3ae88749abbbda4e4b98a55cf70e4432663dbf74c71"
+      },
+      "payment_txid": "57c6e619b510b9d435e01d2ba6c7465e4541e76e2f9e115ffc1168d63034fa34",
+      "wire_hex": "000000205e0d2f81451e0c77e8ac6dc6c380c03d30907fe7ecc5f71131f792889e43ae24578b490cbf27c6b4bc70c713a56a8ea6ff953792c779f27262b43ca594428b909c03026bffff7f20010000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3901700800000003000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a472040000004847304402205843f723c552407bb91cf98c420f4aee6a86d48d410bfbbc8079df8dfb2cffd1022014fa17c8f92ec93b83890af681c0a92e2189c41f27271468af1b0561facbd07e4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 10580583,
+      "native_capture_ns": 20924542,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 101125083,
+            "write_begin_ns": 109105042,
+            "ping_nonce": "4b4d24dab79dc416",
+            "write_end_ns": 109198708,
+            "pong_ns": 111563708,
+            "pong_nonce": "4b4d24dab79dc416"
+          },
+          {
+            "planned_release_ns": 101125083,
+            "write_begin_ns": 109864083,
+            "ping_nonce": "0873f669ad6731ad",
+            "write_end_ns": 110217500,
+            "pong_ns": 111638250,
+            "pong_nonce": "0873f669ad6731ad"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 101125083,
+            "write_begin_ns": 109049792,
+            "ping_nonce": "e4341ed07d5ca8a2",
+            "write_end_ns": 109179000,
+            "pong_ns": 111421125,
+            "pong_nonce": "e4341ed07d5ca8a2"
+          },
+          {
+            "planned_release_ns": 101125083,
+            "write_begin_ns": 109130042,
+            "ping_nonce": "1fd529ee933c7ab4",
+            "write_end_ns": 109214917,
+            "pong_ns": 111520250,
+            "pong_nonce": "1fd529ee933c7ab4"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "8506ae83d4836ee19f5af3ae88749abbbda4e4b98a55cf70e4432663dbf74c71",
+        "8506ae83d4836ee19f5af3ae88749abbbda4e4b98a55cf70e4432663dbf74c71"
+      ],
+      "receiver_active_hashes": [
+        "530ad3860027c2a792a8decb8086a324976a8f9bfb461c42116010013bccf431",
+        "530ad3860027c2a792a8decb8086a324976a8f9bfb461c42116010013bccf431"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -2316083,
+          2513916
+        ],
+        [
+          -1656167,
+          2508208
+        ]
+      ]
+    },
+    {
+      "index": 5,
+      "source": "stock-right",
+      "parent": "530ad3860027c2a792a8decb8086a324976a8f9bfb461c42116010013bccf431",
+      "solution": {
+        "hash": "7b24226e85489b884b05f37907b2d76b1d05bbc4f34634866db1699ec0b23d75",
+        "body_sha256": "bc5299ac3a6c77256349582e984d68e0e4bf1925aa61d1e5f34924205ccb8114"
+      },
+      "payment_txid": "dc6e9c9e5b6a452943a605cf7b9847aec5f841717cbaf655962f9c6468ef2791",
+      "wire_hex": "0000002031f4cc3b01106011421c46fb9b8f6a9724a38680cbdea892a7c2270086d30a5301b5aac5f971a64e5bcf45ca5be4b3a1506a83962b116c9eb830a786a37fb2049b03026bffff7f20030000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03017100ffffffff014cf6052a01000000232103b1f8d42c6e2ba9b7eae8eb37e82e2b428cf5f1f4fafc8bdff081e192d0884590ac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a472050000004847304402200bb66f99b488db5f01195f995cfd0f76e9bcaab59420bf82ad99091ed77f98e602200510faafb584a7aabb2faa91a43a7fd6a966342474833631d45f415fca94778a4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 4280875,
+      "native_capture_ns": 105580292,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 185820500,
+            "write_begin_ns": 193571500,
+            "ping_nonce": "50d314d861a787fe",
+            "write_end_ns": 193690167,
+            "pong_ns": 196882292,
+            "pong_nonce": "50d314d861a787fe"
+          },
+          {
+            "planned_release_ns": 185820500,
+            "write_begin_ns": 195729125,
+            "ping_nonce": "8daa33706b0647ef",
+            "write_end_ns": 195832709,
+            "pong_ns": 197174209,
+            "pong_nonce": "8daa33706b0647ef"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 185820500,
+            "write_begin_ns": 195765209,
+            "ping_nonce": "2abf7ca0987ae29d",
+            "write_end_ns": 195791709,
+            "pong_ns": 197142084,
+            "pong_nonce": "2abf7ca0987ae29d"
+          },
+          {
+            "planned_release_ns": 185820500,
+            "write_begin_ns": 193539959,
+            "ping_nonce": "b60e580c9e041006",
+            "write_end_ns": 193791042,
+            "pong_ns": 196816500,
+            "pong_nonce": "b60e580c9e041006"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "bc5299ac3a6c77256349582e984d68e0e4bf1925aa61d1e5f34924205ccb8114",
+        "bc5299ac3a6c77256349582e984d68e0e4bf1925aa61d1e5f34924205ccb8114"
+      ],
+      "receiver_active_hashes": [
+        "7b24226e85489b884b05f37907b2d76b1d05bbc4f34634866db1699ec0b23d75",
+        "7b24226e85489b884b05f37907b2d76b1d05bbc4f34634866db1699ec0b23d75"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -3570584,
+          1117083
+        ],
+        [
+          -1087375,
+          3634250
+        ]
+      ]
+    },
+    {
+      "index": 6,
+      "source": "scary",
+      "parent": "7b24226e85489b884b05f37907b2d76b1d05bbc4f34634866db1699ec0b23d75",
+      "solution": {
+        "hash": "3d8e097f1f5653e97d062485493204a16fa255ac363803f8fc0e002d52594874",
+        "body_sha256": "d05b101e03dd6e2c0c1c7b6eac9d6df1ee9e9ec673fa7d3f91299f257b80c23c"
+      },
+      "payment_txid": "11a160856773b3561f88d7ec1faec0a2f9229ddccf6b4b29aa2d5084debf4b0e",
+      "wire_hex": "00000020753db2c09e69b16d863446f3c4bb051d6bd7b20779f3054b889b48856e22247be81b4eb7ac6c870b641c049a21535cccd7c7331eaf333eb2552556c0766763319c03026bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3901720800000004000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a472060000004847304402207baa89c641ddcdbfcca2e04496b11e84b3f6c9b9f7064544755e248a4d13fdf002206ba3c3bf53a9ef0e132118a7ce8e798df0c000695b8f19abe07c05f014ed52f94100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 10274917,
+      "native_capture_ns": 30279500,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 110468375,
+            "write_begin_ns": 117103958,
+            "ping_nonce": "7bdb6b759834b2ab",
+            "write_end_ns": 117197167,
+            "pong_ns": 122903792,
+            "pong_nonce": "7bdb6b759834b2ab"
+          },
+          {
+            "planned_release_ns": 110468375,
+            "write_begin_ns": 119142542,
+            "ping_nonce": "cbf5762a05caad40",
+            "write_end_ns": 119178125,
+            "pong_ns": 122679625,
+            "pong_nonce": "cbf5762a05caad40"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 110468375,
+            "write_begin_ns": 119125625,
+            "ping_nonce": "ecd055e3c1ca6598",
+            "write_end_ns": 119192458,
+            "pong_ns": 123372083,
+            "pong_nonce": "ecd055e3c1ca6598"
+          },
+          {
+            "planned_release_ns": 110468375,
+            "write_begin_ns": 117053875,
+            "ping_nonce": "0896f4c8f31ef895",
+            "write_end_ns": 117175583,
+            "pong_ns": 122476792,
+            "pong_nonce": "0896f4c8f31ef895"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "d05b101e03dd6e2c0c1c7b6eac9d6df1ee9e9ec673fa7d3f91299f257b80c23c",
+        "d05b101e03dd6e2c0c1c7b6eac9d6df1ee9e9ec673fa7d3f91299f257b80c23c"
+      ],
+      "receiver_active_hashes": [
+        "3d8e097f1f5653e97d062485493204a16fa255ac363803f8fc0e002d52594874",
+        "3d8e097f1f5653e97d062485493204a16fa255ac363803f8fc0e002d52594874"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -6268125,
+          3778167
+        ],
+        [
+          -3334250,
+          5625750
+        ]
+      ]
+    },
+    {
+      "index": 7,
+      "source": "stock-right",
+      "parent": "3d8e097f1f5653e97d062485493204a16fa255ac363803f8fc0e002d52594874",
+      "solution": {
+        "hash": "172710b75ec709ab08ae76aeeaccad6f1186854df5ca6c2be3ad850696261ac8",
+        "body_sha256": "635c8ed5388045bd82458f84ced525e4c0c7a568d3da8ca897741aa18b60f641"
+      },
+      "payment_txid": "ab294093728c76ff1d28ac24fc19faf3c513df8df0b9d6ed4362df302b4eec2a",
+      "wire_hex": "00000020744859522d000efcf8033836ac55a26fa10432498524067de953561f7f098e3d5d3fc6d0f550d2dec40bc63e55d1b159c2b74bfa3ca7f8b5e38ab2e237db8f289c03026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03017300ffffffff014cf6052a0100000023210326933e73e1bccfd324d834281bf2b69c59cc152fdb27d370ad5f2a3722a165bfac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a472070000004847304402206c7db9c385cb6f197b8ea2fec2faad33477516ec0bcdf509605803df4844630f0220770e116ead150cc0c8aead6e47b1e4301d8606c43fc8c78928af1fdd8a9596324100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 5159833,
+      "native_capture_ns": 106709458,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 186775625,
+            "write_begin_ns": 191683166,
+            "ping_nonce": "7fb6f55849d9c8f2",
+            "write_end_ns": 191698000,
+            "pong_ns": 192965083,
+            "pong_nonce": "7fb6f55849d9c8f2"
+          },
+          {
+            "planned_release_ns": 186775625,
+            "write_begin_ns": 191638333,
+            "ping_nonce": "853fd16fd78f3758",
+            "write_end_ns": 191653875,
+            "pong_ns": 192926458,
+            "pong_nonce": "853fd16fd78f3758"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 186775625,
+            "write_begin_ns": 187171125,
+            "ping_nonce": "f20f0f3145b7909c",
+            "write_end_ns": 187213666,
+            "pong_ns": 189869375,
+            "pong_nonce": "f20f0f3145b7909c"
+          },
+          {
+            "planned_release_ns": 186775625,
+            "write_begin_ns": 187189333,
+            "ping_nonce": "7a5ac47737ca0cbf",
+            "write_end_ns": 187228125,
+            "pong_ns": 189831166,
+            "pong_nonce": "7a5ac47737ca0cbf"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "635c8ed5388045bd82458f84ced525e4c0c7a568d3da8ca897741aa18b60f641",
+        "635c8ed5388045bd82458f84ced525e4c0c7a568d3da8ca897741aa18b60f641"
+      ],
+      "receiver_active_hashes": [
+        "172710b75ec709ab08ae76aeeaccad6f1186854df5ca6c2be3ad850696261ac8",
+        "172710b75ec709ab08ae76aeeaccad6f1186854df5ca6c2be3ad850696261ac8"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          1813791,
+          5793958
+        ],
+        [
+          1807167,
+          5737125
+        ]
+      ]
+    },
+    {
+      "index": 8,
+      "source": "scary",
+      "parent": "172710b75ec709ab08ae76aeeaccad6f1186854df5ca6c2be3ad850696261ac8",
+      "solution": {
+        "hash": "5f6dd69d230ef4c3630a654bd66523d8ef139e0c802313547906b381f5e00bfd",
+        "body_sha256": "7d4ca94b730de7e3164ec409d61c9fc8450850ad76146eb2ea004be85b5c4ef0"
+      },
+      "payment_txid": "ce8dd82cdfab284c8248664382156987bba173d035ac4f34e64b79f63f19f1be",
+      "wire_hex": "00000020c81a26960685ade32b6ccaf54d8586116fadcceaae76ae08ab09c75eb710271748cf7f5192170fe756ee8a395fd8a9a4c903cc8eb69655c00fb963cd613b4fb19c03026bffff7f20020000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3901740800000005000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720800000049483045022100896ec1fbe7f307ddcf12b3326a398575e54233dbbcde302a83d8afd4bb58f076022035d039cfa092c488a242ba9adff01d05f3e29910a8981ef2bbbce1ebcede751b4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 10492292,
+      "native_capture_ns": 20846792,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 101069083,
+            "write_begin_ns": 110652792,
+            "ping_nonce": "e41ca850e45fd8c9",
+            "write_end_ns": 110666833,
+            "pong_ns": 118108833,
+            "pong_nonce": "e41ca850e45fd8c9"
+          },
+          {
+            "planned_release_ns": 101069083,
+            "write_begin_ns": 110685583,
+            "ping_nonce": "24bb2722e5518f15",
+            "write_end_ns": 110699792,
+            "pong_ns": 118276542,
+            "pong_nonce": "24bb2722e5518f15"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 101069083,
+            "write_begin_ns": 110543333,
+            "ping_nonce": "68e02ce21371a6a2",
+            "write_end_ns": 110563750,
+            "pong_ns": 118345792,
+            "pong_nonce": "68e02ce21371a6a2"
+          },
+          {
+            "planned_release_ns": 101069083,
+            "write_begin_ns": 110494750,
+            "ping_nonce": "1f7b5a0ecc667939",
+            "write_end_ns": 110637958,
+            "pong_ns": 118323250,
+            "pong_nonce": "1f7b5a0ecc667939"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "7d4ca94b730de7e3164ec409d61c9fc8450850ad76146eb2ea004be85b5c4ef0",
+        "7d4ca94b730de7e3164ec409d61c9fc8450850ad76146eb2ea004be85b5c4ef0"
+      ],
+      "receiver_active_hashes": [
+        "5f6dd69d230ef4c3630a654bd66523d8ef139e0c802313547906b381f5e00bfd",
+        "5f6dd69d230ef4c3630a654bd66523d8ef139e0c802313547906b381f5e00bfd"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -7693000,
+          7565500
+        ],
+        [
+          -7637667,
+          7781792
+        ]
+      ]
+    },
+    {
+      "index": 9,
+      "source": "stock-right",
+      "parent": "5f6dd69d230ef4c3630a654bd66523d8ef139e0c802313547906b381f5e00bfd",
+      "solution": {
+        "hash": "3b49755fd86485794b9ec7c36d6e5d7d7551dc14950d0980b5662642c22204d3",
+        "body_sha256": "3d4d680b1e29a1c86b6f1b9f221e9aa484a016ce4323fe821c54a413b1512b69"
+      },
+      "payment_txid": "33a86f6cfe457bf9addd595560f51e3309a263937e52992cb734c4d1270f546d",
+      "wire_hex": "00000020fd0be0f581b30679541323800c9e13efd82365d64b650a63c3f40e239dd66d5f463f10b64ec8bf2f55ba0f7fd5c5bcd1a23982df0657f047ac9b8672cbb2816d9c03026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03017500ffffffff014cf6052a010000002321030f65459cd0b2aedf8a2e4a06d7f67d17ddc248045190f133e1f918e28f9536baac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720900000048473044022001c996d997c7b9ea36332c7f27162311e758f235a7a866af634be0951c7b383c02202f353c8fe6d4e15a717bd93985272b0fb1afa09170c7040a1aac35900bf90ab74100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 4027125,
+      "native_capture_ns": 106740333,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 186881417,
+            "write_begin_ns": 196309250,
+            "ping_nonce": "7331aabd2354d34c",
+            "write_end_ns": 196393125,
+            "pong_ns": 205349917,
+            "pong_nonce": "7331aabd2354d34c"
+          },
+          {
+            "planned_release_ns": 186881417,
+            "write_begin_ns": 196227167,
+            "ping_nonce": "3c33eee12206bed2",
+            "write_end_ns": 196334375,
+            "pong_ns": 203690083,
+            "pong_nonce": "3c33eee12206bed2"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 186881417,
+            "write_begin_ns": 194975500,
+            "ping_nonce": "547779e35a37b43d",
+            "write_end_ns": 195081708,
+            "pong_ns": 203627500,
+            "pong_nonce": "547779e35a37b43d"
+          },
+          {
+            "planned_release_ns": 186881417,
+            "write_begin_ns": 193928333,
+            "ping_nonce": "fdd949d20bb23928",
+            "write_end_ns": 194099250,
+            "pong_ns": 200407208,
+            "pong_nonce": "fdd949d20bb23928"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "3d4d680b1e29a1c86b6f1b9f221e9aa484a016ce4323fe821c54a413b1512b69",
+        "3d4d680b1e29a1c86b6f1b9f221e9aa484a016ce4323fe821c54a413b1512b69"
+      ],
+      "receiver_active_hashes": [
+        "3b49755fd86485794b9ec7c36d6e5d7d7551dc14950d0980b5662642c22204d3",
+        "3b49755fd86485794b9ec7c36d6e5d7d7551dc14950d0980b5662642c22204d3"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -7318250,
+          10374417
+        ],
+        [
+          -4180041,
+          9761750
+        ]
+      ]
+    },
+    {
+      "index": 10,
+      "source": "scary",
+      "parent": "3b49755fd86485794b9ec7c36d6e5d7d7551dc14950d0980b5662642c22204d3",
+      "solution": {
+        "hash": "40788d395b677dc51f61601b011bf85c51a9a66b42e501758b4b7d779947bbac",
+        "body_sha256": "e50429c8c1b6bf3e311545060ea60803dd2a569f4e953726113d14a2dfb6debd"
+      },
+      "payment_txid": "a1f037f27121dc2377e4a6796617c5c919666fdf0d5037073b6be6e8ee464d1c",
+      "wire_hex": "00000020d30422c2422666b580090d9514dc51757d5d6e6dc3c79e4b798564d85f75493bbfae3c3cbca11f7ae59009b24bd3abfb17aa195ffdde2c18db2b9c8d2a86c42a9c03026bffff7f20010000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3901760800000006000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720a00000049483045022100814f7c22168eecb3ea52830edc0c69e6ebe6b4c7a8e78fd923de8dfadb9c900a02200b8241f60856fc0b9c09fe3803122783494465d26ccb41c329b71ce08c292ff14100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 10655542,
+      "native_capture_ns": 21125375,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 101209459,
+            "write_begin_ns": 111287792,
+            "ping_nonce": "13483fb30f661330",
+            "write_end_ns": 111379584,
+            "pong_ns": 114323917,
+            "pong_nonce": "13483fb30f661330"
+          },
+          {
+            "planned_release_ns": 101209459,
+            "write_begin_ns": 111242000,
+            "ping_nonce": "9de3d6b1e661b919",
+            "write_end_ns": 111344959,
+            "pong_ns": 114472042,
+            "pong_nonce": "9de3d6b1e661b919"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 101209459,
+            "write_begin_ns": 111295250,
+            "ping_nonce": "414ccc50395ee2be",
+            "write_end_ns": 111407792,
+            "pong_ns": 114448417,
+            "pong_nonce": "414ccc50395ee2be"
+          },
+          {
+            "planned_release_ns": 101209459,
+            "write_begin_ns": 111262375,
+            "ping_nonce": "1abaf71a070ad520",
+            "write_end_ns": 111394500,
+            "pong_ns": 114375292,
+            "pong_nonce": "1abaf71a070ad520"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "e50429c8c1b6bf3e311545060ea60803dd2a569f4e953726113d14a2dfb6debd",
+        "e50429c8c1b6bf3e311545060ea60803dd2a569f4e953726113d14a2dfb6debd"
+      ],
+      "receiver_active_hashes": [
+        "40788d395b677dc51f61601b011bf85c51a9a66b42e501758b4b7d779947bbac",
+        "40788d395b677dc51f61601b011bf85c51a9a66b42e501758b4b7d779947bbac"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -3160625,
+          3028667
+        ],
+        [
+          -3133292,
+          3209667
+        ]
+      ]
+    },
+    {
+      "index": 11,
+      "source": "stock-right",
+      "parent": "40788d395b677dc51f61601b011bf85c51a9a66b42e501758b4b7d779947bbac",
+      "solution": {
+        "hash": "19aa49485fec138c9e82a1ca13909c7bedf32355ea8c17445d4cf7a27d85dfda",
+        "body_sha256": "96c08ace635ac03c4107bedcbd564a390e49a8c63df353c32310e7020bd46a9a"
+      },
+      "payment_txid": "30be6ba93ff985611a201237349ecd22a92edb6c9f628a8e347d13321c59e1a4",
+      "wire_hex": "00000020acbb4799777d4b8b7501e5426ba6a9515cf81b011b60611fc57d675b398d7840d013624fe6ed1ef6a525f58dfa2c12b965f8ea3f8d6eac946d499177b8b0f10f9d03026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03017700ffffffff014cf6052a010000002321024b599b169105be0f7e5b3d386784ea11ac5f4260b499e7bb14b2cc535f5a40c5ac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720b00000049483045022100f6124096fd96527d3bdc3d3e40d80895d248560882ea0c1af2c48ba753d4bc35022034744df56e825d5ce9f2d3a5024fafd7f97e54a9a86990ce3508963a9e3eb60c4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 6939500,
+      "native_capture_ns": 109303042,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 189421333,
+            "write_begin_ns": 199326583,
+            "ping_nonce": "be37c5fadc8e60f4",
+            "write_end_ns": 199374625,
+            "pong_ns": 201702542,
+            "pong_nonce": "be37c5fadc8e60f4"
+          },
+          {
+            "planned_release_ns": 189421333,
+            "write_begin_ns": 198184625,
+            "ping_nonce": "a2c3b8dabf6d2401",
+            "write_end_ns": 198241667,
+            "pong_ns": 199154542,
+            "pong_nonce": "a2c3b8dabf6d2401"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 189421333,
+            "write_begin_ns": 199340750,
+            "ping_nonce": "867f86ae1205a3b8",
+            "write_end_ns": 199362958,
+            "pong_ns": 201659125,
+            "pong_nonce": "867f86ae1205a3b8"
+          },
+          {
+            "planned_release_ns": 189421333,
+            "write_begin_ns": 191608375,
+            "ping_nonce": "e0d32b566a443a59",
+            "write_end_ns": 191691792,
+            "pong_ns": 195096208,
+            "pong_nonce": "e0d32b566a443a59"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "96c08ace635ac03c4107bedcbd564a390e49a8c63df353c32310e7020bd46a9a",
+        "96c08ace635ac03c4107bedcbd564a390e49a8c63df353c32310e7020bd46a9a"
+      ],
+      "receiver_active_hashes": [
+        "19aa49485fec138c9e82a1ca13909c7bedf32355ea8c17445d4cf7a27d85dfda",
+        "19aa49485fec138c9e82a1ca13909c7bedf32355ea8c17445d4cf7a27d85dfda"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -2332542,
+          2361792
+        ],
+        [
+          3088417,
+          7546167
+        ]
+      ]
+    },
+    {
+      "index": 12,
+      "source": "scary",
+      "parent": "19aa49485fec138c9e82a1ca13909c7bedf32355ea8c17445d4cf7a27d85dfda",
+      "solution": {
+        "hash": "42a1162095ee19069d3ff644244b64129e46bdc5b94ed0cc0d7511cb81063d8a",
+        "body_sha256": "2cb507cd787a888da6a3fda7baac6eea09ca8878dedda7dc5bc58f82565af652"
+      },
+      "payment_txid": "4a452d314c9131c6a98f4b8f24498647d9acced5ef30cf343639c67bb8305fc7",
+      "wire_hex": "00000020dadf857da2f74c5d44178cea5523f3ed7b9c9013caa1829e8c13ec5f4849aa1999c470d6b807e1351a59a945420e198d79a71038df01a33994e4f09d1c6eb6a69d03026bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3901780800000007000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720c00000048473044022065dd238371e0a27419cae87994039efbc9bc8cc10607a53eb26a0d73fa2e6d3102201caa2dedf732a72f9676d7b8ab0ba64497c6d05f90fa43560be9ef396d45861c4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 11095625,
+      "native_capture_ns": 22190166,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 102468958,
+            "write_begin_ns": 107300875,
+            "ping_nonce": "f5e3e844c8d43989",
+            "write_end_ns": 107402583,
+            "pong_ns": 110682875,
+            "pong_nonce": "f5e3e844c8d43989"
+          },
+          {
+            "planned_release_ns": 102468958,
+            "write_begin_ns": 108056416,
+            "ping_nonce": "f039e73751e19942",
+            "write_end_ns": 108112041,
+            "pong_ns": 111446291,
+            "pong_nonce": "f039e73751e19942"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 102468958,
+            "write_begin_ns": 108082750,
+            "ping_nonce": "afc765ba693d8b01",
+            "write_end_ns": 108128750,
+            "pong_ns": 111021583,
+            "pong_nonce": "afc765ba693d8b01"
+          },
+          {
+            "planned_release_ns": 102468958,
+            "write_begin_ns": 108141208,
+            "ping_nonce": "6db3213c55ed0a26",
+            "write_end_ns": 108155166,
+            "pong_ns": 111416875,
+            "pong_nonce": "6db3213c55ed0a26"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "2cb507cd787a888da6a3fda7baac6eea09ca8878dedda7dc5bc58f82565af652",
+        "2cb507cd787a888da6a3fda7baac6eea09ca8878dedda7dc5bc58f82565af652"
+      ],
+      "receiver_active_hashes": [
+        "42a1162095ee19069d3ff644244b64129e46bdc5b94ed0cc0d7511cb81063d8a",
+        "42a1162095ee19069d3ff644244b64129e46bdc5b94ed0cc0d7511cb81063d8a"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -3720708,
+          2600125
+        ],
+        [
+          -3360459,
+          3305083
+        ]
+      ]
+    },
+    {
+      "index": 13,
+      "source": "stock-right",
+      "parent": "42a1162095ee19069d3ff644244b64129e46bdc5b94ed0cc0d7511cb81063d8a",
+      "solution": {
+        "hash": "6cf9777bff0d7fc30b50b08c413e516297bfb718b34f50c2f9d0ca559d3f7cea",
+        "body_sha256": "17b9a1bd4d2c8843bd32fb6bb152eded9a29163efb3068134e00d642cd165a79"
+      },
+      "payment_txid": "2b10ae7d474936183514273d54eb9f7ec529136a8948c3dfc79a84c23376f6e8",
+      "wire_hex": "000000208a3d0681cb11750dccd04eb9c5bd469e12644b2444f63f9d0619ee952016a142256923d793a9b4feaebd038a19def51b329bad5d073c0b349cdf6e836b4c03799d03026bffff7f20010000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03017900ffffffff014cf6052a010000002321023e909f00ac14b1c7ec643cd0efc6b6bee55530b54c7ff2feea3cf0be0195fe00ac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720d000000494830450221008bf329a85eb16974aeaca4d21417a90e7107b390b7393be658f2a5d33d90b42a02200c83c191a4744362c9949cc66540b144143a15e8992099d48ea2b6ed9d9eedc64100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 3385875,
+      "native_capture_ns": 105355750,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 185520334,
+            "write_begin_ns": 192375959,
+            "ping_nonce": "2b49a346eeb24804",
+            "write_end_ns": 192422667,
+            "pong_ns": 194699000,
+            "pong_nonce": "2b49a346eeb24804"
+          },
+          {
+            "planned_release_ns": 185520334,
+            "write_begin_ns": 192363084,
+            "ping_nonce": "6e198ab5afdc4df5",
+            "write_end_ns": 192454459,
+            "pong_ns": 193398792,
+            "pong_nonce": "6e198ab5afdc4df5"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 185520334,
+            "write_begin_ns": 192352834,
+            "ping_nonce": "40b62bd19bdbd9b1",
+            "write_end_ns": 192396917,
+            "pong_ns": 194737917,
+            "pong_nonce": "40b62bd19bdbd9b1"
+          },
+          {
+            "planned_release_ns": 185520334,
+            "write_begin_ns": 187434875,
+            "ping_nonce": "50a974dbe74633ee",
+            "write_end_ns": 187469459,
+            "pong_ns": 189792292,
+            "pong_nonce": "50a974dbe74633ee"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "17b9a1bd4d2c8843bd32fb6bb152eded9a29163efb3068134e00d642cd165a79",
+        "17b9a1bd4d2c8843bd32fb6bb152eded9a29163efb3068134e00d642cd165a79"
+      ],
+      "receiver_active_hashes": [
+        "6cf9777bff0d7fc30b50b08c413e516297bfb718b34f50c2f9d0ca559d3f7cea",
+        "6cf9777bff0d7fc30b50b08c413e516297bfb718b34f50c2f9d0ca559d3f7cea"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          -2361958,
+          2346166
+        ],
+        [
+          2570792,
+          5963917
+        ]
+      ]
+    },
+    {
+      "index": 14,
+      "source": "scary",
+      "parent": "6cf9777bff0d7fc30b50b08c413e516297bfb718b34f50c2f9d0ca559d3f7cea",
+      "solution": {
+        "hash": "76ebe80dfae409315d059a4c4eaeb910f2ecf096b0e39b0e32216e45765f20bb",
+        "body_sha256": "86e52a733650c7a46c19b3987fef30e39ad42e26af6905d22028fc1396b8b2f3"
+      },
+      "payment_txid": "a4f81d581c69c1017aaa70e03e0cccad7911024fdbcd074ae8aad31a95d553bc",
+      "wire_hex": "00000020ea7c3f9d55cad0f9c2504fb318b7bf9762513e418cb0500bc37f0dff7b77f96ca734a36470080d83f461560875cc6ecd7abb9ce20d1e7d4cfbe9b20882d9e1969d03026bffff7f20040000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff39017a0800000008000000000c2f73636172792d6e6f64652f20c8d7692d70be35bcaab86571af08e21866a4dff9d1a0cbb5ef99fee46f491372ffffffff014cf6052a010000000151000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720e0000004847304402203b9f291f8d4d3d60cf74698b56498a1184c364bd299cc403164ece93b8aafd92022005606b920dc706fc77abdbee8ba5098930b217b012200442416cb23390f8cd074100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 10541250,
+      "native_capture_ns": 21875542,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 102066125,
+            "write_begin_ns": 111144209,
+            "ping_nonce": "bbcc4f1285a59a83",
+            "write_end_ns": 111186625,
+            "pong_ns": 112413417,
+            "pong_nonce": "bbcc4f1285a59a83"
+          },
+          {
+            "planned_release_ns": 102066125,
+            "write_begin_ns": 110607542,
+            "ping_nonce": "fe85c8afc910944f",
+            "write_end_ns": 110663959,
+            "pong_ns": 113641042,
+            "pong_nonce": "fe85c8afc910944f"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 102066125,
+            "write_begin_ns": 105309417,
+            "ping_nonce": "2f628df7bc673d68",
+            "write_end_ns": 105421167,
+            "pong_ns": 108287167,
+            "pong_nonce": "2f628df7bc673d68"
+          },
+          {
+            "planned_release_ns": 102066125,
+            "write_begin_ns": 111138209,
+            "ping_nonce": "53ca5d2b4ca49918",
+            "write_end_ns": 111261625,
+            "pong_ns": 114063750,
+            "pong_nonce": "53ca5d2b4ca49918"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "86e52a733650c7a46c19b3987fef30e39ad42e26af6905d22028fc1396b8b2f3",
+        "86e52a733650c7a46c19b3987fef30e39ad42e26af6905d22028fc1396b8b2f3"
+      ],
+      "receiver_active_hashes": [
+        "76ebe80dfae409315d059a4c4eaeb910f2ecf096b0e39b0e32216e45765f20bb",
+        "76ebe80dfae409315d059a4c4eaeb910f2ecf096b0e39b0e32216e45765f20bb"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          2857042,
+          7104000
+        ],
+        [
+          -3456208,
+          2502833
+        ]
+      ]
+    },
+    {
+      "index": 15,
+      "source": "stock-right",
+      "parent": "76ebe80dfae409315d059a4c4eaeb910f2ecf096b0e39b0e32216e45765f20bb",
+      "solution": {
+        "hash": "7976c79049865b43fc8542d96c9496bef8e2e98611cd9fb8306150d4e6b107e9",
+        "body_sha256": "67af247834c3aac36bdd65932f3b15d98fa2ac616e64eab14fe3a8e74e96edcd"
+      },
+      "payment_txid": "efbd8db3a2f11ca0f752256d5a6e074ab2342b8baa634ab29e536dd7c6a97687",
+      "wire_hex": "00000020bb205f76456e21320e9be3b096f0ecf210b9ae4e4c9a055d3109e4fa0de8eb76dce0dcf0c607556c773f2d342a66054d5a2dc40f427fa52774aa5879275d9ed89d03026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03017b00ffffffff014cf6052a01000000232103ea2a34df8e380111418b069b668daffb7e5d440630b4ab0a4cf357f6a3dda1fbac000000000100000001ad64f1ab092e85b78a74ce13d6573ded6ca8502dd93feee7d7a54e46d7e4a4720f000000484730440220586eec7932cc4616613d9dc91e9306e691c6f4116e305651e59298c2eb7b475002205a0a079420743eb96e2eda71ca8ec742c05e41c55dde467c8c67d16ce5b56cfb4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+      "peer_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "peer_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "native_submit_ack_ns": 5023666,
+      "native_capture_ns": 107328833,
+      "legs": [
+        [
+          {
+            "planned_release_ns": 187408583,
+            "write_begin_ns": 196475875,
+            "ping_nonce": "bf825a6907b820da",
+            "write_end_ns": 196495833,
+            "pong_ns": 197287500,
+            "pong_nonce": "bf825a6907b820da"
+          },
+          {
+            "planned_release_ns": 187408583,
+            "write_begin_ns": 193780500,
+            "ping_nonce": "92e78c6d33dfba53",
+            "write_end_ns": 193813125,
+            "pong_ns": 194823041,
+            "pong_nonce": "92e78c6d33dfba53"
+          }
+        ],
+        [
+          {
+            "planned_release_ns": 187408583,
+            "write_begin_ns": 193805541,
+            "ping_nonce": "212d89cb89ed150d",
+            "write_end_ns": 193850416,
+            "pong_ns": 196166166,
+            "pong_nonce": "212d89cb89ed150d"
+          },
+          {
+            "planned_release_ns": 187408583,
+            "write_begin_ns": 188475583,
+            "ping_nonce": "f148dbe6d57cb34e",
+            "write_end_ns": 188524125,
+            "pong_ns": 190977583,
+            "pong_nonce": "f148dbe6d57cb34e"
+          }
+        ]
+      ],
+      "receiver_wire_sha256": [
+        "67af247834c3aac36bdd65932f3b15d98fa2ac616e64eab14fe3a8e74e96edcd",
+        "67af247834c3aac36bdd65932f3b15d98fa2ac616e64eab14fe3a8e74e96edcd"
+      ],
+      "receiver_active_hashes": [
+        "7976c79049865b43fc8542d96c9496bef8e2e98611cd9fb8306150d4e6b107e9",
+        "7976c79049865b43fc8542d96c9496bef8e2e98611cd9fb8306150d4e6b107e9"
+      ],
+      "left_minus_right_bounds_ns": [
+        [
+          309709,
+          3481959
+        ],
+        [
+          2802917,
+          6347458
+        ]
+      ]
+    }
+  ],
+  "complete": true,
+  "clock": {
+    "implementation": "mach_absolute_time()",
+    "resolution_seconds": 4.166666666666666e-08
+  },
+  "external_quiescence_receipt_sha256": "9ba9fe884fe79d50e07887a3b2eef287ee08a2a3c6daa93b90777ce87533db37",
+  "base": "1464cc2df684709f50c1004e305bb18f3759fd651381a31ff5648b73eaf84a69",
+  "private_stock_bridges": 4,
+  "calibrated": {
+    "max_ingress_bound_ns": 20103875,
+    "max_native_capture_ns": 117770708,
+    "proposed_tolerance_ns": 23000000,
+    "proposed_hold_ns": 250000000,
+    "proposed_signed_delay_ns": 184000000
+  }
+}
