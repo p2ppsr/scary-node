@@ -2,7 +2,7 @@
 
 Scary Node is an alpha Rust implementation of a BSV mining node. Its default command listens to the native Teranode peer network on BSV mainnet. An operator can enable block observation, submit signed spends of recently witnessed outputs and give a locally assembled block candidate to an ASIC over Stratum V1.
 
-The node starts with an empty working set. It sees an output created, observes other miners build on its block, and tracks subsequent spends on that branch. A spend becomes eligible only after the creating block has a successor and the node has processed the complete bodies covering the intervening interval. Continued proof of work is the entrant’s basis for recognizing accepted history. Scary Node checks Chronicle-era ordinary spends with the shared BDK interpreter. Signed directives govern frozen outputs and authorized confiscations. [Validation model](docs/validation.md)
+The node starts with an empty working set. It sees an output created, observes other miners build on its block, and tracks subsequent spends on that branch. A confirmed output can fund a template after its creating block has a successor and the node has processed every intervening body. An eligible transaction can also fund a child later in the same template. Continued proof of work is the entrant’s basis for recognizing accepted history. Scary Node checks Chronicle-era ordinary spends with the shared BDK interpreter. Signed directives govern frozen outputs and authorized confiscations. [Validation model](docs/validation.md)
 
 ## Listen on mainnet
 
@@ -60,7 +60,7 @@ The race lab gives a Scary Node Stratum job and a full-state Teranode job one SH
 
 [Experimental design and reproduction](docs/races.md) · [Stale rates and uncertainty](docs/race-results.md)
 
-The native-receiver study also measures opportunities when a miner has no ready job and includes a full-state versus full-state control. Four paired engineering trials found that immediate SV publication reduced median solo submit-to-active readback from 533 ms to 46 ms. The preregistered evaluation on each frozen executable measures stale rates and their uncertainty. [Native propagation study](docs/production-cohort.md)
+The native-receiver study also measures opportunities when a miner has no ready job and includes a full-state versus full-state control. Four paired engineering trials found that immediate SV publication reduced median solo submit-to-active readback from 533 ms to 46 ms. The preregistered evaluations measure stale rates and their uncertainty. The matched-ingress study additionally times native delivery to independent receivers and includes all registered opportunities. [Native propagation study](docs/production-cohort.md) · [Matched-ingress design and enrollment](docs/propagation-control.md)
 
 ## Verify job and branch recovery
 
@@ -72,7 +72,7 @@ The reliability proof submits an older Stratum job after a same-parent update, c
 
 Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. Run `regtest/mixed.sh` for independent SV Node and Teranode adoption, or `regtest/mixed.sh --stream sustained` to reproduce 24 mixed-network Stratum rounds. The four-store block replay covers 524,288 signed spends. The separate 30-minute lab uses native wallet connections and 300 scheduled mining opportunities. [Reproduction and production acceptance](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md) · [Native wallet and Stratum lab](docs/sustained-native-trial.md)
 
-To audit the 30-minute direct-wallet result without running Docker, download its signed source and selected block bodies. Through the five-minute drain, the four-node lab confirmed 1,143,159 of 5,529,600 offered payments, or 544.36 per second. The production-settings inventory replication confirmed all 5,529,600 at 3,037.51 per second, with zero entrant-issued jobs in its 225 slots. The direct-wallet replay checks every offered transaction ID and recounts confirmed transactions from 134 full blocks. [Download the regtest wires](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1) · [Offline verification](docs/sustained-native-trial.md) · [Inventory replication and work availability](docs/sustained-native-replication.md)
+To audit both 30-minute wallet trials without running Docker, download the common signed source, each study’s selected block bodies and the inventory wallets’ request and delivery records. Through the five-minute drain, the four-node lab confirmed 1,143,159 of 5,529,600 offered payments, or 544.36 per second. The production-settings inventory replication confirmed all 5,529,600 at 3,037.51 per second, with zero entrant-issued jobs in its 225 slots. Offline replay verified every offered transaction ID and all Merkle roots across the 134 direct-wallet and 77 inventory-trial blocks. [Download the regtest wires](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1) · [Offline verification](docs/sustained-native-trial.md) · [Inventory replication and work availability](docs/sustained-native-replication.md)
 
 ## Point an ASIC at your node
 
@@ -88,7 +88,9 @@ Set the payout locking script to an address you control. Run the node with a rea
   --payout-script "$PAYOUT_SCRIPT_HEX"
 ```
 
-Configure the ASIC’s pool URL as `stratum+tcp://YOUR_NODE:3333`, enter a worker name and use the password from the worker credential file. Check `GET /status` for the observed tip. After entry, use a wallet you control to fund a P2PKH output and wait for the node to observe its block and a successor. In the wallet, sign a fee-paying child of that exact output with `SIGHASH_ALL | FORKID`, save its raw bytes to `child.tx`, and submit it to your node before broadcasting it elsewhere. See the [operator guide](docs/operations.md) for the admitted transaction format.
+Configure the ASIC’s pool URL as `stratum+tcp://YOUR_NODE:3333`, enter a worker name and use the password from the worker credential file. Check authenticated `GET /status` for the selected tip, pending transactions and readiness reasons. Stock SV peers and native Teranode subtrees can supply eligible wallet payments. Scary retains a valid peer payment awaiting its witnessed funding block’s first successor and checks it again when the successor arrives. [Stock-node demonstration](docs/early-peer-intake.md)
+
+To supply your own test payment after entry, use a wallet you control to fund a P2PKH output and wait for the node to observe its block and a successor. In the wallet, sign a fee-paying child of that exact output with `SIGHASH_ALL | FORKID`, save its raw bytes to `child.tx`, and submit it to your node before broadcasting it elsewhere. See the [operator guide](docs/operations.md) for the admitted transaction format.
 
 ```sh
 curl --fail-with-body --data-binary @child.tx \
