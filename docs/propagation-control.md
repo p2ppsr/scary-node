@@ -101,3 +101,22 @@ python3 qualification/matched_subgroups.py docs/evidence/chronicle-matched-obser
 python3 qualification/matched_subgroups.py docs/evidence/chronicle-matched-observer-v2-evaluation \
   "$REGISTRATION" --pilot-summary "$SIZING"
 ```
+
+## Closed replacement sizing pilot
+
+All 16 independent sessions sealed, with 96 scheduled parents in each of the six randomized producer/delay conditions and 576 in total. No setup retry or measured interruption occurred in this replacement cohort. The equal-delay witnessed miner had work on 84 of 96 parents. Its full-state competitor had work on all 96. The table preserves unready parents in those exposure counts. Each stale fraction uses that miner’s own discoveries as its denominator. [Registered summary and per-receiver counts](evidence/chronicle-matched-observer-v2-pilot/summary.json) · [Individually hashed raw sessions](evidence/chronicle-matched-observer-v2-pilot/shards.json)
+
+| Producer pair, left / right | Assigned downstream delay | Left stale / discoveries | Right stale / discoveries | Ties certified on both receivers / all ties |
+| --- | --- | ---: | ---: | ---: |
+| Witnessed / full | Right +184 ms | 0 / 56 | 34 / 74 | 34 / 34 |
+| Witnessed / full | Equal | 8 / 57 | 27 / 74 | 35 / 35 |
+| Witnessed / full | Left +184 ms | 24 / 60 | 0 / 60 | 24 / 24 |
+| Full / full | Right +184 ms | 0 / 66 | 30 / 60 | 30 / 30 |
+| Full / full | Equal | 13 / 65 | 18 / 62 | 30 / 31 |
+| Full / full | Left +184 ms | 35 / 62 | 0 / 69 | 35 / 35 |
+
+In the equal-assigned witnessed/full condition, stale rates were **14.04% and 36.49%**. The paired difference was **−22.45 percentage points**, with a session-clustered 95% interval from **−43.01 to −1.89 points**. The corresponding full/full control difference was **−9.03 points**, with a 95% interval from **−27.91 to +9.84 points**. Both arms met the registered 95% ingress-certification threshold for equal-assigned simultaneous discoveries. Across the signed conditions, the earlier-delivered role won all 123 ties. This identifies an experimentally imposed arrival-order effect on the isolated receivers. [Control results and descriptive tie subgroups](evidence/chronicle-matched-observer-v2-pilot-subgroups.json)
+
+A 23 ms equivalence tolerance leaves room for one candidate to arrive first. On the preselected continuation receiver, an exploratory replay of the equal-assigned ties found that the conservative ingress interval established the earlier side in 10 of 35 witnessed/full ties and 6 of 31 full/full ties. The earlier side won in all 16 determinate cases. The interval spanned zero on the remaining 50. Those observations cannot distinguish arrival order, receiver-side processing and chance as explanations for the residual role difference. In each probe window, all 1,152 active-tip queries returned. Of 1,530 by-hash body lookups across the two receivers in that window, 320 exhausted both attempts and remained unknown. Their discoveries and scheduled parents stayed in the analysis. [Raw deadline measurements](evidence/chronicle-matched-observer-v2-pilot/sessions-00000.jsonl.gz)
+
+The sizing half-width was **20.56 percentage points**. The preregistered formula uses the observed between-session influence standard deviation of **0.38586** to fix **6,765 fresh independent sessions**, or **243,540 scheduled parents**. Each of the six producer/delay conditions receives 40,590 scheduled parents. The evaluation targets a one-percentage-point half-width and will report the precision actually achieved. These 16 sizing sessions and the interrupted first pilot are excluded from that evaluation. [Published sizing inputs](evidence/chronicle-matched-observer-v2-pilot/summary.json)
