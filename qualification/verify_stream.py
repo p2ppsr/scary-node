@@ -15,7 +15,14 @@ def verify(path):
     with gzip.open(path, "rt") as f:
         data = json.load(f)["stream"]
     rows = data["rounds"]
-    assert len(rows) == 8
+    planned = data.get("planned_rounds", 8)
+    assert (
+        planned,
+        data["ordinary_payments_per_round"],
+        data.get("admission_batch", 1),
+        data.get("planned_background", 24),
+    ) in {(8, 1024, 1, 24), (24, 2048, 256, 96)}
+    assert len(rows) == planned
     ordinary = data["ordinary_payments_per_round"]
     funding = bytes.fromhex(data["funding_block_hex"])
     fund_hash = data["funding_block"]
@@ -89,7 +96,11 @@ def verify(path):
         previous = h
     offers = data["background"]
     assert len(spent) == len(balances)
-    assert len(offers) == len({o["txid"] for o in offers}) == 24
+    assert (
+        len(offers)
+        == len({o["txid"] for o in offers})
+        == data.get("planned_background", 24)
+    )
     assert all(
         landed[o["txid"]] == o["active_block"] and o["open_ns"] <= o["ack_ns"]
         for o in offers

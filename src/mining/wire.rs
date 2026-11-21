@@ -91,7 +91,7 @@ pub fn transaction<'a>(
 }
 
 /// Contextual locktime can be read without copying every script into SDK objects.
-pub fn final_under(raw: &[u8], height: u32, median: Option<u32>) -> Result<Option<bool>> {
+pub fn final_under(raw: &[u8], height: u32, time_cutoff: Option<u32>) -> Result<Option<bool>> {
     let lock = u32::from_le_bytes(
         raw.get(raw.len().checked_sub(4).context("missing locktime")?..)
             .context("missing locktime")?
@@ -116,7 +116,7 @@ pub fn final_under(raw: &[u8], height: u32, median: Option<u32>) -> Result<Optio
     Ok(if lock < 500_000_000 {
         Some(lock < height)
     } else {
-        median.map(|t| lock < t)
+        time_cutoff.map(|t| lock < t)
     })
 }
 pub fn p2sh(script: &[u8]) -> bool {

@@ -23,10 +23,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
     collections::{HashMap, HashSet},
-    fs::{self, OpenOptions},
+    fs,
     io::Write,
     net::SocketAddr,
-    path::{Path, PathBuf},
+    path::Path,
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -40,7 +40,7 @@ pub struct Config {
     pub network: String,
     pub peers: Vec<String>,
     pub listen: String,
-    pub key_file: PathBuf,
+    pub key: identity::Keypair,
     pub asset_bind: Option<SocketAddr>,
     pub asset_url: Option<String>,
     pub fetch_bodies: bool,
@@ -76,7 +76,10 @@ pub enum Event {
         peer: String,
         hash: String,
     },
-    Gap(String),
+    Gap {
+        hash: Option<String>,
+        reason: String,
+    },
     PublicationFailed {
         hash: String,
         error: String,
@@ -92,7 +95,7 @@ struct Behaviour {
     identify: identify::Behaviour,
 }
 
-fn load_key(path: &Path) -> Result<identity::Keypair> {
+pub fn load_key(path: &Path) -> Result<identity::Keypair> {
     match fs::read(path) {
         Ok(bytes) => {
             return identity::Keypair::from_protobuf_encoding(&bytes)
@@ -101,22 +104,15 @@ fn load_key(path: &Path) -> Result<identity::Keypair> {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
         Err(e) => return Err(e.into()),
     }
-    if let Some(p) = path.parent() {
-        fs::create_dir_all(p)?;
-    }
+    let parent = path.parent().context("missing peer identity directory")?;
+    fs::create_dir_all(parent)?;
     let key = identity::Keypair::generate_ed25519();
-    let mut opts = OpenOptions::new();
-    opts.write(true).create_new(true);
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        opts.mode(0o600);
-    }
-    let mut file = opts
-        .open(path)
-        .context("creating unique private peer identity")?;
+    let mut file = tempfile::NamedTempFile::new_in(parent)?;
     file.write_all(&key.to_protobuf_encoding()?)?;
-    file.sync_all()?;
+    file.as_file().sync_all()?;
+    file.persist_noclobber(path)
+        .context("installing unique private peer identity")?;
+    fs::File::open(parent)?.sync_all()?;
     Ok(key)
 }
 
@@ -273,9 +269,10 @@ async fn dispatch(
         let hash = request.hash.clone();
         if queue.offer(request).is_err() {
             events
-                .send(Event::Gap(format!(
-                    "block download queue unavailable for {hash}"
-                )))
+                .send(Event::Gap {
+                    reason: format!("block download queue unavailable for {hash}"),
+                    hash: Some(hash),
+                })
                 .await?;
         }
     }
@@ -448,10 +445,9 @@ pub async fn run(
         config.network != "regtest" || !config.peers.is_empty() || config.allow_sv_only,
         "regtest needs an explicit peer"
     );
-    let key = load_key(&config.key_file)?;
     let protocol = format!("/teranode/bitcoin/{}/1.0.0", config.network);
     let topics = Topics::new(&config.network);
-    let mut swarm = SwarmBuilder::with_existing_identity(key)
+    let mut swarm = SwarmBuilder::with_existing_identity(config.key)
         .with_tokio()
         .with_tcp(
             tcp::Config::default().nodelay(true),
@@ -541,7 +537,7 @@ pub async fn run(
                         Err(error) => eprintln!("mainnet bootstrap lookup: {error}"),
                     }
                 }
-                let (blocked,missing)={let m=state.lock().await;(m.directives.banned.clone(),m.missing_recent())};
+                let (blocked,missing)={let m=state.lock().await;(m.directives.active_bans(),m.missing_recent())};
                 if let Some(queue)=&fetch{
                     for (id,height) in missing {
                         for base in asset_sources.values(){

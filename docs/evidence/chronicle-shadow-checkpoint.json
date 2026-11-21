@@ -1,0 +1,62 @@
+{
+  "external_reference": {
+    "provider": "WhatsOnChain mainnet block header API",
+    "anchor_height": 976421,
+    "anchor_hash": "00000000000000001076543ba0f684404e1b03b04a38403e531db3f381dced9a",
+    "tip_height": 976511,
+    "tip_hash": "000000000000000000aba8e7b99e254343964efe2347596967945d1aa4ee91c2",
+    "tip_chainwork": "0000000000000000000000000000000000000000016f7b6647ad2f0687bdb7ce",
+    "reference_tip_read_at_utc": "2026-11-21T18:30:46.749890Z",
+    "retrospective_headers_supplemented": 3,
+    "absolute_chainwork_delta_matched": true
+  },
+  "first": {
+    "height": 976422,
+    "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+    "observed_utc": "2026-11-21T02:23:34Z"
+  },
+  "latest": {
+    "height": 976511,
+    "hash": "000000000000000000aba8e7b99e254343964efe2347596967945d1aa4ee91c2",
+    "observed_utc": "2026-11-21T18:25:17Z"
+  },
+  "target_contiguous_blocks": 1008,
+  "target_length_observed": false,
+  "current_contiguous_blocks": 90,
+  "current_run_first_height": 976422,
+  "current_run_accumulated_work_hex": "0x2e51dceaeebe4168d23",
+  "wire_headers_rehashed": 87,
+  "header_median_time_checks": 76,
+  "independent_cw144_predictions": 0,
+  "predictions_compared_to_successors": 0,
+  "signed_ready_records": 86,
+  "latest_ready_signed_sequence": 1,
+  "unsigned_templates": 0,
+  "unsigned_templates_with_independent_cw144": 0,
+  "withheld_decisions": {
+    "difficulty window incomplete": 86,
+    "difficulty window incomplete + directives unready": 4
+  },
+  "restored_process_starts": 7,
+  "restore_mismatch_records": [],
+  "receipt_confirmed_sv_only_failover": true,
+  "distinct_timed_reporting_peers_per_tip": {
+    "0": 2,
+    "11": 83,
+    "12": 2,
+    "13": 1,
+    "14": 1,
+    "16": 1
+  },
+  "coverage_failure_recoveries": [
+    {
+      "retained_height": 976425,
+      "next_observed_height": 976426,
+      "elapsed_seconds": 152,
+      "direct_successor": true
+    }
+  ],
+  "coverage_failures_awaiting_successor": 0,
+  "continuity_or_node_prediction_exceptions": [],
+  "observations_sha256": "a4704e7960c64ca3ea8dc9a3e4a127e07320b5d4e9b5c4087a0869da90751144"
+}

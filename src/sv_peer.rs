@@ -242,7 +242,7 @@ pub async fn discover(
                 in_use.remove(&addr);
                 events.send(Event::Disconnected(format!("sv:{addr}"))).await?;
                 if let Err(e)=result{
-                    if e.downcast_ref::<IncompleteBody>().is_some(){events.send(Event::Gap(e.to_string())).await?;}
+                    if e.downcast_ref::<IncompleteBody>().is_some(){events.send(Event::Gap { hash: None, reason: e.to_string() }).await?;}
                     eprintln!("discovered SV peer {addr} disconnected: {e}");
                 }
             }
@@ -260,7 +260,12 @@ pub async fn run(
         if !state.lock().await.directives.peer_banned(&addr.ip()) {
             if let Err(e) = session(addr, regtest, &state, &events).await {
                 if e.downcast_ref::<IncompleteBody>().is_some() {
-                    events.send(Event::Gap(e.to_string())).await?;
+                    events
+                        .send(Event::Gap {
+                            hash: None,
+                            reason: e.to_string(),
+                        })
+                        .await?;
                 }
                 eprintln!("SV peer {addr} disconnected: {e}");
             }
@@ -391,13 +396,31 @@ async fn session(
                     }
                     "tx" if handshake=>{let _=state.lock().await.submit_tx(&body);}
                     "block" if handshake=>{
-                        let height=block_height(&body)?;
-                        let parent:Hash=body[4..36].try_into()?;
-                        let current=state.lock().await.height_hint();
+                        let header = body.get(..80).context("short SV block header")?;
+                        let hash = hash256(header);
+                        let parent: Hash = header[4..36].try_into()?;
+                        let (current, linked) = {
+                            let state = state.lock().await;
+                            (state.height_hint(), state.linked_height(hash, parent))
+                        };
+                        let height = match (regtest, linked) {
+                            (true, Some(height)) => height,
+                            _ => match block_height(&body) {
+                                Ok(height) => height,
+                                Err(_) if regtest => {
+                                    events.send(Event::Gap {
+                                        hash: Some(wire::display_hash(hash)),
+                                        reason: "awaiting regtest block height from linked ancestry".into(),
+                                    }).await?;
+                                    continue;
+                                }
+                                Err(error) => return Err(error),
+                            }
+                        };
                         if current>0 && height>current.saturating_add(1) && height<=current.saturating_add(24) {
                             send(&mut w,regtest,"getdata",&inventory(2,parent)).await?;
                         }
-                        let hash=wire::display_hash(hash256(&body[..80]));let (ack,done)=tokio::sync::oneshot::channel();
+                        let hash=wire::display_hash(hash);let (ack,done)=tokio::sync::oneshot::channel();
                         events.send(Event::Block{height,source:format!("sv:{addr}"),raw:body,validated:ack}).await?;
                         if done.await.unwrap_or(false){events.send(Event::Delivery{peer:format!("sv:{addr}"),hash,direction:"received_body"}).await?;}
                     }

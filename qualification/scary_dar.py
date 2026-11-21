@@ -175,7 +175,7 @@ class LabFeed:
 
 
 @contextlib.contextmanager
-def entrant(binary, node, feed, dir, port, stratum):
+def entrant(binary, node, feed, dir, port, stratum, *, extra_args=(), require_directives=True):
     peer = node.docker("port", node.container, "18444/tcp")
     log = (dir / "node.log").open("ab")
     assets = get_port()
@@ -205,6 +205,7 @@ def entrant(binary, node, feed, dir, port, stratum):
             str(dir / "token"),
             "--regtest-alert-keys",
             str(dir / "keys.json"),
+            *extra_args,
         ],
         stdout=log,
         stderr=log,
@@ -216,9 +217,8 @@ def entrant(binary, node, feed, dir, port, stratum):
             if p.poll() is not None:
                 raise RuntimeError((dir / "node.log").read_text()[-900:])
             s = response(api + "/status")
-            return (
-                s["peer"]["connected_peer_ids_seen"]
-                and s["mining"]["directives"]["ready"]
+            return s["peer"]["connected_peer_ids_seen"] and (
+                not require_directives or s["mining"]["directives"]["ready"]
             )
 
         until(ready, "connected SV peer and signed feed")
@@ -298,8 +298,9 @@ def run(node, feed, dir, binary):
             },
         )
         until(
-            lambda: response(api + "/status")["mining"]["directives"]["last_applied"]
-            == 2,
+            lambda: (
+                response(api + "/status")["mining"]["directives"]["last_applied"] == 2
+            ),
             "confiscation authorization",
         )
         require(

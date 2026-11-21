@@ -1,0 +1,17 @@
+# Attach the two full implementations after each has independently adopted the entrant's work.
+services:
+  tn2:
+    # Stock v0.16.1 discovers its local address by opening a UDP socket to
+    # 8.8.8.8:80 even with explicit listeners. A host route confined to the
+    # internal bridge permits address selection without an internet gateway.
+    cap_add: [NET_ADMIN]
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - 'route add -host 8.8.8.8 dev eth0; exec setpriv --bounding-set=-net_admin --inh-caps=-all --ambient-caps=-all ./teranode.run "$$@"'
+      - teranode
+    environment:
+      startLegacy: "true"
+      legacy_listen_addresses: "0.0.0.0:18444"
+      legacy_connect_peers: "svref:18444"
+      legacy_allowSyncCandidateFromLocalPeers: "true"

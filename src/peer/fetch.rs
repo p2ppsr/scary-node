@@ -250,7 +250,14 @@ async fn worker(
             }
         }
         if let Some(error) = last_error {
-            if events.send(Event::Gap(error)).await.is_err() {
+            if events
+                .send(Event::Gap {
+                    hash: Some(hash),
+                    reason: error,
+                })
+                .await
+                .is_err()
+            {
                 return;
             }
         }

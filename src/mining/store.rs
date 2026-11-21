@@ -58,31 +58,6 @@ impl<W: Write> Write for Hashed<W> {
     }
 }
 impl Mining {
-    pub(super) fn extranonce_lease(&self) -> Result<(u32, u32)> {
-        let dir = self
-            .path
-            .as_ref()
-            .context("extranonce allocation needs durable state")?;
-        let dest = dir.join("extranonce.watermark");
-        let start = match fs::read(&dest) {
-            Ok(b) => u32::from_le_bytes(
-                b.as_slice()
-                    .try_into()
-                    .context("invalid extranonce watermark")?,
-            ),
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => 0,
-            Err(e) => return Err(e.into()),
-        };
-        ensure!(start < u32::MAX, "extranonce space exhausted");
-        let end = start.saturating_add(1024);
-        let tmp = dir.join("extranonce.next");
-        let mut f = File::create(&tmp)?;
-        f.write_all(&end.to_le_bytes())?;
-        f.sync_all()?;
-        fs::rename(tmp, dest)?;
-        File::open(dir)?.sync_all()?;
-        Ok((start, end))
-    }
     pub fn open_store(&mut self, dir: &Path) -> Result<()> {
         let file = dir.join("witness.state");
         if file.exists() {
@@ -124,11 +99,6 @@ impl Mining {
                         .all(|(p, h)| hash256(p) == h[4..36]),
                 "checkpoint header continuity failure"
             );
-            for b in &restored.chain.applied {
-                let header = restored.inspect_header(&b.raw)?;
-                let (txs, err) = restored.inspect_body(b.height, &header, &b.raw)?;
-                ensure!(!txs.is_empty() && err.is_none(), "invalid checkpoint body");
-            }
             if restored.active_since_entry.is_empty() {
                 if let Some(height) = restored.height {
                     for (i, h) in restored.headers.iter().rev().enumerate() {
@@ -138,6 +108,7 @@ impl Mining {
                     }
                 }
             }
+            restored.verify_restored_boundary()?;
             if restored
                 .height
                 .is_some_and(|h| h < interpreter::activation(restored.regtest))
@@ -203,5 +174,59 @@ impl Mining {
             self.revision += 1;
         }
         result
+    }
+}
+
+impl Mining {
+    fn verify_restored_boundary(&self) -> Result<()> {
+        ensure!(
+            self.headers.is_empty() == self.height.is_none(),
+            "checkpoint height and headers disagree"
+        );
+        ensure!(
+            self.chain.applied.len() <= self.headers.len(),
+            "undo journal extends beyond the observed headers"
+        );
+        // Older checkpoints acquired the active-height index by migration. From
+        // either representation, every retained header must identify this branch.
+        for (offset, header) in self.headers.iter().rev().enumerate() {
+            let h = self
+                .height
+                .and_then(|tip| tip.checked_sub(offset as u32))
+                .context("checkpoint height underflow")?;
+            ensure!(
+                self.active_since_entry.get(&hash256(header)) == Some(&h),
+                "checkpoint active-height index mismatch"
+            );
+        }
+        for (offset, (entry, header)) in self
+            .chain
+            .applied
+            .iter()
+            .rev()
+            .zip(self.headers.iter().rev())
+            .enumerate()
+        {
+            ensure!(
+                self.height.and_then(|tip| tip.checked_sub(offset as u32)) == Some(entry.height),
+                "checkpoint undo height mismatch"
+            );
+            ensure!(
+                self.inspect_header(entry.height, &entry.raw)? == *header,
+                "checkpoint body on another branch"
+            );
+            let (txs, err) = self.inspect_body(entry.height, header, &entry.raw)?;
+            ensure!(!txs.is_empty() && err.is_none(), "invalid checkpoint body");
+        }
+        if let Some(solution) = &self.solution_body {
+            let header = self.inspect_header(solution.height, &solution.raw)?;
+            ensure!(
+                hash256(&header) == solution.hash,
+                "checkpoint solution hash mismatch"
+            );
+            let (_, err) = self.inspect_body(solution.height, &header, &solution.raw)?;
+            ensure!(err.is_none(), "invalid checkpoint solution body");
+        }
+        Ok(())
     }
 }

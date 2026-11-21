@@ -56,7 +56,7 @@ pub fn confiscation(raw: &[u8]) -> Result<Option<Vec<Outpoint>>> {
     Ok(marked.then_some(inputs))
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 struct Freeze {
     start: u32,
     stop: u32,
@@ -66,6 +66,8 @@ struct Freeze {
 pub struct Book {
     keys: Vec<String>,
     actions: HashMap<Hash, u32>,
+    results: Vec<Value>,
+    failed_action: Option<(Hash, Value)>,
     sealed: Vec<Hash>, // envelope digests in contiguous sequence order, starting at one
     pub verified: u32,
     pub pending: Option<String>,
@@ -78,9 +80,13 @@ pub struct Book {
     frozen: HashMap<Outpoint, Freeze>,
     confiscated: HashSet<Outpoint>,
     whitelist: HashMap<Hash, u32>,
-    pub banned: HashSet<ipnet::IpNet>,
+    banned: HashMap<ipnet::IpNet, u64>,
     pub invalid: HashSet<Hash>,
     pub last_notice: Option<String>,
+}
+
+fn action_key(method: &str, params: &Value) -> Result<Hash> {
+    Ok(hash256(&serde_json::to_vec(&json!([method, params]))?))
 }
 
 impl Book {
@@ -89,6 +95,8 @@ impl Book {
         Ok(Self {
             keys: keys.to_vec(),
             actions: HashMap::new(),
+            results: vec![],
+            failed_action: None,
             sealed: vec![],
             verified: 0,
             pending: None,
@@ -101,7 +109,7 @@ impl Book {
             frozen: HashMap::new(),
             confiscated: HashSet::new(),
             whitelist: HashMap::new(),
-            banned: HashSet::new(),
+            banned: HashMap::new(),
             invalid: HashSet::new(),
             last_notice: None,
         })
@@ -137,7 +145,7 @@ impl Book {
         "genesis_verified":self.genesis_verified,"reported_sequence":self.reported_sequence,"connected":self.connected,"supervised":self.supervised,
         "outstanding_action":self.pending,"ready":self.ready(),"last_notice":self.last_notice,
         "frozen_records":self.frozen.len(),"authorized_confiscations":self.whitelist.len(),
-        "invalidated_blocks":self.invalid.len(),"banned_peers":self.banned.len()})
+        "invalidated_blocks":self.invalid.len(),"banned_peers":self.active_bans().len()})
     }
     pub fn frozen(&self, out: &Outpoint, height: u32, policy: bool) -> bool {
         self.confiscated.contains(out)
@@ -149,8 +157,20 @@ impl Book {
                 }
             })
     }
+    pub fn active_bans(&self) -> HashSet<ipnet::IpNet> {
+        let at = unix_now();
+        self.banned
+            .iter()
+            .filter_map(|(net, &until)| (at < until).then_some(*net))
+            .collect()
+    }
     pub fn peer_banned(&self, ip: &IpAddr) -> bool {
-        self.banned.iter().any(|net| net.contains(ip))
+        self.peer_banned_at(ip, unix_now())
+    }
+    fn peer_banned_at(&self, ip: &IpAddr, at: u64) -> bool {
+        self.banned
+            .iter()
+            .any(|(net, &until)| at < until && net.contains(ip))
     }
     pub fn has_freezes(&self) -> bool {
         !self.frozen.is_empty() || !self.confiscated.is_empty()
@@ -179,7 +199,7 @@ impl Book {
             }
             ensure!(seq == self.applied() + 1, "alert journal sequence gap");
             let bytes = fs::read(path)?;
-            if let Err(e) = self.receive(&bytes, None) {
+            if let Err(e) = self.receive(&bytes, Some(dir)) {
                 if self.verified == seq && self.pending.is_some() {
                     break;
                 }
@@ -241,10 +261,31 @@ impl Book {
                 u32::from_le_bytes(raw[..4].try_into()?) == 1,
                 "unknown alert version"
             );
-            next.apply(kind, &raw[20..end])
+            let ban_start = if kind == 5 {
+                match dir {
+                    Some(dir) => local_ban_start(dir, seq)?,
+                    None => unix_now(),
+                }
+            } else {
+                0
+            };
+            next.apply(kind, &raw[20..end], ban_start)
         })();
         if let Err(e) = result {
             self.pending = Some(format!("sequence {seq}: {e}"));
+            if let Some(dir) = dir {
+                use sha2::{Digest, Sha256};
+                let failure = json!({
+                    "sequence": seq, "kind": kind, "signed_sha256": hex::encode(Sha256::digest(raw)),
+                    "error": e.to_string(), "rpc_result": next.failed_action.as_ref().map(|(_, r)| r),
+                });
+                durable_file(
+                    dir,
+                    &format!("{seq:010}.failure"),
+                    &serde_json::to_vec(&failure)?,
+                )?;
+                self.failed_action = next.failed_action;
+            }
             return Err(e);
         }
         next.sealed.push(digest);
@@ -253,21 +294,26 @@ impl Book {
         Ok(true)
     }
     pub fn receipt(&self, method: &str, params: &Value, durable: u32) -> Result<Value> {
-        let digest = hash256(&serde_json::to_vec(&json!([method, params]))?);
+        let digest = action_key(method, params)?;
+        if let Some((_, result)) = self
+            .failed_action
+            .as_ref()
+            .filter(|(key, _)| *key == digest)
+        {
+            return Ok(result.clone());
+        }
         let sequence = self
             .actions
             .get(&digest)
             .context("signed action awaiting durable application")?;
         ensure!(*sequence <= durable, "action has not reached disk");
-        Ok(if method.starts_with("addTo") {
-            json!({"notProcessed":[]})
-        } else {
-            Value::Null
-        })
+        Ok(self.results[*sequence as usize - 1].clone())
     }
 
-    fn apply(&mut self, kind: u32, mut body: &[u8]) -> Result<()> {
+    fn apply(&mut self, kind: u32, mut body: &[u8], ban_start: u64) -> Result<()> {
         let mut rpc = None::<(&str, Value)>;
+        let mut result = Value::Null;
+        self.failed_action = None;
         match kind {
             1 => self.last_notice = Some(String::from_utf8_lossy(field(&mut body)?).into_owned()),
             2 | 3 => {
@@ -276,6 +322,7 @@ impl Book {
                     "invalid freeze record length"
                 );
                 let mut funds = Vec::new();
+                let mut not_processed = Vec::new();
                 let mut item = 0;
                 while !body.is_empty() {
                     item += 1;
@@ -292,33 +339,48 @@ impl Book {
 
                     funds.push(json!({"txOut":{"txId":wire::display_hash(hash),"vout":vout},
                         "enforceAtHeight":[{"start":start,"stop":stop}],"policyExpiresWithConsensus":policy_expires}));
-                    self.frozen.insert(
-                        (hash, vout),
-                        Freeze {
-                            start,
-                            stop,
-                            policy_expires,
-                        },
-                    );
+                    let record = Freeze {
+                        start,
+                        stop,
+                        policy_expires,
+                    };
+                    if self.frozen.get(&(hash, vout)) == Some(&record) {
+                        not_processed.push(
+                            json!({"txOut": {"txId":wire::display_hash(hash), "vout":vout},
+                            "reason":"already in consensus"}),
+                        );
+                    } else {
+                        self.frozen.insert((hash, vout), record);
+                    }
                 }
                 rpc = Some(("addToConsensusBlacklist", json!([{"funds":funds}])));
+                result = json!({"notProcessed":not_processed});
             }
             4 => {
                 let h = integer(&mut body)?;
                 ensure!(h <= i32::MAX as u32, "confiscation height out of range");
                 let tx = field(&mut body)?;
                 let id = hash256(tx);
-                let inputs = confiscation(tx)?.context("missing confiscation marker")?;
-                for (i, p) in inputs.iter().enumerate() {
-                    ensure!(
-                        self.frozen(p, h, false),
-                        "confiscation input {i} is not consensus frozen"
-                    );
+                let method = "addToConfiscationTxidWhitelist";
+                let params = json!([{"confiscationTxs":[{"confiscationTx":{"enforceAtHeight":h,"hex":hex::encode(tx)}}]}]);
+                let inputs = confiscation(tx).ok().flatten();
+                let reason = match &inputs {
+                    None => Some("confiscation transaction is not valid"),
+                    Some(inputs) if inputs.iter().any(|p| !self.frozen(p, h, false)) => {
+                        Some("confiscated TXO is not consensus frozen")
+                    }
+                    _ => None,
+                };
+                if let Some(reason) = reason {
+                    let reply = json!({"notProcessed":[{
+                        "confiscationTx":{"txId":wire::display_hash(id)}, "reason":reason
+                    }]});
+                    self.failed_action = Some((action_key(method, &params)?, reply));
+                    anyhow::bail!("{reason}");
                 }
-                rpc = Some((
-                    "addToConfiscationTxidWhitelist",
-                    json!([{"confiscationTxs":[{"confiscationTx":{"enforceAtHeight":h,"hex":hex::encode(tx)}}]}]),
-                ));
+                let inputs = inputs.context("missing confiscation marker")?;
+                rpc = Some((method, params));
+                result = json!({"notProcessed":[]});
                 self.confiscated.extend(inputs);
                 let entry = self.whitelist.entry(id).or_insert(h);
                 *entry = (*entry).min(h);
@@ -339,7 +401,12 @@ impl Book {
                     json!([peer_text, if kind == 5 { "add" } else { "remove" }]),
                 ));
                 if kind == 5 {
-                    self.banned.insert(peer);
+                    let until = self.banned.entry(peer).or_default();
+                    if *until <= ban_start {
+                        *until = ban_start
+                            .checked_add(86_400)
+                            .context("ban expiry overflow")?;
+                    }
                 } else {
                     self.banned.remove(&peer);
                 }
@@ -361,11 +428,10 @@ impl Book {
         }
         ensure!(body.is_empty(), "trailing alert payload");
         if let Some((method, params)) = rpc {
-            self.actions.insert(
-                hash256(&serde_json::to_vec(&json!([method, params]))?),
-                self.verified,
-            );
+            self.actions
+                .insert(action_key(method, &params)?, self.verified);
         }
+        self.results.push(result);
         Ok(())
     }
 }
@@ -389,6 +455,31 @@ fn field<'a>(reader: &mut &'a [u8]) -> Result<&'a [u8]> {
     let n = wire::varint(reader)?;
     wire::take(reader, n)
 }
+fn unix_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+}
+
+// SV Node's default ban duration runs from the local application, including
+// when a new entrant applies a pre-entry alert. Preserve the original anchor
+// on restart. Earlier journals have the first local verification in their
+// signed file timestamp; migrate it once into the durable ban record.
+fn local_ban_start(dir: &Path, seq: u32) -> Result<u64> {
+    let name = format!("{seq:010}.ban-start");
+    let path = dir.join(&name);
+    if path.exists() {
+        return Ok(u64::from_le_bytes(fs::read(path)?.as_slice().try_into()?));
+    }
+    let first = fs::metadata(dir.join(format!("{seq:010}.signed")))?
+        .modified()?
+        .duration_since(std::time::UNIX_EPOCH)?
+        .as_secs();
+    durable_file(dir, &name, &first.to_le_bytes())?;
+    Ok(first)
+}
+
 fn persist(dir: &Path, seq: u32, raw: &[u8]) -> Result<()> {
     durable_file(dir, &format!("{seq:010}.signed"), raw)
 }
@@ -431,7 +522,8 @@ fn apply_signed(dir: &Path, state: &mut crate::mining::Mining, raw: &[u8]) -> Re
             );
         } else {
             let receipt = json!({"sequence":seq,"signed_sha256":digest,"kind":u32::from_le_bytes(raw[16..20].try_into()?),
-                "prior_revision":previous,"applied_revision":state.work_revision(),"active_height":state.height_hint()});
+                "prior_revision":previous,"applied_revision":state.work_revision(),"active_height":state.height_hint(),
+                "rpc_result":state.directives.results[seq as usize - 1]});
             durable_file(dir, &file, &serde_json::to_vec(&receipt)?)?;
         }
         state.commit_directive_sequence(seq)?;
@@ -673,6 +765,30 @@ pub(crate) mod tests {
         repeated.copy_within(end - 195..end - 130, end - 65);
         assert!(book.receive(&repeated, None).is_err());
         assert_eq!(book.applied(), 5);
+    }
+
+    #[test]
+    fn default_sv_ban_expires_from_the_first_local_application_after_replay() {
+        let signing = keys(12);
+        let mut book = Book::new(&public(&signing), true).unwrap();
+        let dir = std::env::temp_dir().join(format!("scary-ban-time-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let subnet = b"192.0.2.0/24";
+        let mut body = vec![subnet.len() as u8];
+        body.extend(subnet);
+        body.extend(b"\x03lab");
+        let ban = signed(1, 5, &body, &signing);
+        book.receive(&ban, Some(&dir)).unwrap();
+        let applied = local_ban_start(&dir, 1).unwrap();
+        let ip = "192.0.2.42".parse().unwrap();
+        assert!(book.peer_banned_at(&ip, applied + 86_399));
+        assert!(!book.peer_banned_at(&ip, applied + 86_400));
+        assert!(!book.receive(&ban, Some(&dir)).unwrap());
+        let mut restored = Book::new(&public(&signing), true).unwrap();
+        restored.restore_through(&dir, 1).unwrap();
+        assert_eq!(restored.banned, book.banned);
+        assert!(!restored.peer_banned_at(&ip, applied + 86_400));
+        fs::remove_dir_all(dir).unwrap();
     }
 
     #[test]

@@ -1,0 +1,71 @@
+{
+  "started_unix_s": 1795286123,
+  "verified_unix_s": 1795286125,
+  "release_sha256": "aaf4b839dd81da98c49cad0b2a0646c85aa851c24cdabffebb18c36b996e98f7",
+  "passive_mainnet": true,
+  "recovered_start_hash": "00000000000000000f2fbf3c77d9bad84d0cb3b446445c9014e754b3b22c3260",
+  "before": {
+    "height": 976512,
+    "tip_hash": "00000000000000000f2fbf3c77d9bad84d0cb3b446445c9014e754b3b22c3260",
+    "coverage_start": 976422,
+    "coverage_end": 976512,
+    "headers": 91,
+    "witnessed_outputs": 30128,
+    "pending_transactions": 94,
+    "window_chainwork": "2ecf62ed15dea2dc9c5",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "difficulty history incomplete"
+    ],
+    "alert_ready": true,
+    "alert_verified": 1,
+    "alert_applied": 1,
+    "alert_connected": true,
+    "alert_last_peer_sync": {
+      "sequence": 1,
+      "unix_s": 1795285914
+    },
+    "storage_failure": null
+  },
+  "after": {
+    "height": 976512,
+    "tip_hash": "00000000000000000f2fbf3c77d9bad84d0cb3b446445c9014e754b3b22c3260",
+    "coverage_start": 976422,
+    "coverage_end": 976512,
+    "headers": 91,
+    "witnessed_outputs": 30128,
+    "pending_transactions": 53,
+    "window_chainwork": "2ecf62ed15dea2dc9c5",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "awaiting current tip from a connected data peer",
+      "difficulty history incomplete"
+    ],
+    "alert_ready": true,
+    "alert_verified": 1,
+    "alert_applied": 1,
+    "alert_connected": true,
+    "alert_last_peer_sync": {
+      "sequence": 1,
+      "unix_s": 1795285914
+    },
+    "storage_failure": null
+  },
+  "reconfirmed": {
+    "height": 976512,
+    "tip_hash": "00000000000000000f2fbf3c77d9bad84d0cb3b446445c9014e754b3b22c3260",
+    "tip_confirmed_since_disconnect": true,
+    "connected_data_peers": 8,
+    "readiness_reasons": [
+      "difficulty history incomplete"
+    ],
+    "durable_directive_sequence": 1,
+    "receiver": {
+      "active_peers": 2,
+      "sequence": 1,
+      "synced": true,
+      "unprocessed_alerts": 0
+    },
+    "checked_unix_s": 1795286173
+  }
+}

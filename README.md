@@ -60,6 +60,8 @@ The race lab gives a Scary Node Stratum job and a full-state Teranode job one SH
 
 [Experimental design and reproduction](docs/races.md) · [Stale rates and uncertainty](docs/race-results.md)
 
+The native-receiver study also measures opportunities when a miner has no ready job and includes a full-state versus full-state control. Four paired engineering trials found that immediate SV publication reduced median solo submit-to-active readback from 533 ms to 46 ms. The preregistered evaluation on each frozen executable measures stale rates and their uncertainty. [Native propagation study](docs/production-cohort.md)
+
 ## Verify job and branch recovery
 
 The reliability proof submits an older Stratum job after a same-parent update, checks settlement on two Teranodes, and follows a short reorg while preserving the witnessed state it can still use. The larger matched-work sample also checks each locally solved block against its settlement ancestry.
@@ -68,7 +70,7 @@ The reliability proof submits an older Stratum job after a same-parent update, c
 
 ## Verify Chronicle validation and asset recovery
 
-Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. Run `regtest/mixed.sh` for independent SV Node and Teranode adoption, or the native workload driver to reproduce the 524,288-spend capacity measurement. [Reproduction](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md)
+Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. Run `regtest/mixed.sh` for independent SV Node and Teranode adoption, or `regtest/mixed.sh --stream sustained` to reproduce 24 mixed-network Stratum rounds. The native workload driver covers 524,288 signed spends. [Reproduction](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md)
 
 ## Point an ASIC at your node
 

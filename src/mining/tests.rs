@@ -92,6 +92,33 @@ async fn witness_requires_successor_signature_and_unspent_coverage() {
 }
 
 #[test]
+fn alternate_body_failure_respects_current_coverage_and_other_readiness_failures() {
+    let mut state = Mining::new(true, Vec::new()).unwrap();
+    let first = make_block([8; 32], 150, &[]);
+    let first_hash = hash256(&first[..80]);
+    let second = make_block(first_hash, 151, &[]);
+    state.observe(150, &first).unwrap();
+    state.observe(151, &second).unwrap();
+    let revision = state.revision;
+    for hash in [first_hash, hash256(&second[..80])] {
+        assert!(
+            !state.record_body_gap(Some(&wire::display_hash(hash)), "late Asset failure".into())
+        );
+    }
+    assert!(state.observation_window_ready());
+    assert_eq!(state.revision, revision);
+
+    assert!(state.record_body_gap(Some(&wire::display_hash([7; 32])), "missing body".into()));
+    assert!(!state.observation_window_ready());
+    assert!(state.record_body_gap(None, "truncated SV body".into()));
+    assert!(!state.record_body_gap(
+        Some(&wire::display_hash(first_hash)),
+        "late Asset failure".into()
+    ));
+    assert_eq!(state.suspended_reason.as_deref(), Some("truncated SV body"));
+}
+
+#[test]
 fn higher_tip_retires_work_until_its_complete_body_arrives() {
     let mut state = Mining::new(true, Vec::new()).unwrap();
     let first = make_block([8; 32], 150, &[]);
@@ -198,6 +225,12 @@ async fn rejected_known_signature_retires_jobs_and_cannot_be_reanchored() {
         m.check_transaction(&valid).unwrap()["outcome"],
         "determinate"
     );
+    m.directives.supervised = true;
+    let during_sync = m.check_transaction(&valid).unwrap();
+    assert_eq!(during_sync["outcome"], "deferred");
+    assert_eq!(during_sync["script_checks_passed"], 1);
+    assert_eq!(during_sync["amount_checks_passed"], 1);
+    m.directives.supervised = false;
     let mut previous_amount = tx(&funding.id().unwrap(), 90_000, lock.clone());
     previous_amount
         .sign(0, &signer, 0x41, 100_001, &lock)
@@ -615,6 +648,11 @@ async fn packages_use_candidate_height_and_survive_restart() {
         &[raws[1].clone(), raws[0].clone()],
     );
     assert!(recovered.verify_own_block(252, &reversed, true).is_err());
+    let parent_tip = recovered.tip();
+    assert!(recovered.observe(252, &reversed).is_err());
+    assert_eq!(recovered.tip(), parent_tip);
+    recovered.observe(252, &body).unwrap();
+    assert_eq!(recovered.tip(), Some(hash256(&body[..80])));
     std::fs::remove_dir_all(dir).unwrap();
 }
 
@@ -698,7 +736,20 @@ async fn soft_freeze_releases_on_fourth_successor_and_explicit_invalidation_roll
     m.directives.receive(&envelope, None).unwrap();
     m.directives_changed(&envelope).unwrap();
     let first = make_block(m.tip().unwrap(), 251, &[child.to_bytes().unwrap()]);
+    m.directives.supervised = true;
+    assert!(m.observe(251, &first).is_err());
+    assert!(m.blocked && m.soft_freezes.is_empty());
+    m.directives.supervised = false;
     m.observe(251, &first).unwrap();
+    // SV persists the block-index flag independently of later UTXO changes.
+    // The effective rule can expire while that block still serves its hold.
+    let mut released = freeze.clone();
+    released[48..56].copy_from_slice(&251u64.to_le_bytes());
+    let release = signed(2, 3, &released, &signing);
+    m.directives.receive(&release, None).unwrap();
+    m.directives_changed(&release).unwrap();
+    assert_eq!(m.height, Some(250));
+    assert!(m.soft_freezes.contains(&hash256(&first[..80])));
     let mut prev = hash256(&first[..80]);
     for height in 252..=255 {
         let block = make_block(prev, height, &[]);
@@ -709,7 +760,7 @@ async fn soft_freeze_releases_on_fourth_successor_and_explicit_invalidation_roll
     }
     let mut payload = hash256(&first[..80]).to_vec();
     payload.extend(b"\x03lab");
-    let invalid = signed(2, 7, &payload, &signing);
+    let invalid = signed(3, 7, &payload, &signing);
     m.directives.receive(&invalid, None).unwrap();
     m.directives_changed(&invalid).unwrap();
     assert_eq!(m.tip(), Some(hash256(&parent[..80])));
@@ -719,7 +770,7 @@ async fn soft_freeze_releases_on_fourth_successor_and_explicit_invalidation_roll
 }
 
 #[test]
-fn checkpoint_interruption_preserves_previous_boundary_and_burns_extranonce_lease() {
+fn checkpoint_interruption_preserves_previous_boundary() {
     let dir = std::env::temp_dir().join(format!("scary-interrupt-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let mut m = Mining::new(true, vec![]).unwrap();
@@ -727,7 +778,6 @@ fn checkpoint_interruption_preserves_previous_boundary_and_burns_extranonce_leas
     let parent = make_block([71; 32], 240, &[]);
     m.observe(240, &parent).unwrap();
     m.save().unwrap();
-    assert_eq!(m.extranonce_lease().unwrap(), (0, 1024));
     let child = make_block(m.tip().unwrap(), 241, &[]);
     m.observe(241, &child).unwrap();
     std::fs::create_dir(dir.join("witness.next")).unwrap();
@@ -735,7 +785,6 @@ fn checkpoint_interruption_preserves_previous_boundary_and_burns_extranonce_leas
     let mut restored = Mining::new(true, vec![]).unwrap();
     restored.open_store(&dir).unwrap();
     assert_eq!(restored.tip(), Some(hash256(&parent[..80])));
-    assert_eq!(restored.extranonce_lease().unwrap(), (1024, 2048));
     std::fs::remove_dir_all(dir).unwrap();
 }
 
@@ -784,4 +833,111 @@ fn failed_commit_fences_volatile_work_and_repeated_body_skips_unchanged_checkpoi
     restored.open_store(directory.path()).unwrap();
     assert_eq!(restored.tip(), persisted);
     assert!(restored.observation_window_ready());
+}
+
+#[test]
+fn chronicle_finality_uses_the_active_network_clock_and_complete_parent_median() {
+    let mut m = Mining::new(true, vec![]).unwrap();
+    let mut previous = [0x12; 32];
+    for h in 565..=575 {
+        let b = make_block(previous, h, &[]);
+        m.observe(h, &b).unwrap();
+        previous = hash256(&b[..80]);
+        if h < 575 {
+            assert_eq!(m.parent_median(), None);
+        }
+    }
+    let block_time = 1_600_000_700;
+    let median = 1_600_000_570;
+    assert_eq!(
+        m.block_context(575, block_time).time_cutoff,
+        Some(block_time)
+    );
+    assert_eq!(m.block_context(576, block_time).time_cutoff, Some(median));
+    let mut cb = create_locked_coinbase(median, u32::MAX - 1);
+    assert_eq!(
+        wire::final_under(&cb, 576, Some(median)).unwrap(),
+        Some(false)
+    );
+    assert_eq!(
+        wire::final_under(&cb, 575, Some(block_time)).unwrap(),
+        Some(true)
+    );
+    assert_eq!(wire::final_under(&cb, 576, None).unwrap(), None);
+    cb = create_locked_coinbase(median, u32::MAX);
+    assert_eq!(wire::final_under(&cb, 576, None).unwrap(), Some(true));
+    let mut header = [0; 80];
+    header[..4].copy_from_slice(&1_i32.to_le_bytes());
+    assert!(m.check_header_version(1250, &header).is_ok());
+    assert!(m.check_header_version(1251, &header).is_err());
+    header[..4].copy_from_slice(&3_i32.to_le_bytes());
+    assert!(m.check_header_version(1350, &header).is_ok());
+    assert!(m.check_header_version(1351, &header).is_err());
+}
+
+fn create_locked_coinbase(lock_time: u32, sequence: u32) -> Vec<u8> {
+    let mut tx = Transaction::new();
+    tx.add_input(TransactionInput {
+        source_txid: Some("00".repeat(32)),
+        source_output_index: u32::MAX,
+        sequence,
+        ..Default::default()
+    })
+    .unwrap();
+    tx.add_output(TransactionOutput {
+        satoshis: Some(0),
+        locking_script: LockingScript::from_binary(&[0x51]),
+        change: false,
+    })
+    .unwrap();
+    tx.lock_time = lock_time;
+    tx.to_bytes().unwrap()
+}
+
+#[test]
+fn restore_links_undo_bodies_to_the_selected_header() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut m = Mining::new(true, vec![]).unwrap();
+    m.open_store(dir.path()).unwrap();
+    let active = make_block([9; 32], 240, &[]);
+    let alternate = make_block([12; 32], 240, &[]);
+    m.observe(240, &active).unwrap();
+    m.chain.applied.back_mut().unwrap().raw = crate::body::BlockBody::Memory(Arc::new(alternate));
+    m.save().unwrap();
+    let mut standby = Mining::new(true, vec![]).unwrap();
+    assert!(standby
+        .open_store(dir.path())
+        .unwrap_err()
+        .to_string()
+        .contains("checkpoint body on another branch"));
+}
+
+#[test]
+fn invalidation_selects_an_already_buffered_eligible_tip() {
+    use crate::alerts::tests::{keys, public, signed};
+    let signing = keys(13);
+    let mut m = Mining::new(true, vec![]).unwrap();
+    m.directives = crate::alerts::Book::new(&public(&signing), false).unwrap();
+    let base = make_block([9; 32], 240, &[]);
+    m.observe(240, &base).unwrap();
+    let former = make_block(m.tip().unwrap(), 241, &[]);
+    m.observe(241, &former).unwrap();
+    let other_tx = tx(
+        &"ef".repeat(32),
+        100_000,
+        LockingScript::from_binary(&[0x51]),
+    );
+    let alternate = make_block(hash256(&base[..80]), 241, &[other_tx.to_bytes().unwrap()]);
+    m.observe(241, &alternate).unwrap();
+    assert_eq!(m.tip(), Some(hash256(&former[..80])));
+    let mut body = hash256(&former[..80]).to_vec();
+    body.extend(b"\x03lab");
+    let instruction = signed(1, 7, &body, &signing);
+    m.directives.receive(&instruction, None).unwrap();
+    m.directives_changed(&instruction).unwrap();
+    assert_eq!(m.tip(), Some(hash256(&alternate[..80])));
+    assert_eq!(
+        m.outpoint(&other_tx.id().unwrap(), 0).unwrap()["known"],
+        true
+    );
 }

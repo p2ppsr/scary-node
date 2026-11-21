@@ -360,7 +360,7 @@ def prove():
                 raise ValueError("funding coinbase paid a different script")
             background_history = []
             if os.environ.get("SCARY_MIXED_STREAM"):
-                for _ in range(24):
+                for _ in range(96 if os.environ["SCARY_MIXED_STREAM"] == "sustained" else 24):
                     coin_block = rpc(a, "generatetoaddress", 1, wallet.address)[0]
                     wait("historical background coin", lambda: assert_tip(b, coin_block))
                     _, cb_txs, cb_outputs = block(a, coin_block)
@@ -454,7 +454,10 @@ def prove():
         streamed = None
         if mixed and os.environ.get("SCARY_MIXED_STREAM"):
             from mixed_workload import stream
-            streamed = stream(wallet, child_id, value - 2000, background_history)
+            sustained = os.environ["SCARY_MIXED_STREAM"] == "sustained"
+            streamed = stream(wallet, child_id, value - 2000, background_history,
+                              rounds=24 if sustained else 8, ordinary=2048 if sustained else 1024,
+                              batch=256 if sustained else 1)
         requests = set()
         for line in compose("logs", "--no-color", "--no-log-prefix", "scary-node", capture=True).splitlines():
             try:

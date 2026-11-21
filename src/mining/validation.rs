@@ -35,15 +35,36 @@ pub(super) struct Observation {
     pub height: u32,
     pub hash: String,
     pub coinbase_reward_checked: bool,
+    #[serde(default)]
+    pub coinbase_finality_checked: bool,
+    #[serde(default)]
+    pub applied_directive_sequence: Option<u32>,
+    #[serde(default)]
+    pub directive_state_ready: Option<bool>,
     #[serde(flatten)]
     pub checks: Checks,
 }
 
 #[derive(Default)]
 pub(super) struct Assessment {
+    confiscation: bool,
     pub checks: Checks,
     pub fee: Option<u64>,
     pub violation: Option<&'static str>,
+}
+
+#[derive(Clone, Copy)]
+enum InputView<'a> {
+    Observed(&'a HashSet<Hash>),
+    Candidate(&'a HashMap<Outpoint, Coin>),
+    DryRun,
+}
+
+#[derive(Clone, Copy)]
+pub(super) struct BlockContext {
+    height: u32,
+    pub(super) time_cutoff: Option<u32>,
+    directives_ready: bool,
 }
 
 // An entry survives for at most MAX_WATCHED later consumptions. Removing an
@@ -153,33 +174,51 @@ fn checked_sum(sum: Option<u64>, value: u64) -> Option<u64> {
 }
 
 impl Mining {
+    pub(super) fn block_context(&self, height: u32, block_time: u32) -> BlockContext {
+        // Chronicle can be activated early on regtest. Its independent CSV
+        // activation still selects the absolute locktime clock at height 576.
+        let time_cutoff = if self.regtest && height < 576 {
+            Some(block_time)
+        } else {
+            self.parent_median()
+        };
+        BlockContext {
+            height,
+            time_cutoff,
+            directives_ready: self.directives.ready(),
+        }
+    }
+
     fn assess(
         &self,
         raw: &[u8],
-        height: u32,
+        context: BlockContext,
         seen: &mut HashSet<Outpoint>,
         budget: &mut usize,
-        block_observation: bool,
-        created: Option<&HashMap<Outpoint, Coin>>,
+        view: InputView<'_>,
     ) -> Result<Assessment> {
+        let height = context.height;
         let is_confiscation = crate::alerts::confiscation(raw)?.is_some();
         let is_authorized = is_confiscation && self.directives.authorized(&hash256(raw), height);
         let mut tx_inputs = 0;
         let mut total_in = Some(0);
         let mut total_out = Some(0);
         let mut supported = Vec::new();
-        let mut a = Assessment::default();
+        let mut a = Assessment {
+            confiscation: is_confiscation,
+            ..Assessment::default()
+        };
         a.checks.noncoinbase_transactions = 1;
-        let finality = wire::final_under(
-            raw,
-            height,
-            (self.headers.len() >= 11).then(|| self.median_time()),
-        )?;
+        let finality = wire::final_under(raw, height, context.time_cutoff)?;
         if finality == Some(false) {
             a.violation = Some("non-final transaction");
         }
-        if is_confiscation && self.directives.ready() && !is_authorized {
-            a.violation = Some("unauthorized confiscation");
+        if is_confiscation && !is_authorized {
+            if context.directives_ready {
+                a.violation = Some("unauthorized confiscation");
+            } else if matches!(view, InputView::Observed(_)) {
+                anyhow::bail!("awaiting verified directives for confiscation");
+            }
         }
         let mut bytes = raw;
         wire::transaction(&mut bytes, |event| match event {
@@ -192,17 +231,18 @@ impl Mining {
                     a.violation
                         .get_or_insert("duplicate input in transaction or block");
                 }
-                if !block_observation
+                if !matches!(view, InputView::Observed(_))
+                    && context.directives_ready
                     && !is_confiscation
                     && self.directives.frozen(&p, height, false)
                 {
                     a.violation.get_or_insert("consensus frozen input");
                 }
-                if let Some(coin) = self
-                    .coins
-                    .get(&p)
-                    .or_else(|| created.and_then(|outputs| outputs.get(&p)))
-                {
+                let coin = self.coins.get(&p).or_else(|| match view {
+                    InputView::Candidate(outputs) => outputs.get(&p),
+                    _ => None,
+                });
+                if let Some(coin) = coin {
                     if coin.confiscation && height.saturating_sub(coin.height) < 1000 {
                         a.violation.get_or_insert("immature confiscation output");
                     }
@@ -215,6 +255,9 @@ impl Mining {
                     if coin.height >= interpreter::activation(self.regtest) {
                         supported.push((tx_inputs, coin));
                     }
+                } else if matches!(view, InputView::Observed(ids) if ids.contains(&id)) {
+                    a.violation
+                        .get_or_insert("same-block output unavailable at spend");
                 } else if self.spent.has(&p) {
                     a.checks.consumed_inputs += 1;
                     a.violation
@@ -287,6 +330,7 @@ impl Mining {
             - a.checks.authorized_script_exemptions;
         if a.violation.is_none() {
             if supported_context
+                && context.directives_ready
                 && finality == Some(true)
                 && a.fee.is_some()
                 && (a.checks.script_checks_deferred == 0 || is_authorized)
@@ -302,25 +346,24 @@ impl Mining {
     pub(super) fn assess_candidate(
         &self,
         raw: &[u8],
-        height: u32,
+        context: BlockContext,
         seen: &mut HashSet<Outpoint>,
         created: &HashMap<Outpoint, Coin>,
     ) -> Result<u64> {
         let mut budget = usize::MAX;
-        let a = self.assess(raw, height, seen, &mut budget, false, Some(created))?;
+        let a = self.assess(
+            raw,
+            context,
+            seen,
+            &mut budget,
+            InputView::Candidate(created),
+        )?;
+        if let Some(reason) = a.violation {
+            anyhow::bail!("invalid candidate transaction: {reason}");
+        }
         ensure!(
-            a.violation.is_none() && a.checks.unknown_inputs == 0 && a.checks.consumed_inputs == 0,
-            "ineligible candidate inputs"
-        );
-        let ctx = crate::alerts::confiscation(raw)?.is_some();
-        ensure!(
-            (ctx && self.directives.authorized(&hash256(raw), height))
-                || a.checks.script_checks_deferred == 0,
-            "incomplete candidate validation"
-        );
-        ensure!(
-            self.final_at(&Transaction::from_binary(&mut &raw[..])?, height),
-            "non-final candidate"
+            a.checks.transactions_determinate == 1,
+            "candidate checks deferred"
         );
         a.fee.context("candidate fee unresolved")
     }
@@ -337,7 +380,14 @@ impl Mining {
             return Ok(json!({"outcome":"deferred","reason":"awaiting complete peer body"}));
         }
         let mut budget = usize::MAX;
-        let a = self.assess(raw, height, &mut HashSet::new(), &mut budget, false, None)?;
+        let context = self.block_context(height, now()?.max(self.median_time().saturating_add(1)));
+        let a = self.assess(
+            raw,
+            context,
+            &mut HashSet::new(),
+            &mut budget,
+            InputView::DryRun,
+        )?;
         let mut value = serde_json::to_value(a.checks)?;
         value["outcome"] = json!(if a.violation.is_some() {
             "invalid"
@@ -381,12 +431,17 @@ impl Mining {
 
     pub(super) fn apply_observed(
         &mut self,
-        height: u32,
+        context: BlockContext,
         hash: Hash,
         txs: Vec<(Hash, &[u8])>,
     ) -> Result<Applied> {
         // Only touched coins enter the undo journal. Tombstones, diagnostics and
         // job state are committed after every transaction and the reward pass.
+        let height = context.height;
+        let coinbase_finality = wire::final_under(txs[0].1, height, context.time_cutoff)?;
+        if coinbase_finality == Some(false) {
+            return Err(InvalidBody("non-final coinbase").into());
+        }
         let mut undo = Vec::new();
         let mut spent_changes = Vec::new();
         let result = (|| -> Result<(Checks, bool, u64)> {
@@ -396,16 +451,25 @@ impl Mining {
             let mut seen = HashSet::new();
             let mut budget = usize::MAX;
             let mut omitted = 0;
+            let body_ids: HashSet<Hash> = txs.iter().map(|(id, _)| *id).collect();
             for (pos, (id, raw)) in txs.into_iter().enumerate() {
-                let is_confiscation = pos != 0 && crate::alerts::confiscation(raw)?.is_some();
-                if pos != 0 {
-                    let a = self.assess(raw, height, &mut seen, &mut budget, true, None)?;
+                let is_confiscation = if pos == 0 {
+                    false
+                } else {
+                    let a = self.assess(
+                        raw,
+                        context,
+                        &mut seen,
+                        &mut budget,
+                        InputView::Observed(&body_ids),
+                    )?;
                     if let Some(violation) = a.violation {
                         return Err(InvalidBody(violation).into());
                     }
                     fees = fees.zip(a.fee).and_then(|(sum, fee)| sum.checked_add(fee));
                     checks.merge(a.checks);
-                }
+                    a.confiscation
+                };
                 wire::transaction(&mut &raw[..], |e| match e {
                     Event::Input(id, i, _) => {
                         if let Some(coin) = self.coins.remove(&(id, i)) {
@@ -425,11 +489,7 @@ impl Mining {
                         if height >= interpreter::activation(self.regtest)
                             && !script.starts_with(&[0, 0x6a])
                         {
-                            if seen.contains(&(id, i)) {
-                                // A body-order forward reference was already counted as unknown.
-                                // Avoid resurrecting its output when the producer appears later.
-                                spent_changes.push(((id, i), true));
-                            } else if self.coins.len() < capacity().witnessed_outputs {
+                            if self.coins.len() < capacity().witnessed_outputs {
                                 let previous = self.coins.insert(
                                     (id, i),
                                     Coin {
@@ -447,8 +507,8 @@ impl Mining {
                         }
                     }
                 })?;
+                ensure!(omitted == 0, "witnessed-output capacity exhausted; increase SCARY_MAX_WITNESSED_OUTPUTS and retry the body");
             }
-            ensure!(omitted==0,"witnessed-output capacity exhausted; increase SCARY_MAX_WITNESSED_OUTPUTS and retry the body");
             let reward = reward.ok_or(InvalidBody("coinbase value exceeds money range"))?;
             if let Some(fees) = fees {
                 if reward > subsidy(height, self.regtest).saturating_add(fees) {
@@ -487,6 +547,9 @@ impl Mining {
             hash: wire::display_hash(hash),
             checks,
             coinbase_reward_checked: reward_checked,
+            coinbase_finality_checked: coinbase_finality.is_some(),
+            applied_directive_sequence: Some(self.directives.applied()),
+            directive_state_ready: Some(context.directives_ready),
         });
         Ok(Applied {
             coins: undo,

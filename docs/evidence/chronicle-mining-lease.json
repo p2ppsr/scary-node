@@ -1,0 +1,12 @@
+{
+  "network": "regtest",
+  "release_binary_sha256": "3e336bf706c36149d61e80e79d529e7c06eacd97ad682c6041823e2ec414ba40",
+  "legacy_watermark": 250,
+  "first_subscription": 251,
+  "last_primary_subscription": 1275,
+  "fenced_concurrent_restore": "mining identity already active or lease unavailable",
+  "parallel_distinct_identity_subscribed": true,
+  "shutdown": "SIGKILL",
+  "rejected_empty_authority": "mining lease domain changed or missing",
+  "first_restored_subscription": 2299
+}

@@ -113,6 +113,8 @@ pub struct Mining {
     #[serde(skip)]
     path: Option<std::path::PathBuf>,
     #[serde(skip)]
+    pub(crate) mining_identity: [u8; 32],
+    #[serde(skip)]
     storage_failure: Option<String>,
     #[serde(skip, default = "solution_watch")]
     solution_watch: tokio::sync::watch::Sender<()>,
@@ -136,6 +138,8 @@ pub struct Mining {
     #[serde(default)]
     invalid_descendants: HashSet<Hash>,
     #[serde(default)]
+    soft_freezes: HashSet<Hash>,
+    #[serde(default)]
     invalidated_boundary: bool,
     awaiting_height: Option<u32>,
     #[serde(with = "store::headers")]
@@ -148,6 +152,11 @@ pub struct Mining {
     pending_outputs: HashMap<Outpoint, Coin>,
     #[serde(skip)]
     pending_bytes: usize,
+    // Prefix commitments follow the same admission order as ordered_pending().
+    #[serde(skip)]
+    pending_prefixes: Vec<Hash>,
+    #[serde(skip)]
+    worker_template: Option<Arc<stratum::Job>>,
     revision: u64,
     solved_on_tip: bool,
     suspended_reason: Option<String>,
@@ -213,6 +222,7 @@ impl Mining {
         );
         Ok(Self {
             path: None,
+            mining_identity: [0; 32],
             storage_failure: None,
             solution_watch: solution_watch(),
             live_peers: HashSet::new(),
@@ -230,6 +240,7 @@ impl Mining {
             height: None,
             active_since_entry: HashMap::new(),
             invalid_descendants: HashSet::new(),
+            soft_freezes: HashSet::new(),
             invalidated_boundary: false,
             awaiting_height: None,
             headers: VecDeque::new(),
@@ -238,6 +249,8 @@ impl Mining {
             pending_inputs: HashSet::new(),
             pending_outputs: HashMap::new(),
             pending_bytes: 0,
+            pending_prefixes: Vec::new(),
+            worker_template: None,
             revision: 0,
             solved_on_tip: false,
             suspended_reason: None,
@@ -349,7 +362,7 @@ impl Mining {
     }
 
     pub fn announced_header(&mut self, height: u32, header: &[u8]) {
-        if self.inspect_header(header).is_ok() {
+        if self.inspect_header(height, header).is_ok() {
             self.announced_height(height);
         }
     }
@@ -361,17 +374,25 @@ impl Mining {
         self.recent_invalid.push_back((hash, height, reason));
     }
 
-    fn inspect_header(&self, raw: &[u8]) -> Result<[u8; 80]> {
+    fn check_header_version(&self, height: u32, header: &[u8; 80]) -> Result<()> {
+        let version = i32::from_le_bytes(header[..4].try_into()?);
+        // Mainnet Chronicle follows both version-floor activations. Regtest
+        // can activate Chronicle at height 2 while these floors are pending.
+        ensure!(
+            version >= 4 || (self.regtest && (height < 1251 || (height < 1351 && version >= 3))),
+            "obsolete block version"
+        );
+        Ok(())
+    }
+
+    fn inspect_header(&self, height: u32, raw: &[u8]) -> Result<[u8; 80]> {
         ensure!(
             raw.len() <= body_limit(),
             "block exceeds configured observation capacity"
         );
         let mut r = raw;
         let header: [u8; 80] = wire::take(&mut r, 80)?.try_into()?;
-        ensure!(
-            i32::from_le_bytes(header[..4].try_into()?) >= 4,
-            "obsolete block version"
-        );
+        self.check_header_version(height, &header)?;
         let hash = hash256(&header);
         let target = bits(&header);
         let limit = if self.regtest { 0x207fffff } else { 0x1d00ffff };
@@ -422,7 +443,7 @@ impl Mining {
         let (txs, coinbase_error) = self.inspect_body(height, &header, &raw)?;
         let applied = match coinbase_error {
             Some(reason) => Err(validation::InvalidBody(reason).into()),
-            None => self.apply_observed(height, hash, txs),
+            None => self.apply_observed(self.block_context(height, timestamp(&header)), hash, txs),
         };
         let applied = applied.inspect_err(|error| {
             if self.height.is_some() && error.downcast_ref::<validation::InvalidBody>().is_some() {
@@ -480,11 +501,14 @@ impl Mining {
                     coinbase_error = Some("missing first coinbase");
                 } else if !coinbase_size_ok {
                     coinbase_error = Some("invalid coinbase script size");
-                } else if !self.regtest && !coinbase_height {
+                } else if (!self.regtest || height >= 100_000_000) && !coinbase_height {
                     coinbase_error = Some("coinbase height differs from announcement");
                 }
             } else if null_inputs != 0 {
                 coinbase_error = Some("extra coinbase input");
+            }
+            if raw_tx.len() > 1_000_000_000 {
+                coinbase_error = Some("transaction exceeds consensus size");
             }
             txs.push((hash256(raw_tx), raw_tx));
         }
@@ -523,10 +547,18 @@ impl Mining {
                     && !self.invalid_descendants.contains(&hash),
                 "explicitly invalidated candidate"
             );
-            self.inspect_header(raw)?;
+            self.inspect_header(height, raw)?;
+        }
+        if !solved {
+            self.check_header_version(height, &header)?;
         }
         let (txs, error) = self.inspect_body(height, &header, raw)?;
         ensure!(error.is_none(), "invalid candidate coinbase");
+        let context = self.block_context(height, timestamp(&header));
+        ensure!(
+            wire::final_under(txs[0].1, height, context.time_cutoff)? == Some(true),
+            "candidate coinbase finality unresolved or non-final"
+        );
         let mut fees = 0u64;
         let mut used = HashSet::new();
         let mut created = HashMap::new();
@@ -535,7 +567,7 @@ impl Mining {
                 self.pending.contains_key(id),
                 "candidate transaction retired"
             );
-            let assessment = self.assess_candidate(tx, height, &mut used, &created)?;
+            let assessment = self.assess_candidate(tx, context, &mut used, &created)?;
             Self::collect_outputs(&mut created, *id, tx, height)?;
             fees = fees
                 .checked_add(assessment)
@@ -561,6 +593,10 @@ impl Mining {
         Ok(())
     }
 
+    fn parent_median(&self) -> Option<u32> {
+        (self.headers.len() >= 11).then(|| self.median_time())
+    }
+
     fn median_time(&self) -> u32 {
         let mut times: Vec<_> = self.headers.iter().rev().take(11).map(timestamp).collect();
         times.sort_unstable();
@@ -579,6 +615,7 @@ impl Mining {
     }
     fn clear_pending(&mut self) {
         self.pending.clear();
+        self.pending_prefixes.clear();
         self.pending_inputs.clear();
         self.pending_outputs.clear();
         self.pending_bytes = 0;
@@ -652,8 +689,8 @@ impl Mining {
         ensure!(tx.to_bytes()? == raw, "transaction serialization mismatch");
         let candidate_height = height.checked_add(1).context("height overflow")?;
         ensure!(
-            self.final_at(&tx, candidate_height),
-            "non-final transaction"
+            wire::final_under(raw, candidate_height, self.parent_median())? == Some(true),
+            "transaction finality unresolved or non-final under mempool policy"
         );
         let is_confiscation = crate::alerts::confiscation(raw)?.is_some();
         if is_confiscation {
@@ -739,6 +776,10 @@ impl Mining {
         Self::collect_outputs(&mut self.pending_outputs, id, raw, candidate_height)?;
         self.pending_inputs.extend(inputs.iter().copied());
         self.pending_bytes += raw.len();
+        self.pending_prefixes.push(wire::joined(
+            self.pending_prefixes.last().copied().unwrap_or_default(),
+            id,
+        ));
         self.pending.insert(
             id,
             Entry {
@@ -750,17 +791,6 @@ impl Mining {
         );
         self.revision += 1;
         Ok(wire::display_hash(id))
-    }
-
-    fn final_at(&self, tx: &Transaction, height: u32) -> bool {
-        let cutoff = if tx.lock_time < 500_000_000 {
-            height
-        } else {
-            self.median_time()
-        };
-        tx.lock_time == 0
-            || tx.lock_time < cutoff
-            || tx.inputs.iter().all(|input| input.sequence == u32::MAX)
     }
 
     pub(crate) fn durable_sequence(&self) -> u32 {
@@ -866,7 +896,7 @@ impl Mining {
         json!({
             "connected_data_peers":self.live_peers.len(),"tip_confirmed_since_disconnect":self.confirmed_since_disconnect,"storage_failure":self.storage_failure,"clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,
             "mapped_bodies":mapped_count,"mapped_body_bytes":mapped_bytes,"capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
-            "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
+            "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "explicit_soft_freezes": self.soft_freezes.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
             "observation_window_ready": self.observation_window_ready(), "headers": self.headers.len(), "awaiting_height": self.awaiting_height,
             "witnessed_outputs": self.coins.len(), "omitted_outputs": self.omitted_outputs,
             "pending_transactions": self.pending.len(), "accepted_shares": self.accepted_shares,

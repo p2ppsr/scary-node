@@ -1,6 +1,7 @@
 mod alerts;
 mod body;
 mod difficulty;
+mod lease;
 mod mining;
 mod peer;
 mod sv_peer;
@@ -58,6 +59,9 @@ struct Args {
     /// Base directory for the persistent peer identity (one subdirectory per network).
     #[arg(long, default_value = ".scary-node")]
     data_dir: PathBuf,
+    /// Existing shared lease directory for miners that can use the same identity.
+    #[arg(long, requires = "stratum_bind")]
+    mining_lease_dir: Option<PathBuf>,
     /// Local maintained Alert System API base, protected by a bearer-authenticated gateway.
     #[arg(long, requires = "alert_token_file")]
     alert_service_url: Option<String>,
@@ -210,6 +214,41 @@ async fn submit(State(app): State<App>, raw: Bytes) -> (StatusCode, Json<Value>)
     }
 }
 
+fn framed_batch(mut raw: &[u8]) -> Result<Vec<&[u8]>> {
+    let count = mining::wire::varint(&mut raw)?;
+    ensure!(
+        (1..=4096).contains(&count),
+        "expected 1 to 4096 transactions"
+    );
+    let mut items = Vec::with_capacity(count);
+    for _ in 0..count {
+        items.push(mining::wire::transaction(&mut raw, |_| {})?);
+    }
+    ensure!(raw.is_empty(), "trailing bytes after transaction batch");
+    Ok(items)
+}
+
+async fn submit_batch(State(app): State<App>, raw: Bytes) -> (StatusCode, Json<Value>) {
+    let items = match framed_batch(&raw) {
+        Ok(items) => items,
+        Err(e) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({"error":e.to_string()})),
+            )
+        }
+    };
+    let mut receipts = Vec::with_capacity(items.len());
+    for bytes in items {
+        let result = app.mining.lock().await.submit_tx(bytes);
+        receipts.push(match result {
+            Ok(id) => json!({"txid":id}),
+            Err(e) => json!({"error":e.to_string()}),
+        });
+    }
+    (StatusCode::OK, Json(json!({"results":receipts})))
+}
+
 async fn outpoint(
     State(app): State<App>,
     Path((id, index)): Path<(String, u32)>,
@@ -355,10 +394,15 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                     }
                 }
             }
-            Event::Gap(reason) => {
+            Event::Gap { hash, reason } => {
                 {
                     let mut m = app.mining.lock().await;
-                    m.wait_for_body(reason.clone());
+                    if !m.record_body_gap(hash.as_deref(), reason.clone()) {
+                        log(
+                            json!({"event":"redundant_body_fetch_failed","hash":hash,"reason":reason}),
+                        );
+                        continue;
+                    }
                     m.save()?;
                     if let Some(file) = &app.shadow {
                         shadow_record(
@@ -456,6 +500,19 @@ async fn main() -> Result<()> {
     }
     mining.set_min_observed_blocks(args.min_observed_blocks as usize)?;
     mining.open_store(&dir)?;
+    let key = peer::load_key(&dir.join("peer.key"))?;
+    mining.mining_identity = bsv::primitives::hash::hash256(&key.public().encode_protobuf());
+    let lease = args
+        .stratum_bind
+        .map(|_| {
+            lease::MiningLease::acquire(
+                args.mining_lease_dir.as_deref(),
+                network,
+                &mining.mining_identity,
+                &dir,
+            )
+        })
+        .transpose()?;
     mining.supervise_data_peers(args.sv_bodies_only);
     if mining.tip().is_some() {
         let s = mining.status();
@@ -517,6 +574,7 @@ async fn main() -> Result<()> {
             post(check_transaction).layer(DefaultBodyLimit::max(mining::transaction_limit())),
         )
         .route("/transactions", post(submit))
+        .route("/transactions/batch", post(submit_batch))
         .layer(DefaultBodyLimit::max(mining::transaction_limit()))
         .layer(axum::middleware::from_fn_with_state(
             app.operator_token.clone(),
@@ -530,7 +588,7 @@ async fn main() -> Result<()> {
         allow_sv_only: !args.sv_peer.is_empty() || args.sv_bodies_only,
         peers: args.peer,
         listen: args.listen,
-        key_file: dir.join("peer.key"),
+        key,
         asset_bind: args.asset_bind,
         asset_url: args.asset_url,
         fetch_bodies: fetch_bodies && !args.sv_bodies_only,
@@ -575,12 +633,13 @@ async fn main() -> Result<()> {
     tasks.spawn(peer::run(cfg, events, app.mining.clone(), solved));
     tasks.spawn(consume(app.clone(), stream));
     tasks.spawn(async move { axum::serve(api, router).await.context("operator API") });
-    if let Some(bind) = args.stratum_bind {
+    if let (Some(bind), Some(lease)) = (args.stratum_bind, lease) {
         tasks.spawn(mining::run_stratum(
             bind,
             app.mining,
             solutions.clone(),
             worker_password,
+            lease,
         ));
     }
     // Keep the solution channel open in listen-only mode.
@@ -597,4 +656,30 @@ async fn main() -> Result<()> {
     }
     tasks.abort_all();
     Ok(())
+}
+
+#[cfg(test)]
+mod batch_tests {
+    use super::*;
+
+    #[test]
+    fn framing_validates_every_item_before_admission() {
+        let mut tx = vec![1, 0, 0, 0, 1];
+        tx.extend([0; 36]);
+        tx.push(0);
+        tx.extend([0xff; 4]);
+        tx.push(1);
+        tx.extend([0; 13]);
+        let mut batch = vec![2];
+        batch.extend(&tx);
+        batch.extend(&tx);
+        assert_eq!(
+            framed_batch(&batch).unwrap(),
+            [tx.as_slice(), tx.as_slice()]
+        );
+        assert!(framed_batch(&batch[..batch.len() - 1]).is_err());
+        batch.push(0);
+        assert!(framed_batch(&batch).is_err());
+        assert!(framed_batch(&[0]).is_err());
+    }
 }

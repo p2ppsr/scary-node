@@ -26,6 +26,8 @@ cargo build --locked --example chronicle
 (cd qualification/go && go build -o ../../.native/go-oracle .)
 .native/py/bin/python qualification/chronicle.py .native/chronicle.json
 .native/py/bin/python qualification/chronicle_signatures.py .native/signatures.json
+.native/py/bin/python qualification/block_context.py --binary ./target/release/scary-node .native/block-context.json
+.native/py/bin/python qualification/alert_receipts.py --binary ./target/release/scary-node .native/alert-item-receipts.json
 python3 qualification/sv_dar.py .native/sv-dar.json
 python3 qualification/scary_dar.py --binary ./target/release/scary-node .native/scary-dar.json
 python3 qualification/directive_race.py --binary ./target/release/scary-node .native/directive-race.json
@@ -71,6 +73,17 @@ python3 qualification/verify_stream.py .native/mixed-stream.json.gz
 ./regtest/mixed.sh --down
 ```
 
+For the 24-round population, use fresh regtest volumes and run the following commands. This profile uses 256 transactions per authenticated operator request and 96 historical background spends. The verifier checks each fee, Merkle root, peer wire digest, successor and background inclusion.
+
+```sh
+./regtest/mixed.sh --stream sustained > .native/mixed-sustained.json
+gzip -c .native/mixed-sustained.json > .native/mixed-sustained.json.gz
+python3 qualification/verify_stream.py .native/mixed-sustained.json.gz
+./regtest/mixed.sh --down
+```
+
+To check native settlement between stock reference nodes, leave the mixed network running after a successful proof and run `python3 qualification/mixed_native.py .native/native-successors.json` before teardown. The fixture restarts the second Teranode on its same volume and connects its stock legacy service to SV Node. A container-local host route lets stock Teranode select a source address on the isolated bridge. The launcher drops its network administration capability before starting the daemon. Twelve alternating solves exercise both directions over native protocols. [Stock legacy service](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/docs/topics/services/legacy.md)
+
 Pass `--rollback-binary PATH` to the large-body driver to restore the new checkpoint with an older executable and verify its next active tip against SV Node. Pin the older build and retain its digest. The measured rollback uses a body below the MessagePack single-binary limit.
 
 ## Native receiver integration on regtest
@@ -115,6 +128,8 @@ python3 qualification/shadow.py "$SHADOW_LOG"
 python3 qualification/shadow_export.py "$SHADOW_LOG" "$FAILOVER_RECEIPT" .native/shadow-public.json
 ```
 
+The [passive mainnet checkpoint](mainnet-shadow.md) includes replayable raw headers, a separate public chainwork anchor, signed-state readiness checks and the finite 1,008-block collection command.
+
 ## Operator handling of notices
 
 Assign an on-call operator and a deputy to the official notice channel and alert telemetry. Record receipt time, signed sequence, notice terms, affected items and effective heights. Track any specified deadline and route a failed item to the on-call operator while work is paused. Preserve signed bytes, application receipts, job history and independent tip observations for the resolution. Deliver informational notices to the responsible operator. On a substantive rule or interpreter change, pin the new reference and rerun qualification before resuming the affected work. Escalate a significant threat or potential directive event and route official information requests to the responsible operator for a prompt, lawful response. Review the published rules and the actual notice for effective time, deadlines and disclosure restrictions. [NAR Part I, especially I.5](https://nar.bsvblockchain.org/network-access-rules/part-i-master-rules) · [NAR Part III, especially III.2 and III.7](https://nar.bsvblockchain.org/network-access-rules/part-iii-enforcement-rules)
@@ -122,3 +137,7 @@ Assign an on-call operator and a deputy to the official notice channel and alert
 ## Remaining production qualification
 
 The required evidence includes a signed history through a live receiver, directive-versus-solution races, clock and storage fault recovery, interrupted writes and software rollback. It also includes independent SV Node and Teranode delivery for the same DAR bytes, large contiguous bodies at sustained load, independent receivers for full-state controls, opportunities during unready intervals and a prospective 1,008-block shadow run with restart and peer failover. Record durations, hardware, queue depth, uncovered intervals and each endpoint's verdict. SV Node determines the DAR outcome. [Teranode's documented ownership reassignment behavior](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/docs/topics/services/alert.md#24-utxo-reassignment)
+
+### Stratum identity and standby recovery
+
+Build the release and run `python3 qualification/mining_lease.py .native/mining-lease.json`. Two actual node processes attempt subscriptions using separate state directories containing the same identity. The driver checks enforcement while both are alive, kills the active process, then reconnects a stale standby to the original allocation authority. A third miner uses an independent identity with the same payout. No network proof of work is needed to exercise the allocation boundary. [Measured connection numbers](evidence/chronicle-mining-lease.json)

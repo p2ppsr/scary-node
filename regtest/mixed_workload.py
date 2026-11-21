@@ -125,23 +125,32 @@ def run(wallet, source, value, count):
     return record_ancestry(NODES[1], result)
 
 
-def mine_round(parent, payments, fees):
+def mine_round(parent, payments, fees, batch=1):
     a, b = NODES
     count = len(payments)
     start = time.monotonic_ns()
     conn = http.client.HTTPConnection("127.0.0.1", 19480 + PORT_SHIFT, timeout=45)
     try:
-        for raw_tx in payments:
+        for start_index in range(0, count, batch):
+            group = payments[start_index : start_index + batch]
+            if batch == 1:
+                path, payload = "/transactions", group[0]
+            else:
+                path = "/transactions/batch"
+                payload = compact(len(group)) + b"".join(group)
             conn.request(
-                "POST",
-                "/transactions",
-                raw_tx,
-                {"Content-Type": "application/octet-stream"},
+                "POST", path, payload, {"Content-Type": "application/octet-stream"}
             )
             reply = conn.getresponse()
             data = json.load(reply)
-            if reply.status != 202 or data["txid"] != txid(raw_tx):
+            if reply.status != (202 if batch == 1 else 200):
                 raise RuntimeError(f"candidate admission {reply.status} {data}")
+            if ([data] if batch == 1 else data["results"]) != [
+                {"txid": txid(raw)} for raw in group
+            ]:
+                raise RuntimeError(
+                    "candidate admission receipts differ from ordered offers"
+                )
     finally:
         conn.close()
     admitted = time.monotonic_ns()
@@ -193,7 +202,7 @@ def mine_round(parent, payments, fees):
     }
 
 
-def stream(wallet, source, value, history, rounds=8, ordinary=1024):
+def stream(wallet, source, value, history, rounds=8, ordinary=1024, batch=1):
     """Fixed-cadence historical spends go to the full miners during witnessed Stratum assembly."""
     a, b = NODES
     per_round = ordinary + 1
@@ -243,7 +252,7 @@ def stream(wallet, source, value, history, rounds=8, ordinary=1024):
         future = senders.submit(transact)
         for i, raw in enumerate(prepared):
             before = time.monotonic_ns()
-            result = mine_round(parent, raw, 1000 * ordinary + amount)
+            result = mine_round(parent, raw, 1000 * ordinary + amount, batch)
             result.update(
                 round=i + 1,
                 start_ns=before - start,
@@ -298,6 +307,9 @@ def stream(wallet, source, value, history, rounds=8, ordinary=1024):
             capture=True,
         ).split()[0],
         "rounds": rows,
+        "planned_rounds": rounds,
+        "planned_background": len(history),
+        "admission_batch": batch,
         "funding": fid,
         "funding_value": amount,
         "funding_block": fund,

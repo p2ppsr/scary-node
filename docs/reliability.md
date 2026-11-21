@@ -1,5 +1,8 @@
 # Recovering work across tip changes
 
+This page describes the fourth-commit recovery experiment on alpha.3. The Chronicle implementation persists its observation boundary and retains compact same-parent work commitments. [Current operating behavior](operations.md)
+
+
 The node holds a witnessed view of one fully observed branch. A competing body whose header and transaction commitment can be checked is buffered. The incumbent remains active at equal work. When buffered bodies connect from an observed ancestor and exceed the incumbent’s accumulated work, the node reverses the detached blocks, validates the replacement in parent order and keeps the resulting branch. An alternate body that fails the contextual checks leaves the earlier verified branch available for recovery. Merkle commitments, contextual difficulty, time, watched spends and amounts are checked using the same paths as for a direct extension.
 
 The journal stores up to eight recent blocks, subject to a 64 MiB body budget and 250,000 total undo entries. It reverses observed coin creations, removals and consumption records, including recent-spend cache eviction. A separate queue holds up to 24 competing or out-of-order bodies within a 64 MiB aggregate budget. A missing parent can arrive after its child. A branch whose ancestor has left the journal stays outside the automatic recovery window. When a credible higher tip is pending, the node withholds new jobs until it obtains a usable branch. An already admitted payment stays pending if its inputs remain eligible on the replacement branch. A wallet can resubmit a detached payment after its input becomes eligible again. The view is in memory. Restarting establishes a new observation boundary.

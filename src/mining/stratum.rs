@@ -3,7 +3,7 @@ use super::{now, subsidy, wire, Hash, Mining};
 use anyhow::{ensure, Context, Result};
 use bsv::primitives::hash::hash256;
 use serde_json::{json, Value};
-use std::collections::{HashSet, VecDeque};
+use std::collections::{HashMap, HashSet};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
@@ -15,7 +15,7 @@ const VERSION: u32 = 0x20000000;
 const MAIN_SHARE_BITS: u32 = 0x1b00ffff; // difficulty 65,536
 const MAX_LINE: usize = 4096;
 
-struct Job {
+pub(super) struct Job {
     revision: u64,
     parent_epoch: u64,
     height: u32,
@@ -25,7 +25,9 @@ struct Job {
     prefix: Vec<u8>,
     suffix: Vec<u8>,
     branches: Vec<Hash>,
-    txs: Vec<Arc<[u8]>>,
+    transactions: usize,
+    pool_commitment: Hash,
+    directive_sequence: u32,
 }
 
 impl Job {
@@ -62,7 +64,8 @@ impl Job {
         let reward = subsidy(height, state.regtest)
             .checked_add(fees)
             .context("coinbase overflow")?;
-        let (prefix, suffix) = coinbase_parts(height, reward, &state.payout);
+        let (prefix, suffix) =
+            coinbase_parts(height, reward, &state.payout, &state.mining_identity);
         let mut leaves = vec![[0; 32]];
         let ordered = state.ordered_pending();
         leaves.extend(ordered.iter().map(|(id, _)| *id));
@@ -77,21 +80,22 @@ impl Job {
             prefix,
             suffix,
             branches,
-            txs: ordered.iter().map(|(_, e)| e.raw.clone()).collect(),
+            transactions: ordered.len(),
+            pool_commitment: *state
+                .pending_prefixes
+                .last()
+                .context("missing pending commitment")?,
+            directive_sequence: state.applied_sequence,
         };
         let (header, coinbase) = job.work([0; 4], [0; 4], time, 0);
-        state.verify_own_block(height, &job.block(&header, &coinbase), false)?;
+        state.verify_own_block(height, &job.block(&header, &coinbase, &ordered), false)?;
         Ok(Some(job))
     }
 
     fn eligible(&self, state: &Mining) -> bool {
         self.parent_epoch == state.parent_epoch
-            && self.txs.iter().all(|raw| {
-                state
-                    .pending
-                    .get(&hash256(raw))
-                    .is_some_and(|e| e.raw.as_ref() == raw.as_ref())
-            })
+            && (self.transactions == 0
+                || state.pending_prefixes.get(self.transactions - 1) == Some(&self.pool_commitment))
     }
 
     fn id(&self) -> String {
@@ -136,25 +140,46 @@ impl Job {
         (header, coinbase)
     }
 
-    fn block(&self, header: &[u8; 80], coinbase: &[u8]) -> Vec<u8> {
+    fn block(
+        &self,
+        header: &[u8; 80],
+        coinbase: &[u8],
+        ordered: &[(Hash, &super::Entry)],
+    ) -> Vec<u8> {
         let mut raw = header.to_vec();
-        wire::put_varint(&mut raw, self.txs.len() + 1);
+        wire::put_varint(&mut raw, self.transactions + 1);
         raw.extend(coinbase);
-        for tx in &self.txs {
-            raw.extend_from_slice(tx);
+        for (_, entry) in ordered.iter().take(self.transactions) {
+            raw.extend_from_slice(&entry.raw);
         }
         raw
     }
 }
 
 impl Mining {
+    fn worker_job(&mut self) -> Result<Option<Arc<Job>>> {
+        if !self.observation_window_ready() || self.solved_on_tip {
+            return Ok(None);
+        }
+        if let Some(job) = &self.worker_template {
+            if job.revision == self.revision
+                && job.directive_sequence == self.applied_sequence
+                && job.eligible(self)
+            {
+                return Ok(Some(job.clone()));
+            }
+        }
+        self.worker_template = Job::from_state(self)?.map(Arc::new);
+        Ok(self.worker_template.clone())
+    }
+
     pub fn shadow_decision(&self) -> Result<Value> {
         let tip = self.headers.back().context("shadow tip absent")?;
         let job = Job::from_state(self)?;
         let template=job.map(|j|{
             let (header,coinbase)=j.work([0;4],[0;4],j.time,0);
             json!({"height":j.height,"bits":j.bits,"header_hex":hex::encode(header),"coinbase":hex::encode(coinbase),
-                   "transactions":j.txs.iter().map(|t|wire::display_hash(hash256(t))).collect::<Vec<_>>()})
+                   "transactions":self.ordered_pending().into_iter().map(|(id,_)|wire::display_hash(id)).collect::<Vec<_>>()})
         });
         Ok(
             json!({"observed_at":now()?,"height":self.height,"hash":wire::display_hash(hash256(tip)),
@@ -164,10 +189,15 @@ impl Mining {
         )
     }
 }
-fn coinbase_parts(height: u32, value: u64, payout: &[u8]) -> (Vec<u8>, Vec<u8>) {
+fn coinbase_parts(
+    height: u32,
+    value: u64,
+    payout: &[u8],
+    identity: &[u8; 32],
+) -> (Vec<u8>, Vec<u8>) {
     let height_push = wire::height_push(height);
     let tag = b"/scary-node/";
-    let script_len = height_push.len() + 1 + 8 + 1 + tag.len();
+    let script_len = height_push.len() + 1 + 8 + 1 + tag.len() + 1 + identity.len();
     let mut prefix = 1u32.to_le_bytes().to_vec();
     prefix.push(1);
     prefix.extend([0; 32]);
@@ -177,6 +207,8 @@ fn coinbase_parts(height: u32, value: u64, payout: &[u8]) -> (Vec<u8>, Vec<u8>) 
     prefix.push(8); // push the concatenated connection and worker extranonces
     let mut suffix = vec![tag.len() as u8];
     suffix.extend(tag);
+    suffix.push(identity.len() as u8);
+    suffix.extend(identity);
     suffix.extend(u32::MAX.to_le_bytes());
     suffix.push(1);
     suffix.extend(value.to_le_bytes());
@@ -224,7 +256,7 @@ fn share(
     params: &[Value],
     worker: &str,
     x1: [u8; 4],
-    seen: &mut HashSet<([u8; 4], u32, u32)>,
+    seen: &mut HashSet<(u64, [u8; 4], u32, u32)>,
     solved: &mpsc::Sender<(u32, Vec<u8>)>,
 ) -> Result<()> {
     ensure!(params.len() == 5, "expected five mining.submit parameters");
@@ -244,7 +276,8 @@ fn share(
         time >= job.time && time <= now()?.saturating_add(7200),
         "ntime outside job window"
     );
-    ensure!(!seen.contains(&(x2, time, nonce)), "duplicate share");
+    let share_id = (job.revision, x2, time, nonce);
+    ensure!(!seen.contains(&share_id), "duplicate share");
     let (header, coinbase) = job.work(x1, x2, time, nonce);
     let digest = hash256(&header);
     let network = wire::meets_target(digest, job.bits)?;
@@ -258,11 +291,11 @@ fn share(
         "low-difficulty share"
     );
     ensure!(
-        seen.len() < 4096,
+        network || seen.len() < 4096,
         "share replay window full; reconnect for a new extranonce"
     );
     if network {
-        let block = job.block(&header, &coinbase);
+        let block = job.block(&header, &coinbase, &state.ordered_pending());
         state.verify_own_block(job.height, &block, true)?;
         let permit = solved
             .try_reserve()
@@ -286,7 +319,7 @@ fn share(
         permit.send((job.height, block));
         state.solution_watch.send_replace(());
     }
-    seen.insert((x2, time, nonce));
+    seen.insert(share_id);
     state.accepted_shares += 1;
     Ok(())
 }
@@ -304,8 +337,11 @@ async fn session(
     let x1 = serial.to_be_bytes();
     let mut subscribed = false;
     let mut worker = None::<String>;
-    const RETAINED_JOBS: usize = 8;
-    let mut jobs = VecDeque::<(Job, HashSet<_>)>::new();
+    // Keep every issued valid commitment. At the connection bound, coalesce
+    // further refreshes until eligibility changes or the parent advances.
+    const RETAINED_JOBS: usize = 4096;
+    let mut jobs = HashMap::<u64, Arc<Job>>::new();
+    let mut seen = HashSet::new();
     let mut announced_revision = None;
     let mut refresh = tokio::time::interval(Duration::from_millis(150));
     refresh.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
@@ -379,10 +415,12 @@ async fn session(
                 "mining.extranonce.subscribe" => Ok(json!(true)),
                 "mining.submit" => {
                     let id = args.get(1).and_then(Value::as_str);
-                    let job = jobs.iter_mut().find(|(j, _)| Some(j.id().as_str()) == id);
-                    if let (Some((j, seen)), Some(w)) = (job, &worker) {
+                    let job = id
+                        .and_then(|text| u64::from_str_radix(text, 16).ok())
+                        .and_then(|revision| jobs.get(&revision));
+                    if let (Some(j), Some(w)) = (job, &worker) {
                         let mut s = state.lock().await;
-                        let reply = share(&mut s, j, args, w, x1, seen, &solved);
+                        let reply = share(&mut s, j, args, w, x1, &mut seen, &solved);
                         if let Err(e) = &reply {
                             code = match e.to_string().as_str() {
                                 "stale job" => 21,
@@ -406,7 +444,7 @@ async fn session(
             };
             write_message(&mut output, response).await?;
         } else {
-            let s = state.lock().await;
+            let mut s = state.lock().await;
             if !s.observation_window_ready() && !jobs.is_empty() {
                 return Ok(());
             }
@@ -416,12 +454,19 @@ async fn session(
             }
             let first = announced_revision.is_none();
             announced_revision = Some(revision);
-            let next_job = Job::from_state(&s)?;
-            if !jobs.is_empty() && next_job.is_none() {
+            let had_jobs = !jobs.is_empty();
+            jobs.retain(|_, job| job.eligible(&s));
+            if jobs.is_empty() {
+                seen.clear();
+            }
+            if jobs.len() >= RETAINED_JOBS && !s.solved_on_tip {
+                continue;
+            }
+            let next_job = s.worker_job()?;
+            if had_jobs && next_job.is_none() {
                 // Stratum V1 has no cancellation without a replacement job.
                 return Ok(());
             }
-            jobs.retain(|(job, _)| job.eligible(&s));
             let clean = jobs.is_empty();
             let regtest = s.regtest;
             drop(s);
@@ -439,10 +484,7 @@ async fn session(
             }
             if let Some(job) = next_job {
                 write_message(&mut output, job.notification(clean)).await?;
-                if jobs.len() == RETAINED_JOBS {
-                    jobs.pop_front();
-                }
-                jobs.push_back((job, HashSet::new()));
+                jobs.insert(job.revision, job);
             }
         }
     }
@@ -453,6 +495,7 @@ pub async fn run_stratum(
     state: Arc<Mutex<Mining>>,
     solved: mpsc::Sender<(u32, Vec<u8>)>,
     password: Option<Arc<str>>,
+    mut lease: crate::lease::MiningLease,
 ) -> Result<()> {
     ensure!(
         !state.lock().await.payout.is_empty(),
@@ -468,7 +511,7 @@ pub async fn run_stratum(
             continue;
         };
         if next == end {
-            (next, end) = state.lock().await.extranonce_lease()?;
+            (next, end) = lease.reserve()?;
         }
         next = next.checked_add(1).context("extranonce space exhausted")?;
         let serial = next;
@@ -497,7 +540,7 @@ mod tests {
             bits:0x207fffff,time:1_700_000_000,
             prefix:hex::decode("01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff16510408070605").unwrap(),
             suffix:hex::decode("4558414d504c45ffffffff010100000000000000015100000000").unwrap(),
-            branches:vec![hash256(b"child")],txs:vec![]};
+            branches:vec![hash256(b"child")],transactions:0,pool_commitment:[0;32],directive_sequence:0};
         let msg = j.notification(true);
         assert_eq!(
             msg["params"][1],
@@ -522,7 +565,7 @@ mod tests {
         parent[72..76].copy_from_slice(&0x207fffffu32.to_le_bytes());
         state.headers.push_back(parent);
         state.height = Some(25);
-        let (prefix, suffix) = coinbase_parts(26, 5_000_000_000, &[0x51]);
+        let (prefix, suffix) = coinbase_parts(26, 5_000_000_000, &[0x51], &state.mining_identity);
         let time = now().unwrap();
         let job = Job {
             revision: state.revision,
@@ -534,7 +577,9 @@ mod tests {
             prefix,
             suffix,
             branches: vec![],
-            txs: vec![],
+            transactions: 0,
+            pool_commitment: [0; 32],
+            directive_sequence: 0,
         };
         let x1 = [0, 0, 0, 1];
         let mut seen = HashSet::new();

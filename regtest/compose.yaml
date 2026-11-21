@@ -62,7 +62,9 @@ services:
     build: ..
     image: ${SCARY_NODE_IMAGE:-scary-node:local}
     networks: [regtest]
-    volumes: [scary-data:/data]
+    environment:
+      XDG_STATE_HOME: /var/lib/scary-state
+    volumes: [scary-data:/data, scary-leases:/var/lib/scary-state]
     depends_on: [tn1, tn2]
     command:
       - --network
@@ -101,6 +103,7 @@ volumes:
   tn1-data:
   tn2-data:
   scary-data:
+  scary-leases:
 networks:
   regtest:
     driver: bridge

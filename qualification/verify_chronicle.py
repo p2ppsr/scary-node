@@ -12,11 +12,123 @@ sys.path.insert(0, str(ROOT / "regtest"))
 from prove import decode_block, dsha, txid
 from verify_receipt import check_header, single_input
 from cohort_estimate import analyze
+from relay_comparison import paired_report
 from shadow import audit
 from verify_stream import verify as verify_stream
 
 
+def verify_block_context(record):
+    history = [bytes.fromhex(h) for h in record["headers_before_cases"]]
+    assert len(history) == 11
+    for i, header in enumerate(history):
+        check_header(header, txid(header), txid(history[i - 1]) if i else None)
+    assert [r["height"] for r in record["rows"]] == [575, 576, 577]
+    for row in record["rows"]:
+        body = bytes.fromhex(row["block_hex"])
+        h, block_hash = row["height"], row["sv_active_hash"]
+        assert row["parent_hash"] == txid(history[-1])
+        check_header(body[:80], block_hash, row["parent_hash"])
+        assert row["scary_active_hash"] == row["observation"]["hash"] == block_hash
+        assert (
+            int.from_bytes(body[:4], "little", signed=True)
+            == row["header_version"]
+            == 1
+        )
+        mtp = sorted(int.from_bytes(b[68:72], "little") for b in history[-11:])[5]
+        block_time = int.from_bytes(body[68:72], "little")
+        assert mtp == row["parent_median_time"] and block_time == row["header_time"]
+        _, txs, _ = decode_block(body, block_hash)
+        assert len(txs) == (2 if h in (575, 576) else 1)
+        root = dsha(txs[0]) if len(txs) == 1 else dsha(dsha(txs[0]) + dsha(txs[1]))
+        assert body[36:68] == root
+        source, vout, coinbase_script = single_input(txs[0])
+        assert (source, vout) == ("00" * 32, 0xFFFFFFFF)
+        if h == 577:
+            assert coinbase_script == bytes.fromhex("6a00")
+        assert row["coinbase_sequence"] == 0xFFFFFFFE
+        for raw in txs:
+            # These single-input fixtures all use short scripts and compact counts.
+            script_length = raw[41]
+            assert script_length < 253
+            assert raw[42 + script_length : 46 + script_length] == bytes.fromhex(
+                "feffffff"
+            )
+            assert (
+                int.from_bytes(raw[-4:], "little")
+                == (block_time if h < 576 else mtp) - 1
+            )
+        assert int.from_bytes(txs[0][-4:], "little") == row["coinbase_lock_time"]
+        obs = row["observation"]
+        assert obs["coinbase_finality_checked"] and obs["coinbase_reward_checked"]
+        if len(txs) == 2:
+            assert single_input(txs[1])[0] == record["funding_txid"]
+            assert txid(txs[1]) == row["payment_txid"]
+            assert int.from_bytes(txs[1][-4:], "little") == row["payment_lock_time"]
+            assert obs["transactions_determinate"] == obs["script_checks_passed"] == 1
+            assert (row["payment_lock_time"] >= mtp) == (h == 575)
+        history.append(body[:80])
+
+
 def verify(directory):
+    native = json.loads((directory / "chronicle-native-successors.json").read_text())
+    assert len(native["rows"]) == 12
+    parent = native["starting_parent"]
+    for i, row in enumerate(native["rows"]):
+        wire = bytes.fromhex(row["wire_hex"])
+        assert (i % 2 == 0) == (row["issuer"] == "sv")
+        check_header(wire[:80], row["hash"], parent)
+        decode_block(wire, row["hash"])
+        assert hashlib.sha256(wire).hexdigest() == row["wire_sha256"]
+        assert row["receiver_hashes"] == dict.fromkeys(
+            ("sv", "tn1", "tn2", "entrant"), row["hash"]
+        )
+        parent = row["hash"]
+
+    large_stream = verify_stream(directory / "chronicle-mixed-sustained.json.gz")
+    assert (
+        large_stream["candidate_transactions"],
+        large_stream["active_wire_matches"],
+        large_stream["background_payments"],
+    ) == (49176, 72, 96)
+    lease = json.loads((directory / "chronicle-mining-lease.json").read_text())
+    assert lease["first_subscription"] == lease["legacy_watermark"] + 1
+    assert lease["last_primary_subscription"] == lease["first_subscription"] + 1024
+    assert lease["first_restored_subscription"] == lease["first_subscription"] + 2048
+    assert (
+        lease["shutdown"] == "SIGKILL"
+        and lease["parallel_distinct_identity_subscribed"]
+    )
+
+    verify_block_context(
+        json.loads((directory / "chronicle-block-context.json").read_text())
+    )
+    items = json.loads((directory / "chronicle-alert-items.json").read_text())
+    first, second = items["freeze_results"]
+    expected = {
+        "notProcessed": [
+            {
+                "txOut": {"txId": items["funding_txid"], "vout": 0},
+                "reason": "already in consensus",
+            }
+        ]
+    }
+    for row, seq, result in [(first, 1, {"notProcessed": []}), (second, 2, expected)]:
+        assert row["sequence"] == row["receipt"]["sequence"] == seq
+        assert row["scary"] == row["sv"] == row["receipt"]["rpc_result"] == result
+        assert row["receipt"]["active_height"] == items["height"]
+    rejected = items["unapplied"]
+    assert rejected["failure"]["sequence"] == rejected["last_verified"] == 3
+    assert rejected["last_applied"] == 2 and not rejected["ready"]
+    assert rejected["after_restart"] == {
+        "last_verified": 3,
+        "last_applied": 2,
+        "ready": False,
+    }
+    assert rejected["sv"] == rejected["scary"] == rejected["failure"]["rpc_result"]
+    assert (
+        rejected["sv"]["notProcessed"][0]["reason"]
+        == "confiscated TXO is not consensus frozen"
+    )
     rows = json.loads((directory / "chronicle-opcodes.json").read_text())["rows"]
     with gzip.open(directory / "chronicle-signatures.json.gz", "rt") as file:
         rows += json.load(file)["rows"]
@@ -309,6 +421,9 @@ def verify(directory):
     )
     assert analyze(directory / "chronicle-native-pilot", "pilot") == json.loads(
         (directory / "chronicle-native-sizing.json").read_text()
+    )
+    assert paired_report(directory / "chronicle-relay-comparison") == json.loads(
+        (directory / "chronicle-relay-comparison.json").read_text()
     )
     loss = json.loads((directory / "chronicle-peer-loss.json").read_text())
     assert (

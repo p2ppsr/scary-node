@@ -129,6 +129,22 @@ impl Mining {
         missing.into_iter().collect()
     }
 
+    /// An alternate transport can fail after the same body has been committed.
+    /// Only a hash on the presently witnessed branch proves that failure is redundant.
+    pub(crate) fn record_body_gap(&mut self, requested: Option<&str>, reason: String) -> bool {
+        if let Some(display) = requested {
+            let mut id = [0; 32];
+            if hex::decode_to_slice(display, &mut id).is_ok() {
+                id.reverse();
+                if self.active_since_entry.contains_key(&id) {
+                    return false;
+                }
+            }
+        }
+        self.wait_for_body(reason);
+        true
+    }
+
     pub fn wait_for_body(&mut self, reason: String) {
         if !self.blocked {
             self.revision += 1;
@@ -153,10 +169,43 @@ impl Mining {
                 }
             })?;
             if index != 0 && frozen && crate::alerts::confiscation(tx)?.is_none() {
+                ensure!(
+                    self.directives.ready(),
+                    "awaiting current directives for a frozen input"
+                );
                 return Ok(true);
             }
         }
         Ok(false)
+    }
+
+    // An explicit soft freeze is an attribute of the block index. Changing
+    // the blacklist does not clear it. The default holds three successors.
+    fn held_by_soft_freeze(&self, hash: Hash, mut parent: Hash) -> bool {
+        if self.soft_freezes.is_empty() {
+            return false;
+        }
+        if self.soft_freezes.contains(&hash) {
+            return true;
+        }
+        for _ in 0..3 {
+            if self.soft_freezes.contains(&parent) {
+                return true;
+            }
+            if let Some(b) = self.chain.buffered.iter().find(|b| b.hash == parent) {
+                parent = b.previous();
+            } else if let Some(h) = self
+                .headers
+                .iter()
+                .rev()
+                .find(|h| hash256(&h[..]) == parent)
+            {
+                parent = h[4..36].try_into().expect("header prev hash");
+            } else {
+                break;
+            }
+        }
+        false
     }
 
     #[cfg(test)]
@@ -172,7 +221,7 @@ impl Mining {
         if height < interpreter::activation(self.regtest) {
             return Ok(false);
         }
-        let header = self.inspect_header(&raw)?;
+        let header = self.inspect_header(height, &raw)?;
         let hash = hash256(&header);
         let previous: Hash = header[4..36].try_into().unwrap();
         if self.directives.invalid.contains(&hash)
@@ -218,7 +267,13 @@ impl Mining {
             }
         }
         let direct = old_tip.is_none() || old_tip == Some(previous);
-        let quarantined = self.soft_frozen(&raw, height)?;
+        let existing_hold = self.held_by_soft_freeze(hash, previous);
+        let newly_frozen = direct
+            && !existing_hold
+            && self
+                .soft_frozen(&raw, height)
+                .inspect_err(|error| self.wait_for_body(error.to_string()))?;
+        let quarantined = newly_frozen || existing_hold;
         if direct && !quarantined {
             if let Err(error) = self.connect(height, raw, header) {
                 self.wait_for_body(error.to_string());
@@ -230,6 +285,9 @@ impl Mining {
                 coinbase_error.is_none(),
                 "invalid competing coinbase framing"
             );
+            if newly_frozen {
+                self.soft_freezes.insert(hash);
+            }
             let deep_gap = self
                 .height
                 .is_some_and(|tip| height > tip.saturating_add(BUFFERED_BLOCKS as u32));
@@ -239,7 +297,7 @@ impl Mining {
                 hash,
                 raw,
             };
-            if deep_gap && !quarantined {
+            if deep_gap && !quarantined && !self.soft_frozen(&candidate.raw, height)? {
                 let anchor = self
                     .chain
                     .buffered
@@ -249,6 +307,7 @@ impl Mining {
                 if let Some(p) = anchor {
                     ensure!(
                         !self.soft_frozen(&p.raw, p.height)?
+                            && !self.held_by_soft_freeze(p.hash, p.previous())
                             && !self.directives.invalid.contains(&p.hash)
                             && !self.invalid_descendants.contains(&p.hash),
                         "ineligible re-entry boundary"
@@ -274,33 +333,24 @@ impl Mining {
                     return Ok(true);
                 }
             }
-            let mut held = quarantined;
-            let mut predecessor = previous;
-            for _ in 0..3 {
-                let Some(body) = self.chain.buffered.iter().find(|b| b.hash == predecessor) else {
-                    break;
-                };
-                held |= self.soft_frozen(&body.raw, body.height)?;
-                predecessor = body.previous();
-            }
             self.chain.buffer(candidate);
-            if held && self.awaiting_height.is_some_and(|h| h <= height) {
+            if quarantined && self.awaiting_height.is_some_and(|h| h <= height) {
                 self.awaiting_height = None;
                 self.revision += 1;
             }
-            if !held && self.height.is_some_and(|tip| height > tip) {
+            if !quarantined && self.height.is_some_and(|tip| height > tip) {
                 self.announced_height(height);
             }
         }
 
         // A late parent can make a previously buffered child attachable.
         // A competing branch beats the incumbent only with greater work.
-        let mut result = Ok(());
-        while let Some((ancestor, branch)) = self.best_buffered_branch()? {
-            if let Err(error) = self.switch_branch(ancestor, branch) {
-                result = Err(error);
-                break;
-            }
+        let result = self.activate_buffered_branches();
+        if self.held_by_soft_freeze(hash, previous)
+            && self.awaiting_height.is_some_and(|h| h <= height)
+        {
+            self.awaiting_height = None;
+            self.revision += 1;
         }
         if self.tip() != old_tip {
             let height = self.height.expect("changed tip has a height");
@@ -320,6 +370,26 @@ impl Mining {
             .buffered
             .retain(|b| !self.headers.iter().any(|h| h == &b.header));
         result.map(|_| true)
+    }
+
+    pub(crate) fn linked_height(&self, hash: Hash, parent: Hash) -> Option<u32> {
+        self.active_since_entry
+            .get(&hash)
+            .copied()
+            .or_else(|| self.active_since_entry.get(&parent)?.checked_add(1))
+            .or_else(|| {
+                self.chain.buffered.iter().find_map(|b| {
+                    if b.hash == hash {
+                        Some(b.height)
+                    } else if b.hash == parent {
+                        b.height.checked_add(1)
+                    } else if b.previous() == hash {
+                        b.height.checked_sub(1)
+                    } else {
+                        None
+                    }
+                })
+            })
     }
 
     fn active_height(&self, hash: Hash) -> Option<u32> {
@@ -364,13 +434,11 @@ impl Mining {
             {
                 continue;
             }
-            if path
-                .iter()
-                .take(4)
-                .any(|b| self.soft_frozen(&b.raw, b.height).unwrap_or(true))
-                || path
-                    .iter()
-                    .any(|b| self.directives.invalid.contains(&b.hash))
+            if self.held_by_soft_freeze(tip.hash, tip.previous())
+                || path.iter().any(|b| {
+                    self.directives.invalid.contains(&b.hash)
+                        || self.invalid_descendants.contains(&b.hash)
+                })
             {
                 continue;
             }
@@ -438,7 +506,7 @@ impl Mining {
                     self.rollback(block);
                 }
                 for (height, raw) in old.into_iter().rev() {
-                    let header = self.inspect_header(&raw)?;
+                    let header = self.inspect_header(height, &raw)?;
                     if let Err(error) = self.connect(height, raw, header) {
                         self.suspend();
                         return Err(error.context("could not restore verified branch"));
@@ -456,7 +524,7 @@ impl Mining {
         if !old.is_empty() {
             self.chain.reorgs += 1;
             for (height, raw) in old.into_iter().rev() {
-                let header = self.inspect_header(&raw)?;
+                let header = self.inspect_header(height, &raw)?;
                 self.chain.buffer(Body {
                     height,
                     hash: hash256(&header),
@@ -509,59 +577,48 @@ impl Mining {
         self.parent_epoch += 1;
         self.revision += 1;
     }
-    fn reevaluate_soft_freezes(&mut self) -> Result<()> {
-        let mut first = None;
-        for b in self.chain.applied.iter().rev().take(4) {
-            if self.soft_frozen(&b.raw, b.height)? {
-                first = Some(b.height);
+    fn activate_buffered_branches(&mut self) -> Result<()> {
+        while let Some((ancestor, path)) = self.best_buffered_branch()? {
+            // SV records a new freeze while connecting a competitive branch.
+            // A losing side branch may receive a different directive before
+            // it ever earns enough work for the node to try connecting it.
+            let mut held = false;
+            for b in &path {
+                if !self.soft_freezes.contains(&b.hash) && self.soft_frozen(&b.raw, b.height)? {
+                    self.soft_freezes.insert(b.hash);
+                    held = true;
+                    break;
+                }
             }
-        }
-        if let Some(frozen_height) = first {
-            if self
-                .height
-                .is_none_or(|h| h - frozen_height + 1 >= self.headers.len() as u32)
-            {
-                self.wait_for_body("soft freeze at observation boundary".into());
-                return Ok(());
+            if !held {
+                self.switch_branch(ancestor, path)?;
             }
-            while self.height.is_some_and(|tip| tip >= frozen_height) {
-                let removed = self.detach();
-                let (height, raw) = self.rollback(removed);
-                let header: [u8; 80] = raw[..80].try_into()?;
-                self.chain.buffer(Body {
-                    height,
-                    hash: hash256(&header),
-                    header,
-                    raw,
-                });
-            }
-            self.awaiting_height = None;
-            self.solved_on_tip = false;
-            self.parent_epoch += 1;
-        }
-        let previous = self.tip();
-        while let Some((ancestor, branch)) = self.best_buffered_branch()? {
-            self.switch_branch(ancestor, branch)?;
-        }
-        if previous != self.tip() {
-            self.parent_epoch += 1;
-            self.solved_on_tip = false;
-        }
-        if let Some(h) = self.height {
-            self.lifecycle.observe(&self.headers, h);
         }
         Ok(())
     }
 
     pub(crate) fn directives_changed(&mut self, raw: &[u8]) -> Result<()> {
         let kind = u32::from_le_bytes(raw[16..20].try_into()?);
-        if matches!(kind, 2..=4) {
-            self.reevaluate_soft_freezes()?;
-            self.recheck_pending();
-            self.revision += 1;
-        }
+        let previous = self.tip();
         if kind == 7 {
             self.apply_invalidations();
+        }
+        if matches!(kind, 2..=4 | 7) && !self.invalidated_boundary {
+            // The directive also governs future branches. If a buffered peer
+            // body cannot connect, fence its coverage independently so that it
+            // cannot prevent the signed sequence from advancing.
+            if let Err(error) = self.activate_buffered_branches() {
+                self.wait_for_body(format!("branch selection after directive: {error}"));
+            }
+            if self.tip() != previous {
+                self.parent_epoch += 1;
+                self.solved_on_tip = false;
+                if let Some(h) = self.height {
+                    self.lifecycle.observe(&self.headers, h);
+                }
+            }
+            self.recheck_pending();
+            self.revision += 1;
         }
         if self.solved_on_tip {
             if let Some(b) = &self.solution_body {

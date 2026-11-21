@@ -1,0 +1,121 @@
+{
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "network": "regtest",
+  "binary_sha256": "171defffc37e92337f713c024ed068dde041eb41289353d172018098f4314481",
+  "funding_txid": "2f6322ce77e91db84867e9443b3e7757f3d0a249a1b8d0035628433bec4d400c",
+  "payment_txid": "05e2549663ffea9634e7e82b8a4c6b3fe09ac75ede7adb126cd8b9b4a098f30a",
+  "accepted_tip": "08b9fc62a8f20cc03bf011661cae919286c092f606f383ecc2046293b0f387cf",
+  "height": 107,
+  "freeze_results": [
+    {
+      "sequence": 1,
+      "sv": {
+        "notProcessed": []
+      },
+      "scary": {
+        "notProcessed": []
+      },
+      "receipt": {
+        "active_height": 107,
+        "applied_revision": 6,
+        "kind": 2,
+        "prior_revision": 5,
+        "rpc_result": {
+          "notProcessed": []
+        },
+        "sequence": 1,
+        "signed_sha256": "d574c88be98a31910a5986fe82b3b3c172e7cd1a5fe6b43307562f4f8d8c49bd"
+      }
+    },
+    {
+      "sequence": 2,
+      "sv": {
+        "notProcessed": [
+          {
+            "txOut": {
+              "txId": "2f6322ce77e91db84867e9443b3e7757f3d0a249a1b8d0035628433bec4d400c",
+              "vout": 0
+            },
+            "reason": "already in consensus"
+          }
+        ]
+      },
+      "scary": {
+        "notProcessed": [
+          {
+            "reason": "already in consensus",
+            "txOut": {
+              "txId": "2f6322ce77e91db84867e9443b3e7757f3d0a249a1b8d0035628433bec4d400c",
+              "vout": 0
+            }
+          }
+        ]
+      },
+      "receipt": {
+        "active_height": 107,
+        "applied_revision": 8,
+        "kind": 2,
+        "prior_revision": 7,
+        "rpc_result": {
+          "notProcessed": [
+            {
+              "reason": "already in consensus",
+              "txOut": {
+                "txId": "2f6322ce77e91db84867e9443b3e7757f3d0a249a1b8d0035628433bec4d400c",
+                "vout": 0
+              }
+            }
+          ]
+        },
+        "sequence": 2,
+        "signed_sha256": "8839e2c912441f70eb70d39470e0e84f0b19fb60252eba5a8489db836d43c93d"
+      }
+    }
+  ],
+  "unapplied": {
+    "sv": {
+      "notProcessed": [
+        {
+          "confiscationTx": {
+            "txId": "1f6c3c075bea1bc251a222e4b2682b70a22f1c27af481f7bed0c21a37605b265"
+          },
+          "reason": "confiscated TXO is not consensus frozen"
+        }
+      ]
+    },
+    "scary": {
+      "notProcessed": [
+        {
+          "confiscationTx": {
+            "txId": "1f6c3c075bea1bc251a222e4b2682b70a22f1c27af481f7bed0c21a37605b265"
+          },
+          "reason": "confiscated TXO is not consensus frozen"
+        }
+      ]
+    },
+    "failure": {
+      "error": "confiscated TXO is not consensus frozen",
+      "kind": 4,
+      "rpc_result": {
+        "notProcessed": [
+          {
+            "confiscationTx": {
+              "txId": "1f6c3c075bea1bc251a222e4b2682b70a22f1c27af481f7bed0c21a37605b265"
+            },
+            "reason": "confiscated TXO is not consensus frozen"
+          }
+        ]
+      },
+      "sequence": 3,
+      "signed_sha256": "883b50864a000499ab9adb70ebb9bb4e0fd79c3ee9eea4e76be7bc68b1fa54d0"
+    },
+    "last_verified": 3,
+    "last_applied": 2,
+    "ready": false,
+    "after_restart": {
+      "last_verified": 3,
+      "last_applied": 2,
+      "ready": false
+    }
+  }
+}
