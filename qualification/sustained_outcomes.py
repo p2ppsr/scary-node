@@ -10,7 +10,7 @@ import shutil
 import tarfile
 import tempfile
 
-from verify_sustained_native import REGISTRATION, verify, verify_wires
+from verify_sustained_native import REGISTRATION, observed_bodies, verify, verify_wires
 
 PART_BYTES = 128 * 1024 * 1024
 HASH = re.compile(r"[0-9a-f]{64}")
@@ -45,7 +45,7 @@ def pack_assets(directory, out, corpus):
     parts = []
     group = []
     size = 0
-    for block in result["blocks"]:
+    for block in observed_bodies(result).values():
         if not HASH.fullmatch(block["hash"]) or not HASH.fullmatch(
             block["wire_sha256"]
         ):

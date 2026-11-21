@@ -14,7 +14,12 @@ from sustained_profiles import (
     batch_order,
     cohort_by_batch,
 )
-from verify_sustained_native import check_header, decode_block
+from verify_sustained_native import (
+    check_header,
+    decode_block,
+    observed_bodies,
+    verify_branch_history,
+)
 
 
 class WitnessedWorkloadTests(unittest.TestCase):
@@ -36,6 +41,28 @@ class WitnessedWorkloadTests(unittest.TestCase):
         self.assertEqual(Counter(cohorts), dict.fromkeys(range(6), 1800))
         self.assertEqual(cohorts[1792], positions[1792] // 1800)
         self.assertTrue(any(cohorts[i] != i // 1800 for i in positions))
+
+    def test_detached_wire_is_auditable_without_counting_a_second_confirmation(self):
+        body = {
+            "hash": ENDORSED_HASH,
+            "height": 485,
+            "header_hex": ENDORSEMENT[:80].hex(),
+        }
+        record = {
+            "baseline": {"height": 484, "hash": FUNDING},
+            "blocks": [body],
+            "detached_observations": [body],
+            "branch_events": [
+                {"attach": ENDORSED_HASH, "height": 485},
+                {"detach": ENDORSED_HASH, "height": 485},
+                {"attach": ENDORSED_HASH, "height": 485},
+            ],
+        }
+        self.assertEqual(verify_branch_history(record), 1)
+        self.assertEqual(list(observed_bodies(record)), [ENDORSED_HASH])
+        record["branch_events"].pop(1)
+        with self.assertRaisesRegex(ValueError, "height"):
+            verify_branch_history(record)
 
     def test_endorsed_wire_parent_merkle_and_registered_builds(self):
         self.assertEqual(hashlib.sha256(ENDORSEMENT).hexdigest(), ENDORSED_SHA)

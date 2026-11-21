@@ -324,6 +324,39 @@ def replication_setup(record):
     )
 
 
+def verify_branch_history(record):
+    event_chain = []
+    detached_events = []
+    known = {b["hash"]: b for b in record["blocks"] + record["detached_observations"]}
+    for event in record["branch_events"]:
+        if "detach" in event:
+            require(
+                event_chain and event_chain[-1] == (event["height"], event["detach"]),
+                "branch event withdraws a different block",
+            )
+            detached_events.append(event_chain.pop())
+        else:
+            body = known[event["attach"]]
+            expected_height, parent = (
+                event_chain[-1]
+                if event_chain
+                else (record["baseline"]["height"], record["baseline"]["hash"])
+            )
+            require(
+                body["height"] == event["height"] == expected_height + 1,
+                "branch observation skips a height",
+            )
+            check_header(bytes.fromhex(body["header_hex"]), body["hash"], parent)
+            event_chain.append((body["height"], body["hash"]))
+    require(
+        event_chain == [(b["height"], b["hash"]) for b in record["blocks"]]
+        and detached_events
+        == [(b["height"], b["hash"]) for b in record["detached_observations"]],
+        "final branch or detached observations differ",
+    )
+    return len(detached_events)
+
+
 def verify(record, executable=None):
     arm = record.get(
         "arm", "production" if record["registration"] == REPLICATION else "direct"
@@ -554,6 +587,7 @@ def verify(record, executable=None):
     unready = sum(s.get("scary", {}).get("ready") is False for s in sampled)
     origin = {}
     if arm in WITNESSED_ARMS:
+        detach_count = verify_branch_history(record)
         intervals = [{"selected_nonempty": 0, "payments": 0} for _ in range(6)]
         for i, slot in slots.items():
             body = block_map.get(slot.get("hash"))
@@ -568,6 +602,7 @@ def verify(record, executable=None):
         regular = all(x["selected_nonempty"] for x in intervals)
         origin = {
             "arm": arm,
+            "previously_audited_detached_blocks": detach_count,
             "entrant_primary_by_five_minute_slot_interval": intervals,
             "regular_entrant_origin": regular,
             "entrant_primary_payments_per_total_second": signed_by_miner["scary"]
@@ -792,6 +827,13 @@ def parent_ages(heights, funding_height, miners, rails=65_536):
     }
 
 
+def observed_bodies(record):
+    # A body can be selected, detached and selected again under the same hash.
+    return {
+        b["hash"]: b for b in record.get("detached_observations", []) + record["blocks"]
+    }
+
+
 def verify_wires(record, corpus, blocks, *, parent_graph=False):
     funding = heights = None
     arm = record.get(
@@ -824,6 +866,26 @@ def verify_wires(record, corpus, blocks, *, parent_graph=False):
         )
         funding = [dsha(tx) for tx in txs[1:]]
         heights = array("I", [0]) * PAYMENTS
+    canonical_hashes = {b["hash"] for b in record["blocks"]}
+    independent = {}
+    for digest, b in observed_bodies(record).items():
+        if digest in canonical_hashes:
+            continue
+        raw = (blocks / (digest + ".block")).read_bytes()
+        require(
+            raw[:80].hex() == b["header_hex"]
+            and len(raw) == b["wire_bytes"]
+            and hashlib.sha256(raw).hexdigest() == b["wire_sha256"]
+            and b["independent_wire_sha256"]
+            == dict.fromkeys(("sv", "tn1", "tn2"), b["wire_sha256"]),
+            "detached wire differs from stock observations",
+        )
+        _, txs, _ = decode_block(raw, digest)
+        require(
+            len(txs) - 1 == b["ordinary_transactions"],
+            "detached transaction count differs",
+        )
+        independent[digest] = b["wire_sha256"]
     ordinals = read_source(corpus, record["source"], funding=funding)
     seen = bytearray(PAYMENTS)
     for b in record["blocks"]:
@@ -857,6 +919,9 @@ def verify_wires(record, corpus, blocks, *, parent_graph=False):
         **graph,
         "signed_source_envelopes": len(ordinals),
         "merkle_verified_bodies": len(record["blocks"]),
+        **(
+            {"merkle_verified_detached_only_bodies": independent} if independent else {}
+        ),
         "confirmed_distinct_memberships": sum(seen),
     }
 

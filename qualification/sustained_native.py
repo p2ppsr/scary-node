@@ -605,11 +605,13 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
         producer = readlines(directory / "producer.jsonl")
         slots = sorted(readlines(directory / "slots.jsonl"), key=lambda r: r["index"])
         blocks = []
-        for row in readlines(directory / "body-events.jsonl"):
+        detached = []
+        audit_events = readlines(directory / "body-events.jsonl")
+        for row in audit_events:
             if "detach" in row:
                 if blocks[-1]["hash"] != row["detach"]:
                     raise ValueError("recorded detach mismatch")
-                blocks.pop()
+                detached.append(blocks.pop())
             else:
                 blocks.append(row)
         final = blocks[-1] if blocks else base
@@ -648,6 +650,14 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
             if (directory / "wallet-outcomes.json").exists()
             else [],
         }
+        if ARM in WITNESSED_ARMS:
+            result["detached_observations"] = detached
+            result["branch_events"] = [
+                {"detach": row["detach"], "height": row["height"]}
+                if "detach" in row
+                else {"attach": row["hash"], "height": row["height"]}
+                for row in audit_events
+            ]
         if PRODUCTION_REPLICATION:
             result["source_protocol"] = "inv-getdata-tx"
             result["inventory_progress"] = readlines(

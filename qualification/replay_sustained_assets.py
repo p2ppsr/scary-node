@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 from sustained_outcomes import HASH, digest
-from verify_sustained_native import verify, verify_wires
+from verify_sustained_native import observed_bodies, verify, verify_wires
 
 
 def replay(assets, corpus, receipt_path, manifest_path):
@@ -24,9 +24,10 @@ def replay(assets, corpus, receipt_path, manifest_path):
     ):
         raise ValueError("outcome manifest is for a different study")
 
-    if any(not HASH.fullmatch(b["hash"]) for b in receipt["blocks"]):
+    observed = observed_bodies(receipt)
+    if any(not HASH.fullmatch(h) for h in observed):
         raise ValueError("invalid selected block hash")
-    blocks = {"blocks/" + b["hash"] + ".block": b for b in receipt["blocks"]}
+    blocks = {"blocks/" + b["hash"] + ".block": b for b in observed.values()}
     expected_wallet = {}
     if receipt.get("inventory_final"):
         expected_wallet = {
