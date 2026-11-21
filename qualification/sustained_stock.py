@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import subprocess
 import time
 from pathlib import Path
 
@@ -12,7 +13,7 @@ def snapshot(sv):
     for method in ("getmempoolinfo", "getblockchainactivity", "getorphaninfo"):
         try:
             row[method] = sv(method)
-        except (OSError, ValueError, RuntimeError) as exc:
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
             row[method] = {"error": type(exc).__name__}
     try:
         groups = {}
@@ -29,7 +30,7 @@ def snapshot(sv):
                     key = f"{direction}_{msg}_bytes"
                     stats[key] = stats.get(key, 0) + amounts.get(msg, 0)
         row["peers"] = groups
-    except (OSError, ValueError, RuntimeError) as exc:
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
         row["peers"] = {"error": type(exc).__name__}
     return {"wall_ns": started, "finished_wall_ns": time.time_ns(), **row}
 

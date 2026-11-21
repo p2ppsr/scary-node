@@ -1,0 +1,69 @@
+{
+  "observed_unix_s": 1795292793,
+  "network": "mainnet",
+  "release_sha256": "8f99871ba04a9f0c234d1b9520fc021396689ac7924c02a28666db9c9f3b52c9",
+  "height": 976525,
+  "hash": "000000000000000017fa46eba09baa194a5f61daaec25499ab3f995028c8eb64",
+  "local_header_hex": "0060a925cd475093b5312b8762e5db764902ebc6f756713717d041170000000000000000f966c0c6ee11d2b8369c28cd93199c1549f062ae2af3e95eb571da4bc8f84f844afc016bb4be201846525195",
+  "headers": 104,
+  "coverage_start": 976422,
+  "coverage_end": 976525,
+  "window_chainwork": "352a760140f9a766f0e",
+  "witnessed_outputs": 31339,
+  "pending_transactions": 111,
+  "peer_transaction_intake": {
+    "sv": {
+      "admitted": 314,
+      "duplicate": 618,
+      "ineligible": 2544
+    },
+    "teranode_subtree": {
+      "admitted": 33,
+      "duplicate": 20212,
+      "ineligible": 66662
+    }
+  },
+  "peer_clock": {
+    "connected_endpoints": 5,
+    "connected_network_groups": 5,
+    "disagreeing_samples": false,
+    "hold_threshold_seconds": 120,
+    "minimum_groups": 3,
+    "offset_from_wall_seconds": 1
+  },
+  "connected_data_peers": 9,
+  "durable_directive_sequence": 1,
+  "readiness_reasons": [
+    "difficulty history incomplete"
+  ],
+  "solved_blocks": 0,
+  "last_verified_directive": 1,
+  "last_applied_directive": 1,
+  "directive_ready": true,
+  "unsigned_candidate_on_current_parent": false,
+  "public_reference": {
+    "provider": "WhatsOnChain mainnet block header API",
+    "by_hash": {
+      "00000000000000001741d017377156f7c6eb024976dbe562872b31b5935047cd": {
+        "height": 976524,
+        "hash": "00000000000000001741d017377156f7c6eb024976dbe562872b31b5935047cd",
+        "previous": "000000000000000003300b0b6c17b180d19182723b01f79aa97af0b26affabb8",
+        "bits": 404825885,
+        "header_hex": "00200922b8abff6ab2f07aa99af7013b728291d180b1176c0b0b30030000000000000000aa54a9ec585b3f055368fb99cc2edd0d7cbf6edd7bb4b43d571952cc7f39facec4fa016b1d2721189e76b91f",
+        "chainwork": "0000000000000000000000000000000000000000016f7bcbffd5eb80635be654",
+        "confirmations": 2,
+        "read_at_utc": "2026-11-21T20:26:35.259209Z"
+      },
+      "000000000000000017fa46eba09baa194a5f61daaec25499ab3f995028c8eb64": {
+        "height": 976525,
+        "hash": "000000000000000017fa46eba09baa194a5f61daaec25499ab3f995028c8eb64",
+        "previous": "00000000000000001741d017377156f7c6eb024976dbe562872b31b5935047cd",
+        "bits": 404799156,
+        "header_hex": "0060a925cd475093b5312b8762e5db764902ebc6f756713717d041170000000000000000f966c0c6ee11d2b8369c28cd93199c1549f062ae2af3e95eb571da4bc8f84f844afc016bb4be201846525195",
+        "chainwork": "0000000000000000000000000000000000000000016f7bd3d13e942a3e1d99b9",
+        "confirmations": 1,
+        "read_at_utc": "2026-11-21T20:26:36.618251Z"
+      }
+    }
+  }
+}
