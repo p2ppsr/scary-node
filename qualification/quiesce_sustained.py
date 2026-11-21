@@ -2,6 +2,7 @@
 
 import argparse
 import gzip
+import hashlib
 import json
 import subprocess
 import time
@@ -122,7 +123,69 @@ def quiesce(directory):
     return record
 
 
-def verify_handoff(receipt, stock_log, handoff):
+def verify_frozen(path, record, receipt, handoff, marker):
+    frozen = json.loads(path.read_text())
+    for source, key in (
+        (receipt, "direct_wallet_receipt_sha256"),
+        (handoff, "original_quiescence_sha256"),
+    ):
+        with source.open("rb") as stream:
+            if hashlib.file_digest(stream, "sha256").hexdigest() != frozen[key]:
+                raise ValueError(
+                    "frozen-store supplement names different evidence bytes"
+                )
+    expected = (
+        record["completion"]["final_height"],
+        record["completion"]["final_hash"],
+    )
+    sample = record["samples"][-1]
+    if (
+        frozen["enrolled_project"] != PROJECT
+        or frozen["registration"] != record["registration"]
+        or frozen["sampler_last_clock_ns"] != sample["elapsed_ns"]
+        or frozen["stock_post_window_tip"] != marker["post_window_selected_tips"]["sv"]
+    ):
+        raise ValueError(
+            "frozen-store supplement differs from the enrolled project and final stock sample"
+        )
+    for name in ("sv", "tn1", "tn2", "scary"):
+        view = frozen["last_scheduled_sample"][name]
+        if (
+            view != {k: sample[name][k] for k in ("height", "hash", "read_ns")}
+            or (view["height"], view["hash"]) != expected
+        ):
+            raise ValueError(
+                "independent final native sample differs from the audited chain"
+            )
+    for name, volume in (
+        ("tn1", "tn1-data"),
+        ("tn2", "tn2-data"),
+        ("scary", "scary-data"),
+    ):
+        v = frozen["frozen_stores"][name]
+        if (
+            (v["height"], v["hash"]) != expected
+            or v["volume"] != PROJECT + "_" + volume
+            or v.get("invalid", False)
+        ):
+            raise ValueError("persisted store did not corroborate the final chain")
+    node = frozen["frozen_stores"]["scary"]
+    if (
+        node["header_hex"] != record["blocks"][-1]["header_hex"]
+        or len(bytes.fromhex(node["verified_checkpoint_payload_sha256"])) != 32
+    ):
+        raise ValueError(
+            "frozen entrant checkpoint lacks the canonical header or digest"
+        )
+    return {
+        "height": expected[0],
+        "hash": expected[1],
+        "corroborating_frozen_volumes": 3,
+        "excluded_original_fields": frozen["excluded_optional_fields"],
+    }
+
+
+def verify_handoff(receipt, stock_log, handoff, frozen=None):
     def read(path):
         return gzip.open(path, "rt") if path.suffix == ".gz" else path.open()
 
@@ -159,7 +222,7 @@ def verify_handoff(receipt, stock_log, handoff):
         raise ValueError("queued stock work or closed primary identity differs")
     if not rows or any(b["wall_ns"] < a["wall_ns"] for a, b in zip(rows, rows[1:])):
         raise ValueError("stock gauges missing or out of order")
-    return {
+    evidence = {
         "stock_samples": len(rows),
         "sampled_stock": stock_activity(rows, start),
         "final_stock_before_pause": stock_activity(
@@ -169,6 +232,10 @@ def verify_handoff(receipt, stock_log, handoff):
         "seconds_between_closure_and_verified_pause": (times[-1] - times[0]) / 1e9,
         "paused_services": sorted(SERVICES),
     }
+
+    if frozen:
+        evidence["supplement"] = verify_frozen(frozen, result, receipt, handoff, marker)
+    return evidence
 
 
 if __name__ == "__main__":
@@ -186,11 +253,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--handoff", type=Path, help="closed handoff JSON for offline verification"
     )
+    parser.add_argument(
+        "--frozen",
+        type=Path,
+        help="independent final-store correction for the published direct-wallet handoff",
+    )
     args = parser.parse_args()
-    if args.stock_log or args.handoff:
+    if args.stock_log or args.handoff or args.frozen:
         if not (args.stock_log and args.handoff):
             parser.error("offline verification requires both --stock-log and --handoff")
-        result = verify_handoff(args.path, args.stock_log, args.handoff)
+        result = verify_handoff(args.path, args.stock_log, args.handoff, args.frozen)
     else:
         result = quiesce(args.path)
     print(json.dumps(result, indent=2))

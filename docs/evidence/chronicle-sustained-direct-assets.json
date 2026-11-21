@@ -1,0 +1,31 @@
+{
+  "registration": "11e60074fbdde9587e1652d4de272a24bd4ac68b",
+  "receipt_sha256": "8401cd63c378d31d16a8c99720af4e994144afd5e5a01bdd0a3ab172304362d1",
+  "source_ids_sha256": "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2",
+  "local_wire_verification": {
+    "signed_source_envelopes": 5529600,
+    "merkle_verified_bodies": 134,
+    "confirmed_distinct_memberships": 1143159
+  },
+  "selected_blocks": 134,
+  "distinct_payments": 1143159,
+  "total_selected_wire_bytes": 228078164,
+  "assets": [
+    {
+      "name": "native-sustained-direct-bodies-001.tar.gz",
+      "bytes": 61623419,
+      "sha256": "904fd101f557d2ab9494105c33feed934dad29e083aabce875369cc84a5d9478",
+      "first_height": 485,
+      "last_height": 609,
+      "blocks": 125
+    },
+    {
+      "name": "native-sustained-direct-bodies-002.tar.gz",
+      "bytes": 59127379,
+      "sha256": "29690824550b56de83c746bfd2f8c9fc9e3546070a89aaa85e95618ee59c6975",
+      "first_height": 610,
+      "last_height": 618,
+      "blocks": 9
+    }
+  ]
+}

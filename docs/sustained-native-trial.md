@@ -113,9 +113,12 @@ The final handoff paused all eight containers in the enrolled project and retain
 python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustained-direct.json.gz
 python3 qualification/quiesce_sustained.py docs/evidence/chronicle-sustained-direct.json.gz \
   --stock-log docs/evidence/chronicle-sustained-direct-stock.jsonl.gz \
-  --handoff docs/evidence/chronicle-sustained-direct-handoff.json
+  --handoff docs/evidence/chronicle-sustained-direct-handoff.json \
+  --frozen docs/evidence/chronicle-sustained-direct-frozen.json
 python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustained-direct.json.gz \
   --corpus .native/sustained-signed --blocks .native/sustained-run/blocks
 ```
+
+The full offline replay rehashed all 5,529,600 signed source envelopes, recomputed every selected transaction Merkle commitment across 134 bodies, and recovered the same 1,143,159 distinct signed members. The source dataset and selected body archives can be unpacked into the `--corpus` and `--blocks` directories above. [Outcome asset digests](evidence/chronicle-sustained-direct-assets.json) · [Public workload release](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
 
 On the original frozen Docker project, `uv run --with msgpack==1.1.2 python qualification/sustained_frozen.py .native/sustained-run/receipt.json.gz .native/sustained-run/quiesced.json` reads copies of the project-specific volumes. The dedicated [production-settings replication](sustained-native-replication.md) uses the same signed population, a distinct stock configuration and inventory/request-based wallet delivery. Both studies use one physical workstation and accelerated regtest work.
