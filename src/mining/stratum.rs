@@ -284,6 +284,7 @@ fn share(
             return Err(e);
         }
         permit.send((job.height, block));
+        state.solution_watch.send_replace(());
     }
     seen.insert((x2, time, nonce));
     state.accepted_shares += 1;

@@ -311,10 +311,11 @@ async fn session(
     let mut handshake = false;
     let mut saw_version = false;
     let mut probe = None;
+    let mut solved = state.lock().await.subscribe_solutions();
     let mut due = tokio::time::interval(Duration::from_secs(1));
     loop {
         tokio::select! {
-            _=due.tick()=>{
+            _=async { tokio::select! { _=due.tick()=>{}, _=solved.changed()=>{} } }=>{
                 let s=state.lock().await;
                 ensure!(!s.directives.peer_banned(&addr.ip()),"peer banned");
                 if handshake && last_repair.elapsed()>=Duration::from_secs(3) {

@@ -114,6 +114,8 @@ pub struct Mining {
     path: Option<std::path::PathBuf>,
     #[serde(skip)]
     storage_failure: Option<String>,
+    #[serde(skip, default = "solution_watch")]
+    solution_watch: tokio::sync::watch::Sender<()>,
     #[serde(skip)]
     live_peers: HashSet<String>,
     #[serde(skip)]
@@ -162,6 +164,10 @@ pub struct Mining {
     min_observed_blocks: usize,
 }
 
+fn solution_watch() -> tokio::sync::watch::Sender<()> {
+    tokio::sync::watch::channel(()).0
+}
+
 pub(super) fn now() -> Result<u32> {
     Ok(SystemTime::now()
         .duration_since(UNIX_EPOCH)?
@@ -208,6 +214,7 @@ impl Mining {
         Ok(Self {
             path: None,
             storage_failure: None,
+            solution_watch: solution_watch(),
             live_peers: HashSet::new(),
             supervise_peers: false,
             sv_bodies_only: false,
@@ -773,6 +780,10 @@ impl Mining {
     pub(crate) fn height_hint(&self) -> u32 {
         self.height.unwrap_or(0)
     }
+    pub(crate) fn subscribe_solutions(&self) -> tokio::sync::watch::Receiver<()> {
+        self.solution_watch.subscribe()
+    }
+
     pub(crate) fn solution_bytes(&self, hash: &Hash) -> Option<&[u8]> {
         self.solution_body
             .as_ref()
