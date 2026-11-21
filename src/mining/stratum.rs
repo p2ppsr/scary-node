@@ -49,7 +49,7 @@ impl Job {
                 .context("timestamp overflow")?,
         );
         ensure!(
-            time <= now()?.saturating_add(7200),
+            time <= state.candidate_time_max()?,
             "median-time floor is in the future"
         );
         let fees = state
@@ -290,7 +290,7 @@ fn share(
     let time = u32::from_be_bytes(four_hex(&params[3])?);
     let nonce = u32::from_be_bytes(four_hex(&params[4])?);
     ensure!(
-        time >= job.time && time <= now()?.saturating_add(7200),
+        time >= job.time && time <= state.candidate_time_max()?,
         "ntime outside job window"
     );
     let share_id = (job.revision, x2, time, nonce);

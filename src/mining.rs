@@ -1,5 +1,7 @@
 //! In-memory witnessed-output chain view and conservative candidate policy.
 mod chain;
+mod clock;
+pub(crate) use clock::version_clock;
 mod interpreter;
 mod lifecycle;
 mod store;
@@ -149,6 +151,8 @@ pub struct Mining {
     #[serde(skip)]
     live_peers: HashSet<String>,
     #[serde(skip)]
+    peer_clocks: clock::PeerClocks,
+    #[serde(skip)]
     supervise_peers: bool,
     #[serde(skip)]
     sv_bodies_only: bool,
@@ -260,6 +264,7 @@ impl Mining {
             storage_failure: None,
             solution_watch: solution_watch(),
             live_peers: HashSet::new(),
+            peer_clocks: clock::PeerClocks::default(),
             supervise_peers: false,
             sv_bodies_only: false,
             confirmed_since_disconnect: false,
@@ -315,6 +320,7 @@ impl Mining {
         self.peer_ready()
             && self.storage_failure.is_none()
             && clock_ready()
+            && self.peer_clocks.ready()
             && self.directives.ready()
             && self.applied_sequence == self.directives.applied()
             && !self.blocked
@@ -331,9 +337,23 @@ impl Mining {
     fn peer_ready(&self) -> bool {
         !self.supervise_peers || (!self.live_peers.is_empty() && self.confirmed_since_disconnect)
     }
+    pub(crate) fn record_peer_clock(&mut self, addr: std::net::SocketAddr, sample: Option<i64>) {
+        self.peer_clocks.update(addr, sample, self.regtest);
+    }
+    fn candidate_time_max(&self) -> Result<u32> {
+        Ok(self
+            .peer_clocks
+            .candidate_time_limit(now()?)
+            .saturating_add(7200))
+    }
     pub(crate) fn peer_connection(&mut self, peer: &str, connected: bool) {
         if self.sv_bodies_only && !peer.starts_with("sv:") {
             return;
+        }
+        if !connected {
+            if let Some(addr) = peer.strip_prefix("sv:").and_then(|s| s.parse().ok()) {
+                self.record_peer_clock(addr, None);
+            }
         }
         if connected {
             self.live_peers.insert(peer.to_owned());
@@ -567,7 +587,7 @@ impl Mining {
         );
         ensure!(
             timestamp(&header) > self.median_time()
-                && timestamp(&header) <= now()?.saturating_add(7200),
+                && timestamp(&header) <= self.candidate_time_max()?,
             "candidate time out of range"
         );
         ensure!(
@@ -927,6 +947,10 @@ impl Mining {
                 !clock_ready(),
                 "wall clock differs from monotonic elapsed time",
             ),
+            (
+                !self.peer_clocks.ready(),
+                "SV peer times disagree with local clock or each other",
+            ),
             (!self.directives.ready(), "directive state uncertain"),
             (
                 self.invalidated_boundary,
@@ -963,7 +987,7 @@ impl Mining {
 
         let (mapped_count, mapped_bytes) = self.chain.mapped_bodies();
         json!({
-            "connected_data_peers":self.live_peers.len(),"tip_confirmed_since_disconnect":self.confirmed_since_disconnect,"storage_failure":self.storage_failure,"clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,
+            "connected_data_peers":self.live_peers.len(),"tip_confirmed_since_disconnect":self.confirmed_since_disconnect,"storage_failure":self.storage_failure,"clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,"peer_clock":self.peer_clocks.status(self.regtest),
             "mapped_bodies":mapped_count,"mapped_body_bytes":mapped_bytes,"capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
             "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "explicit_soft_freezes": self.soft_freezes.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
             "observation_window_ready": self.observation_window_ready(),

@@ -448,6 +448,7 @@ async fn session(
     let mut handshake = false;
     let handshake_deadline = tokio::time::Instant::now() + Duration::from_secs(15);
     let mut saw_version = false;
+    let mut clock_sample = None;
     let mut peer_version = 0;
     let mut probe = None;
     let mut solved = state.lock().await.subscribe_solutions();
@@ -500,8 +501,10 @@ async fn session(
             incoming=rx.recv()=>{
                 let (cmd,body)=incoming.context("SV connection closed")??;
                 match cmd.as_str(){
-                    "version"=>{ensure!(!saw_version && body.len()>=80,"invalid SV handshake");saw_version=true;peer_version=i32::from_le_bytes(body[..4].try_into()?);send(&mut w,regtest,"verack",&[]).await?;}
-                    "verack"=>{ensure!(saw_version && !handshake && body.is_empty(),"unexpected verack");handshake=true;events.send(Event::Connected(format!("sv:{addr}"))).await?;
+                    "version"=>{ensure!(!saw_version && body.len()>=80,"invalid SV handshake");saw_version=true;peer_version=i32::from_le_bytes(body[..4].try_into()?);
+                        clock_sample=crate::mining::version_clock(i64::from_le_bytes(body[12..20].try_into()?));send(&mut w,regtest,"verack",&[]).await?;}
+                    "verack"=>{ensure!(saw_version && !handshake && body.is_empty(),"unexpected verack");handshake=true;state.lock().await.record_peer_clock(addr,clock_sample);
+                        events.send(Event::Connected(format!("sv:{addr}"))).await?;
                         probe=state.lock().await.header_probe();
                         if let Some((parent,_,_))=probe {
                             send(&mut w, regtest, "getheaders", &header_locator(parent)).await?;

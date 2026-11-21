@@ -182,3 +182,9 @@ The required evidence includes a signed history through a live receiver, directi
 ### Stratum identity and standby recovery
 
 Build the release and run `python3 qualification/mining_lease.py .native/mining-lease.json`. Two actual node processes attempt subscriptions using separate state directories containing the same identity. The driver checks enforcement while both are alive, kills the active process, then reconnects a stale standby to the original allocation authority. A third miner uses an independent identity with the same payout. No network proof of work is needed to exercise the allocation boundary. [Measured connection numbers](evidence/chronicle-mining-lease.json)
+
+## Mining clock at startup
+
+The node compares the host wall clock with elapsed monotonic time and with the UTC timestamps of completed native SV protocol handshakes. The network comparison takes a median within each IPv4 /16 or IPv6 /32 prefix, then a median across groups. A mainnet comparison needs three groups. An isolated regtest can compare against its single stock peer. A majority of group representatives must agree within 120 seconds of their median. A discrepancy exceeding 120 seconds suspends work. Losing a connection preserves the last corroborated comparison until new evidence replaces it. Candidate timestamps and worker time rolls use the earlier of local and corroborated peer time for the two-hour limit.
+
+Operator status exposes the endpoint and group counts, the last corroborated offset from the current wall clock, and disagreement. With insufficient samples the initial offset is null. A Teranode-only connection supplies no version-message UTC sample. Synchronize the host independently before starting it. This check provides corroboration from reachable peers and does not authenticate UTC. Reproduce the isolated startup and running-clock checks using the clock fault command above.
