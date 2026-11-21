@@ -59,6 +59,13 @@ def verify(result):
     leaves = b"\xff" * 32 + dsha(payment)
     assert leaves.hex() == result["subtree_leaves_hex"]
     assert dsha(leaves)[::-1].hex() == result["subtree_root"]
+    if "asset_blkdat_sha256" in result:
+        framed = bytes.fromhex("f9beb4d9") + (len(raw) + 81).to_bytes(4, "little") + raw
+        assert result["asset_blkdat_sha256"] == hashlib.sha256(framed).hexdigest()
+        assert (
+            result["asset_requested_order_sha256"]
+            == hashlib.sha256(payment + raw[81 : -len(payment)]).hexdigest()
+        )
     sha = hashlib.sha256(raw).hexdigest()
     assert len(raw) == result["reference_bytes"]
     for key in (

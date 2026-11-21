@@ -1,0 +1,102 @@
+{
+  "reference_image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "binary_sha256": "d08577d33f08fd311901e0d73039da16622849bfd59cedc5e458d1c58a754b8b",
+  "ordered_header_hex": [
+    "000000207ec4ea80a2642e99d71556633577a31e75620ac4c8de0916a95f3fe3d0a3f405ce20861a0ef12a57eb78008e4d35c99f2a0323d1c1a6ee39265a75abff482b7401f5016bffff7f2001000000",
+    "000000203ab0cb9082566ffa5f6b2cdb5b3fb347ece143424fa02df0358dca852a24e75e2be513ca2d735bb96a1d37da64af52f42d671bab48911e2096d14cf9ff9fb5ed02f5016bffff7f2002000000",
+    "0000002077aca93b9db7689547b27af2ea5872a402e7a77668d9601ebb6250b149965d33c6ecdb786c602d616779d5f250087a165b43f18a404678780cf1be472a9d37d102f5016bffff7f2000000000",
+    "00000020180eea224560307cba05aa3af669a9775ff183b1b494c25eea827ae4b558943b48df4763ab5cc7c4081c8e7c0d8ec2ca7a4661bbe2db8e1c5e526587f6b8c6b102f5016bffff7f2000000000",
+    "0000002044111d555740d8c67cd1fb2e6ffed5662bde4deb4eb63dbe94e0d3fb4592fc4243db400ea25c1deca7a86ab6536de423a46532c76e69076792addd6c733545a502f5016bffff7f2000000000"
+  ],
+  "ordered_block_ids": [
+    "5ee7242a85ca8d35f02da04f4243e1ec47b33f5bdb2c6b5ffa6f568290cbb03a",
+    "335d9649b15062bb1e60d96876a7e702a47258eaf27ab2479568b79d3ba9ac77",
+    "3b9458b5e47a82ea5ec294b4b183f15f77a969f63aaa05ba7c30604522ea0e18",
+    "42fc9245fbd3e094be3db64eeb4dde2b66d5fe6f2efbd17cc6d84057551d1144",
+    "1c487f5073500e851287be32ca721ab5c36cc6b6cfd15a5bd762b08336851180"
+  ],
+  "local_solutions": [
+    "335d9649b15062bb1e60d96876a7e702a47258eaf27ab2479568b79d3ba9ac77",
+    "3b9458b5e47a82ea5ec294b4b183f15f77a969f63aaa05ba7c30604522ea0e18"
+  ],
+  "single_sv_readbacks": [
+    {
+      "solution": "335d9649b15062bb1e60d96876a7e702a47258eaf27ab2479568b79d3ba9ac77",
+      "parent": "5ee7242a85ca8d35f02da04f4243e1ec47b33f5bdb2c6b5ffa6f568290cbb03a",
+      "stock_tip": "335d9649b15062bb1e60d96876a7e702a47258eaf27ab2479568b79d3ba9ac77",
+      "entrant_tip": "335d9649b15062bb1e60d96876a7e702a47258eaf27ab2479568b79d3ba9ac77",
+      "peer_tip_reports": 1,
+      "queued_at_ms": 1795290351643,
+      "sent_at_ms": 1795290351663,
+      "requested_active_headers_at_ms": 1795290353161,
+      "received_body_at_ms": 1795290353192,
+      "inclusion_at_ms": 1795290353182,
+      "before_readback": {
+        "observation_window_ready": true,
+        "solved_on_selected_parent": true,
+        "job_preconditions_met": false,
+        "job_wait_reason": "awaiting independent observation after solving on the selected parent"
+      },
+      "after_readback": {
+        "solved_on_selected_parent": false,
+        "job_preconditions_met": false,
+        "job_wait_reason": "no eligible pending transactions"
+      },
+      "chain_state_before_successor": "observed_active",
+      "settlement_before_successor": null
+    },
+    {
+      "solution": "3b9458b5e47a82ea5ec294b4b183f15f77a969f63aaa05ba7c30604522ea0e18",
+      "parent": "335d9649b15062bb1e60d96876a7e702a47258eaf27ab2479568b79d3ba9ac77",
+      "stock_tip": "3b9458b5e47a82ea5ec294b4b183f15f77a969f63aaa05ba7c30604522ea0e18",
+      "entrant_tip": "3b9458b5e47a82ea5ec294b4b183f15f77a969f63aaa05ba7c30604522ea0e18",
+      "peer_tip_reports": 1,
+      "queued_at_ms": 1795290353277,
+      "sent_at_ms": 1795290353296,
+      "requested_active_headers_at_ms": 1795290355162,
+      "received_body_at_ms": 1795290355193,
+      "inclusion_at_ms": 1795290355183,
+      "before_readback": {
+        "observation_window_ready": true,
+        "solved_on_selected_parent": true,
+        "job_preconditions_met": false,
+        "job_wait_reason": "awaiting independent observation after solving on the selected parent"
+      },
+      "after_readback": {
+        "solved_on_selected_parent": false,
+        "job_preconditions_met": false,
+        "job_wait_reason": "no eligible pending transactions"
+      },
+      "chain_state_before_successor": "observed_active",
+      "settlement_before_successor": null
+    }
+  ],
+  "reference_block_hex": "000000203ab0cb9082566ffa5f6b2cdb5b3fb347ece143424fa02df0358dca852a24e75e2be513ca2d735bb96a1d37da64af52f42d671bab48911e2096d14cf9ff9fb5ed02f5016bffff7f20020000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff39016c0800000001000000000c2f73636172792d6e6f64652f2017cc172c9e3ad437c2bf013397e5f5f7ec81b0c3e17cb761011b8df40fef817cffffffff014cf6052a010000000151000000000100000001d31c75a2865e1982ac049c570604c2df9dca22ae51bfcd96360b013566c15a3e0000000049483045022100bd17c596d487470ffe0d67770dd8490c323a221f29e614b599fd23a08067d1bd0220261ec08a1762363a1a7aa6b95e1493e34ba41464230ad28b8ceb285c874309544100000000015482010000000000434104e91aa97513e820bc69767ee54a6a42d78c33cb4929761bd748f05290ba68d7d2dcc27dcda5ca0500e23de5df525112a51b9d9aab61d6b8c4495e520f127a2e3dac00000000",
+  "payments_hex": [
+    "0100000001d31c75a2865e1982ac049c570604c2df9dca22ae51bfcd96360b013566c15a3e0000000049483045022100bd17c596d487470ffe0d67770dd8490c323a221f29e614b599fd23a08067d1bd0220261ec08a1762363a1a7aa6b95e1493e34ba41464230ad28b8ceb285c874309544100000000015482010000000000434104e91aa97513e820bc69767ee54a6a42d78c33cb4929761bd748f05290ba68d7d2dcc27dcda5ca0500e23de5df525112a51b9d9aab61d6b8c4495e520f127a2e3dac00000000",
+    "0100000001d31c75a2865e1982ac049c570604c2df9dca22ae51bfcd96360b013566c15a3e0100000049483045022100e5404b6ec5b3890d545f924bd39a4878d51daa2912f41aa89dc07d2b9f01140a022030f85da8a205e8eacc02b46116ea61cb478689fd03fc40080ecd79f403e331484100000000015482010000000000434104e91aa97513e820bc69767ee54a6a42d78c33cb4929761bd748f05290ba68d7d2dcc27dcda5ca0500e23de5df525112a51b9d9aab61d6b8c4495e520f127a2e3dac00000000"
+  ],
+  "subtree_root": "c393fed1b7407c863cbcbb367a83c57fc2f95dee1068e9b0f238684a9ab61ef8",
+  "subtree_leaves_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbcd4556414f0ab705cfcd1d8b4738adceda23278cd4fb63016e1bd17122774a5",
+  "reference_bytes": 399,
+  "reference_sha256": "fee0253a3b612cf48e75b9bd97cb2c01a73db0b5cb14c0b924b07feb51005174",
+  "sv_getdata_after_restart_sha256": "fee0253a3b612cf48e75b9bd97cb2c01a73db0b5cb14c0b924b07feb51005174",
+  "asset_wire_after_subtree_first_sha256": "fee0253a3b612cf48e75b9bd97cb2c01a73db0b5cb14c0b924b07feb51005174",
+  "asset_blkdat_sha256": "92859ccbc74ff101f8ed813b8a05b8810031f21963664511d1fcad2624da63b9",
+  "asset_requested_order_sha256": "5646e63000fdd64892d6eede9dcee27a43f962923252cbb908f15458a1824e0a",
+  "retrieving_peer_sent_body_at_ms": 1795290355791,
+  "retrieving_peer_reported_tip": false,
+  "prior_chain_state": "settled",
+  "foreign_successor_sv_reply": "notfound",
+  "foreign_successor_asset_status": 404,
+  "invalidation_sequence": 1,
+  "after_invalidation_asset_status": {
+    "block_legacy/335d9649b15062bb1e60d96876a7e702a47258eaf27ab2479568b79d3ba9ac77?wire=1": 404,
+    "subtree/c393fed1b7407c863cbcbb367a83c57fc2f95dee1068e9b0f238684a9ab61ef8": 404,
+    "block/3b9458b5e47a82ea5ec294b4b183f15f77a969f63aaa05ba7c30604522ea0e18": 404
+  },
+  "after_invalidation_sv_replies": [
+    "notfound",
+    "notfound"
+  ]
+}

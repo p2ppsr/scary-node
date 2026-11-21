@@ -3,7 +3,7 @@ use super::body_limit;
 use crate::mining::wire::{display_hash, merkle, put_varint, take, transaction, varint, Hash};
 use anyhow::{ensure, Context, Result};
 use axum::{
-    body::Bytes,
+    body::{Body, Bytes},
     extract::{DefaultBodyLimit, Path, State},
     http::{header, StatusCode},
     response::{IntoResponse, Response},
@@ -36,7 +36,7 @@ pub(super) struct Assets {
     pub subtree: Option<String>,
     pub header: String,
     raw: Bytes,
-    blkdat_size: u32,
+    blkdat_header: Option<[u8; 8]>,
     block_model: Bytes,
     leaves: Bytes,
     tail: Range<usize>,
@@ -53,14 +53,28 @@ enum NativeAsset {
     SubtreeTransactions,
 }
 
+// The optional blkdat representation in v0.16.1 adds the header and count
+// width to SizeInBytes. Only that legacy representation uses a 32-bit length.
+fn blkdat_header(raw_len: usize, header_and_count: usize) -> Option<[u8; 8]> {
+    let size = u32::try_from(raw_len.checked_add(header_and_count)?).ok()?;
+    let mut header = [0xf9, 0xbe, 0xb4, 0xd9, 0, 0, 0, 0];
+    header[4..].copy_from_slice(&size.to_le_bytes());
+    Some(header)
+}
+
 impl Assets {
-    fn blkdat(&self) -> Bytes {
-        // v0.16.1 writeLegacyBlockHeader uses this marker even on regtest.
-        let mut bytes = Vec::with_capacity(self.raw.len() + 8);
-        bytes.extend_from_slice(&[0xf9, 0xbe, 0xb4, 0xd9]);
-        bytes.extend_from_slice(&self.blkdat_size.to_le_bytes());
-        bytes.extend_from_slice(&self.raw);
-        bytes.into()
+    fn blkdat(&self) -> Response {
+        let Some(header) = self.blkdat_header else {
+            return (
+                StatusCode::NOT_ACCEPTABLE,
+                "Block size exceeds blkdat framing. Request ?wire=1.",
+            )
+                .into_response();
+        };
+        framed_binary(
+            self.raw.len() + header.len(),
+            [Bytes::copy_from_slice(&header), self.raw.clone()],
+        )
     }
 
     // Report at most one successful request per representation per retained
@@ -87,7 +101,7 @@ impl Assets {
         // The reference adds the header and CompactSize width to the native
         // SizeInBytes field when framing the no-query response.
         let header_and_count = raw.len() - remaining.len();
-        let blkdat_size = u32::try_from(raw.len() + header_and_count)?;
+        let blkdat_header = blkdat_header(raw.len(), header_and_count);
         ensure!(
             count > 0 && count <= remaining.len() / 60,
             "invalid block transaction count"
@@ -144,7 +158,7 @@ impl Assets {
             tail: coinbase.end..raw.len(),
             transactions: txs,
             raw,
-            blkdat_size,
+            blkdat_header,
             requested: AtomicU8::new(0),
         })
     }
@@ -207,6 +221,26 @@ impl AssetService {
 
 fn binary(bytes: Bytes) -> Response {
     ([(header::CONTENT_TYPE, "application/octet-stream")], bytes).into_response()
+}
+
+// All parts are immutable views of retained bytes, with their exact total
+// length known before headers are sent. No response-sized copy is needed.
+fn framed_binary(
+    length: usize,
+    chunks: impl IntoIterator<Item = Bytes, IntoIter: Send + 'static>,
+) -> Response {
+    let length = length.to_string();
+    let body = Body::from_stream(futures::stream::iter(
+        chunks.into_iter().map(Ok::<_, std::convert::Infallible>),
+    ));
+    (
+        [
+            (header::CONTENT_TYPE, "application/octet-stream"),
+            (header::CONTENT_LENGTH, &length),
+        ],
+        body,
+    )
+        .into_response()
 }
 
 async fn lookup(service: &AssetService, key: &str, tree: bool) -> Option<Arc<Assets>> {
@@ -282,7 +316,7 @@ async fn legacy(
     if query.get("wire").is_some_and(|value| !value.is_empty()) {
         return binary(a.raw.clone());
     }
-    binary(a.blkdat())
+    a.blkdat()
 }
 async fn subtree(State(store): State<AssetService>, Path(hash): Path<String>) -> Response {
     match lookup(&store, &hash, true).await {
@@ -314,7 +348,8 @@ async fn batch(
     if ids.is_empty() || !remainder.is_empty() {
         return StatusCode::BAD_REQUEST.into_response();
     }
-    let mut out = Vec::new();
+    let mut out = Vec::with_capacity(ids.len());
+    let mut length = 0;
     let mut seen = HashSet::new();
     for id in ids {
         if !seen.insert(id) {
@@ -323,10 +358,11 @@ async fn batch(
         let Some(range) = a.transactions.get(id) else {
             return StatusCode::NOT_FOUND.into_response();
         };
-        out.extend(&a.raw[range.clone()]);
+        length += range.len();
+        out.push(a.raw.slice(range.clone()));
     }
     a.requested(NativeAsset::SubtreeTransactions);
-    binary(out.into())
+    framed_binary(length, out)
 }
 
 #[cfg(test)]
@@ -345,7 +381,15 @@ mod tests {
     }
 
     #[test]
-    fn serves_wire_and_native_commitments_from_the_same_solved_bytes() {
+    fn legacy_size_only_limits_the_optional_blkdat_representation() {
+        let largest = u32::MAX as usize - 83;
+        assert_eq!(blkdat_header(largest, 83).unwrap()[4..], [0xff; 4]);
+        assert!(blkdat_header(largest + 1, 83).is_none());
+        assert!(blkdat_header(usize::MAX, 83).is_none());
+    }
+
+    #[tokio::test]
+    async fn serves_wire_and_native_commitments_from_the_same_solved_bytes() {
         let coinbase = example_transaction(0);
         let child = example_transaction(1);
         let child_id = hash256(&child);
@@ -355,8 +399,17 @@ mod tests {
         raw.push(2);
         raw.extend(&coinbase);
         raw.extend(&child);
-        let a = Assets::new(10, raw.clone()).unwrap();
-        let framed = a.blkdat();
+        let mut a = Assets::new(10, raw.clone()).unwrap();
+        let reply = a.blkdat();
+        assert_eq!(
+            reply.headers()[header::CONTENT_LENGTH],
+            (raw.len() + 8).to_string()
+        );
+        let framed = axum::body::to_bytes(reply.into_body(), raw.len() + 8)
+            .await
+            .unwrap();
+        a.blkdat_header = None;
+        assert_eq!(a.blkdat().status(), StatusCode::NOT_ACCEPTABLE);
         assert_eq!(&framed[..4], &[0xf9, 0xbe, 0xb4, 0xd9]);
         assert_eq!(&framed[4..8], &((raw.len() + 81) as u32).to_le_bytes());
         assert_eq!(&framed[8..], &raw);

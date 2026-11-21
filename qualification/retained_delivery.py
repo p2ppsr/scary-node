@@ -256,6 +256,18 @@ def run(binary, directory):
                 )
                 code, asset_raw = fetch(base + legacy)
                 assert code == 200 and asset_raw == reference
+                code, framed = fetch(base + "block_legacy/" + first)
+                assert code == 200 and framed == (
+                    bytes.fromhex("f9beb4d9")
+                    + struct.pack("<I", len(reference) + 81)
+                    + reference
+                )
+                coinbase = reference[81 : -len(payments[0])]
+                code, ordered = fetch(
+                    base + "subtree/" + tree + "/txs",
+                    dsha(payments[0]) + dsha(coinbase),
+                )
+                assert code == 200 and ordered == payments[0] + coinbase
                 sv_raw = peer.block(first)
                 assert sv_raw == reference
 
@@ -302,6 +314,8 @@ def run(binary, directory):
                     "reference_sha256": digest(reference),
                     "sv_getdata_after_restart_sha256": digest(sv_raw),
                     "asset_wire_after_subtree_first_sha256": digest(asset_raw),
+                    "asset_blkdat_sha256": digest(framed),
+                    "asset_requested_order_sha256": digest(ordered),
                     "retrieving_peer_sent_body_at_ms": sent_at,
                     "retrieving_peer_reported_tip": False,
                     "prior_chain_state": "settled",
