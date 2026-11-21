@@ -1,0 +1,7511 @@
+{
+  "network": "regtest",
+  "reference_ingress": "SV submitblock",
+  "native_reference_link": "SV wire to Teranode legacy, Teranode native gossip",
+  "funding_block": "0e3d2d34a15a063b9b23867fd18918d219916b155258d8a72ae9f428198ceec5",
+  "funding_header": "00000020857bdc142329cfffc943a790d9461b96b219100aa878f7c02ff9cc57856fd33a19b0ec74ae798564a83a4128afe33873dc3bc2602edc786111d8d1802b9c523eb6e9016bffff7f2000000000",
+  "receiver_window": 4,
+  "final_native_observations": {
+    "scary_node": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "first_observed_ns": 461310826000
+    },
+    "tn2": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "first_observed_ns": 479793244250
+    },
+    "tn1": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "first_observed_ns": 501855751167
+    }
+  },
+  "transactions_per_block": 16384,
+  "rounds": 32,
+  "measured_wall_ns": 501862157625,
+  "transactions_per_second": 1044.6852627445103,
+  "rows": [
+    {
+      "height": 452,
+      "hash": "67555ad5ed2408050ff5afca0c09100a0a37ac8dedb0dddf4f4fe4edb27a88fc",
+      "header_hex": "00000020c5ee8c1928f4e92aa7d85852156b9119d21889d17f86239b3b065aa1342d3d0e8a084cbf4010117d6f4fd843d37bbe4d9153b3391db3d0aa77f05630653d3c9eb7e9016bffff7f2000000000",
+      "bytes": 3268587,
+      "wire_sha256": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2",
+      "offered_ns": 555792,
+      "source_accepted_ns": 561982375,
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2",
+        "tn2": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2",
+        "sv": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2"
+      }
+    },
+    {
+      "height": 453,
+      "hash": "75a20b99814ef9303938b9243db5e335e21205b9320629add99f46722adb5756",
+      "header_hex": "00000020fc887ab2ede44f4fdfddb0ed8dac370a0a10090ccaaff50f050824edd55a5567bf0a211c8c377c669eebb0b1cc98351f3848393d73a1e3361ecd583818a2811eb8e9016bffff7f2000000000",
+      "bytes": 3268658,
+      "wire_sha256": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e",
+      "offered_ns": 562911250,
+      "source_accepted_ns": 1138542292,
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e",
+        "tn2": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e",
+        "sv": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e"
+      }
+    },
+    {
+      "height": 454,
+      "hash": "7632f4635ee4c1676bddeb08a9b4475fd513ec0bf02a6f8013569d83fb9100d2",
+      "header_hex": "000000205657db2a72469fd9ad290632b90512e235e3b53d24b9383930f94e81990ba2755ce85b843f9e1c08e0947812171485d69e61e510750dfb27a8442cd11cd8589fb9e9016bffff7f2000000000",
+      "bytes": 3268696,
+      "wire_sha256": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197",
+      "offered_ns": 1139451125,
+      "source_accepted_ns": 1724028417,
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197",
+        "tn2": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197",
+        "sv": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197"
+      }
+    },
+    {
+      "height": 455,
+      "hash": "3256c27d2395426903e5e7635cde68bff6424e146feff4f654ec83727342aad6",
+      "header_hex": "00000020d20091fb839d5613806f2af00bec13d55f47b4a908ebdd6b67c1e45e63f43276918340aacf1f81dba33ed097eaf2e5f0c053516d44b61bdfb31e9339287d2d1dbae9016bffff7f2000000000",
+      "bytes": 3268692,
+      "wire_sha256": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59",
+      "offered_ns": 1724901500,
+      "source_accepted_ns": 2292317875,
+      "receiver_polls": [
+        {
+          "read_ns": 2419557625,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 453
+          }
+        },
+        {
+          "read_ns": 3400236250,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 454
+          }
+        },
+        {
+          "read_ns": 4309988750,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 4816705084,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 5331007500,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 5843086209,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 6351237042,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 6862845459,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 7369007542,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 7878117000,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 8385519209,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 8896530292,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 9402554875,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 9913404917,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 10424506542,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 10948538625,
+          "heights": {
+            "tn1": 451,
+            "tn2": 451,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 11460034584,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 11969033250,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 12481824375,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 12993060500,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 13503713459,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 14013485334,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 14525162417,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 15037219292,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 15548535709,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 16060990459,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 16571403625,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 17083918084,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 17592940125,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 18101138625,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 18612142625,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 19123034459,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 19630862875,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 20139387667,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 20648830584,
+          "heights": {
+            "tn1": 451,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 21160714959,
+          "heights": {
+            "tn1": 452,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59",
+        "tn2": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59",
+        "sv": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59"
+      }
+    },
+    {
+      "height": 456,
+      "hash": "09bcf53f1a39359cc5ad71cb06f66964c61db3e1d9aa213dc625819ddd1ada1b",
+      "header_hex": "00000020d6aa42737283ec54f6f4ef6f144e42f6bf68de5c63e7e503694295237dc25632feba5cb35a09939ebe169ddf060fe72d7e4c96b154b1ec4fff949c66c61e3fc9bbe9016bffff7f2001000000",
+      "bytes": 3268589,
+      "wire_sha256": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93",
+      "offered_ns": 21161233125,
+      "source_accepted_ns": 22266854625,
+      "receiver_polls": [
+        {
+          "read_ns": 22274222084,
+          "heights": {
+            "tn1": 452,
+            "tn2": 452,
+            "scary_node": 455
+          }
+        },
+        {
+          "read_ns": 23344556875,
+          "heights": {
+            "tn1": 452,
+            "tn2": 452,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 23855908417,
+          "heights": {
+            "tn1": 452,
+            "tn2": 452,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 24368738167,
+          "heights": {
+            "tn1": 452,
+            "tn2": 452,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 24876151709,
+          "heights": {
+            "tn1": 452,
+            "tn2": 452,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 25391777209,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 25907663750,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 26417346542,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 26927203667,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 27436104375,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 27947962917,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 28459689334,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 28971864209,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 29482891375,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 29996364209,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 30502609250,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 31013584375,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 31525364792,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 32037935042,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 32547937709,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 33062013709,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 33571975000,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 34081468042,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 34587258334,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 35097657375,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 35608959584,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 36122573584,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 36634029042,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 37146736167,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 37656403417,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 38166877792,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 38676217125,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 39187897625,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 39698831667,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 40207363375,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 40721841334,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 41232321167,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 41743609834,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 42252769750,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 42764412125,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 43274001542,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 43780790584,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 44291933667,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 44804087417,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 45314052834,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 45820642625,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 46332187500,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 46840708542,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 47349375625,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 47855932625,
+          "heights": {
+            "tn1": 452,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 48373986292,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93",
+        "tn2": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93",
+        "sv": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93"
+      }
+    },
+    {
+      "height": 457,
+      "hash": "79ee806627322ad4daa95b8fa7219ed3f5e496f08ff8ddcc449facfbddbeb75b",
+      "header_hex": "000000201bda1add9d8125c63d21aad9e1b31dc66469f606cb71adc59c35391a3ff5bc09e6cfcd8af881d35bf0380fd6429bd9f00c558e6f2d1b56e504e9c51ed2c49a49bce9016bffff7f2004000000",
+      "bytes": 3268628,
+      "wire_sha256": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f",
+      "offered_ns": 48375073875,
+      "source_accepted_ns": 48968674875,
+      "receiver_polls": [
+        {
+          "read_ns": 48976946875,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 456
+          }
+        },
+        {
+          "read_ns": 50060595500,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 50572957417,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 51082638667,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 51588333709,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 52098500542,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 52608911875,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 53120843459,
+          "heights": {
+            "tn1": 453,
+            "tn2": 454,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 53633103875,
+          "heights": {
+            "tn1": 453,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 54143647500,
+          "heights": {
+            "tn1": 453,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 54654052500,
+          "heights": {
+            "tn1": 453,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 55167696875,
+          "heights": {
+            "tn1": 453,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 55677546000,
+          "heights": {
+            "tn1": 453,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 56186931167,
+          "heights": {
+            "tn1": 453,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 56699807125,
+          "heights": {
+            "tn1": 453,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 57214658000,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f",
+        "tn2": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f",
+        "sv": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f"
+      }
+    },
+    {
+      "height": 458,
+      "hash": "7428ab6423f27635777961370a6474f6e7b7eed00ffbc7573b0843a8249bce53",
+      "header_hex": "000000205bb7beddfbac9f44ccddf88ff096e4f5d39e21a78f5ba9dad42a32276680ee7907b73d0ff2170690de92476d1dfd2063bfc6b893cf737aea6b587c4e2d6177fcbde9016bffff7f2001000000",
+      "bytes": 3268620,
+      "wire_sha256": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22",
+      "offered_ns": 57215664875,
+      "source_accepted_ns": 57818614792,
+      "receiver_polls": [
+        {
+          "read_ns": 57828000334,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 457
+          }
+        },
+        {
+          "read_ns": 59018740334,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 59528314042,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 60036398334,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 60547355125,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 61057197709,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 61569020125,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 62080251084,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 62590180250,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 63100517917,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 63607107584,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 64113858209,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 64624523084,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 65131320250,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 65642701500,
+          "heights": {
+            "tn1": 454,
+            "tn2": 455,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 66156396625,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 66670185542,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 67176476375,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 67689771292,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 68200506459,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 68708675459,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 69220068417,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 69727206500,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 70237218917,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 70748860000,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 71258752334,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 71770739792,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 72277967959,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 72788717959,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 73297978084,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 73810082375,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 74317760250,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 74828825292,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 75339016709,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 75852707375,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 76365540334,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 76877557750,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 77386799709,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 77899142042,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 78410937875,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 78921676500,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 79435933000,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 79943220584,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 80452900709,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 80963271834,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 81474781334,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 81986799375,
+          "heights": {
+            "tn1": 454,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 82499792167,
+          "heights": {
+            "tn1": 455,
+            "tn2": 456,
+            "scary_node": 458
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22",
+        "tn2": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22",
+        "sv": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22"
+      }
+    },
+    {
+      "height": 459,
+      "hash": "0d15012df34941deb0733cc3709056303e4942e5b62c7ea776b346c3331c7d63",
+      "header_hex": "0000002053ce9b24a843083b57c7fb0fd0eeb7e7f674640a376179773576f22364ab28747686a343b1c89cce5998a440936dbb3890e9da2a9901a37c74792b506dc76b6ebee9016bffff7f2000000000",
+      "bytes": 3268754,
+      "wire_sha256": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5",
+      "offered_ns": 82500643084,
+      "source_accepted_ns": 83095214917,
+      "receiver_polls": [
+        {
+          "read_ns": 83104111375,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 458
+          }
+        },
+        {
+          "read_ns": 84489621209,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 85003722625,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 85514523584,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 86021253709,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 86529160167,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 87042713250,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 87554736542,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 88067925084,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 88575747375,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 89085658667,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 89592765709,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 90101123750,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 90611431292,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 91120773417,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 91634695584,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 92143761167,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 92651748042,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 93157890334,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 93665745750,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 94178004292,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 94686752167,
+          "heights": {
+            "tn1": 455,
+            "tn2": 457,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 95198692834,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 459
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5",
+        "tn2": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5",
+        "sv": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5"
+      }
+    },
+    {
+      "height": 460,
+      "hash": "0b8e33c1aab2d1fbf4677ea1610836c7fdc8a8a9d5ef0a99dbeb800ea1799e89",
+      "header_hex": "00000020637d1c33c346b376a77e2cb6e542493e30569070c33c73b0de4149f32d01150dc31eec423908456d6f3c92aed4d7aa67c8ab94910a52c7b69d89df5972ecb5f4bfe9016bffff7f2001000000",
+      "bytes": 3268590,
+      "wire_sha256": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f",
+      "offered_ns": 95199575834,
+      "source_accepted_ns": 95783232667,
+      "receiver_polls": [
+        {
+          "read_ns": 95793607542,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 459
+          }
+        },
+        {
+          "read_ns": 96998800042,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 97511501792,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 98024370625,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 98531651917,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 99039390125,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 99546898000,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 100058343209,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 100565662334,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 101075753584,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 101586772917,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 102096746625,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 102609119334,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 103121652459,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 103634091459,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 104143341209,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 104652667834,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 105164259959,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 105674076459,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 106185221834,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 106694224750,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 107205467250,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 107714797625,
+          "heights": {
+            "tn1": 456,
+            "tn2": 458,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 108226010334,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 108734029084,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 109244535667,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 109757685167,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 110270092542,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 110780345959,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 111290297000,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 111802740500,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 112316789292,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 112826239959,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 113337817959,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 113851129625,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 114360028917,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 114873467584,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 115384558584,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 115890326459,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 116399523750,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 116912855125,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 117421223209,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 117930565250,
+          "heights": {
+            "tn1": 456,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 118442119584,
+          "heights": {
+            "tn1": 457,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f",
+        "tn2": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f",
+        "sv": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f"
+      }
+    },
+    {
+      "height": 461,
+      "hash": "0e8d3e4ed4187b1e49abaff99ac26bd5beba90e2ab561f30edfeb3cc6578aaa1",
+      "header_hex": "00000020899e79a10e80ebdb990aefd5a9a8c8fdc7360861a17e67f4fbd1b2aac1338e0be977290563ce5e61e6dc8d811ba5199a6bc40c8486488c066d059209646ad092c0e9016bffff7f2003000000",
+      "bytes": 3268589,
+      "wire_sha256": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa",
+      "offered_ns": 118442673625,
+      "source_accepted_ns": 119052983042,
+      "receiver_polls": [
+        {
+          "read_ns": 119065725625,
+          "heights": {
+            "tn1": 457,
+            "tn2": 459,
+            "scary_node": 460
+          }
+        },
+        {
+          "read_ns": 120268884500,
+          "heights": {
+            "tn1": 457,
+            "tn2": 459,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 120779883667,
+          "heights": {
+            "tn1": 457,
+            "tn2": 459,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 121292022000,
+          "heights": {
+            "tn1": 457,
+            "tn2": 459,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 121808597375,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 122322897000,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 122835551584,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 123346408584,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 123856985667,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 124367362084,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 124880134834,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 125392296750,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 125899585292,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 126412114917,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 126925379792,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 127439853667,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 127948554250,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 128461899792,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 128973036917,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 129485040875,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 129999132792,
+          "heights": {
+            "tn1": 457,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 130512240834,
+          "heights": {
+            "tn1": 458,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa",
+        "tn2": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa",
+        "sv": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa"
+      }
+    },
+    {
+      "height": 462,
+      "hash": "7f5086b15de91f4f1a52b31ecc497ae0b1110715d61221f97f5e0a964ba8d6ec",
+      "header_hex": "00000020a1aa7865ccb3feed301f56abe290babed56bc29af9afab491e7b18d44e3e8d0e46d6fbeabe88c3880a377de04009d3adf27cbeb0d9958bee3973cd21c525a3ecc1e9016bffff7f2005000000",
+      "bytes": 3268679,
+      "wire_sha256": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8",
+      "offered_ns": 130513283584,
+      "source_accepted_ns": 131104051667,
+      "receiver_polls": [
+        {
+          "read_ns": 131114219459,
+          "heights": {
+            "tn1": 458,
+            "tn2": 460,
+            "scary_node": 461
+          }
+        },
+        {
+          "read_ns": 132442607959,
+          "heights": {
+            "tn1": 458,
+            "tn2": 460,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 132957789584,
+          "heights": {
+            "tn1": 458,
+            "tn2": 460,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 133470261000,
+          "heights": {
+            "tn1": 458,
+            "tn2": 460,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 133983212167,
+          "heights": {
+            "tn1": 458,
+            "tn2": 460,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 134494800334,
+          "heights": {
+            "tn1": 458,
+            "tn2": 460,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 135004173500,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 135516811750,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 136029126875,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 136541487084,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 137053875042,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 137565335417,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 138072393875,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 138581594667,
+          "heights": {
+            "tn1": 458,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 139095463417,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8",
+        "tn2": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8",
+        "sv": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8"
+      }
+    },
+    {
+      "height": 463,
+      "hash": "0de011c474d1dff2ae49d0bcd1ed4cc28a5fcd74478a5ca0b3eba0c483f48ecc",
+      "header_hex": "00000020ecd6a84b960a5e7ff92112d6150711b1e07a49cc1eb3521a4f1fe95db186507fbade981e7d1ec9f2b365c850dfea9a56010a568ef26c63160b7b812cc4e7ef6bc2e9016bffff7f2000000000",
+      "bytes": 3268674,
+      "wire_sha256": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76",
+      "offered_ns": 139096447125,
+      "source_accepted_ns": 139693935667,
+      "receiver_polls": [
+        {
+          "read_ns": 139705113625,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 462
+          }
+        },
+        {
+          "read_ns": 140938156209,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 141452075209,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 141963083625,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 142472070250,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 142979776209,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 143488357167,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 143998866709,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 144512066125,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 145022119375,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 145530074084,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 146040838250,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 146552178959,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 147062807042,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 147573010334,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 148082308500,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 148590951000,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 149100073584,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 149612125625,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 150119378459,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 150631318417,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 151143192709,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 151657613084,
+          "heights": {
+            "tn1": 459,
+            "tn2": 461,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 152170932792,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 152684974875,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 153199672042,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 153709510917,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 154216876584,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 154726961542,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 155234631500,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 155746431334,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 156255912417,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 156769862792,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 157280189167,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 157790624750,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 158300145834,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 158812830209,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 159329949834,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 159845085084,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 160352314875,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 160870826834,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 161381893417,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 161900121209,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 162412740084,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 162925487584,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 163442529375,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 163961247959,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 164477479000,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 164988304500,
+          "heights": {
+            "tn1": 459,
+            "tn2": 462,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 165508357709,
+          "heights": {
+            "tn1": 459,
+            "tn2": 463,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 166024251959,
+          "heights": {
+            "tn1": 459,
+            "tn2": 463,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 166537086542,
+          "heights": {
+            "tn1": 459,
+            "tn2": 463,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 167046260209,
+          "heights": {
+            "tn1": 459,
+            "tn2": 463,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 167564847334,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 463
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76",
+        "tn2": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76",
+        "sv": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76"
+      }
+    },
+    {
+      "height": 464,
+      "hash": "57c62225acc99ab15a08058202928d86d7de5ea73c519346e961889781d464ad",
+      "header_hex": "00000020cc8ef483c4a0ebb3a05c8a4774cd5f8ac24cedd1bcd049aef2dfd174c411e00d3a652943b5ad1475d948f2583aec60aeca9317edd5c36c76ff7f0f5cc874f85dc3e9016bffff7f2002000000",
+      "bytes": 3268609,
+      "wire_sha256": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5",
+      "offered_ns": 167566690459,
+      "source_accepted_ns": 168305204459,
+      "receiver_polls": [
+        {
+          "read_ns": 168312641459,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 463
+          }
+        },
+        {
+          "read_ns": 169465596834,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 169983254792,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 170500284417,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 171016471000,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 171526317959,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 172044155792,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 172562043834,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 173076080625,
+          "heights": {
+            "tn1": 460,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 173587167334,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5",
+        "tn2": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5",
+        "sv": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5"
+      }
+    },
+    {
+      "height": 465,
+      "hash": "58b204ed1fe2fcbd5c58bdc068f82c5c88dbfc00021cf3e8f6b29c082e801e58",
+      "header_hex": "00000020ad64d481978861e94693513ca75eded7868d92028205085ab19ac9ac2522c657e87874fdbea140487efd5e3bf1e6b1bdfcc5cd6879094c20c1a9c37ccb70ee3ac4e9016bffff7f2001000000",
+      "bytes": 3268750,
+      "wire_sha256": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6",
+      "offered_ns": 173588231167,
+      "source_accepted_ns": 174188811125,
+      "receiver_polls": [
+        {
+          "read_ns": 174210630625,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 464
+          }
+        },
+        {
+          "read_ns": 175443880542,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 175953290334,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 176461640167,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 176970633959,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 177483307334,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 177995540792,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 178502333084,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 179008372750,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 179514167417,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 180038795292,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 180619608709,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 181128033542,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 181638228875,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 182295644334,
+          "heights": {
+            "tn1": 461,
+            "tn2": 463,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 182891401417,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 183481281334,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 183993521417,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 184503110417,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 185021177084,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 185533275167,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 186041858209,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 186549182084,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 187062961875,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 187580176417,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 188095518292,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 188608613000,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 189125127209,
+          "heights": {
+            "tn1": 461,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 189643468167,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6",
+        "tn2": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6",
+        "sv": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6"
+      }
+    },
+    {
+      "height": 466,
+      "hash": "4317b2f0b7f2c8fca9827eb67f8f32a3785ba0844cd9807288011dec8cf0d4ca",
+      "header_hex": "00000020581e802e089cb2f6e8f31c0200fcdb885c2cf868c0bd585cbdfce21fed04b258360dcd599c26b39f5e131404226d3b470b490d773f45a0c483a1aa67bb2e13d8c5e9016bffff7f2002000000",
+      "bytes": 3268730,
+      "wire_sha256": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110",
+      "offered_ns": 189644648875,
+      "source_accepted_ns": 190240789334,
+      "receiver_polls": [
+        {
+          "read_ns": 190249793584,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 465
+          }
+        },
+        {
+          "read_ns": 191496362125,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 192008882667,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 192525440709,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 193039676500,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 193554988125,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 194072993750,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 194581096417,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 195089928584,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 195605042084,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 196121610750,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 196636619667,
+          "heights": {
+            "tn1": 462,
+            "tn2": 464,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 197153691709,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 197667127375,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 198184689417,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 198697249750,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 199204903334,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 199716028709,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 200231291250,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 200746797500,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 201264116834,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 201772205500,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 202279503584,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 202794371542,
+          "heights": {
+            "tn1": 462,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 203310352042,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110",
+        "tn2": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110",
+        "sv": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110"
+      }
+    },
+    {
+      "height": 467,
+      "hash": "5702ee91b212ab9ec55c7e6d0353f79de95b7b9a2090d8fe47c8278e0fa8e02b",
+      "header_hex": "00000020cad4f08cec1d01887280d94c84a05b78a3328f7fb67e82a9fcc8f2b7f0b2174362ad8046500c96f479559ef3e557205558f5489b21f40b71b7a00845c8ad1901c6e9016bffff7f2000000000",
+      "bytes": 3268695,
+      "wire_sha256": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7",
+      "offered_ns": 203311353584,
+      "source_accepted_ns": 203919489875,
+      "receiver_polls": [
+        {
+          "read_ns": 203929435292,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 466
+          }
+        },
+        {
+          "read_ns": 205140732959,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 205657126542,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 206175952000,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 206689988167,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 207201654750,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 207720506250,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 208238267334,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 208758454834,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 209273514250,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 209783341250,
+          "heights": {
+            "tn1": 463,
+            "tn2": 465,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 210299991292,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 210813213459,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 211332111375,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 211841476542,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 212348976167,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 212863453917,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 213371589834,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 213881455834,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 214386389292,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 214899598417,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 215413974792,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 215920633875,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 216430911667,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 216941665292,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 217449249417,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 217962268750,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 218467817084,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 218980376500,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 219493715875,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 220000510250,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 220516524042,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 221036044667,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 221554194250,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 222066967250,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 222573050667,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 223089954417,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 223607754084,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 224122217667,
+          "heights": {
+            "tn1": 463,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 224640963000,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7",
+        "tn2": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7",
+        "sv": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7"
+      }
+    },
+    {
+      "height": 468,
+      "hash": "5194964b66155bdf575e401f5263a08085fd18690ce2b2d0a98c446b3eb7a95c",
+      "header_hex": "000000202be0a80f8e27c847fed890209a7b5be99df753036d7e5cc59eab12b291ee02573ea08c79561f2deddf90255c2a85e1ece6df6f0d867fd4be8c358bebd71b8103c7e9016bffff7f2001000000",
+      "bytes": 3268709,
+      "wire_sha256": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a",
+      "offered_ns": 224642016750,
+      "source_accepted_ns": 225236162417,
+      "receiver_polls": [
+        {
+          "read_ns": 225246166792,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 467
+          }
+        },
+        {
+          "read_ns": 226459803834,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 226977400917,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 227495106000,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 228011032750,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 228523831750,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 229037039542,
+          "heights": {
+            "tn1": 464,
+            "tn2": 466,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 229559220834,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 230074731709,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 230585378417,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 231093006834,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 231605587250,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 232123436250,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 232639434917,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 233156473250,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 233674158667,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 234183623584,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 234690146250,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 235202975834,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 235714093834,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 236224870334,
+          "heights": {
+            "tn1": 464,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 236734446709,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a",
+        "tn2": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a",
+        "sv": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a"
+      }
+    },
+    {
+      "height": 469,
+      "hash": "7e707e7b22a5cf8994b06bc5b3e9d38ade5a2944ae58756631990e90d8039af4",
+      "header_hex": "000000205ca9b73e6b448ca9d0b2e20c6918fd8580a063521f405e57df5b15664b96945131e437bed2afdd8a3a0b5bebeec0014b534e4a317747514eaea4aeb35116731bc8e9016bffff7f2002000000",
+      "bytes": 3268701,
+      "wire_sha256": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4",
+      "offered_ns": 236735682459,
+      "source_accepted_ns": 237327992792,
+      "receiver_polls": [
+        {
+          "read_ns": 237338399625,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 468
+          }
+        },
+        {
+          "read_ns": 238546284209,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 239065603625,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 239588269209,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 240098785625,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 240614922334,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 241122677792,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 241641995459,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 242160648750,
+          "heights": {
+            "tn1": 465,
+            "tn2": 467,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 242681574500,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 243209444584,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 243722234584,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 244233448875,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 244745831209,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 245255300625,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 245764520834,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 246281531667,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 246791964292,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 247308872875,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 247816147125,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 248332943709,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 248841973250,
+          "heights": {
+            "tn1": 465,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 249353387084,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4",
+        "tn2": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4",
+        "sv": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4"
+      }
+    },
+    {
+      "height": 470,
+      "hash": "5274c8240fb3f55d33ef93050f33d968b9fcf4b39d573a8fbe3269c989b1e95c",
+      "header_hex": "00000020f49a03d8900e9931667558ae44295ade8ad3e9b3c56bb09489cfa5227b7e707e8c30d1e1dd31b98a7292d4239cb00b73728141a7e430abcf36eecfe7d505effec9e9016bffff7f2000000000",
+      "bytes": 3268538,
+      "wire_sha256": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1",
+      "offered_ns": 249353996917,
+      "source_accepted_ns": 249954893500,
+      "receiver_polls": [
+        {
+          "read_ns": 249965016042,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 469
+          }
+        },
+        {
+          "read_ns": 251187632209,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 251705479375,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 252214621042,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 252721466750,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 253231864750,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 253742233000,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 254260279334,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 254776920792,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 255293587959,
+          "heights": {
+            "tn1": 466,
+            "tn2": 468,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 255806972667,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 256324747709,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 256835651709,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 257354047417,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 257870361292,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 258399774417,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 258917743750,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 259429153250,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 259943013959,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 260455931709,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 260973223167,
+          "heights": {
+            "tn1": 466,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 261489856084,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1",
+        "tn2": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1",
+        "sv": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1"
+      }
+    },
+    {
+      "height": 471,
+      "hash": "6e4ed49236dc9d090f0a4b6269e034274688b751cc2d72cf77cb51a45bf2cd68",
+      "header_hex": "000000205ce9b189c96932be8f3a579db3f4fcb968d9330f0593ef335df5b30f24c87452897b3503b77a32caaf1e69bf57a00c770a763839b92d29aacb328ef007f1f5eccae9016bffff7f2000000000",
+      "bytes": 3268812,
+      "wire_sha256": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5",
+      "offered_ns": 261491072125,
+      "source_accepted_ns": 262088274834,
+      "receiver_polls": [
+        {
+          "read_ns": 262095866667,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 470
+          }
+        },
+        {
+          "read_ns": 263500638709,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 264013846500,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 264525370584,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 265034118417,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 265549141375,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 266060096167,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 266573680084,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 267081734959,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 267596918292,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 268115913709,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 268627392542,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 269134426750,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 269642352417,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 270151823292,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 270660026834,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 271171216875,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 271686361000,
+          "heights": {
+            "tn1": 467,
+            "tn2": 469,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 272205569000,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 272725210250,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 273232737084,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 273744934917,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 274258812542,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 274775429209,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 275293983209,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 275809545417,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 276325802584,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 276840965875,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 277359355209,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 277877105625,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 278387657084,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 278902923250,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 279417536084,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 279934809792,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 280454732125,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 280971303209,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 281485855875,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 282005281459,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 282522641167,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 283036718375,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 283552258250,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 284062202209,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 284572013667,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 285086182042,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 285594230459,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 286104899042,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 286616128000,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 287126219542,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 287637326250,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 288144733417,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 288662440292,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 289178494167,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 289696367042,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 290205693459,
+          "heights": {
+            "tn1": 467,
+            "tn2": 470,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 290716024500,
+          "heights": {
+            "tn1": 467,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 291234613834,
+          "heights": {
+            "tn1": 467,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 291744057042,
+          "heights": {
+            "tn1": 467,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 292258790459,
+          "heights": {
+            "tn1": 467,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 292776098375,
+          "heights": {
+            "tn1": 467,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 293291429542,
+          "heights": {
+            "tn1": 467,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 293800416959,
+          "heights": {
+            "tn1": 467,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 294314474834,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5",
+        "tn2": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5",
+        "sv": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5"
+      }
+    },
+    {
+      "height": 472,
+      "hash": "64cf6c91129402e32f00b00deb0d4bb13ce6c35f6c16f2496b75ca2bb473b1c5",
+      "header_hex": "0000002068cdf25ba451cb77cf722dcc51b788462734e069624b0a0f099ddc3692d44e6ea78515e5fe5edc806b992f6aa1ffce6fad8a61f4d2e404fa3ceb17dfdd07b33acbe9016bffff7f2000000000",
+      "bytes": 3268648,
+      "wire_sha256": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba",
+      "offered_ns": 294314987292,
+      "source_accepted_ns": 294916175125,
+      "receiver_polls": [
+        {
+          "read_ns": 294923190834,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        },
+        {
+          "read_ns": 296123871959,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 296636007292,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 297145008125,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 297654824625,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 298165672167,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 298672974667,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 299185290334,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 299699613375,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 300213436084,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 300726212250,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 301234570709,
+          "heights": {
+            "tn1": 468,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 301745239334,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba",
+        "tn2": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba",
+        "sv": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba"
+      }
+    },
+    {
+      "height": 473,
+      "hash": "7276481dbbbff2d63ebdcc53544d06afa7f2ba9e04f99121162348d67625fc17",
+      "header_hex": "00000020c5b173b42bca756b49f2166c5fc3e63cb14b0deb0db0002fe3029412916ccf6415f02e8717395be945cf2bec780af624d4f368d0115cbca6cdafb345dd7fd5c7cce9016bffff7f2002000000",
+      "bytes": 3268699,
+      "wire_sha256": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042",
+      "offered_ns": 301745779334,
+      "source_accepted_ns": 302353106375,
+      "receiver_polls": [
+        {
+          "read_ns": 302361454625,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 472
+          }
+        },
+        {
+          "read_ns": 303597632334,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 304115570459,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 304678033959,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 305189353792,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 305701457042,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 306266580209,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 306810528959,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 307398009750,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 307914900834,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 308422369709,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 308935828209,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 309447891834,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 309964254917,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 310474468792,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 310985487792,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 311499427375,
+          "heights": {
+            "tn1": 469,
+            "tn2": 471,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 312017471792,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 312534168750,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 313053541375,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 313564331542,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 314082335959,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 314590583584,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 315107108000,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 315615127542,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 316123085042,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 316634740209,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 317146094542,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 317658499667,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 318174112834,
+          "heights": {
+            "tn1": 469,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 318691079209,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042",
+        "tn2": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042",
+        "sv": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042"
+      }
+    },
+    {
+      "height": 474,
+      "hash": "63d32d7aa82a3a3fd296a1bf4f042bfb05915dea3c709e1d2de3e54eddc33e75",
+      "header_hex": "0000002017fc2576d64823162191f9049ebaf2a7af064d5453ccbd3ed6f2bfbb1d487672281a13c40f3e5ff627aaef67dc9aff2377daa5c31bede4e948f384f7e941722acde9016bffff7f2002000000",
+      "bytes": 3268656,
+      "wire_sha256": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b",
+      "offered_ns": 318692168417,
+      "source_accepted_ns": 319295838250,
+      "receiver_polls": [
+        {
+          "read_ns": 319304233834,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 473
+          }
+        },
+        {
+          "read_ns": 320581341125,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 321096222709,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 321614809584,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 322122092709,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 322631749709,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 323147973750,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 323667104834,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 324183786375,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 324700169584,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 325212515084,
+          "heights": {
+            "tn1": 470,
+            "tn2": 472,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 325729106334,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 326243089834,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 326755753792,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 327270745250,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 327783041459,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 328292188084,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 328810958167,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 329325029417,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 329838000917,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 330345876459,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 330858803667,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 331376769334,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 331892597417,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 332401443084,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 332917420417,
+          "heights": {
+            "tn1": 470,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 333427290875,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b",
+        "tn2": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b",
+        "sv": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b"
+      }
+    },
+    {
+      "height": 475,
+      "hash": "6050ab1e0affc1c6f9257c5cf05b33002d8cd0805e4738a3574db00ae013e11c",
+      "header_hex": "00000020753ec3dd4ee5e32d1d9e703cea5d9105fb2b044fbfa196d23f3a2aa87a2dd3637c45816a2c8ce593511f2f3a5f3ed990277608fee5f7db85bfc724931bb5af1acee9016bffff7f2001000000",
+      "bytes": 3268692,
+      "wire_sha256": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38",
+      "offered_ns": 333427892542,
+      "source_accepted_ns": 334025348167,
+      "receiver_polls": [
+        {
+          "read_ns": 334034224084,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 474
+          }
+        },
+        {
+          "read_ns": 335238586917,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 335751310500,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 336261820334,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 336783048500,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 337297803417,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 337807918292,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 338318578000,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 338825648375,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 339340952875,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 339854086750,
+          "heights": {
+            "tn1": 471,
+            "tn2": 473,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 340369550084,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 340883040375,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 341400116084,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 341914794000,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 342430865542,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 342948131125,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 343463536625,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 343980683125,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 344495085459,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 345009384667,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 345520605459,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 346037507917,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 346548287084,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 347056110500,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 347572629209,
+          "heights": {
+            "tn1": 471,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 348090235917,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38",
+        "tn2": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38",
+        "sv": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38"
+      }
+    },
+    {
+      "height": 476,
+      "hash": "45f5b34fc21ad66a39d3c2789aaeb23b5acb26adb957fb7868d4ddfdefe659c1",
+      "header_hex": "000000201ce113e00ab04d57a338475e80d08c2d00335bf05c7c25f9c6c1ff0a1eab506011d4562f84d7d832b265403dbff77950ca9f7231ffb0efbf16a88e5c0c2e16cfcfe9016bffff7f2000000000",
+      "bytes": 3268667,
+      "wire_sha256": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316",
+      "offered_ns": 348091279125,
+      "source_accepted_ns": 348693351042,
+      "receiver_polls": [
+        {
+          "read_ns": 348706216250,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 475
+          }
+        },
+        {
+          "read_ns": 349943585125,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 350456726750,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 350967100167,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 351476136542,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 351994611792,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 352506210167,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 353024271167,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 353542286584,
+          "heights": {
+            "tn1": 472,
+            "tn2": 474,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 354057380709,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 354575291209,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 355087636084,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 355598138917,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 356118055125,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 356630638959,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 357148621167,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 357658899125,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 358165199084,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 358681725417,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 359189479125,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 359705434875,
+          "heights": {
+            "tn1": 472,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 360220174000,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316",
+        "tn2": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316",
+        "sv": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316"
+      }
+    },
+    {
+      "height": 477,
+      "hash": "5a16bc91786863b9bd1bfb727d67e13ea32f75158b04f4ba8f99abff84e53d50",
+      "header_hex": "00000020c159e6effdddd46878fb57b9ad26cb5a3bb2ae9a78c2d3396ad61ac24fb3f545f9404a328c2e1d0f9647570405e6c811131102464720f2f74e23b142b2176449d0e9016bffff7f2000000000",
+      "bytes": 3268708,
+      "wire_sha256": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a",
+      "offered_ns": 360221173792,
+      "source_accepted_ns": 360830297250,
+      "receiver_polls": [
+        {
+          "read_ns": 360837895209,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 476
+          }
+        },
+        {
+          "read_ns": 362413279834,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 362920056000,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 363439168625,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 363955556417,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 364472777375,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 364982938292,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 365494900834,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 366003936042,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 366518290917,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 367033784417,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 367543095750,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 368055088750,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 368565948459,
+          "heights": {
+            "tn1": 473,
+            "tn2": 475,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 369084767042,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 369599946000,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 370119776417,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 370635924250,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 371152588125,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 371662238542,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 372176910292,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 372691347584,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 373204831542,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 373719193000,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 374229134500,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 374744662084,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 375258797375,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 375766270459,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 376277878834,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 376792973292,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 377307943500,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 377821183375,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 378335850042,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 378844239792,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 379358669417,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 379869374625,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 380384571000,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 380897109167,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 381413259959,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 381930892459,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 382442231584,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 382960696084,
+          "heights": {
+            "tn1": 473,
+            "tn2": 476,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 383475764292,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 383985010042,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 384498351625,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 385009374584,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 385527417792,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 386043388167,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 386558766709,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 387072260542,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 387587303709,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 388096283584,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 388607046125,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 389122697500,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 389632742750,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 390146499750,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 390657318209,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 391164047084,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 391678017917,
+          "heights": {
+            "tn1": 473,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 392189854000,
+          "heights": {
+            "tn1": 474,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a",
+        "tn2": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a",
+        "sv": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a"
+      }
+    },
+    {
+      "height": 478,
+      "hash": "08647c037883d39f8b4f3bd1403eab7b234814c7706dc2ea6b8198de461d8a41",
+      "header_hex": "00000020503de584ffab998fbaf4048b15752fa33ee1677d72fb1bbdb963687891bc165a6767eb95a4b87be5399201ee5d02df3134fa70a6b55818fc985664066ab427e0d1e9016bffff7f2001000000",
+      "bytes": 3268565,
+      "wire_sha256": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991",
+      "offered_ns": 392190882167,
+      "source_accepted_ns": 392825518125,
+      "receiver_polls": [
+        {
+          "read_ns": 392834438750,
+          "heights": {
+            "tn1": 474,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        },
+        {
+          "read_ns": 394035038834,
+          "heights": {
+            "tn1": 474,
+            "tn2": 477,
+            "scary_node": 478
+          }
+        },
+        {
+          "read_ns": 394547525584,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 478
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991",
+        "tn2": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991",
+        "sv": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991"
+      }
+    },
+    {
+      "height": 479,
+      "hash": "175f80b8a6166ac3b3d81ebfdeede8987d8d98a0b49c73edff5ac6601bf13aab",
+      "header_hex": "00000020418a1d46de98816beac26d70c71448237bab3e40d13b4f8b9fd38378037c6408efaa050a5318da8148aa8d97614839e728f5b14cf717b3003ee665210f99c1a6d2e9016bffff7f2000000000",
+      "bytes": 3268707,
+      "wire_sha256": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88",
+      "offered_ns": 394548467875,
+      "source_accepted_ns": 395131557334,
+      "receiver_polls": [
+        {
+          "read_ns": 395140259875,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 478
+          }
+        },
+        {
+          "read_ns": 396355227125,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 396867749084,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 397381792084,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 397899699042,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 398413225959,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 398922814792,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 399437133875,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 399953545375,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 400470501375,
+          "heights": {
+            "tn1": 475,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 400990365125,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88",
+        "tn2": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88",
+        "sv": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88"
+      }
+    },
+    {
+      "height": 480,
+      "hash": "50f4803510781e3ea03c48051298e1a28c0f44b63806b4206cf2351a21eb696c",
+      "header_hex": "00000020ab3af11b60c65affed739cb4a0988d7d98e8eddebf1ed8b3c36a16a6b8805f172c4182ee357deffcfb30bd873b898b45e1e26a825faea9511936ac69bbc3d74ed3e9016bffff7f2000000000",
+      "bytes": 3268570,
+      "wire_sha256": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95",
+      "offered_ns": 400992026584,
+      "source_accepted_ns": 401571300375,
+      "receiver_polls": [
+        {
+          "read_ns": 401579978667,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 479
+          }
+        },
+        {
+          "read_ns": 402786477084,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 403298957125,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 403807425667,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 404324888542,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 404840287834,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 405351926500,
+          "heights": {
+            "tn1": 476,
+            "tn2": 477,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 405867120584,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 406388990000,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 406907624625,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 407417348250,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 407935257959,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 408443127459,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 408957982959,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 409468037709,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 409983591750,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 410496990542,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 411007132459,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 411520467667,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 412038078500,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 412551544834,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 413068208709,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 413577436417,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 414090982000,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 414607510750,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 415126061875,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 415641309000,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 416156990167,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 416677842834,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 417196853584,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 417713020417,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 418231308750,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 418742506625,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 419251085459,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 419768289917,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 420279480667,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 420794796917,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 421309057459,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 421815588250,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 422323577000,
+          "heights": {
+            "tn1": 476,
+            "tn2": 478,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 422838237792,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 423358880792,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 423869098792,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 424378669917,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 424893299250,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 425408255417,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 425918242209,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 426436943292,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 426951767292,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 427470748792,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 427979419084,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 428496775042,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 429004076500,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 429519014042,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 430037936625,
+          "heights": {
+            "tn1": 476,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 430547098250,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95",
+        "tn2": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95",
+        "sv": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95"
+      }
+    },
+    {
+      "height": 481,
+      "hash": "34e24d6b8c2b13a336efac97fd7ea6149aba1f5e8f9ae692c08541042d4f35f0",
+      "header_hex": "000000206c69eb211a35f26c20b40638b6440f8ca2e1981205483ca03e1e78103580f450ca26fb8120e24dc0f84b4faa95de5f51155922ce9b692ea29aae77e426d1cc28d4e9016bffff7f2000000000",
+      "bytes": 3268733,
+      "wire_sha256": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9",
+      "offered_ns": 430547608834,
+      "source_accepted_ns": 431272842209,
+      "receiver_polls": [
+        {
+          "read_ns": 431282344917,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 480
+          }
+        },
+        {
+          "read_ns": 432462232209,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 432979458917,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 433489978959,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 434008186209,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 434524376917,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 435035951250,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 435547106292,
+          "heights": {
+            "tn1": 477,
+            "tn2": 479,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 436062161875,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 436570654875,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 437083719625,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 437599740417,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 438116007459,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 438624629875,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 439143691292,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 439660864500,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 440178916000,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 440693871584,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 441201218334,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 441717524542,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 442226007000,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 442734184375,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 443248236042,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 443758238125,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 444268347500,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 444783350792,
+          "heights": {
+            "tn1": 477,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 445301142084,
+          "heights": {
+            "tn1": 478,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9",
+        "tn2": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9",
+        "sv": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9"
+      }
+    },
+    {
+      "height": 482,
+      "hash": "048a7b66ad79236aa9300522d75218825a4fcb2dd6ae49fed5dbc9b69939f077",
+      "header_hex": "00000020f0354f2d044185c092e69a8f5e1fba9a14a67efd97acef36a3132b8c6b4de234842f7bcbb7aff698c4ab76965e00fcedf203fcfb21dcd88bf7a22e31219945f7d5e9016bffff7f2001000000",
+      "bytes": 3268672,
+      "wire_sha256": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69",
+      "offered_ns": 445301648709,
+      "source_accepted_ns": 445918607750,
+      "receiver_polls": [
+        {
+          "read_ns": 445928661000,
+          "heights": {
+            "tn1": 478,
+            "tn2": 480,
+            "scary_node": 481
+          }
+        },
+        {
+          "read_ns": 447150148375,
+          "heights": {
+            "tn1": 478,
+            "tn2": 480,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 447669001209,
+          "heights": {
+            "tn1": 478,
+            "tn2": 480,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 448180547292,
+          "heights": {
+            "tn1": 478,
+            "tn2": 480,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 448696857375,
+          "heights": {
+            "tn1": 478,
+            "tn2": 480,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 449208124542,
+          "heights": {
+            "tn1": 478,
+            "tn2": 480,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 449721423334,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 450233512542,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 450746356584,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 451260706209,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 451774092500,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 452283362459,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 452792118250,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 453311032667,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 453823850167,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 454339491084,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 454857614542,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 455373761250,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 455893067375,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 456409570584,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 456918016459,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 457430206917,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 457946722125,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 458458626500,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 458972851292,
+          "heights": {
+            "tn1": 478,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 459484170375,
+          "heights": {
+            "tn1": 479,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69",
+        "tn2": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69",
+        "sv": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69"
+      }
+    },
+    {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "header_hex": "0000002077f03999b6c9dbd5fe49aed62dcb4f5a821852d7220530a96a2379ad667b8a041698fa2286a7b7cf44dce24e1bb9ad2e5eb9cea409f6a09288cca4ec99d02ebcd6e9016bffff7f2001000000",
+      "bytes": 3268634,
+      "wire_sha256": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6",
+      "offered_ns": 459484687584,
+      "source_accepted_ns": 460090388250,
+      "receiver_polls": [
+        {
+          "read_ns": 460099735209,
+          "heights": {
+            "tn1": 479,
+            "tn2": 481,
+            "scary_node": 482
+          }
+        },
+        {
+          "read_ns": 461310891834,
+          "heights": {
+            "tn1": 479,
+            "tn2": 481,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 461829197167,
+          "heights": {
+            "tn1": 479,
+            "tn2": 481,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 462339511709,
+          "heights": {
+            "tn1": 479,
+            "tn2": 481,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 462849020334,
+          "heights": {
+            "tn1": 479,
+            "tn2": 481,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 463367279667,
+          "heights": {
+            "tn1": 479,
+            "tn2": 481,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 463881581709,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 464395142375,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 464909274334,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 465424023584,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 465942376167,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 466457739292,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 466969808459,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 467479449709,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 467991292584,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 468499279542,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 469017466750,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 469526518875,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 470045251417,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 470561227709,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 471068566667,
+          "heights": {
+            "tn1": 479,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        },
+        {
+          "read_ns": 471579324834,
+          "heights": {
+            "tn1": 480,
+            "tn2": 482,
+            "scary_node": 483
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6",
+        "tn2": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6",
+        "sv": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6"
+      }
+    }
+  ],
+  "scary_binary_sha256": "37607754e571e49da55c1206b793b5efb64669a585482cc155dce9074fbfdbf6",
+  "docker": {
+    "architecture": "aarch64",
+    "vcpus": 16,
+    "memory_bytes": 102380195840
+  }
+}
