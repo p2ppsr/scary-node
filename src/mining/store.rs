@@ -178,7 +178,7 @@ impl Mining {
 }
 
 impl Mining {
-    fn verify_restored_boundary(&self) -> Result<()> {
+    fn verify_restored_boundary(&mut self) -> Result<()> {
         ensure!(
             self.headers.is_empty() == self.height.is_none(),
             "checkpoint height and headers disagree"
@@ -217,6 +217,7 @@ impl Mining {
             );
             let (txs, err) = self.inspect_body(entry.height, header, &entry.raw)?;
             ensure!(!txs.is_empty() && err.is_none(), "invalid checkpoint body");
+            self.lifecycle.restore_subtree(hash256(header), &txs)?;
         }
         if let Some(solution) = &self.solution_body {
             let header = self.inspect_header(solution.height, &solution.raw)?;
@@ -224,8 +225,9 @@ impl Mining {
                 hash256(&header) == solution.hash,
                 "checkpoint solution hash mismatch"
             );
-            let (_, err) = self.inspect_body(solution.height, &header, &solution.raw)?;
+            let (txs, err) = self.inspect_body(solution.height, &header, &solution.raw)?;
             ensure!(err.is_none(), "invalid checkpoint solution body");
+            self.lifecycle.restore_subtree(solution.hash, &txs)?;
         }
         Ok(())
     }

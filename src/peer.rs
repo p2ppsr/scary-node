@@ -1,6 +1,7 @@
 //! Teranode v0.16.1 native peer, including go-p2p-message-bus envelope framing.
 mod assets;
 mod fetch;
+mod subtree;
 use assets::{AssetService, Assets};
 pub(crate) use fetch::public_ip;
 use fetch::valid_base;
@@ -75,6 +76,7 @@ pub enum Event {
     Subtree {
         peer: String,
         hash: String,
+        queue_full: bool,
     },
     Gap {
         hash: Option<String>,
@@ -195,6 +197,7 @@ async fn dispatch(
     topics: &Topics,
     events: &mpsc::Sender<Event>,
     fetch: Option<&fetch::Queue>,
+    subtrees: Option<&fetch::Queue>,
     sources: &mut HashMap<String, String>,
 ) -> Result<()> {
     let author = message.source.context("unsigned message")?.to_string();
@@ -233,10 +236,21 @@ async fn dispatch(
         );
         let hash = notice.hash.to_ascii_lowercase();
         if message.topic == topics.subtree.hash() {
+            let queue_full = subtrees.is_some_and(|queue| {
+                queue
+                    .offer(Request {
+                        hash: hash.clone(),
+                        height: 0,
+                        base: notice.data_hub_url,
+                        header: None,
+                    })
+                    .is_err()
+            });
             events
                 .send(Event::Subtree {
-                    peer: author.clone(),
+                    peer: author,
                     hash,
+                    queue_full,
                 })
                 .await?;
             return Ok(());
@@ -486,7 +500,7 @@ pub async fn run(
         config.asset_bind.is_some() == config.asset_url.is_some(),
         "Asset bind and advertised URL must be supplied together"
     );
-    let assets = AssetService::default();
+    let assets = AssetService::new(state.clone());
     if let (Some(bind), Some(base)) = (config.asset_bind, config.asset_url.as_ref()) {
         assets.serve(bind, base).await?;
     }
@@ -495,6 +509,9 @@ pub async fn run(
     } else {
         None
     };
+    let subtrees = config
+        .fetch_bodies
+        .then(|| fetch::Queue::start_subtrees(config.network.clone(), state.clone()));
     let mut identified = HashSet::<PeerId>::new();
     let mut retry = tokio::time::interval(Duration::from_secs(25));
     retry.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
@@ -591,7 +608,7 @@ pub async fn run(
                     }
                 }
                 SwarmEvent::Behaviour(BehaviourEvent::Gossip(gossipsub::Event::Message { message, .. })) => {
-                    if let Err(error) = dispatch(message, &topics, &events, fetch.as_ref(),&mut asset_sources).await {
+                    if let Err(error) = dispatch(message, &topics, &events, fetch.as_ref(),subtrees.as_ref(),&mut asset_sources).await {
                         if last_gossip_error.is_none_or(|t| t.elapsed() >= Duration::from_secs(30)) {
                             eprintln!("ignored invalid Teranode message: {error}");
                             last_gossip_error = Some(Instant::now());

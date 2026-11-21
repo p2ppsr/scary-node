@@ -32,11 +32,7 @@ pub(super) struct Job {
 
 impl Job {
     fn from_state(state: &Mining) -> Result<Option<Self>> {
-        if state.solved_on_tip
-            || !state.observation_window_ready()
-            || state.pending.is_empty()
-            || state.payout.is_empty()
-        {
+        if state.job_wait_reason().is_some() {
             return Ok(None);
         }
         let parent = state.headers.back().context("no parent")?;
@@ -157,6 +153,20 @@ impl Job {
 }
 
 impl Mining {
+    pub(super) fn job_wait_reason(&self) -> Option<&'static str> {
+        if !self.observation_window_ready() {
+            Some("observation window unready")
+        } else if self.solved_on_tip {
+            Some("awaiting independent observation after solving on the selected parent")
+        } else if self.payout.is_empty() {
+            Some("payout script absent")
+        } else if self.pending.is_empty() {
+            Some("no eligible pending transactions")
+        } else {
+            None
+        }
+    }
+
     fn worker_job(&mut self) -> Result<Option<Arc<Job>>> {
         if !self.observation_window_ready() || self.solved_on_tip {
             return Ok(None);
@@ -216,6 +226,13 @@ fn coinbase_parts(
     suffix.extend(payout);
     suffix.extend(0u32.to_le_bytes());
     (prefix, suffix)
+}
+
+pub(super) fn framing_bytes(height: u32, payout: &[u8], total_transactions: usize) -> usize {
+    let (prefix, suffix) = coinbase_parts(height, 0, payout, &[0; 32]);
+    let mut count = Vec::new();
+    wire::put_varint(&mut count, total_transactions);
+    80 + count.len() + prefix.len() + 8 + suffix.len()
 }
 
 fn four_hex(s: &Value) -> Result<[u8; 4]> {
@@ -306,9 +323,14 @@ fn share(
             hash: digest,
             raw: Arc::from(block.as_slice()),
         });
+        let subtree = (!job.branches.is_empty()).then(|| {
+            job.branches
+                .iter()
+                .fold([0xff; 32], |root, branch| wire::joined(root, *branch))
+        });
         state
             .lifecycle
-            .queue(digest, job.previous, job.height, job.id());
+            .queue(digest, job.previous, job.height, job.id(), subtree);
         state.solved_on_tip = true;
         state.solved_blocks += 1;
         state.revision += 1;

@@ -20,9 +20,16 @@ use std::{
         Arc,
     },
 };
-use tokio::{net::TcpListener, sync::RwLock};
+use tokio::{
+    net::TcpListener,
+    sync::{Mutex, RwLock},
+};
 
-type Store = Arc<RwLock<VecDeque<Arc<Assets>>>>;
+struct Store {
+    mining: Arc<Mutex<crate::mining::Mining>>,
+    cached: RwLock<VecDeque<Arc<Assets>>>,
+    rebuild: Mutex<()>,
+}
 
 pub(super) struct Assets {
     pub hash: String,
@@ -68,12 +75,12 @@ impl Assets {
         }
     }
 
-    pub fn new(height: u32, raw: Vec<u8>) -> Result<Self> {
+    pub fn new(height: u32, raw: impl Into<Bytes>) -> Result<Self> {
+        let raw = raw.into();
         ensure!(
             raw.len() <= body_limit(),
             "block exceeds the alpha Asset size limit"
         );
-        let raw = Bytes::from(raw);
         let mut remaining = &raw[..];
         let header = take(&mut remaining, 80)?;
         let count = varint(&mut remaining)?;
@@ -143,12 +150,22 @@ impl Assets {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub(super) struct AssetService {
-    store: Store,
+    store: Arc<Store>,
 }
 
 impl AssetService {
+    pub fn new(mining: Arc<Mutex<crate::mining::Mining>>) -> Self {
+        Self {
+            store: Arc::new(Store {
+                mining,
+                cached: RwLock::default(),
+                rebuild: Mutex::new(()),
+            }),
+        }
+    }
+
     pub async fn serve(&self, bind: SocketAddr, base: &str) -> Result<()> {
         let base = reqwest::Url::parse(base)?;
         ensure!(super::valid_base(&base), "invalid advertised Asset URL");
@@ -160,7 +177,7 @@ impl AssetService {
             .route("/subtree_data/{hash}", get(subtree_data))
             .route("/subtree/{hash}/txs", post(batch))
             .layer(DefaultBodyLimit::max(1024 * 1024))
-            .with_state(self.store.clone());
+            .with_state(self.clone());
         let path = base.path().trim_end_matches('/');
         let app = if path.is_empty() {
             routes
@@ -179,7 +196,7 @@ impl AssetService {
     }
 
     pub async fn insert(&self, asset: Arc<Assets>) {
-        let mut list = self.store.write().await;
+        let mut list = self.store.cached.write().await;
         list.retain(|old| old.hash != asset.hash);
         list.push_back(asset);
         while list.len() > 16 || list.iter().map(|a| a.raw.len()).sum::<usize>() > body_limit() {
@@ -192,22 +209,54 @@ fn binary(bytes: Bytes) -> Response {
     ([(header::CONTENT_TYPE, "application/octet-stream")], bytes).into_response()
 }
 
-async fn lookup(store: &Store, hash: &str, tree: bool) -> Option<Arc<Assets>> {
-    store
-        .read()
-        .await
-        .iter()
-        .rev()
-        .find(|a| {
-            if tree {
-                a.subtree.as_deref() == Some(hash)
-            } else {
-                a.hash == hash
-            }
-        })
-        .cloned()
+async fn lookup(service: &AssetService, key: &str, tree: bool) -> Option<Arc<Assets>> {
+    let resolve = async || {
+        service
+            .store
+            .mining
+            .lock()
+            .await
+            .requested_solution(key, tree)
+    };
+    let (id, _, _) = resolve().await?;
+    let hash = display_hash(id);
+    let cached = async || {
+        service
+            .store
+            .cached
+            .read()
+            .await
+            .iter()
+            .find(|a| a.hash == hash)
+            .cloned()
+    };
+    if let Some(asset) = cached().await {
+        return Some(asset);
+    }
+
+    // Coalesce cold reads. Building a subtree index can hash a large block.
+    // Only a locally retained, eligible solution can start this work.
+    let _building = service.store.rebuild.lock().await;
+    let (current, height, raw) = resolve().await?;
+    if current != id {
+        return None;
+    }
+    if let Some(asset) = cached().await {
+        return Some(asset);
+    }
+    let asset = Arc::new(
+        tokio::task::spawn_blocking(move || Assets::new(height, raw))
+            .await
+            .ok()?
+            .ok()?,
+    );
+    if resolve().await?.0 != id {
+        return None;
+    }
+    service.insert(asset.clone()).await;
+    Some(asset)
 }
-async fn block(State(store): State<Store>, Path(hash): Path<String>) -> Response {
+async fn block(State(store): State<AssetService>, Path(hash): Path<String>) -> Response {
     match lookup(&store, &hash, false).await {
         Some(a) => {
             a.requested(NativeAsset::Block);
@@ -216,14 +265,14 @@ async fn block(State(store): State<Store>, Path(hash): Path<String>) -> Response
         None => StatusCode::NOT_FOUND.into_response(),
     }
 }
-async fn block_header(State(store): State<Store>, Path(hash): Path<String>) -> Response {
+async fn block_header(State(store): State<AssetService>, Path(hash): Path<String>) -> Response {
     match lookup(&store, &hash, false).await {
         Some(a) => binary(a.raw.slice(..80)),
         None => StatusCode::NOT_FOUND.into_response(),
     }
 }
 async fn legacy(
-    State(store): State<Store>,
+    State(store): State<AssetService>,
     Path(hash): Path<String>,
     axum::extract::Query(query): axum::extract::Query<HashMap<String, String>>,
 ) -> Response {
@@ -235,7 +284,7 @@ async fn legacy(
     }
     binary(a.blkdat())
 }
-async fn subtree(State(store): State<Store>, Path(hash): Path<String>) -> Response {
+async fn subtree(State(store): State<AssetService>, Path(hash): Path<String>) -> Response {
     match lookup(&store, &hash, true).await {
         Some(a) => {
             a.requested(NativeAsset::Subtree);
@@ -244,7 +293,7 @@ async fn subtree(State(store): State<Store>, Path(hash): Path<String>) -> Respon
         None => StatusCode::NOT_FOUND.into_response(),
     }
 }
-async fn subtree_data(State(store): State<Store>, Path(hash): Path<String>) -> Response {
+async fn subtree_data(State(store): State<AssetService>, Path(hash): Path<String>) -> Response {
     match lookup(&store, &hash, true).await {
         Some(a) => {
             a.requested(NativeAsset::SubtreeData);
@@ -253,7 +302,11 @@ async fn subtree_data(State(store): State<Store>, Path(hash): Path<String>) -> R
         None => StatusCode::NOT_FOUND.into_response(),
     }
 }
-async fn batch(State(store): State<Store>, Path(hash): Path<String>, body: Bytes) -> Response {
+async fn batch(
+    State(store): State<AssetService>,
+    Path(hash): Path<String>,
+    body: Bytes,
+) -> Response {
     let Some(a) = lookup(&store, &hash, true).await else {
         return StatusCode::NOT_FOUND.into_response();
     };

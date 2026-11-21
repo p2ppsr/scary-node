@@ -43,10 +43,48 @@ pub(super) struct Queue {
 
 impl Queue {
     pub fn start(network: String, events: mpsc::Sender<Event>) -> Self {
+        let (queue, inbox) = Self::channel();
+        tokio::spawn(worker(network, inbox, queue.schedule.clone(), events));
+        queue
+    }
+
+    pub fn start_subtrees(
+        network: String,
+        state: Arc<tokio::sync::Mutex<crate::mining::Mining>>,
+    ) -> Self {
+        let (queue, mut inbox) = Self::channel();
+        let schedule = queue.schedule.clone();
+        tokio::spawn(async move {
+            while let Some(hash) = inbox.recv().await {
+                loop {
+                    let Some(request) = schedule
+                        .lock()
+                        .expect("subtree schedule")
+                        .next_source(&hash)
+                    else {
+                        break;
+                    };
+                    let result = super::subtree::receive(&network, &request, &state).await;
+                    match result {
+                        Ok(()) => {
+                            schedule
+                                .lock()
+                                .expect("subtree schedule")
+                                .mark_delivered(hash.clone());
+                            break;
+                        }
+                        Err(err) => eprintln!("transaction subtree {hash} unavailable: {err}"),
+                    }
+                }
+            }
+        });
+        queue
+    }
+
+    fn channel() -> (Self, mpsc::Receiver<String>) {
         let (ready, inbox) = mpsc::channel(MAX_QUEUED_HASHES);
         let schedule = Arc::new(Mutex::new(Schedule::default()));
-        tokio::spawn(worker(network, inbox, schedule.clone(), events));
-        Self { schedule, ready }
+        (Self { schedule, ready }, inbox)
     }
 
     pub fn offer(&self, request: Request) -> Result<()> {
@@ -134,8 +172,13 @@ pub(crate) fn public_ip(ip: IpAddr) -> bool {
     }
 }
 
-async fn fetch(network: &str, r: &Request) -> Result<crate::body::BlockBody> {
-    let mut url = Url::parse(&r.base)?;
+pub(super) async fn download(
+    network: &str,
+    base: &str,
+    path: &str,
+    query: Option<&str>,
+) -> Result<crate::body::BlockBody> {
+    let mut url = Url::parse(base)?;
     ensure!(valid_base(&url), "invalid advertised Asset base URL");
     let host = url
         .host_str()
@@ -161,18 +204,12 @@ async fn fetch(network: &str, r: &Request) -> Result<crate::body::BlockBody> {
         .read_timeout(Duration::from_secs(45))
         .connect_timeout(Duration::from_secs(8))
         .build()?;
-    let path = format!(
-        "{}/block_legacy/{}",
-        url.path().trim_end_matches('/'),
-        r.hash
-    );
-    url.set_path(&path);
-    // Teranode's no-query representation includes a blkdat-style eight-byte prefix.
-    url.set_query(Some("wire=1"));
+    url.set_path(&format!("{}/{path}", url.path().trim_end_matches('/')));
+    url.set_query(query);
     let res = client.get(url).send().await?.error_for_status()?;
     ensure!(
         res.content_length().unwrap_or(0) <= body_limit() as u64,
-        "block exceeds the alpha download limit"
+        "Asset response exceeds configured capacity"
     );
     let mut spool = crate::body::Spool::new(body_limit());
     let mut chunks = res.bytes_stream();
@@ -180,7 +217,18 @@ async fn fetch(network: &str, r: &Request) -> Result<crate::body::BlockBody> {
         let chunk = chunk?;
         spool.append(&chunk)?;
     }
-    let bytes = spool.finish()?;
+    spool.finish()
+}
+
+async fn fetch(network: &str, r: &Request) -> Result<crate::body::BlockBody> {
+    // The default legacy response includes blkdat framing; request just the wire block.
+    let bytes = download(
+        network,
+        &r.base,
+        &format!("block_legacy/{}", r.hash),
+        Some("wire=1"),
+    )
+    .await?;
     ensure!(bytes.len() > 80, "truncated Asset block");
     ensure!(
         display_hash(hash256(&bytes[..80])) == r.hash,

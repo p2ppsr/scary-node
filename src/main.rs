@@ -85,7 +85,7 @@ struct Args {
     /// Reachable base URL advertised for local assets, ending in /api/v1.
     #[arg(long, requires = "asset_bind")]
     asset_url: Option<String>,
-    /// File containing the operator API bearer token. Required for a mainnet non-loopback API.
+    /// File containing the operator API bearer token. Required for mainnet mining and a non-loopback mainnet API.
     #[arg(long)]
     operator_token_file: Option<PathBuf>,
     /// File containing the Stratum worker password. Required for mainnet mining.
@@ -108,6 +108,7 @@ struct PeerStats {
     statuses: u64,
     notices: u64,
     subtrees: u64,
+    subtree_queue_full: u64,
     gaps: u64,
     last_status: Option<Value>,
     tips: std::collections::BTreeMap<String, Value>,
@@ -193,7 +194,7 @@ async fn status(State(app): State<App>) -> Json<Value> {
     Json(json!({
         "network":app.network, "release":{"version":env!("CARGO_PKG_VERSION"), "executable_sha256":app.executable_sha256}, "mining":mining, "peer":{
             "connected_peer_ids_seen":p.seen.len(), "status_messages":p.statuses,
-            "block_notices":p.notices, "subtree_notices":p.subtrees, "coverage_gaps":p.gaps,
+            "block_notices":p.notices, "subtree_notices":p.subtrees, "subtree_queue_full":p.subtree_queue_full, "coverage_gaps":p.gaps,
             "last_peer_status":p.last_status, "last_block_notice":p.last_block,
             "last_published":p.last_published
         }
@@ -355,9 +356,17 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 p.last_block = Some(v.clone());
                 log(v);
             }
-            Event::Subtree { peer, hash } => {
-                app.peer.lock().await.subtrees += 1;
-                log(json!({"event":"subtree_notice","peer":peer,"hash":hash}));
+            Event::Subtree {
+                peer,
+                hash,
+                queue_full,
+            } => {
+                let mut p = app.peer.lock().await;
+                p.subtrees += 1;
+                p.subtree_queue_full += u64::from(queue_full);
+                log(
+                    json!({"event":"subtree_notice","peer":peer,"hash":hash,"queue_full":queue_full}),
+                );
             }
             Event::Block {
                 source,

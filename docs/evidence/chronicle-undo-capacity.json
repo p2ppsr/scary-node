@@ -1,0 +1,78 @@
+{
+  "binary_sha256": "12738b611c339879c9382014f0d6343d4cb4aae2324923a8aa187bc46eb059c0",
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "before": {
+    "height": 106,
+    "tip_hash": "666fe6ff95f8a3a0ac4670c50e238aa8e0a2181f650cdb1dfaade5a9e17d52a2",
+    "witnessed_outputs": 1,
+    "observation_window_ready": true,
+    "readiness_reasons": [],
+    "capacity": {
+      "block_bytes": 268435456,
+      "journal_bytes": 536870912,
+      "pending_bytes": 134217728,
+      "pending_transactions": 65536,
+      "transaction_bytes": 16777216,
+      "undo_items": 1,
+      "witnessed_outputs": 64
+    },
+    "suspended_reason": null
+  },
+  "exhausted": {
+    "height": 106,
+    "tip_hash": "666fe6ff95f8a3a0ac4670c50e238aa8e0a2181f650cdb1dfaade5a9e17d52a2",
+    "witnessed_outputs": 1,
+    "observation_window_ready": false,
+    "readiness_reasons": [
+      "body coverage interrupted"
+    ],
+    "capacity": {
+      "block_bytes": 268435456,
+      "journal_bytes": 536870912,
+      "pending_bytes": 134217728,
+      "pending_transactions": 65536,
+      "transaction_bytes": 16777216,
+      "undo_items": 1,
+      "witnessed_outputs": 64
+    },
+    "suspended_reason": "undo capacity exhausted; increase SCARY_MAX_UNDO_ITEMS and retry the body"
+  },
+  "restored": {
+    "capacity": {
+      "block_bytes": 268435456,
+      "journal_bytes": 536870912,
+      "pending_bytes": 134217728,
+      "pending_transactions": 65536,
+      "transaction_bytes": 16777216,
+      "undo_items": 2000000,
+      "witnessed_outputs": 64
+    },
+    "height": 106,
+    "observation_window_ready": false,
+    "readiness_reasons": [
+      "awaiting current tip from a connected data peer",
+      "body coverage interrupted"
+    ],
+    "tip_hash": "666fe6ff95f8a3a0ac4670c50e238aa8e0a2181f650cdb1dfaade5a9e17d52a2",
+    "witnessed_outputs": 1
+  },
+  "repaired": {
+    "height": 108,
+    "tip_hash": "0b151543bdb5f97a8ae2dbf502153ef957141496fbcf6e2ceb60b27914bea52a",
+    "witnessed_outputs": 5,
+    "observation_window_ready": true,
+    "readiness_reasons": [],
+    "capacity": {
+      "block_bytes": 268435456,
+      "journal_bytes": 536870912,
+      "pending_bytes": 134217728,
+      "pending_transactions": 65536,
+      "transaction_bytes": 16777216,
+      "undo_items": 2000000,
+      "witnessed_outputs": 64
+    },
+    "suspended_reason": null
+  },
+  "retrieved_parent": "3627d9825be6daffbd25c828329cb6622b1161bc6efccc091e9eddbdb3877a60",
+  "reference_tip": "0b151543bdb5f97a8ae2dbf502153ef957141496fbcf6e2ceb60b27914bea52a"
+}

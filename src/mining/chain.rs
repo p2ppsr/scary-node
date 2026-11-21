@@ -4,8 +4,6 @@ use num_bigint::BigUint;
 
 const REORG_DEPTH: usize = 8;
 const BUFFERED_BLOCKS: usize = 24;
-const HISTORY_BYTES: usize = 512 << 20;
-const UNDO_ITEMS: usize = 2_000_000;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub(super) struct AppliedBlock {
@@ -61,13 +59,13 @@ impl RecentChain {
 
     fn prune(&mut self) {
         while self.applied.len() > REORG_DEPTH
-            || self.applied.iter().map(|b| b.raw.len()).sum::<usize>() > HISTORY_BYTES
+            || self.applied.iter().map(|b| b.raw.len()).sum::<usize>() > capacity().journal_bytes
             || self
                 .applied
                 .iter()
                 .map(|b| b.applied.coins.len() + b.applied.spends.len())
                 .sum::<usize>()
-                > UNDO_ITEMS
+                > capacity().undo_items
         {
             self.applied.pop_front();
         }
@@ -77,7 +75,7 @@ impl RecentChain {
         self.buffered.retain(|b| b.hash != body.hash);
         self.buffered.push_back(body);
         while self.buffered.len() > BUFFERED_BLOCKS
-            || self.buffered.iter().map(|b| b.raw.len()).sum::<usize>() > HISTORY_BYTES
+            || self.buffered.iter().map(|b| b.raw.len()).sum::<usize>() > capacity().journal_bytes
         {
             self.buffered.pop_front();
         }

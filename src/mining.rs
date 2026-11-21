@@ -23,6 +23,10 @@ pub(crate) struct Capacity {
     pub block_bytes: usize,
     pub transaction_bytes: usize,
     pub witnessed_outputs: usize,
+    pub journal_bytes: usize,
+    pub undo_items: usize,
+    pub pending_transactions: usize,
+    pub pending_bytes: usize,
 }
 impl Capacity {
     fn load() -> Result<Self> {
@@ -45,7 +49,16 @@ impl Capacity {
             transaction_bytes <= block_bytes,
             "transaction capacity exceeds block capacity"
         );
+        let journal_bytes = read("SCARY_MAX_JOURNAL_BYTES", (512 << 20).max(block_bytes))?;
+        ensure!(
+            journal_bytes >= block_bytes,
+            "journal capacity must hold at least one maximum-sized block"
+        );
         Ok(Self {
+            journal_bytes,
+            undo_items: read("SCARY_MAX_UNDO_ITEMS", 2_000_000)?,
+            pending_transactions: read("SCARY_MAX_PENDING_TRANSACTIONS", 65_536)?,
+            pending_bytes: read("SCARY_MAX_PENDING_BYTES", (128 << 20).min(block_bytes))?,
             block_bytes,
             transaction_bytes,
             witnessed_outputs: read("SCARY_MAX_WITNESSED_OUTPUTS", 1_000_000)?,
@@ -70,8 +83,6 @@ pub(crate) fn transaction_limit() -> usize {
     capacity().transaction_bytes
 }
 const MAX_WATCHED: usize = 100_000;
-const MAX_PENDING: usize = 65_536;
-const MAX_CANDIDATE_TX_BYTES: usize = 128 << 20;
 const MAX_MONEY: u64 = 21_000_000 * 100_000_000;
 const HEADER_WINDOW: usize = 147;
 
@@ -108,8 +119,25 @@ struct SolvedBody {
     raw: Arc<[u8]>,
 }
 
+#[derive(Clone, Copy, Default, serde::Serialize)]
+struct IntakeCounts {
+    admitted: u64,
+    duplicate: u64,
+    ineligible: u64,
+}
+
+#[derive(Clone, Copy)]
+pub(crate) enum TxSource {
+    Sv,
+    Subtree,
+}
+
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Mining {
+    #[serde(skip)]
+    sv_intake: IntakeCounts,
+    #[serde(skip)]
+    subtree_intake: IntakeCounts,
     #[serde(skip)]
     path: Option<std::path::PathBuf>,
     #[serde(skip)]
@@ -220,8 +248,14 @@ impl Mining {
             payout_script.is_empty() || payout_script.len() <= 10_000,
             "payout script too long"
         );
+        ensure!(
+            !wire::p2sh(&payout_script),
+            "P2SH mining payout is ineligible under SV Node mining policy"
+        );
         Ok(Self {
             path: None,
+            sv_intake: IntakeCounts::default(),
+            subtree_intake: IntakeCounts::default(),
             mining_identity: [0; 32],
             storage_failure: None,
             solution_watch: solution_watch(),
@@ -277,7 +311,7 @@ impl Mining {
         Ok(())
     }
 
-    fn observation_window_ready(&self) -> bool {
+    pub(crate) fn observation_window_ready(&self) -> bool {
         self.peer_ready()
             && self.storage_failure.is_none()
             && clock_ready()
@@ -656,6 +690,24 @@ impl Mining {
             let _ = self.admit(&raw);
         }
     }
+    pub(crate) fn has_pending(&self, id: &Hash) -> bool {
+        self.pending.contains_key(id)
+    }
+
+    pub(crate) fn peer_tx(&mut self, source: TxSource, raw: &[u8]) {
+        let count = self.pending.len();
+        let result = self.submit_tx(raw);
+        let stats = match source {
+            TxSource::Sv => &mut self.sv_intake,
+            TxSource::Subtree => &mut self.subtree_intake,
+        };
+        match result {
+            Ok(_) if self.pending.len() > count => stats.admitted += 1,
+            Ok(_) => stats.duplicate += 1,
+            Err(_) => stats.ineligible += 1,
+        }
+    }
+
     pub fn submit_tx(&mut self, raw: &[u8]) -> Result<String> {
         ensure!(self.storage_failure.is_none(), "durable state write failed");
         ensure!(self.directives.ready(), "directive state is not ready");
@@ -679,15 +731,32 @@ impl Mining {
         if self.pending.contains_key(&id) {
             return Ok(wire::display_hash(id));
         }
+        let candidate_height = height.checked_add(1).context("height overflow")?;
+        let proposed_bytes = raw
+            .len()
+            .checked_add(self.pending_bytes)
+            .context("pending byte count overflow")?;
         ensure!(
-            self.pending.len() < MAX_PENDING
-                && raw.len() + self.pending_bytes <= MAX_CANDIDATE_TX_BYTES,
+            self.pending.len() < capacity().pending_transactions
+                && proposed_bytes <= capacity().pending_bytes,
             "candidate admission capacity reached"
         );
+        // Most offers fit without constructing a coinbase. Its largest scriptSig is
+        // 100 bytes. The rest of the transaction, header and count fit in 200 bytes
+        // in addition to the payout script. Near the boundary use the exact framing.
+        let remaining = body_limit()
+            .checked_sub(proposed_bytes)
+            .context("candidate exceeds local body capacity")?;
+        if remaining < 300 + self.payout.len() {
+            ensure!(
+                stratum::framing_bytes(candidate_height, &self.payout, self.pending.len() + 2)
+                    <= remaining,
+                "candidate exceeds local body capacity"
+            );
+        }
 
         let tx = Transaction::from_binary(&mut &raw[..])?;
         ensure!(tx.to_bytes()? == raw, "transaction serialization mismatch");
-        let candidate_height = height.checked_add(1).context("height overflow")?;
         ensure!(
             wire::final_under(raw, candidate_height, self.parent_median())? == Some(true),
             "transaction finality unresolved or non-final under mempool policy"
@@ -897,8 +966,11 @@ impl Mining {
             "connected_data_peers":self.live_peers.len(),"tip_confirmed_since_disconnect":self.confirmed_since_disconnect,"storage_failure":self.storage_failure,"clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,
             "mapped_bodies":mapped_count,"mapped_body_bytes":mapped_bytes,"capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
             "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "explicit_soft_freezes": self.soft_freezes.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
-            "observation_window_ready": self.observation_window_ready(), "headers": self.headers.len(), "awaiting_height": self.awaiting_height,
+            "observation_window_ready": self.observation_window_ready(),
+            "job_preconditions_met": self.job_wait_reason().is_none(), "job_wait_reason": self.job_wait_reason(), "solved_on_selected_parent": self.solved_on_tip,
+            "headers": self.headers.len(), "awaiting_height": self.awaiting_height,
             "witnessed_outputs": self.coins.len(), "omitted_outputs": self.omitted_outputs,
+            "peer_transaction_intake":{"sv":self.sv_intake,"teranode_subtree": self.subtree_intake},
             "pending_transactions": self.pending.len(), "accepted_shares": self.accepted_shares,
             "solved_blocks": self.solved_blocks, "suspended_reason": self.suspended_reason, "solutions": self.lifecycle.status()
         })

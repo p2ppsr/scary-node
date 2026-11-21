@@ -463,7 +463,8 @@ async fn honest_reorg_restores_witnessed_inputs_and_replaces_settlement_ancestry
     for child_first in [false, true] {
         let mut m = Mining::new(true, lock.to_binary()).unwrap();
         m.observe(155, &first).unwrap();
-        m.lifecycle.queue(a_id, anchor, 156, "first-branch".into());
+        m.lifecycle
+            .queue(a_id, anchor, 156, "first-branch".into(), None);
         m.observe(156, &a).unwrap();
         assert_eq!(
             m.outpoint(&funded.id().unwrap(), 0).unwrap()["consumed"],
@@ -613,6 +614,54 @@ fn checkpoint_restores_branch_and_refuses_corrupt_state() {
     std::fs::write(&f, bytes).unwrap();
     assert!(Mining::new(true, vec![]).unwrap().open_store(&dir).is_err());
     std::fs::remove_dir_all(&dir).unwrap();
+}
+
+#[test]
+fn retained_solution_subtree_migrates_and_expires_with_the_undo_body() {
+    let directory = tempfile::tempdir().unwrap();
+    let parent = [0x47; 32];
+    let payment = tx(&"11".repeat(32), 6000, LockingScript::from_binary(&[0x51]))
+        .to_bytes()
+        .unwrap();
+    let raw = make_block(parent, 250, std::slice::from_ref(&payment));
+    let id = hash256(&raw[..80]);
+    let hash = wire::display_hash(id);
+    let subtree = wire::display_hash(wire::merkle(vec![[0xff; 32], hash256(&payment)]).unwrap().0);
+    let mut state = Mining::new(true, vec![]).unwrap();
+    state.open_store(directory.path()).unwrap();
+    // Older solution records had no native subtree index.
+    state
+        .lifecycle
+        .queue(id, parent, 250, "legacy".into(), None);
+    state.observe(250, &raw).unwrap();
+    let next = make_block(id, 251, &[]);
+    state.observe(251, &next).unwrap();
+    state.save().unwrap();
+
+    let mut restored = Mining::new(true, vec![]).unwrap();
+    restored.open_store(directory.path()).unwrap();
+    assert_eq!(
+        restored
+            .requested_solution(&subtree, true)
+            .unwrap()
+            .2
+            .as_ref(),
+        raw
+    );
+    assert!(restored
+        .requested_solution(&wire::display_hash(hash256(&next[..80])), false)
+        .is_none());
+    restored.announced_height(252);
+    assert!(restored.requested_solution(&hash, false).is_none());
+    for height in 252..=258 {
+        let next = make_block(restored.tip().unwrap(), height, &[]);
+        restored.observe(height, &next).unwrap();
+        assert_eq!(
+            restored.requested_solution(&hash, false).is_some(),
+            height < 258
+        );
+    }
+    assert!(restored.requested_solution(&subtree, true).is_none());
 }
 
 #[tokio::test]

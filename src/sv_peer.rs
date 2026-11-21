@@ -18,6 +18,7 @@ use tokio::{
 };
 
 const VERSION: i32 = 70016;
+const EXTENDED_PAYLOAD_VERSION: i32 = 70016;
 fn magic(regtest: bool) -> [u8; 4] {
     if regtest {
         [0xda, 0xb5, 0xbf, 0xfa]
@@ -35,39 +36,107 @@ fn command(raw: &[u8]) -> Result<&str> {
     );
     Ok(std::str::from_utf8(&raw[..end])?)
 }
+const IO_PROGRESS: Duration = Duration::from_secs(10);
+
+fn frame_header(regtest: bool, name: &str, size: u64, checksum: [u8; 4]) -> Vec<u8> {
+    let mut cmd = [0u8; 12];
+    cmd[..name.len()].copy_from_slice(name.as_bytes());
+    let mut header = magic(regtest).to_vec();
+    if size > u64::from(u32::MAX) {
+        header.extend(*b"extmsg\0\0\0\0\0\0");
+        header.extend(u32::MAX.to_le_bytes());
+        header.extend([0; 4]);
+        header.extend(cmd);
+        header.extend(size.to_le_bytes());
+    } else {
+        header.extend(cmd);
+        header.extend((size as u32).to_le_bytes());
+        header.extend(checksum);
+    }
+    header
+}
+
+fn header_for(regtest: bool, name: &str, bytes: &[u8]) -> Vec<u8> {
+    let checksum = if bytes.len() <= u32::MAX as usize {
+        hash256(bytes)[..4].try_into().expect("four checksum bytes")
+    } else {
+        [0; 4]
+    };
+    frame_header(regtest, name, bytes.len() as u64, checksum)
+}
+
+async fn write_progress(
+    w: &mut (impl AsyncWrite + Unpin),
+    mut bytes: &[u8],
+    max_idle: Duration,
+) -> Result<()> {
+    while !bytes.is_empty() {
+        let n = tokio::time::timeout(max_idle, w.write(bytes)).await??;
+        ensure!(n != 0, "SV peer closed during send");
+        bytes = &bytes[n..];
+    }
+    Ok(())
+}
+
 async fn send(
     w: &mut (impl AsyncWrite + Unpin),
     regtest: bool,
     name: &str,
     body: &[u8],
 ) -> Result<()> {
-    let mut cmd = [0u8; 12];
-    cmd[..name.len()].copy_from_slice(name.as_bytes());
-    let mut header = magic(regtest).to_vec();
-    if body.len() >= u32::MAX as usize {
-        header.extend(*b"extmsg\0\0\0\0\0\0");
-        header.extend(u32::MAX.to_le_bytes());
-        header.extend([0; 4]);
-        header.extend(cmd);
-        header.extend((body.len() as u64).to_le_bytes());
-    } else {
-        header.extend(cmd);
-        header.extend((body.len() as u32).to_le_bytes());
-        header.extend(&hash256(body)[..4]);
-    }
-    tokio::time::timeout(Duration::from_secs(10), async {
-        w.write_all(&header).await?;
-        w.write_all(body).await?;
-        w.flush().await
-    })
-    .await??;
+    write_progress(w, &header_for(regtest, name, body), IO_PROGRESS).await?;
+    write_progress(w, body, IO_PROGRESS).await?;
+    tokio::time::timeout(IO_PROGRESS, w.flush()).await??;
     Ok(())
 }
+
+// A transfer holds immutable bytes. A peer waiting on TCP must not hold the
+// mining lock. Release the final byte only while its exact hash is still eligible.
+async fn send_block(
+    w: &mut tokio::net::tcp::OwnedWriteHalf,
+    regtest: bool,
+    peer: SocketAddr,
+    state: &Mutex<Mining>,
+    hash: &str,
+    raw: axum::body::Bytes,
+) -> Result<()> {
+    let (last, body) = raw.split_last().context("empty solution")?;
+    let header = header_for(regtest, "block", &raw);
+    write_progress(w, &header, IO_PROGRESS).await?;
+    for chunk in body.chunks(1 << 20) {
+        {
+            let s = state.lock().await;
+            ensure!(
+                s.observation_window_ready() && !s.directives.peer_banned(&peer.ip()),
+                "block delivery suspended"
+            );
+        }
+        write_progress(w, chunk, IO_PROGRESS).await?;
+    }
+    loop {
+        tokio::time::timeout(IO_PROGRESS, w.writable()).await??;
+        let s = state.lock().await;
+        ensure!(
+            !s.directives.peer_banned(&peer.ip()) && s.requested_solution(hash, false).is_some(),
+            "block retired during delivery"
+        );
+        match w.try_write(std::slice::from_ref(last)) {
+            Ok(1) => return Ok(()),
+            Ok(_) => anyhow::bail!("SV peer closed before block completion"),
+            Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => continue,
+            Err(e) => return Err(e.into()),
+        }
+    }
+}
+
 #[derive(Debug)]
-struct IncompleteBody(String);
+struct IncompleteBody {
+    hash: Option<String>,
+    reason: String,
+}
 impl std::fmt::Display for IncompleteBody {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.0)
+        f.write_str(&self.reason)
     }
 }
 impl std::error::Error for IncompleteBody {}
@@ -100,39 +169,57 @@ async fn receive(
     } else {
         limit.min(32 << 20)
     };
-    if cmd == "block" && n > cap as u64 {
-        return Err(IncompleteBody(format!(
-            "SV body of {n} bytes exceeds configured capacity {cap}"
-        ))
-        .into());
+    let mut prefix = Vec::with_capacity(80);
+    let failure = |prefix: &[u8], reason: String| -> anyhow::Error {
+        if cmd == "block" {
+            IncompleteBody {
+                hash: (prefix.len() == 80).then(|| wire::display_hash(hash256(prefix))),
+                reason,
+            }
+            .into()
+        } else {
+            anyhow::anyhow!(reason)
+        }
+    };
+    if n > cap as u64 {
+        return Err(failure(
+            &prefix,
+            format!("SV {cmd} of {n} bytes exceeds configured capacity {cap}"),
+        ));
     }
-    ensure!(n <= cap as u64, "SV peer message exceeds local capacity");
     let mut spool = crate::body::Spool::new(cap);
     let mut input = (&mut *r).take(n);
     let mut chunk = vec![0; 64 << 10];
-    loop {
-        let received = input.read(&mut chunk).await?;
+    let mut left = n;
+    while left != 0 {
+        // A quiet peer may legitimately send no new message for a long time.
+        // Once a header promises a body, require its stream to make progress.
+        let received = tokio::time::timeout(Duration::from_secs(30), input.read(&mut chunk))
+            .await
+            .map_err(|_| failure(&prefix, format!("SV {cmd} stopped mid-message")))?
+            .map_err(|e| failure(&prefix, format!("SV {cmd} read failed: {e}")))?;
         if received == 0 {
-            break;
+            return Err(failure(
+                &prefix,
+                format!("truncated SV {cmd} with {left} bytes outstanding"),
+            ));
         }
-        if let Err(error) = spool.append(&chunk[..received]) {
-            return Err(if cmd == "block" {
-                IncompleteBody(format!("SV body spool failed: {error}")).into()
-            } else {
-                error
-            });
+        if cmd == "block" && prefix.len() < 80 {
+            prefix.extend_from_slice(&chunk[..received.min(80 - prefix.len())]);
         }
+        spool
+            .append(&chunk[..received])
+            .map_err(|e| failure(&prefix, format!("SV {cmd} spool failed: {e}")))?;
+        left -= received as u64;
     }
-    let body = spool.finish().map_err(|e| {
-        if cmd == "block" {
-            anyhow::Error::new(IncompleteBody(format!("SV body spool failed: {e}")))
-        } else {
-            e
-        }
-    })?;
-    ensure!(body.len() as u64 == n, "truncated SV peer message");
-    if !ext {
-        ensure!(hash256(&body)[..4] == h[20..24], "SV message checksum");
+    let body = spool
+        .finish()
+        .map_err(|e| failure(&prefix, format!("SV {cmd} spool failed: {e}")))?;
+    if !ext && hash256(&body)[..4] != h[20..24] {
+        return Err(failure(
+            &prefix,
+            format!("SV {cmd} message checksum mismatch"),
+        ));
     }
     Ok((cmd, body))
 }
@@ -151,6 +238,50 @@ fn version(height: u32) -> Vec<u8> {
     raw.extend(height.to_le_bytes());
     raw.push(1);
     raw
+}
+fn header_locator(parent: Hash) -> Vec<u8> {
+    let mut locator = VERSION.to_le_bytes().to_vec();
+    locator.push(1);
+    locator.extend(parent);
+    locator.extend([0; 32]);
+    locator
+}
+
+// An SV peer commonly suppresses an announcement back to the peer that sent
+// it the block. Query the active branch without repeatedly publishing work.
+struct SolutionReadback {
+    parent: Hash,
+    hash: Hash,
+    height: u32,
+    attempts: usize,
+    reported_active: bool,
+    next: tokio::time::Instant,
+}
+
+impl SolutionReadback {
+    fn new(parent: Hash, hash: Hash, height: u32) -> Self {
+        Self {
+            parent,
+            hash,
+            height,
+            attempts: 0,
+            reported_active: false,
+            next: tokio::time::Instant::now() + Duration::from_secs(1),
+        }
+    }
+
+    fn due(&mut self, now: tokio::time::Instant) -> bool {
+        // An immediate first read can race the receiver's block validation.
+        const RETRY_DELAYS: [u64; 4] = [2, 4, 8, 16];
+        if self.attempts > RETRY_DELAYS.len() || now < self.next {
+            return false;
+        }
+        if let Some(delay) = RETRY_DELAYS.get(self.attempts) {
+            self.next = now + Duration::from_secs(*delay);
+        }
+        self.attempts += 1;
+        true
+    }
 }
 fn inventory(kind: u32, hash: Hash) -> Vec<u8> {
     let mut p = vec![1];
@@ -242,7 +373,7 @@ pub async fn discover(
                 in_use.remove(&addr);
                 events.send(Event::Disconnected(format!("sv:{addr}"))).await?;
                 if let Err(e)=result{
-                    if e.downcast_ref::<IncompleteBody>().is_some(){events.send(Event::Gap { hash: None, reason: e.to_string() }).await?;}
+                    if let Some(gap)=e.downcast_ref::<IncompleteBody>(){events.send(Event::Gap { hash: gap.hash.clone(), reason: e.to_string() }).await?;}
                     eprintln!("discovered SV peer {addr} disconnected: {e}");
                 }
             }
@@ -259,10 +390,10 @@ pub async fn run(
     loop {
         if !state.lock().await.directives.peer_banned(&addr.ip()) {
             if let Err(e) = session(addr, regtest, &state, &events).await {
-                if e.downcast_ref::<IncompleteBody>().is_some() {
+                if let Some(gap) = e.downcast_ref::<IncompleteBody>() {
                     events
                         .send(Event::Gap {
-                            hash: None,
+                            hash: gap.hash.clone(),
                             reason: e.to_string(),
                         })
                         .await?;
@@ -312,45 +443,68 @@ async fn session(
     let _guard = Abort(reader);
     let mut prefers_headers = false;
     let mut advertised = None;
+    let mut readback: Option<SolutionReadback> = None;
     let mut last_repair = tokio::time::Instant::now();
     let mut handshake = false;
+    let handshake_deadline = tokio::time::Instant::now() + Duration::from_secs(15);
     let mut saw_version = false;
+    let mut peer_version = 0;
     let mut probe = None;
     let mut solved = state.lock().await.subscribe_solutions();
     let mut due = tokio::time::interval(Duration::from_secs(1));
     loop {
         tokio::select! {
+            _=tokio::time::sleep_until(handshake_deadline), if !handshake=>{
+                anyhow::bail!("SV peer did not complete its handshake")
+            }
             _=async { tokio::select! { _=due.tick()=>{}, _=solved.changed()=>{} } }=>{
                 let s=state.lock().await;
                 ensure!(!s.directives.peer_banned(&addr.ip()),"peer banned");
-                if handshake && last_repair.elapsed()>=Duration::from_secs(3) {
-                    let missing=s.missing_recent();last_repair=tokio::time::Instant::now();
-                    for (id,_) in missing{send(&mut w,regtest,"getdata",&inventory(2,id)).await?;}
-                }
-                if handshake {if let Some(hash)=s.relayable_solution(){
+                let missing = if handshake && last_repair.elapsed()>=Duration::from_secs(3) {
+                    last_repair=tokio::time::Instant::now();
+                    s.missing_recent()
+                } else { Vec::new() };
+                let offer = if handshake { s.relayable_solution() } else { None };
+                drop(s);
+                for (id,_) in missing{send(&mut w,regtest,"getdata",&inventory(2,id)).await?;}
+                if handshake {if let Some(hash)=offer{
                     if advertised!=Some(hash){
-                        let raw=s.solution_bytes(&hash).expect("selected stored solution");
+                        let hash_name = wire::display_hash(hash);
+                        let Some((_, height, raw)) = state.lock().await.requested_solution(&hash_name, false) else {continue};
                         if prefers_headers {
                             let mut payload=vec![1];payload.extend(&raw[..80]);payload.push(0);
                             send(&mut w,regtest,"headers",&payload).await?;
                         } else {send(&mut w,regtest,"inv",&inventory(2,hash)).await?;}
-                        send(&mut w,regtest,"block",raw).await?;
+                        let parent = raw[4..36].try_into()?;
+                        if raw.len() > u32::MAX as usize && peer_version < EXTENDED_PAYLOAD_VERSION {
+                            advertised = Some(hash);
+                            events.send(Event::Delivery{peer:format!("sv:{addr}"),hash:hash_name,direction:"peer_lacks_extended_framing"}).await?;
+                            continue;
+                        }
+                        send_block(&mut w,regtest,addr,state,&hash_name,raw).await?;
                         advertised=Some(hash);
-                        drop(s);
+                        readback = Some(SolutionReadback::new(parent, hash, height));
                         events.send(Event::Delivery{peer:format!("sv:{addr}"),hash:wire::display_hash(hash),direction:"sent_body"}).await?;
+                    } else if let Some(check) = &mut readback {
+                        if check.hash == hash && check.due(tokio::time::Instant::now()) {
+                            probe = Some((check.parent, hash, check.height));
+                            send(&mut w, regtest, "getheaders", &header_locator(check.parent)).await?;
+                            events.send(Event::Delivery {
+                                peer: format!("sv:{addr}"), hash: wire::display_hash(hash),
+                                direction: "requested_active_headers",
+                            }).await?;
+                        }
                     }
-                }else{advertised=None;}}
+                }else{advertised=None;readback=None;}}
             }
             incoming=rx.recv()=>{
                 let (cmd,body)=incoming.context("SV connection closed")??;
                 match cmd.as_str(){
-                    "version"=>{ensure!(!saw_version && body.len()>=80,"invalid SV handshake");saw_version=true;send(&mut w,regtest,"verack",&[]).await?;}
+                    "version"=>{ensure!(!saw_version && body.len()>=80,"invalid SV handshake");saw_version=true;peer_version=i32::from_le_bytes(body[..4].try_into()?);send(&mut w,regtest,"verack",&[]).await?;}
                     "verack"=>{ensure!(saw_version && !handshake && body.is_empty(),"unexpected verack");handshake=true;events.send(Event::Connected(format!("sv:{addr}"))).await?;
                         probe=state.lock().await.header_probe();
                         if let Some((parent,_,_))=probe {
-                            let mut locator=VERSION.to_le_bytes().to_vec();
-                            locator.push(1);locator.extend(parent);locator.extend([0u8;32]);
-                            send(&mut w,regtest,"getheaders",&locator).await?;
+                            send(&mut w, regtest, "getheaders", &header_locator(parent)).await?;
                         }}
                     "sendheaders" if handshake && body.is_empty()=>{prefers_headers=true;}
                     "getheaders" if handshake=>{
@@ -383,18 +537,31 @@ async fn session(
                             }
                         }
                         probe=None;
+                        ensure!(input.is_empty(),"trailing header bytes");
                         if let Some((tip,height))=last {
+                            if let Some(check) = readback.as_mut().filter(|r| r.hash == tip) {
+                                check.reported_active = true;
+                                if req.is_empty() { readback = None; }
+                            }
                             events.send(Event::Status{peer:format!("sv:{addr}"),height,hash:wire::display_hash(tip)}).await?;
                         }
-                        ensure!(input.is_empty(),"trailing header bytes");
                         for id in req{send(&mut w,regtest,"getdata",&inventory(2,id)).await?;}
                     }
                     "ping" if body.len()==8=>send(&mut w,regtest,"pong",&body).await?,
                     "inv" if handshake=>{let mut req=Vec::new();let mut count=0;
-                        for (kind,hash) in items(&body)?{if kind==1 || kind==2{req.extend(kind.to_le_bytes());req.extend(hash);count+=1;}}
+                        {
+                            let entries = items(&body)?;
+                            let s = state.lock().await;
+                            let mut unique = std::collections::HashSet::new();
+                            for (kind, hash) in entries {
+                                if (kind == 2 || (kind == 1 && !s.has_pending(&hash))) && unique.insert((kind, hash)) {
+                                    req.extend(kind.to_le_bytes()); req.extend(hash); count += 1;
+                                }
+                            }
+                        }
                         if count>0{let mut packed=Vec::new();wire::put_varint(&mut packed,count);packed.extend(req);send(&mut w,regtest,"getdata",&packed).await?;}
                     }
-                    "tx" if handshake=>{let _=state.lock().await.submit_tx(&body);}
+                    "tx" if handshake=>{state.lock().await.peer_tx(crate::mining::TxSource::Sv, &body);}
                     "block" if handshake=>{
                         let header = body.get(..80).context("short SV block header")?;
                         let hash = hash256(header);
@@ -422,19 +589,136 @@ async fn session(
                         }
                         let hash=wire::display_hash(hash);let (ack,done)=tokio::sync::oneshot::channel();
                         events.send(Event::Block{height,source:format!("sv:{addr}"),raw:body,validated:ack}).await?;
-                        if done.await.unwrap_or(false){events.send(Event::Delivery{peer:format!("sv:{addr}"),hash,direction:"received_body"}).await?;}
+                        if done.await.unwrap_or(false) {
+                            if readback.as_ref().is_some_and(|r| r.reported_active && wire::display_hash(r.hash) == hash) {
+                                readback = None;
+                            }
+                            events.send(Event::Delivery{peer:format!("sv:{addr}"),hash,direction:"received_body"}).await?;
+                        }
                     }
                     "getdata" if handshake=>{
                         for (kind,id) in items(&body)?{
-                            let s=state.lock().await;
-                            if kind==2 && s.relayable_solution()==Some(id){
-                                if let Some(raw)=s.solution_bytes(&id){send(&mut w,regtest,"block",raw).await?;drop(s);events.send(Event::Delivery{peer:format!("sv:{addr}"),hash:wire::display_hash(id),direction:"sent_body"}).await?;}
-                            }else {drop(s);send(&mut w,regtest,"notfound",&inventory(kind,id)).await?;}
+                            let hash = wire::display_hash(id);
+                            let s = state.lock().await;
+                            ensure!(!s.directives.peer_banned(&addr.ip()), "peer banned");
+                            if kind == 2 {
+                                if let Some((_, _, raw)) = s.requested_solution(&hash, false) {
+                                    drop(s);
+                                    if raw.len() > u32::MAX as usize && peer_version < EXTENDED_PAYLOAD_VERSION {
+                                        send(&mut w, regtest, "notfound", &inventory(kind,id)).await?;
+                                        continue;
+                                    }
+                                    send_block(&mut w, regtest, addr, state, &hash, raw).await?;
+                                    events.send(Event::Delivery {
+                                        peer: format!("sv:{addr}"), hash, direction: "sent_body",
+                                    }).await?;
+                                    continue;
+                                }
+                            }
+                            drop(s);
+                            send(&mut w, regtest, "notfound", &inventory(kind,id)).await?;
                         }
                     }
                     _=>{}
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn active_header_readback_has_five_timed_attempts_per_solution() {
+        let mut check = SolutionReadback::new([1; 32], [2; 32], 18);
+        let first = check.next;
+        for (seconds, expected) in [
+            (0, true),
+            (1, false),
+            (2, true),
+            (5, false),
+            (6, true),
+            (13, false),
+            (14, true),
+            (29, false),
+            (30, true),
+            (600, false),
+        ] {
+            assert_eq!(check.due(first + Duration::from_secs(seconds)), expected);
+        }
+        let locator = header_locator(check.parent);
+        assert_eq!(locator[4], 1);
+        assert_eq!(locator[5..37], check.parent);
+        assert_eq!(locator[37..], [0; 32]);
+    }
+}
+
+#[cfg(test)]
+mod frame_tests {
+    use super::*;
+
+    #[test]
+    fn sv_reference_extends_only_lengths_above_uint32_max() {
+        let max = u64::from(u32::MAX);
+        let regular = frame_header(true, "block", max, [1, 2, 3, 4]);
+        assert_eq!(regular.len(), 24);
+        assert_eq!(command(&regular[4..16]).unwrap(), "block");
+        assert_eq!(&regular[16..20], &u32::MAX.to_le_bytes());
+        assert_eq!(&regular[20..24], &[1, 2, 3, 4]);
+        let extended = frame_header(true, "block", max + 1, [1, 2, 3, 4]);
+        assert_eq!(extended.len(), 44);
+        assert_eq!(command(&extended[4..16]).unwrap(), "extmsg");
+        assert_eq!(&extended[16..20], &u32::MAX.to_le_bytes());
+        assert_eq!(&extended[20..24], &[0; 4]);
+        assert_eq!(command(&extended[24..36]).unwrap(), "block");
+        assert_eq!(&extended[36..44], &(max + 1).to_le_bytes());
+    }
+
+    #[tokio::test]
+    async fn healthy_partial_writes_can_span_several_idle_intervals() {
+        let (mut sender, mut receiver) = tokio::io::duplex(1);
+        let idle = Duration::from_millis(300);
+        let start = tokio::time::Instant::now();
+        let (sent, bytes) = tokio::join!(write_progress(&mut sender, &[42; 16], idle), async {
+            let mut bytes = [0; 16];
+            for byte in &mut bytes {
+                *byte = receiver.read_u8().await.unwrap();
+                tokio::time::sleep(Duration::from_millis(30)).await;
+            }
+            bytes
+        });
+        sent.unwrap();
+        assert_eq!(bytes, [42; 16]);
+        assert!(start.elapsed() > idle);
+    }
+
+    #[tokio::test]
+    async fn interrupted_body_is_attributed_only_after_its_entire_header_arrives() {
+        let raw = [71; 128];
+        for size in [29, 80, 100] {
+            let mut input = header_for(true, "block", &raw);
+            input.extend_from_slice(&raw[..size]);
+            let gap = receive(&mut &input[..], true, 2048)
+                .await
+                .unwrap_err()
+                .downcast::<IncompleteBody>()
+                .unwrap();
+            assert_eq!(
+                gap.hash,
+                (size >= 80).then(|| wire::display_hash(hash256(&raw[..80])))
+            );
+            assert!(gap.reason.contains("truncated SV block"));
+        }
+        let (mut reader, mut writer) = tokio::io::duplex(7);
+        let (send_result, received) = tokio::join!(
+            send(&mut writer, true, "block", &raw),
+            receive(&mut reader, true, 2048),
+        );
+        send_result.unwrap();
+        let (name, body) = received.unwrap();
+        assert_eq!(name, "block");
+        assert_eq!(&*body, &raw);
     }
 }

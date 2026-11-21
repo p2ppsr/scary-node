@@ -14,7 +14,7 @@ from sv_reference import Reference, IMAGE
 
 
 @contextlib.contextmanager
-def observer(binary, peer, directory, port, budget):
+def observer(binary, peer, directory, port, budget, undo_budget=None):
     with (directory / "log").open("ab") as log:
         proc = subprocess.Popen(
             [
@@ -29,7 +29,15 @@ def observer(binary, peer, directory, port, budget):
                 "--data-dir",
                 str(directory / "state"),
             ],
-            env={**os.environ, "SCARY_MAX_WITNESSED_OUTPUTS": str(budget)},
+            env={
+                **os.environ,
+                "SCARY_MAX_WITNESSED_OUTPUTS": str(budget),
+                **(
+                    {"SCARY_MAX_UNDO_ITEMS": str(undo_budget)}
+                    if undo_budget is not None
+                    else {}
+                ),
+            },
             stdout=log,
             stderr=log,
         )
@@ -40,7 +48,7 @@ def observer(binary, peer, directory, port, budget):
             proc.wait(timeout=15)
 
 
-def run(binary, directory):
+def run(binary, directory, undo=False):
     with Reference().running(peer=True) as n:
         n.rpc("generate", 105)
         port = get_port()
@@ -51,8 +59,9 @@ def run(binary, directory):
             return response(url)["mining"]
 
         def capture():
+            current = view()
             return {
-                k: view()[k]
+                k: current[k]
                 for k in (
                     "height",
                     "tip_hash",
@@ -60,10 +69,13 @@ def run(binary, directory):
                     "observation_window_ready",
                     "readiness_reasons",
                     "capacity",
+                    "suspended_reason",
                 )
             }
 
-        with observer(binary, peer, directory, port, 1):
+        with observer(
+            binary, peer, directory, port, 64 if undo else 1, 1 if undo else None
+        ):
             until(
                 lambda: response(url)["peer"]["connected_peer_ids_seen"],
                 "first handshake",
@@ -71,6 +83,10 @@ def run(binary, directory):
             first = n.rpc("generate", 1)[0]
             until(lambda: view()["tip_hash"] == first, "initial committed boundary")
             before = capture()
+            additional_outputs = 0
+            if undo:
+                payment = n.rpc("sendtoaddress", n.rpc("getnewaddress"), 1)
+                additional_outputs = len(n.rpc("getrawtransaction", payment, 1)["vout"])
             missing = n.rpc("generate", 1)[0]
             until(
                 lambda: (
@@ -80,6 +96,9 @@ def run(binary, directory):
                 "visible resource exhaustion",
             )
             blocked = capture()
+            if undo:
+                assert "undo capacity exhausted" in blocked["suspended_reason"]
+                assert blocked["capacity"]["undo_items"] == 1
             assert (
                 blocked["tip_hash"] == first
                 and blocked["witnessed_outputs"] == before["witnessed_outputs"]
@@ -107,7 +126,7 @@ def run(binary, directory):
             )
             repaired = capture()
             assert (
-                repaired["witnessed_outputs"] == 3
+                repaired["witnessed_outputs"] == 3 + additional_outputs
                 and n.rpc("getblockhash", 107) == missing
             )
         return {
@@ -126,7 +145,10 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("receipt", type=Path)
     p.add_argument("--binary", type=Path, default=ROOT / "target/release/scary-node")
+    p.add_argument(
+        "--undo", action="store_true", help="exercise the per-block undo budget"
+    )
     a = p.parse_args()
     with tempfile.TemporaryDirectory() as td:
-        result = run(a.binary, Path(td))
+        result = run(a.binary, Path(td), a.undo)
     a.receipt.write_text(json.dumps(result, indent=2) + "\n")

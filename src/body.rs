@@ -37,6 +37,12 @@ impl Deref for BlockBody {
     }
 }
 
+impl AsRef<[u8]> for BlockBody {
+    fn as_ref(&self) -> &[u8] {
+        self
+    }
+}
+
 pub struct Spool {
     ram: Vec<u8>,
     file: Option<BufWriter<File>>,
@@ -96,7 +102,9 @@ impl Spool {
 }
 impl Serialize for BlockBody {
     fn serialize<S: Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
-        if self.len() <= u32::MAX as usize {
+        // Bound the decoder's largest allocation even when the whole checkpoint is read
+        // from a non-seekable stream. Legacy single-binary bodies still decode.
+        if self.len() <= RAM_BYTES {
             return s.serialize_bytes(self);
         }
         let chunks = self.chunks(RAM_BYTES);
@@ -155,6 +163,13 @@ mod tests {
         let restored: BlockBody = rmp_serde::from_slice(&encoded).unwrap();
         assert_eq!(&*b, &*restored);
         assert!(matches!(restored, BlockBody::File(_)));
-        assert_eq!(rmp_serde::to_vec(&b).unwrap(), encoded);
+        let chunked = rmp_serde::to_vec(&b).unwrap();
+        let chunks: Vec<serde_bytes::ByteBuf> = rmp_serde::from_slice(&chunked).unwrap();
+        assert_eq!(chunks.len(), 2);
+        assert_eq!(chunks[0].len(), RAM_BYTES);
+        assert_eq!(chunks[1].len(), part.len());
+        let restored: BlockBody = rmp_serde::from_read(chunked.as_slice()).unwrap();
+        assert!(matches!(restored, BlockBody::File(_)));
+        assert_eq!(restored.as_ref(), b.as_ref());
     }
 }

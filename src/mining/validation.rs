@@ -507,6 +507,10 @@ impl Mining {
                         }
                     }
                 })?;
+                ensure!(
+                    undo.len().saturating_add(spent_changes.len()) <= capacity().undo_items,
+                    "undo capacity exhausted; increase SCARY_MAX_UNDO_ITEMS and retry the body"
+                );
                 ensure!(omitted == 0, "witnessed-output capacity exhausted; increase SCARY_MAX_WITNESSED_OUTPUTS and retry the body");
             }
             let reward = reward.ok_or(InvalidBody("coinbase value exceeds money range"))?;
