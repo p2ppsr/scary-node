@@ -100,7 +100,15 @@ class Reference:
         self.ready()
 
     @contextlib.contextmanager
-    def running(self, peer=False, network="bridge", fast_rpc=False):
+    def running(
+        self,
+        peer=False,
+        network="bridge",
+        fast_rpc=False,
+        *,
+        block_bytes=20_000_000,
+        tmpfs_bytes=None,
+    ):
         networking = (
             ["--network", network, "--publish", "127.0.0.1::18444"]
             if peer
@@ -121,8 +129,11 @@ class Reference:
             *networking,
             "--name",
             self.container,
-            "--volume",
-            "/data",
+            *(
+                ["--volume", "/data"]
+                if tmpfs_bytes is None
+                else ["--tmpfs", f"/data:size={tmpfs_bytes}"]
+            ),
             "--entrypoint",
             "bitcoind",
             IMAGE,
@@ -135,7 +146,7 @@ class Reference:
             "-discover=0",
             "-genesisactivationheight=1",
             "-chronicleactivationheight=2",
-            "-excessiveblocksize=20000000",
+            f"-excessiveblocksize={block_bytes}",
             "-maxstackmemoryusageconsensus=100000000",
             "-txindex=1",
             "-acceptnonstdtxn=1",

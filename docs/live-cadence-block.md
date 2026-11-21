@@ -51,3 +51,18 @@ Verify the shipped receipt offline, or export the evidence for a new completed r
 .native/py/bin/python qualification/verify_live_cadence.py docs/evidence/chronicle-live-cadence-result.json.gz
 .native/py/bin/python qualification/verify_live_cadence.py cadence-run --export my-cadence-result.json.gz
 ```
+
+## Restart and independent chain replay
+
+After settlement, the entrant restarted on its original volume. It restored **69,671 witnessed outputs** and the same 38 consecutive validation records from height 450 through 487. The restored record for height 485 includes all 1,800,000 signature and value checks. The signed directive sequence and cumulative work over the window also matched the pre-stop state. All four nodes reported the same final hash, and the stock SV mempool was empty. A supplemental setup check initially read the default lab ports. It stopped before restarting any service. The recovery driver now verifies both cadence port pairs before opening the lab. [Checkpoint and independent replay](evidence/chronicle-live-cadence-restore.json.gz)
+
+A second, empty SV Node v1.2.3 replayed heights 1 through 484 from the public dataset. It requested the 359 MB block over native P2P, validated it and served the identical bytes on a fresh connection. It then accepted both archived successor bodies and reached the exact height-487 hash recorded by the restored entrant. This replay used a temporary 4 GiB RAM filesystem. The four-node performance result above used the original disk-backed stores.
+
+For the process restart, use the eight paused services of the completed cadence run. The capture command temporarily resumes them, restarts the entrant, saves both exact successor bodies and returns the services to their paused state. For the independent replay, use an empty reference container and the public history, signed corpus and reconstructed fixture from the reproduction steps above. Choose fresh paths for new receipts.
+
+```sh
+.native/py/bin/python qualification/cadence_recovery.py capture cadence-run restored.json
+.native/py/bin/python qualification/cadence_recovery.py replay workload/paired-corpus workload/sustained-signed cadence.block restored.json fresh-stock.json
+.native/py/bin/python qualification/cadence_recovery.py verify restored.json fresh-stock.json --measured my-cadence-result.json.gz
+.native/py/bin/python qualification/cadence_recovery.py verify docs/evidence/chronicle-live-cadence-restore.json.gz
+```
