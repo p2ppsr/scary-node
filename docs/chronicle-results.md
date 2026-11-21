@@ -11,6 +11,8 @@ The four extra consensus acceptances in the signature corpus show why policy and
 
 A separate fresh-volume run put two Teranode v0.16.1 peers on an isolated Docker network. Scary Node joined at height 101 with one contemporary header, mined an ordinary payment at height 104, and both reference processes served the identical body and adopted a successor. The block hash was `36ae4c568778ca3a2f0d8f71c6cd0bd850ca1a9b5d3906abc203d17a05882afc`. This test evaluates the native Teranode publication path. The same-byte DAR interoperability run requires matching directive state on the receiving Teranode. [Teranode receipt](evidence/chronicle-teranode-proof.json)
 
+The directive race used two fresh isolated SV Node processes and actual network-target Stratum submissions. With the signed freeze durably applied first, the worker lost the job, the solution queue stayed empty and SV Node stayed on its original parent. With delivery completed first, SV Node adopted the exact candidate before the freeze arrived. These are forced orderings at the two boundaries. [Directive receipts and peer dispositions](evidence/chronicle-directive-race.json)
+
 ## Validation and durable storage throughput
 
 The host was an Apple M3 Max with 16 CPU cores and 128 GB RAM. Docker ran the Linux ARM64 release-profile test binary with the pinned native archive. Each measured body spent 4,096 distinct witnessed P2PKH outputs. All 16,384 signatures passed and every input value was known. Times include block parsing, hashing, BDK evaluation, witnessed-state update, undo and solution serialization, file sync, rename and directory sync. Fixture signing and network transit were outside the timer.

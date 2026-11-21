@@ -28,6 +28,8 @@ cargo build --locked --example chronicle
 .native/py/bin/python qualification/chronicle_signatures.py .native/signatures.json
 python3 qualification/sv_dar.py .native/sv-dar.json
 python3 qualification/scary_dar.py --binary ./target/release/scary-node .native/scary-dar.json
+python3 qualification/directive_race.py --binary ./target/release/scary-node .native/directive-race.json
+python3 qualification/verify_chronicle.py
 ./qualification/throughput.sh .native/throughput
 ```
 

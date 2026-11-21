@@ -1,0 +1,64 @@
+[
+  {
+    "order": "directive-first",
+    "parent": "7f6fefbd080d4e3620e6bc000810ac9f8c11329a59f85abe2c48c85750add459",
+    "height": 108,
+    "candidate": "7e32107c043bb30a33851b521cb4273383ad433b6a08a56e172d2e9c474c1b04",
+    "outcome": "ValueError",
+    "reference_tip": "7f6fefbd080d4e3620e6bc000810ac9f8c11329a59f85abe2c48c85750add459",
+    "durable_sequence": 1,
+    "receipt": {
+      "active_height": 107,
+      "applied_revision": 6,
+      "kind": 2,
+      "prior_revision": 5,
+      "sequence": 1,
+      "signed_sha256": "8c5b9d50b32862e5d52848f0c256f14901305ce4a9d6cb356c752b4b98d0544f"
+    },
+    "solutions": []
+  },
+  {
+    "order": "solution-first",
+    "parent": "75998ed988a27bd3da56b6f3a6de1f149dc4ec073469098bc010ac5af993d0a2",
+    "height": 108,
+    "candidate": "124be507c7754d925b94a59573b080f8c54ddc10b2efebe9bb496ae5b840f648",
+    "outcome": "reference adopted before freeze",
+    "reference_tip": "124be507c7754d925b94a59573b080f8c54ddc10b2efebe9bb496ae5b840f648",
+    "durable_sequence": 1,
+    "receipt": {
+      "active_height": 107,
+      "applied_revision": 8,
+      "kind": 2,
+      "prior_revision": 6,
+      "sequence": 1,
+      "signed_sha256": "6cd1eed69f6a15325b7fff0770a27f8c305ea9bcdd60fb9df2d89203fc0e5336"
+    },
+    "solutions": [
+      {
+        "chain_state": "directive_retired",
+        "deliveries": {
+          "sv:127.0.0.1:60320": {
+            "sent_body": 1795228346468
+          }
+        },
+        "first_inclusion_at_ms": null,
+        "first_settlement_at_ms": null,
+        "hash": "124be507c7754d925b94a59573b080f8c54ddc10b2efebe9bb496ae5b840f648",
+        "height": 108,
+        "job": "4",
+        "parent": "75998ed988a27bd3da56b6f3a6de1f149dc4ec073469098bc010ac5af993d0a2",
+        "peer_tip_reporters": [],
+        "publication_error": "NoPeersSubscribedToTopic",
+        "published_at_ms": null,
+        "queued_at_ms": 1795228346091,
+        "transitions": [
+          {
+            "at_ms": 1795228348549,
+            "height": 107,
+            "state": "directive_retired"
+          }
+        ]
+      }
+    ]
+  }
+]

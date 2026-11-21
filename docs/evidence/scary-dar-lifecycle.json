@@ -1,39 +1,45 @@
 {
   "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "confiscation_block_hex": "00000020516d6522e446b472c410efbda5cafac048374130230d97f235c28f55ae5b6245951f1ebfbc7fa46c61c576564695c1f0eba58e0f66f71acecf8a0418301278595202016bffff7f20030000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff18016c0800000001000000000c2f73636172792d6e6f64652fffffffff011019062a0100000001510000000001000000017f9e22f6cd2237c5b2e1beda8db486b317e80947fb69ad973868d8087f1d800f0000000000ffffffff0200000000000000001d006a04636674781501b8531bc1ef21eee37a66a0cfa29df6f39a59691cf0b9f505000000001976a91450ff97a644470ffa417b24a49c8ff6b5624d948f88ac00000000",
+  "recipient_block_hex": "00000020fcd3caf84993342be8c6b6fba438044d4771860e367ee6a393318e5027a6fa0479532185ef3625f31514bbe6344d89593c06b40fa53040e5db6b51c967b2e2a0f802016bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff190254040800000401000000000c2f73636172792d6e6f64652fffffffff01f4325402000000000151000000000200000001474f2b2063c6fa382cb0746e58c9839df1d099af1938550c737881f8491247cd010000006a47304402204b5ceddc6dc24dbbf5822bda06fa88c86fc2e3ab141a9107082af619b8181187022024b0c3e5b4687bef81ba805fc84e36fd7d09cc95882840f64d1eea7fea5e3321412103aecd5a2972129a15e3442ef8f773165bc02e974d010195b9d8b1da3205c87292ffffffff01e092f505000000001976a914d0ad195d5f66e3f69ec064d01a458fe933b274c588ac00000000",
+  "confiscation_parent": "45625bae558fc235f2970d2330413748c0facaa5bdef10c472b446e422656d51",
+  "recipient_parent": "04faa627508e3193a3e67e360e8671474d0438a4fbb6c6e82b349349f8cad3fc",
+  "confiscation_hex": "01000000017f9e22f6cd2237c5b2e1beda8db486b317e80947fb69ad973868d8087f1d800f0000000000ffffffff0200000000000000001d006a04636674781501b8531bc1ef21eee37a66a0cfa29df6f39a59691cf0b9f505000000001976a91450ff97a644470ffa417b24a49c8ff6b5624d948f88ac00000000",
+  "recipient_spend_hex": "0200000001474f2b2063c6fa382cb0746e58c9839df1d099af1938550c737881f8491247cd010000006a47304402204b5ceddc6dc24dbbf5822bda06fa88c86fc2e3ab141a9107082af619b8181187022024b0c3e5b4687bef81ba805fc84e36fd7d09cc95882840f64d1eea7fea5e3321412103aecd5a2972129a15e3442ef8f773165bc02e974d010195b9d8b1da3205c87292ffffffff01e092f505000000001976a914d0ad195d5f66e3f69ec064d01a458fe933b274c588ac00000000",
   "alternate_hashes": [
-    "6f5c4c17e7376da91d00c23ad84ae9d4dda8d4a9a082fb37f30783f153fb5dd8",
-    "595c49eb8eeb6baf87b1b8d36a853c966ac4727848bdb4bcb8fffa6984d4b2b1",
-    "621e936e5c4e172f70389192704feafbe03ffad6916f613f03b6b62e74eeba34",
-    "316dd6e0a6e29399d4723f3f50cb770da092d2fc2ab38ea154288851cbd25aaf"
+    "783d9314674a29ab88136dfa0272460eac23da969fb65fe40e593ac4c6373197",
+    "67b8956b1b69b93516025303f165aee3f31172b4c807e2efd22535781a76382f",
+    "39fdd82ce16412bea5b23a1882f30551b89e6f62e93e2d6352d3afa69ec76fab",
+    "6df75cdd0ed081917518062f0accfd9d3543203997212864811ffcdc90d7ebef"
   ],
   "settlement_before_reorg": [
     {
       "chain_state": "settled",
       "deliveries": {
-        "sv:127.0.0.1:52814": {
-          "received_body": 1795227939982,
-          "sent_body": 1795227939586
+        "sv:127.0.0.1:58189": {
+          "received_body": 1795228227879,
+          "sent_body": 1795228227540
         }
       },
-      "first_inclusion_at_ms": 1795227939972,
-      "first_settlement_at_ms": 1795227940708,
-      "hash": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
+      "first_inclusion_at_ms": 1795228227862,
+      "first_settlement_at_ms": 1795228228630,
+      "hash": "1c1d942b351fc1940a381c89a891feec5aaecaaeaba10c78a6f4664fbf08921b",
       "height": 108,
       "job": "5",
-      "parent": "75e09271cbd7c089146483317c831581a140c8444a2c9a7461515d11b40fe22d",
+      "parent": "45625bae558fc235f2970d2330413748c0facaa5bdef10c472b446e422656d51",
       "peer_tip_reporters": [],
       "publication_error": "NoPeersSubscribedToTopic",
       "published_at_ms": null,
-      "queued_at_ms": 1795227938834,
+      "queued_at_ms": 1795228227015,
       "transitions": [
         {
-          "at_ms": 1795227939972,
+          "at_ms": 1795228227862,
           "height": 109,
           "state": "observed_active"
         },
         {
-          "at_ms": 1795227940708,
-          "height": 116,
+          "at_ms": 1795228228630,
+          "height": 110,
           "state": "settled"
         }
       ]
@@ -41,24 +47,24 @@
     {
       "chain_state": "settled",
       "deliveries": {
-        "sv:127.0.0.1:52814": {
-          "received_body": 1795228006573,
-          "sent_body": 1795228006141
+        "sv:127.0.0.1:58189": {
+          "received_body": 1795228316552,
+          "sent_body": 1795228316056
         }
       },
-      "first_inclusion_at_ms": 1795228006547,
-      "first_settlement_at_ms": 1795228006547,
-      "hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
+      "first_inclusion_at_ms": 1795228316518,
+      "first_settlement_at_ms": 1795228316518,
+      "hash": "06604e6125353dbd88654371738b71a5e3895371e0dfcd2c88bfcf55e4395c27",
       "height": 1108,
-      "job": "13e",
-      "parent": "72337dea017838d6dc7d2259e9f104378456959a77b0d1891bfb58bc5777a6a5",
+      "job": "14e",
+      "parent": "04faa627508e3193a3e67e360e8671474d0438a4fbb6c6e82b349349f8cad3fc",
       "peer_tip_reporters": [],
       "publication_error": "NoPeersSubscribedToTopic",
       "published_at_ms": null,
-      "queued_at_ms": 1795228006022,
+      "queued_at_ms": 1795228315362,
       "transitions": [
         {
-          "at_ms": 1795228006547,
+          "at_ms": 1795228316518,
           "height": 1110,
           "state": "settled"
         }
@@ -69,30 +75,30 @@
     {
       "chain_state": "settled",
       "deliveries": {
-        "sv:127.0.0.1:52814": {
-          "received_body": 1795227939982,
-          "sent_body": 1795227939586
+        "sv:127.0.0.1:58189": {
+          "received_body": 1795228227879,
+          "sent_body": 1795228227540
         }
       },
-      "first_inclusion_at_ms": 1795227939972,
-      "first_settlement_at_ms": 1795227940708,
-      "hash": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
+      "first_inclusion_at_ms": 1795228227862,
+      "first_settlement_at_ms": 1795228228630,
+      "hash": "1c1d942b351fc1940a381c89a891feec5aaecaaeaba10c78a6f4664fbf08921b",
       "height": 108,
       "job": "5",
-      "parent": "75e09271cbd7c089146483317c831581a140c8444a2c9a7461515d11b40fe22d",
+      "parent": "45625bae558fc235f2970d2330413748c0facaa5bdef10c472b446e422656d51",
       "peer_tip_reporters": [],
       "publication_error": "NoPeersSubscribedToTopic",
       "published_at_ms": null,
-      "queued_at_ms": 1795227938834,
+      "queued_at_ms": 1795228227015,
       "transitions": [
         {
-          "at_ms": 1795227939972,
+          "at_ms": 1795228227862,
           "height": 109,
           "state": "observed_active"
         },
         {
-          "at_ms": 1795227940708,
-          "height": 116,
+          "at_ms": 1795228228630,
+          "height": 110,
           "state": "settled"
         }
       ]
@@ -100,29 +106,29 @@
     {
       "chain_state": "stale_at_depth",
       "deliveries": {
-        "sv:127.0.0.1:52814": {
-          "received_body": 1795228006573,
-          "sent_body": 1795228006141
+        "sv:127.0.0.1:58189": {
+          "received_body": 1795228316552,
+          "sent_body": 1795228316056
         }
       },
-      "first_inclusion_at_ms": 1795228006547,
-      "first_settlement_at_ms": 1795228006547,
-      "hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
+      "first_inclusion_at_ms": 1795228316518,
+      "first_settlement_at_ms": 1795228316518,
+      "hash": "06604e6125353dbd88654371738b71a5e3895371e0dfcd2c88bfcf55e4395c27",
       "height": 1108,
-      "job": "13e",
-      "parent": "72337dea017838d6dc7d2259e9f104378456959a77b0d1891bfb58bc5777a6a5",
+      "job": "14e",
+      "parent": "04faa627508e3193a3e67e360e8671474d0438a4fbb6c6e82b349349f8cad3fc",
       "peer_tip_reporters": [],
       "publication_error": "NoPeersSubscribedToTopic",
       "published_at_ms": null,
-      "queued_at_ms": 1795228006022,
+      "queued_at_ms": 1795228315362,
       "transitions": [
         {
-          "at_ms": 1795228006547,
+          "at_ms": 1795228316518,
           "height": 1110,
           "state": "settled"
         },
         {
-          "at_ms": 1795228008624,
+          "at_ms": 1795228318707,
           "height": 1111,
           "state": "stale_at_depth"
         }
@@ -131,24 +137,24 @@
   ],
   "alert_source": "isolated authenticated delivery fixture, three distinct SV Node wallet signers",
   "genesis_keys": [
-    "025bdba12a86a8648c4715ce339b042b61a7ff2d7925dc2aeea52b6636b9e0affa",
-    "03d34c3ec0502dc5067c748fd553c3671bc47463c03521ce47c6e2bfd9675a55ce",
-    "03d2373360e2fed9e8adf72302e41f341554c0d97b823ca93dfc83e0e4309f480e",
-    "037259e3b8f166e0f5c6a18ac2a81ab969a253e1fcc2ad36dc1d0b6e619c538ff1",
-    "02430e83f599fbd78be4009ca055818d57e7dbc26804a8b8fef930cc97877444d0"
+    "02e8171fb933865068ce7913b57a51028afc9257a876b3e6e27d259660ab91f215",
+    "0275bb0df5d56c6788e3982b5accdd1a30442d1fe341d90e086eafd26bbb72b5b4",
+    "03587035253d325be4f8c77b432bf7c2e41514ac976acd87eb42edb369774e93c7",
+    "03f25daac523ce0fed0c6c14f54f48989b14d4a4e7b031b96c83d529a912f23a30",
+    "0308ae898a7ed64d1145c4da5bfd7ab5ef16bc100bf68c38f0a719ad83c86da8b7"
   ],
   "signed_records": [
     {
       "sequence_number": 1,
-      "raw": "01000000010000001e01016b0000000002000000b9dedcb93837d7b9a9dc7f86bcc1138548847e5cd562182fc2aca0f67b8ffee801000000000000006c00000000000000ffffff7f00000000001f059d60bf3c0edb88b3bbe2e2f7bdc00f611ae6cb1916498d415f69d5dccd3472358607eb0616409b59c0b460856356d3cec329f4714a0ed5af890b2c47cafcc21fa61be82333c2ee7a003d1f4175fb19cb9dc75949b97353dec36f2f729e2239bc7f654c81521ae7d2cfa1ebf1d023ca9d102eee5c1fbac3a2e87ca2a38db72fab20dae7366533523677102350d6976d355810ad86c23853e2e5b2b694b55377b36f7f96f8c7a436c187f0e63316516d1b7015b8cec943aea85667c79c66144979d2"
+      "raw": "01000000010000003f02016b00000000020000000f801d7f08d8683897ad69fb4709e817b386b48ddabee1b2c53722cdf6229e7f00000000000000006c00000000000000ffffff7f00000000001ffaaf470366dba73673119fb13f8afdf39ca1662c4bf643ae947436a9450a473b58a3ad5aa8cf93de35370ccf78406531af68e5bd514bacc54f9911c80fc38fe31fc0384e3edd56f21b2a1e6f50ec31870f42776ac948b0301cd19c9a47daa7c5f4599de6a0bb2957efb24e7be3a212fd25b1f046be3746274ffdeddbae60b402781f2641c90fbf28aee33405fab82a869285d6188d6bfe48c8c915a548c8e35d0b945a89f8b3f8aa501375b58b1f2e8066dd387a4c31732b900b1d92ec9fa494cae1"
     },
     {
       "sequence_number": 2,
-      "raw": "01000000020000002101016b00000000040000006c000000000000007b0100000001e8fe8f7bf6a0acc22f1862d55c7e84488513c1bc867fdca9b9d73738b9dcdeb90100000000ffffffff0200000000000000001d006a04636674781501b8531bc1ef21eee37a66a0cfa29df6f39a59691cf0b9f505000000001976a9143bc890d7ac219bb0c5645b36d6cd9618212ae32588ac000000002067e045ff5bf39b703cc7c4ae978e1ba2bab9f17885c6bd6491f0e74d592b25f30d9bba481442db55842d3a27b3f0fc38e4b50b18d5d7ad8f4ab0602382191b861fad3de4286d4f48ec633f0764ff7427209e7e46baf2e3754f1875e4212c5bce8f54db262a8409617be5fb69cb8540e6cca4523a0640cac475320f5d073fbecdcc208cff795f3e71b3b632377661df602825c0b6a86b49189dfc80482e5591d1daa3680ebe698b64a47923762dcbec9ea210558c5bcbe461ea12fb618552e740e259"
+      "raw": "01000000020000004102016b00000000040000006c000000000000007b01000000017f9e22f6cd2237c5b2e1beda8db486b317e80947fb69ad973868d8087f1d800f0000000000ffffffff0200000000000000001d006a04636674781501b8531bc1ef21eee37a66a0cfa29df6f39a59691cf0b9f505000000001976a91450ff97a644470ffa417b24a49c8ff6b5624d948f88ac0000000020b6d2da6d713c147f933d2aa75a2def67c77cc745236c2045e39c3bafe03ccf1c3337cc73419b303806e4461f883f303aef639f4516aeac2d8270186a32805d0920a921d1cb8f932f5e7be8e37935eda2143137007a268f539b60b15ad98f9393aa42547f5a8b25dfd0439984c01ae250857f54109133b227446c6569d12c847b36208c161f03a5bf1ca0a9043f267c8caf70c1cce0cc07008f352a37b15c791625ef0f4cea35406dcad6ab8f8bbf628e62be1f6dc48b22bd13e8f058fc418d782fdc"
     }
   ],
-  "confiscation_block": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
-  "confiscation_txid": "a04a4791f48d8b99dedbcc926c80ec86e78dbf28f4386827dcd336e3e48e1501",
+  "confiscation_block": "1c1d942b351fc1940a381c89a891feec5aaecaaeaba10c78a6f4664fbf08921b",
+  "confiscation_txid": "cd471249f88178730c553819af99d0f19d83c9586e74b02c38fac663202b4f47",
   "maturity_minus_one": {
     "amount_checks_deferred": 0,
     "amount_checks_failed": 0,
@@ -167,38 +173,38 @@
     "unknown_inputs": 0
   },
   "maturity_height": 1108,
-  "recipient_spend": "16264aeee2264d9bbf70fbdc95ff1c02af0333ee8c21166e2eff4b2cce3c279f",
+  "recipient_spend": "29f05a66f982ad133ca290b2608d59b4aa9f311f2b5986e66f8128564964e203",
   "confiscation_and_recipient_spend_origin": "Scary Node Stratum worker",
-  "confirmed_hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
-  "remined_spend_hash": "3928a450242828c01a810f04e8e3ae75a6d8cee2cb1b1677fa1a8b1234c40c39",
+  "confirmed_hash": "06604e6125353dbd88654371738b71a5e3895371e0dfcd2c88bfcf55e4395c27",
+  "remined_spend_hash": "2b01459d817dc5a7a827f7941a64b33f341e626b1b6584a17aad9e7e84fa95c2",
   "solutions": [
     {
       "chain_state": "settled",
       "deliveries": {
-        "sv:127.0.0.1:52814": {
-          "received_body": 1795227939982,
-          "sent_body": 1795227939586
+        "sv:127.0.0.1:58189": {
+          "received_body": 1795228227879,
+          "sent_body": 1795228227540
         }
       },
-      "first_inclusion_at_ms": 1795227939972,
-      "first_settlement_at_ms": 1795227940708,
-      "hash": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
+      "first_inclusion_at_ms": 1795228227862,
+      "first_settlement_at_ms": 1795228228630,
+      "hash": "1c1d942b351fc1940a381c89a891feec5aaecaaeaba10c78a6f4664fbf08921b",
       "height": 108,
       "job": "5",
-      "parent": "75e09271cbd7c089146483317c831581a140c8444a2c9a7461515d11b40fe22d",
+      "parent": "45625bae558fc235f2970d2330413748c0facaa5bdef10c472b446e422656d51",
       "peer_tip_reporters": [],
       "publication_error": "NoPeersSubscribedToTopic",
       "published_at_ms": null,
-      "queued_at_ms": 1795227938834,
+      "queued_at_ms": 1795228227015,
       "transitions": [
         {
-          "at_ms": 1795227939972,
+          "at_ms": 1795228227862,
           "height": 109,
           "state": "observed_active"
         },
         {
-          "at_ms": 1795227940708,
-          "height": 116,
+          "at_ms": 1795228228630,
+          "height": 110,
           "state": "settled"
         }
       ]
@@ -206,34 +212,34 @@
     {
       "chain_state": "stale_at_depth",
       "deliveries": {
-        "sv:127.0.0.1:52814": {
-          "received_body": 1795228006573,
-          "sent_body": 1795228006141
+        "sv:127.0.0.1:58189": {
+          "received_body": 1795228316552,
+          "sent_body": 1795228316056
         }
       },
-      "first_inclusion_at_ms": 1795228006547,
-      "first_settlement_at_ms": 1795228006547,
-      "hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
+      "first_inclusion_at_ms": 1795228316518,
+      "first_settlement_at_ms": 1795228316518,
+      "hash": "06604e6125353dbd88654371738b71a5e3895371e0dfcd2c88bfcf55e4395c27",
       "height": 1108,
-      "job": "13e",
-      "parent": "72337dea017838d6dc7d2259e9f104378456959a77b0d1891bfb58bc5777a6a5",
+      "job": "14e",
+      "parent": "04faa627508e3193a3e67e360e8671474d0438a4fbb6c6e82b349349f8cad3fc",
       "peer_tip_reporters": [],
       "publication_error": "NoPeersSubscribedToTopic",
       "published_at_ms": null,
-      "queued_at_ms": 1795228006022,
+      "queued_at_ms": 1795228315362,
       "transitions": [
         {
-          "at_ms": 1795228006547,
+          "at_ms": 1795228316518,
           "height": 1110,
           "state": "settled"
         },
         {
-          "at_ms": 1795228008624,
+          "at_ms": 1795228318707,
           "height": 1111,
           "state": "stale_at_depth"
         }
       ]
     }
   ],
-  "scary_active_tip": "3928a450242828c01a810f04e8e3ae75a6d8cee2cb1b1677fa1a8b1234c40c39"
+  "scary_active_tip": "2b01459d817dc5a7a827f7941a64b33f341e626b1b6584a17aad9e7e84fa95c2"
 }
