@@ -160,6 +160,9 @@ class LabFeed:
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
 
+    def endpoint(self, operator_port):
+        return self.server.server_port
+
     def add(self, kind, payload):
         seq = len(self.records) + 1
         signed = struct.pack("<IIQI", 1, seq, int(time.time()), kind) + payload
@@ -197,7 +200,7 @@ def entrant(binary, node, feed, dir, port, stratum):
             "--api-bind",
             f"127.0.0.1:{port}",
             "--alert-service-url",
-            f"http://127.0.0.1:{feed.server.server_port}",
+            f"http://127.0.0.1:{feed.endpoint(port)}",
             "--alert-token-file",
             str(dir / "token"),
             "--regtest-alert-keys",

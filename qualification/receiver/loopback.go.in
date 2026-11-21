@@ -1,0 +1,71 @@
+// This build-only qualification adapter replaces DHT discovery with two
+// fresh loopback libp2p hosts. Both ends use the pinned receiver's native
+// StreamThread and independent SQLite state.
+package p2p
+
+import (
+	"context"
+	"fmt"
+	"github.com/bsv-blockchain/go-alert-system/app/config"
+	libp2p "github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/protocol"
+	"time"
+)
+
+func QualificationReceiver(ctx context.Context, publisher, receiver *config.Config) (*Server, error) {
+	a, err := libp2p.New(libp2p.ListenAddrStrings("/ip4/127.0.0.1/tcp/0"), libp2p.DisableRelay())
+	if err != nil {
+		return nil, err
+	}
+	b, err := libp2p.New(libp2p.ListenAddrStrings("/ip4/127.0.0.1/tcp/0"), libp2p.DisableRelay())
+	if err != nil {
+		a.Close()
+		return nil, err
+	}
+	go func() { <-ctx.Done(); b.Close(); a.Close() }()
+	pid := protocol.ID("/scary-regtest/alert-system/1.0.0")
+	a.SetStreamHandler(pid, func(stream network.Stream) {
+		defer stream.Close()
+		t := StreamThread{stream: stream, config: publisher, ctx: ctx, peer: stream.Conn().RemotePeer()}
+		if e := t.ProcessSyncMessage(ctx); e != nil {
+			publisher.Services.Log.Errorf("loopback sync: %s", e)
+		}
+	})
+	if err = b.Connect(ctx, peer.AddrInfo{ID: a.ID(), Addrs: a.Addrs()}); err != nil {
+		return nil, err
+	}
+	sync := func() error {
+		stream, e := b.NewStream(ctx, a.ID(), pid)
+		if e != nil {
+			return e
+		}
+		thread := StreamThread{stream: stream, config: receiver, ctx: ctx, peer: a.ID()}
+		if e = thread.Sync(ctx); e != nil {
+			return fmt.Errorf("receiver sync: %w", e)
+		}
+		receiver.Services.Log.Infof("successfully synced up to %d from peer %s", thread.LatestSequence(), a.ID())
+		return nil
+	}
+	if err = sync(); err != nil {
+		return nil, err
+	}
+	server := &Server{config: receiver, host: b, connected: true, activePeers: len(b.Network().Peers())}
+	server.RunAlertProcessingCron(ctx)
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				if e := sync(); e != nil {
+					receiver.Services.Log.Errorf("loopback sync: %s", e)
+				}
+			}
+		}
+	}()
+	return server, nil
+}

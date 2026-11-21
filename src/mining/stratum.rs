@@ -158,7 +158,7 @@ impl Mining {
         });
         Ok(
             json!({"observed_at":now()?,"height":self.height,"hash":wire::display_hash(hash256(tip)),
-            "previous":wire::display_hash(tip[4..36].try_into()?),"bits":super::bits(tip),"expected_next_bits":self.next_bits().ok(),
+            "header_hex":hex::encode(tip),"previous":wire::display_hash(tip[4..36].try_into()?),"bits":super::bits(tip),"expected_next_bits":self.next_bits().ok(),
             "ready":self.observation_window_ready(),"coverage":self.headers.len(),"pending":self.pending.len(),
             "directives":self.directives.status(),"unsigned_candidate":template}),
         )
@@ -409,11 +409,12 @@ async fn session(
             if !s.observation_window_ready() && !jobs.is_empty() {
                 return Ok(());
             }
-            if announced_revision == Some(s.revision) {
+            let revision = (s.revision, s.observation_window_ready());
+            if announced_revision == Some(revision) {
                 continue;
             }
             let first = announced_revision.is_none();
-            announced_revision = Some(s.revision);
+            announced_revision = Some(revision);
             let next_job = Job::from_state(&s)?;
             if !jobs.is_empty() && next_job.is_none() {
                 // Stratum V1 has no cancellation without a replacement job.

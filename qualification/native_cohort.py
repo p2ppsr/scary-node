@@ -326,9 +326,6 @@ def run(path, binary, seed, count, delay):
         if result["physical_swap"]:
             nodes = [nodes[1], nodes[0], nodes[3], nodes[2]]
         a, b, r1, r2 = nodes
-        for x, y in ((a, r1), (b, r2), (r1, r2)):
-            native_link(x, y)
-        until(lambda: all(n.rpc("getconnectioncount") > 0 for n in nodes), "full peers")
         history = a.rpc("generate", 105)
         # Full references receive their common fixture history before the entrant
         # starts. Competitive discoveries are delivered exclusively by native peers.
@@ -343,6 +340,11 @@ def run(path, binary, seed, count, delay):
             lambda: all(n.rpc("getbestblockhash") == base for n in nodes),
             "full histories",
         )
+        # Connect the independent receivers only once all four stocks have the
+        # same active history. This avoids racing fixture submission with relay.
+        for x, y in ((a, r1), (b, r2), (r1, r2)):
+            native_link(x, y)
+        until(lambda: all(n.rpc("getconnectioncount") > 0 for n in nodes), "full peers")
         d = Path(td)
         feed = LabFeed(r1, d)
         life.callback(feed.server.shutdown)

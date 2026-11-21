@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "regtest"))
 from prove import decode_block, dsha, txid
+from verify_receipt import check_header, single_input
 
 
 def verify(directory):
@@ -39,6 +40,41 @@ def verify(directory):
         item["chain_state"] == "settled" for item in dar["settlement_before_reorg"]
     )
     assert dar["scary_active_tip"] == dar["remined_spend_hash"]
+    native = json.loads((directory / "chronicle-receiver-dar.json").read_text())
+    receiver = native["receiver"]
+    assert (
+        receiver["active_peers"] > 0
+        and receiver["unprocessed_alerts"] == 0
+        and receiver["sequence"] == receiver["last_peer_sync"]["sequence"]
+    )
+    assert receiver["sequence"] == len(native["signed_records"]) == 10
+    assert [r["sequence_number"] for r in native["signed_records"]] == list(
+        range(1, 11)
+    )
+    lifecycle = native["directive_lifecycle"]
+    assert [r["kind"] for r in lifecycle] == [1, 2, 3, 5, 6, 7, 8, 1]
+    for r in lifecycle:
+        state = r["directive_state"]
+        assert (
+            state["ready"]
+            and state["last_applied"] == state["last_verified"] == r["sequence"]
+        )
+    assert [
+        r["reference_tcp_connections"] for r in lifecycle if r["kind"] in (5, 6)
+    ] == [0, 1]
+    released = native["ordinary_freeze_unfreeze"]
+    assert (
+        "frozen" in released["entrant_rejection"]
+        and "frozen" in released["sv_rejection"]
+    )
+    assert len(bytes.fromhex(released["inclusion"])) == 32
+    for raw, block in (
+        ("confiscation_block_hex", "confiscation_block"),
+        ("recipient_block_hex", "confirmed_hash"),
+    ):
+        assert txid(bytes.fromhex(native[raw])[:80]) == native[block]
+    assert native["scary_active_tip"] == native["remined_spend_hash"]
+    assert native["reorg_solutions"][-1]["chain_state"] == "stale_at_depth"
     first, second = json.loads(
         (directory / "chronicle-directive-race.json").read_text()
     )
@@ -81,6 +117,77 @@ def verify(directory):
         and reference["successors"][0] == mixed["successor"]
     )
     assert reference["successors"][-1] == reference["settlement_tip"]
+    with gzip.open(directory / "chronicle-mixed-workload.json.gz", "rt") as file:
+        workload = json.load(file)["mixed_workload"]
+    count = workload["transactions"]
+    assert count == 4096
+    fund = bytes.fromhex(workload["funding_block_hex"])
+    check_header(fund[:80], workload["funding_block"])
+    _, funding_txs, funding_outputs = decode_block(fund, workload["funding_block"])
+    index = next(i for i, t in enumerate(funding_txs) if txid(t) == workload["funding"])
+    values = funding_outputs[index]
+    assert len(values) == count
+    check_header(
+        bytes.fromhex(workload["parent_header_hex"]),
+        workload["parent"],
+        workload["funding_block"],
+    )
+    body = bytes.fromhex(workload["body_hex"])
+    solved = workload["solved_hash"]
+    check_header(body[:80], solved, workload["parent"])
+    _, txs, outputs = decode_block(body, solved)
+    assert len(txs) == count + 1 and len(body) == workload["wire_bytes"]
+    inputs = set()
+    fees = 0
+    for tx, produced in zip(txs[1:], outputs[1:]):
+        h, n, _ = single_input(tx)
+        assert h == workload["funding"] and n not in inputs and n < count
+        inputs.add(n)
+        fee = values[n][0] - sum(v for v, _ in produced)
+        assert fee == 1000
+        fees += fee
+    assert fees == workload["fee_satoshis"]
+    assert (
+        sum(v for v, _ in outputs[0])
+        == (5_000_000_000 >> (workload["height"] // 150)) + fees
+    )
+    digest = hashlib.sha256(body).hexdigest()
+    receivers = workload["receivers"]
+    assert len(receivers) == 3 and {r["receiver"] for r in receivers} == {
+        "tn1",
+        "tn2",
+        "sv",
+    }
+    assert all(r["hash"] == solved and r["body_sha256"] == digest for r in receivers)
+    previous = solved
+    for encoded, expected in zip(
+        workload["successor_headers_hex"],
+        workload["settlement"]["successors"],
+        strict=True,
+    ):
+        check_header(bytes.fromhex(encoded), expected, previous)
+        previous = expected
+    assert (
+        len(workload["successor_headers_hex"]) == 2
+        and previous == workload["settlement"]["settlement_tip"]
+    )
+    fault = json.loads((directory / "chronicle-storage-fault.json").read_text())
+    assert fault["process_exit"] == 1 and fault["before"] == fault["restored"]
+    assert (
+        fault["concurrent_writer_refused"] and fault["incomplete_temporary_bytes"] > 0
+    )
+    assert fault["repaired"]["tip_hash"] == fault["reference_tip"]
+    assert fault["repaired"]["height"] == fault["before"]["height"] + 2
+    clock = json.loads((directory / "chronicle-clock-fault.json").read_text())
+    assert clock["solution"] == clock["reference_tip"]
+    assert [r["offset"] for r in clock["held_submissions"]] == ["+600s", "-600s"]
+    for r in clock["held_submissions"]:
+        st = r["status"]
+        assert st["tip_hash"] == clock["parent"] and not st["observation_window_ready"]
+        assert (
+            abs(st["clock_step_seconds"] - int(r["offset"][:-1])) <= 1
+            and st["solved_blocks"] == 0
+        )
     for name, count in (("workload", 8), ("sustained", 128)):
         data = json.loads((directory / f"chronicle-native-{name}.json").read_text())
         timed = data["rows"]

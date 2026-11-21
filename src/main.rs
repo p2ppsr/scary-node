@@ -49,6 +49,9 @@ struct Args {
     /// Discover contemporary SV peers using the reference mainnet DNS seeds.
     #[arg(long)]
     sv_discovery: bool,
+    /// Collect block bodies exclusively over SV P2P while retaining Teranode gossip.
+    #[arg(long)]
+    sv_bodies_only: bool,
     /// Native P2P listen multiaddr.
     #[arg(long, default_value = "/ip4/0.0.0.0/tcp/0")]
     listen: String,
@@ -115,6 +118,17 @@ struct App {
     peer: Arc<Mutex<PeerStats>>,
     shadow: Option<Arc<std::sync::Mutex<std::fs::File>>>,
     operator_token: Option<Arc<str>>,
+}
+
+fn shadow_record(file: &std::sync::Mutex<std::fs::File>, row: &Value) -> Result<()> {
+    use std::io::Write;
+    let mut file = file
+        .lock()
+        .map_err(|_| anyhow::anyhow!("shadow journal unavailable"))?;
+    serde_json::to_writer(&mut *file, row)?;
+    file.write_all(b"\n")?;
+    file.sync_data()?;
+    Ok(())
 }
 
 fn secret_file(path: Option<&PathBuf>) -> Result<Option<Arc<str>>> {
@@ -254,8 +268,17 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 let v = json!({"event":"peer_status","peer":peer,"height":height,"hash":hash});
                 let mut p = app.peer.lock().await;
                 if p.tips.contains_key(&peer) || p.tips.len() < 128 {
-                    p.tips
-                        .insert(peer.clone(), json!({"height":height,"hash":hash}));
+                    let tip = json!({"height":height,"hash":hash});
+                    if p.tips.get(&peer) != Some(&tip) {
+                        if let Some(file) = &app.shadow {
+                            shadow_record(
+                                file,
+                                &json!({"event":"reference_tip","observed_at":mining::now()?,
+                                "peer":peer,"height":height,"hash":hash}),
+                            )?;
+                        }
+                        p.tips.insert(peer.clone(), tip);
+                    }
                 }
                 p.statuses += 1;
                 p.last_status = Some(v.clone());
@@ -290,7 +313,6 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 m.save().context("committing witnessed branch")?;
                 if result.is_ok() && m.tip() != previous {
                     if let Some(ref file) = app.shadow {
-                        use std::io::Write;
                         let mut row = m.shadow_decision()?;
                         row["event"] = json!("tip");
                         row["delivery_source"] = json!(source);
@@ -299,12 +321,7 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                             bsv::primitives::hash::hash256(&raw[..80])
                         ));
 
-                        let mut file = file
-                            .lock()
-                            .map_err(|_| anyhow::anyhow!("shadow journal unavailable"))?;
-                        serde_json::to_writer(&mut *file, &row)?;
-                        file.write_all(b"\n")?;
-                        file.sync_data()?;
+                        shadow_record(file, &row)?;
                     }
                 }
                 let _ = validated.send(result.is_ok());
@@ -444,17 +461,14 @@ async fn main() -> Result<()> {
         peer: Arc::new(Mutex::new(PeerStats::default())),
     };
     if let Some(file) = &app.shadow {
-        use std::io::Write;
         let m = app.mining.lock().await;
-        let mut file = file
-            .lock()
-            .map_err(|_| anyhow::anyhow!("shadow journal unavailable"))?;
-        serde_json::to_writer(
-            &mut *file,
-            &json!({"event":"start","network":network,"at":mining::now()?,"restored_tip":m.tip().map(mining::wire::display_hash),"binary_version":env!("CARGO_PKG_VERSION"),"interpreter":m.status()["interpreter"]}),
+        shadow_record(
+            file,
+            &json!({"event":"start","network":network,"at":mining::now()?,
+            "body_transport":if args.sv_bodies_only {"sv_only"} else {"all"},
+            "restored_tip":m.tip().map(mining::wire::display_hash),"binary_version":env!("CARGO_PKG_VERSION"),
+            "interpreter":m.status()["interpreter"]}),
         )?;
-        file.write_all(b"\n")?;
-        file.sync_data()?;
     }
     let api = tokio::net::TcpListener::bind(args.api_bind)
         .await
@@ -478,14 +492,18 @@ async fn main() -> Result<()> {
         args.observe_bodies || args.stratum_bind.is_some() || args.shadow_log.is_some();
     let cfg = peer::Config {
         network: network.into(),
-        allow_sv_only: !args.sv_peer.is_empty(),
+        allow_sv_only: !args.sv_peer.is_empty() || args.sv_bodies_only,
         peers: args.peer,
         listen: args.listen,
         key_file: dir.join("peer.key"),
         asset_bind: args.asset_bind,
         asset_url: args.asset_url,
-        fetch_bodies,
+        fetch_bodies: fetch_bodies && !args.sv_bodies_only,
     };
+    ensure!(
+        !regtest || !args.sv_bodies_only || !args.sv_peer.is_empty(),
+        "SV body transport needs a regtest SV peer"
+    );
     let (events, stream) = mpsc::channel(16);
     let (solutions, solved) = mpsc::channel(4);
     let mut tasks = tokio::task::JoinSet::new();
@@ -502,7 +520,9 @@ async fn main() -> Result<()> {
         !regtest || !args.sv_discovery,
         "SV DNS discovery is mainnet only"
     );
-    if !regtest && (args.sv_discovery || (fetch_bodies && args.sv_peer.is_empty())) {
+    if !regtest
+        && (args.sv_discovery || ((fetch_bodies || args.sv_bodies_only) && args.sv_peer.is_empty()))
+    {
         tasks.spawn(sv_peer::discover(
             app.mining.clone(),
             events.clone(),

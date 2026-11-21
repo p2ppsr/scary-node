@@ -10,7 +10,7 @@ pub use stratum::run_stratum;
 
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::sync::Arc;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{ensure, Context, Result};
 use bsv::primitives::hash::hash256;
@@ -159,6 +159,22 @@ pub(super) fn now() -> Result<u32> {
         .try_into()?)
 }
 
+// Hold locally originated work during a wall-clock step. The monotonic anchor
+// is process-local. Operators separately synchronize the host before startup.
+const MAX_CLOCK_STEP_SECONDS: i64 = 120;
+static CLOCK_ANCHOR: std::sync::OnceLock<(Instant, u32)> = std::sync::OnceLock::new();
+
+fn clock_step() -> Option<i64> {
+    let wall = now().ok()?;
+    let (mono, initial) = CLOCK_ANCHOR.get_or_init(|| (Instant::now(), wall));
+    let elapsed = i64::try_from(mono.elapsed().as_secs()).ok()?;
+    Some(i64::from(wall) - i64::from(*initial) - elapsed)
+}
+
+fn clock_ready() -> bool {
+    clock_step().is_some_and(|step| step.abs() <= MAX_CLOCK_STEP_SECONDS)
+}
+
 fn timestamp(header: &[u8; 80]) -> u32 {
     u32::from_le_bytes(header[68..72].try_into().unwrap())
 }
@@ -174,6 +190,7 @@ fn subsidy(height: u32, regtest: bool) -> u64 {
 
 impl Mining {
     pub fn new(regtest: bool, payout_script: Vec<u8>) -> Result<Self> {
+        clock_step().context("read initial wall clock")?;
         ensure!(
             payout_script.is_empty() || payout_script.len() <= 10_000,
             "payout script too long"
@@ -226,7 +243,8 @@ impl Mining {
     }
 
     fn observation_window_ready(&self) -> bool {
-        self.directives.ready()
+        clock_ready()
+            && self.directives.ready()
             && self.applied_sequence == self.directives.applied()
             && !self.blocked
             && !self.invalidated_boundary
@@ -734,6 +752,10 @@ impl Mining {
     }
     pub fn status(&self) -> Value {
         let readiness: Vec<&str> = [
+            (
+                !clock_ready(),
+                "wall clock differs from monotonic elapsed time",
+            ),
             (!self.directives.ready(), "directive state uncertain"),
             (
                 self.invalidated_boundary,
@@ -770,6 +792,7 @@ impl Mining {
 
         let (mapped_count, mapped_bytes) = self.chain.mapped_bodies();
         json!({
+            "clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,
             "mapped_bodies":mapped_count,"mapped_body_bytes":mapped_bytes,"capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
             "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
             "observation_window_ready": self.observation_window_ready(), "headers": self.headers.len(), "awaiting_height": self.awaiting_height,

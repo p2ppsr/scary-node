@@ -1,0 +1,31 @@
+{
+  "image_id": "sha256:7276b9394fe9c99ed8673a8c41ffd482c39fb2ee00d0e362bb6e9c5ddf111a34",
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "binary_sha256": "ae982cc74759e0532513771caf3c4558be079f781838214d04a6213640323c15",
+  "volume_bytes": 8388608,
+  "reference_tip": "68ee2b9a19a33a4b97f8b451893caabe09b9b2b4f470f27a5e44a1c746cbe6a3",
+  "missed_parent": "6ac11050586e095a2eb817c6c4be3b55cb2c7b134d79cd298ba42356171e0cfa",
+  "fault": "ENOSPC on checkpoint write",
+  "process_exit": 1,
+  "committed_sha256_preserved": "63d8c4c09a0445d2fff84391c2c2563bcb286fa5e3e8a7de7e20c142a62ad876",
+  "incomplete_temporary_bytes": 53,
+  "concurrent_writer_refused": true,
+  "before": {
+    "height": 106,
+    "tip_hash": "3d74c6be281b6cd4720d769bcff18bf35c7cc1e53804683b79b32a8128998cca",
+    "witnessed_outputs": 1,
+    "observation_window_ready": true
+  },
+  "restored": {
+    "height": 106,
+    "tip_hash": "3d74c6be281b6cd4720d769bcff18bf35c7cc1e53804683b79b32a8128998cca",
+    "witnessed_outputs": 1,
+    "observation_window_ready": true
+  },
+  "repaired": {
+    "height": 108,
+    "tip_hash": "68ee2b9a19a33a4b97f8b451893caabe09b9b2b4f470f27a5e44a1c746cbe6a3",
+    "witnessed_outputs": 3,
+    "observation_window_ready": true
+  }
+}

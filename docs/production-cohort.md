@@ -27,3 +27,5 @@ Run the sizing sessions serially to avoid competition between cohort sessions on
 .native/py/bin/python qualification/run_cohort.py .native/evaluation --phase evaluation \
   --pilot-summary .native/pilot-summary.json > .native/evaluation-summary.json
 ```
+
+The full nodes import fixture history before opening the cohort peer links. In sizing session 41007 a simultaneous native header arrival during the original fixture import returned `duplicate-inconclusive` before the entrant started. That attempt contained zero scheduled opportunities. The unchanged session seed was rerun after serializing these setup steps. The node binary, opportunity schedule, receiver links and analysis are identical across completed sizing sessions.

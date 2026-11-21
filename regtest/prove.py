@@ -200,6 +200,13 @@ def compose(*args, capture=False):
 
 
 def mixed_sv(method, *args):
+    if sum(len(str(a)) for a in args) > 32768:
+        container = compose("ps", "-q", "svref", capture=True).strip()
+        result = subprocess.run(
+            ["docker", "exec", "-i", container, "bitcoin-cli", "-regtest", "-datadir=/data", "-stdin", method],
+            input="\n".join(map(str, args)) + "\n", check=True, capture_output=True, text=True,
+        )
+        return result.stdout.strip()
     return compose("exec", "-T", "svref", "bitcoin-cli", "-regtest", "-datadir=/data",
                    method, *map(str, args), capture=True).strip()
 
@@ -433,6 +440,10 @@ def prove():
             raise ValueError("successor did not extend exact Rust block")
         if mixed:
             mixed_settlement(b, sv_result, descendant)
+        workload = None
+        if mixed and os.environ.get("SCARY_MIXED_WORKLOAD"):
+            from mixed_workload import run
+            workload = run(wallet, child_id, value - 2000, int(os.environ["SCARY_MIXED_WORKLOAD"]))
         requests = set()
         for line in compose("logs", "--no-color", "--no-log-prefix", "scary-node", capture=True).splitlines():
             try:
@@ -459,6 +470,7 @@ def prove():
                           "child": child_id, "stratum_job": job, "solved_header": header.hex(),
                           "solved_hash": solved_hash, "native_announcement_verified": native_publish,
                           **({"sv_reference": sv_result} if mixed else {}),
+                          **({"mixed_workload": workload} if workload else {}),
                           "candidate_block_hex": candidate.hex(), "candidate_asset_requests": sorted(requests),
                           "successor_header_hex": next_block[:80].hex(), "independent_receipts": results,
                           "successor": descendant}, indent=2))

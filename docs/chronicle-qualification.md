@@ -50,11 +50,31 @@ python3 qualification/capacity_recovery.py .native/capacity-recovery.json
 ./regtest/mixed.sh --down
 ```
 
+To reproduce the 4,096-payment mixed Stratum block, start with fresh scoped volumes, then replay the checked-in funding, candidate and successor commitments. The storage fault driver runs against the release image produced by the mixed lab.
+
+```sh
+./regtest/mixed.sh --workload 4096 > .native/mixed-load.json
+python3 qualification/storage_fault.py .native/storage-fault.json
+docker build -t scary-node:clock-lab -f qualification/clock.Dockerfile .
+.native/py/bin/python qualification/clock_fault.py .native/clock-fault.json
+python3 qualification/verify_chronicle.py
+./regtest/mixed.sh --down
+```
+
 Pass `--rollback-binary PATH` to the large-body driver to restore the new checkpoint with an older executable and verify its next active tip against SV Node. Pin the older build and retain its digest. The measured rollback uses a body below the MessagePack single-binary limit.
+
+## Native receiver integration on regtest
+
+Build the v0.3.5 synchronization harness from its pinned source. Its Go overlay supplies loopback peers and a lab publisher, while the receiver uses the upstream StreamThread, signature verifier, SQLite models, processing retry, HTTP handlers and node RPC client. All lab streams bind to loopback with a separate regtest protocol identifier. The Python driver creates the lab trust keys and signs genuine alerts, starts the bearer-authenticated gateway and submits Stratum solves to stock SV Node v1.2.3. The receipt records independently queried active hashes, signed records and receiver application state.
+
+```sh
+python3 qualification/receiver/build.py
+python3 qualification/receiver_dar.py --binary ./target/release/scary-node .native/receiver-dar.json
+```
 
 ## Operating the signed alert receiver
 
-Run the maintained `go-alert-system` v0.3.5 receiver with its official environment-specific configuration. Keep its raw HTTP API on a private network or behind a loopback-only port mapping. Give its SQLite datastore and P2P key durable storage. Retain the official five mainnet trust keys. The genesis packet is common to the release and the environment selects the trust keys. Configure its node RPC user as `scary`, the password from the gateway token file, and the host as the gateway address reachable from the receiver. Set the receiver timezone to UTC and its `log_output_file` to a private durable file readable by the gateway. The gateway listens on loopback. Co-locate it with the receiver or use a private authenticated tunnel. During an empty-state bootstrap the receiver can disable its initial best-block RPC probe. [Upstream receiver release](https://github.com/bsv-blockchain/go-alert-system/releases/tag/v0.3.5) · [Mainnet configuration](https://github.com/bsv-blockchain/go-alert-system/blob/c19f9959fb979f9def944807bd4e58ecadf25717/app/config/envs/mainnet.json)
+Run the maintained `go-alert-system` v0.3.5 receiver with its official environment-specific configuration. Keep its raw HTTP API on a private network or behind a loopback-only port mapping. Give its SQLite datastore and P2P key durable storage. Retain the official five mainnet trust keys. Use an independent SQLite database per network with the table prefix `alert_system`. The pinned receiver uses this literal table prefix to retire the previous key set during rotation. For an existing receiver with a different prefix, preserve its DB and configure a fresh DB with this prefix. Replay and verify the signed history and recent peer synchronization before assigning work. [Upstream key update query](https://github.com/bsv-blockchain/go-alert-system/blob/c19f9959fb979f9def944807bd4e58ecadf25717/app/models/public_key.go#L96) The genesis packet is common to the release and the environment selects the trust keys. Configure its node RPC user as `scary`, the password from the gateway token file, and the host as the gateway address reachable from the receiver. Set the receiver timezone to UTC and its `log_output_file` to a private durable file readable by the gateway. The gateway listens on loopback. Co-locate it with the receiver or use a private authenticated tunnel. During an empty-state bootstrap the receiver can disable its initial best-block RPC probe. [Upstream receiver release](https://github.com/bsv-blockchain/go-alert-system/releases/tag/v0.3.5) · [Mainnet configuration](https://github.com/bsv-blockchain/go-alert-system/blob/c19f9959fb979f9def944807bd4e58ecadf25717/app/config/envs/mainnet.json)
 
 ```sh
 python3 scripts/alert-gateway.py --receiver http://127.0.0.1:3000 \
@@ -71,6 +91,17 @@ For passive operation supply a payout script for the unsigned candidate, a journ
   --payout-script "$PAYOUT_SCRIPT_HEX" --sv-peer "$SV_PEER" \
   --operator-token-file "$OPERATOR_TOKEN_FILE" \
   --alert-service-url http://127.0.0.1:19366 --alert-token-file "$ALERT_TOKEN_FILE"
+```
+
+The failover driver uses the same private data directory across restarts. After a confirmed Teranode Asset delivery it restricts body intake to native SV TCP, records the selected parent and successor, and restores both transports. Teranode gossip continues to supply independent tip reports. The audit checks header proof of work, unsigned Merkle commitments, source transitions, difficulty predictions and reference hashes observed within two hours of a tip decision. An attempted failover qualifies only when a direct SV body extends the restored parent. A reference advancing without body coverage is recorded.
+
+```sh
+python3 qualification/shadow_failover.py --binary ./target/release/scary-node \
+  --journal "$SHADOW_LOG" --receipt "$FAILOVER_RECEIPT" -- \
+  --data-dir "$STATE_DIR" --sv-discovery --payout-script "$PAYOUT_SCRIPT_HEX" \
+  --operator-token-file "$OPERATOR_TOKEN_FILE" --alert-token-file "$ALERT_TOKEN_FILE" \
+  --alert-service-url http://127.0.0.1:19366
+python3 qualification/shadow.py "$SHADOW_LOG"
 ```
 
 ## Operator handling of notices

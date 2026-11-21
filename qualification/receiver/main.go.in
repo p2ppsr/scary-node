@@ -1,0 +1,104 @@
+package main
+
+import (
+	"context"
+	"encoding/hex"
+	"encoding/json"
+	"github.com/bsv-blockchain/go-alert-system/app/config"
+	"github.com/bsv-blockchain/go-alert-system/app/models"
+	"github.com/bsv-blockchain/go-alert-system/app/models/model"
+	"github.com/bsv-blockchain/go-alert-system/app/p2p"
+	"github.com/bsv-blockchain/go-alert-system/app/webserver"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
+)
+
+func load(ctx context.Context, path string) *config.Config {
+	if err := os.Setenv(config.EnvironmentCustomFilePath, path); err != nil {
+		log.Fatal(err)
+	}
+	cfg, err := config.LoadDependencies(ctx, models.BaseModels, false)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = models.CreateGenesisAlert(ctx, model.WithAllDependencies(cfg)); err != nil {
+		log.Fatal(err)
+	}
+	return cfg
+}
+func main() {
+	if len(os.Args) != 5 {
+		log.Fatal("expected publisher config, receiver config, signed history and loopback HTTP address")
+	}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	publisher := load(ctx, os.Args[1])
+	defer publisher.CloseAll(ctx)
+	receiver := load(ctx, os.Args[2])
+	defer receiver.CloseAll(ctx)
+	var stored int
+	update := func() {
+		records, err := os.ReadFile(os.Args[3])
+		if err != nil {
+			log.Fatal(err)
+		}
+		var history []string
+		if err = json.Unmarshal(records, &history); err != nil {
+			log.Fatal(err)
+		}
+		for i, row := range history {
+			if i < stored {
+				continue
+			}
+			raw, e := hex.DecodeString(row)
+			if e != nil {
+				log.Fatal(e)
+			}
+			alert, e := models.NewAlertFromBytes(raw, model.WithAllDependencies(publisher), model.New())
+			if e != nil {
+				log.Fatal(e)
+			}
+			good, e := alert.AreSignaturesValid(ctx)
+			if e != nil || !good || alert.SequenceNumber != uint32(i+1) {
+				log.Fatal("invalid publisher fixture")
+			}
+			if alert.GetAlertType() == models.AlertTypeSetKeys {
+				if e = alert.Execute(ctx); e != nil {
+					log.Fatal(e)
+				}
+			}
+			alert.SerializeData()
+			alert.Processed = true
+			if e = alert.Save(ctx); e != nil {
+				log.Fatal(e)
+			}
+			stored++
+		}
+	}
+	update()
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				update()
+			}
+		}
+	}()
+	peer, err := p2p.QualificationReceiver(ctx, publisher, receiver)
+	if err != nil {
+		log.Fatal(err)
+	}
+	handlers := webserver.NewServer(receiver, peer).Handlers()
+	httpd := &http.Server{Addr: os.Args[4], Handler: handlers}
+	go func() { <-ctx.Done(); httpd.Close() }()
+	if err = httpd.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatal(err)
+	}
+}
