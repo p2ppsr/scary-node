@@ -197,6 +197,7 @@ async fn dispatch(
     topics: &Topics,
     events: &mpsc::Sender<Event>,
     fetch: Option<&fetch::Queue>,
+    sources: &mut HashMap<String, String>,
 ) -> Result<()> {
     let author = message.source.context("unsigned message")?.to_string();
     ensure!(
@@ -215,7 +216,7 @@ async fn dispatch(
         let hash = status.best_block_hash.to_ascii_lowercase();
         events
             .send(Event::Status {
-                peer: author,
+                peer: author.clone(),
                 height: status.best_height,
                 hash: hash.clone(),
             })
@@ -234,7 +235,12 @@ async fn dispatch(
         );
         let hash = notice.hash.to_ascii_lowercase();
         if message.topic == topics.subtree.hash() {
-            events.send(Event::Subtree { peer: author, hash }).await?;
+            events
+                .send(Event::Subtree {
+                    peer: author.clone(),
+                    hash,
+                })
+                .await?;
             return Ok(());
         }
         ensure!(message.topic == topics.block.hash(), "unsupported topic");
@@ -245,7 +251,7 @@ async fn dispatch(
         );
         events
             .send(Event::Notice {
-                peer: author,
+                peer: author.clone(),
                 height: notice.height,
                 hash: hash.clone(),
                 header: header.clone(),
@@ -259,6 +265,9 @@ async fn dispatch(
         }
     };
     if let Some(queue) = fetch {
+        if sources.contains_key(&author) || sources.len() < 128 {
+            sources.insert(author, request.base.clone());
+        }
         let hash = request.hash.clone();
         if queue.offer(request).is_err() {
             events
@@ -351,6 +360,78 @@ fn endpoint_ip(addr: &Multiaddr) -> Option<std::net::IpAddr> {
     })
 }
 
+// Dial a numeric endpoint so the IP evaluated by a ban is the one used by TCP.
+async fn resolve_endpoint(addr: &Multiaddr) -> Result<Vec<Multiaddr>> {
+    for (index, proto) in addr.iter().enumerate() {
+        let (host, family) = match proto {
+            Protocol::Dns(name) => (name, 0),
+            Protocol::Dns4(name) => (name, 4),
+            Protocol::Dns6(name) => (name, 6),
+            Protocol::Dnsaddr(name) => {
+                // Match the supplied suffix (including peer identity) when expanding
+                // the TXT records. Nested indirection is bounded by the caller.
+                let qname = format!("_dnsaddr.{}.", name.trim_end_matches('.'));
+                let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
+                let txt = tokio::time::timeout(Duration::from_secs(3), resolver.txt_lookup(qname))
+                    .await??;
+                let suffix: Multiaddr = addr.iter().skip(index + 1).collect();
+                let mut results = Vec::new();
+                for record in txt.iter().take(32) {
+                    let mut bytes = Vec::new();
+                    for part in record.txt_data() {
+                        bytes.extend_from_slice(part);
+                    }
+                    if let Some(resolved) = std::str::from_utf8(&bytes)
+                        .ok()
+                        .and_then(|s| s.strip_prefix("dnsaddr="))
+                        .and_then(|s| s.parse::<Multiaddr>().ok())
+                        .filter(|a| a.as_ref().ends_with(suffix.as_ref()))
+                    {
+                        results.push(resolved);
+                    }
+                }
+                return Ok(results);
+            }
+            _ => continue,
+        };
+        let ips = tokio::time::timeout(
+            Duration::from_secs(3),
+            tokio::net::lookup_host((host.as_ref(), 0)),
+        )
+        .await??;
+        let endpoints = ips
+            .filter_map(|ip| {
+                let replacement = match ip.ip() {
+                    std::net::IpAddr::V4(v) if family != 6 => Protocol::Ip4(v),
+                    std::net::IpAddr::V6(v) if family != 4 => Protocol::Ip6(v),
+                    _ => return None,
+                };
+                addr.replace(index, |_| Some(replacement))
+            })
+            .collect();
+        return Ok(endpoints);
+    }
+    Ok(vec![addr.clone()])
+}
+
+async fn dial_addresses(addr: &Multiaddr) -> Result<Vec<Multiaddr>> {
+    let mut pending = vec![addr.clone()];
+    let mut addresses = Vec::new();
+    let mut seen = HashSet::new();
+    while let Some(next) = pending.pop() {
+        if !seen.insert(next.clone()) {
+            continue;
+        }
+        ensure!(seen.len() <= 64, "too many DNS peer records");
+        if endpoint_ip(&next).is_some() {
+            addresses.push(next);
+            continue;
+        }
+        pending.extend(resolve_endpoint(&next).await?);
+    }
+    Ok(addresses)
+}
+
 pub async fn run(
     config: Config,
     events: mpsc::Sender<Event>,
@@ -422,20 +503,21 @@ pub async fn run(
     let mut last_discovery = None::<Instant>;
     let mut last_gossip_error = None::<Instant>;
     let mut endpoints = HashMap::new();
+    let mut asset_sources = HashMap::<String, String>::new();
     let mut enforce = tokio::time::interval(Duration::from_secs(1));
     let mut last_attempt = None::<(String, Instant)>;
     loop {
         tokio::select! {
             _ = enforce.tick() => {
                 let s = state.lock().await;
-                for (id, ip) in &endpoints {
+                for (id, ip) in endpoints.values() {
                     if s.directives.peer_banned(ip) { let _ = swarm.disconnect_peer_id(*id); }
                 }
                 if let (Some(base),Some(id)) = (config.asset_url.as_deref(), s.relayable_solution()) {
                     let hash = display_hash(id);
                     if last_attempt.as_ref().is_none_or(|(h,t)| *h != hash || t.elapsed() >= Duration::from_secs(15)) {
                         let raw = s.solution_bytes(&id).expect("matched stored solution").to_vec();
-                        let height = s.height_hint()+1;
+                        let height = s.solution_height(id).expect("selected stored solution");
                         last_attempt = Some((hash.clone(),Instant::now()));
                         let event = match announce(&mut swarm,&topics,&assets,base,height,raw).await {
                             Ok(hash) => Event::Published{hash},
@@ -457,14 +539,27 @@ pub async fn run(
                         Err(error) => eprintln!("mainnet bootstrap lookup: {error}"),
                     }
                 }
-                let blocked = state.lock().await.directives.banned.clone();
+                let (blocked,missing)={let m=state.lock().await;(m.directives.banned.clone(),m.missing_recent())};
+                if let Some(queue)=&fetch{
+                    for (id,height) in missing {
+                        for base in asset_sources.values(){
+                            let _=queue.offer(Request{hash:display_hash(id),height,base:base.clone(),header:None});
+                        }
+                    }
+                }
                 for address in &addresses {
-                    if endpoint_ip(address).is_some_and(|ip| blocked.iter().any(|net|net.contains(&ip))) {continue;}
+
                     if matches!(address.iter().last(), Some(Protocol::P2p(id)) if swarm.is_connected(&id)) {
                         continue;
                     }
-                    if let Err(error) = swarm.dial(address.clone()) {
-                        eprintln!("peer dial: {error}");
+                    match dial_addresses(address).await {
+                        Ok(targets) => {
+                            for target in targets {
+                                if endpoint_ip(&target).is_some_and(|ip| blocked.iter().any(|net|net.contains(&ip))) {continue;}
+                                if let Err(error)=swarm.dial(target){eprintln!("peer dial: {error}");}
+                            }
+                        }
+                        Err(error)=>eprintln!("peer address resolution: {error}"),
                     }
                 }
             }
@@ -484,9 +579,9 @@ pub async fn run(
                 events.send(event).await?;
             }
             event = swarm.select_next_some() => match event {
-                SwarmEvent::ConnectionEstablished { peer_id,endpoint,.. } => {
+                SwarmEvent::ConnectionEstablished { connection_id,peer_id,endpoint,.. } => {
                     if let Some(ip)=endpoint_ip(endpoint.get_remote_address()) {
-                        endpoints.insert(peer_id,ip);
+                        endpoints.insert(connection_id,(peer_id,ip));
                         if state.lock().await.directives.peer_banned(&ip){let _=swarm.disconnect_peer_id(peer_id);}
                     }
                 }
@@ -498,16 +593,16 @@ pub async fn run(
                     }
                 }
                 SwarmEvent::Behaviour(BehaviourEvent::Gossip(gossipsub::Event::Message { message, .. })) => {
-                    if let Err(error) = dispatch(message, &topics, &events, fetch.as_ref()).await {
+                    if let Err(error) = dispatch(message, &topics, &events, fetch.as_ref(),&mut asset_sources).await {
                         if last_gossip_error.is_none_or(|t| t.elapsed() >= Duration::from_secs(30)) {
                             eprintln!("ignored invalid Teranode message: {error}");
                             last_gossip_error = Some(Instant::now());
                         }
                     }
                 }
-                SwarmEvent::ConnectionClosed { peer_id, num_established: 0, .. } => {
-                    endpoints.remove(&peer_id);
-                    identified.remove(&peer_id);
+                SwarmEvent::ConnectionClosed { connection_id,peer_id, num_established, .. } => {
+                    endpoints.remove(&connection_id);
+                    if num_established==0 { identified.remove(&peer_id); }
                 }
                 SwarmEvent::NewListenAddr { address, .. } => {
                     eprintln!("peer listener {address}/p2p/{}", swarm.local_peer_id());

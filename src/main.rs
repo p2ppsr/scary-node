@@ -349,6 +349,7 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
+    mining::configure_capacity()?;
     let network = args.network.name();
     let regtest = matches!(args.network, Network::Regtest);
     ensure!(
@@ -458,10 +459,10 @@ async fn main() -> Result<()> {
         .route("/outpoints/{id}/{index}", get(outpoint))
         .route(
             "/check-transaction",
-            post(check_transaction).layer(DefaultBodyLimit::max(100_000)),
+            post(check_transaction).layer(DefaultBodyLimit::max(mining::transaction_limit())),
         )
         .route("/transactions", post(submit))
-        .layer(DefaultBodyLimit::max(4_000_000))
+        .layer(DefaultBodyLimit::max(mining::transaction_limit()))
         .layer(axum::middleware::from_fn_with_state(
             app.operator_token.clone(),
             authenticate,

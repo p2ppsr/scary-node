@@ -86,6 +86,32 @@ impl Mining {
         self.headers.back().map(|h| hash256(h))
     }
 
+    pub(crate) fn missing_recent(&self) -> Vec<(Hash, u32)> {
+        let Some(tip) = self.height else {
+            return vec![];
+        };
+        let mut missing = HashMap::new();
+        for b in &self.chain.buffered {
+            let Some(height) = b.height.checked_sub(1) else {
+                continue;
+            };
+            if height > tip.saturating_add(BUFFERED_BLOCKS as u32)
+                || height < tip.saturating_sub(self.chain.applied.len() as u32)
+            {
+                continue;
+            }
+            let id = b.previous();
+            if !self.active_since_entry.contains_key(&id)
+                && !self.chain.buffered.iter().any(|body| body.hash == id)
+                && !self.invalid_descendants.contains(&id)
+                && !self.directives.invalid.contains(&id)
+            {
+                missing.insert(id, height);
+            }
+        }
+        missing.into_iter().collect()
+    }
+
     pub fn wait_for_body(&mut self, reason: String) {
         if !self.blocked {
             self.revision += 1;

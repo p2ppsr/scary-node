@@ -439,6 +439,7 @@ async fn honest_reorg_restores_witnessed_inputs_and_replaces_settlement_ancestry
         assert_eq!(m.outpoint(&spend.id().unwrap(), 0).unwrap()["known"], true);
         if child_first {
             m.observe(157, &b2).unwrap();
+            assert_eq!(m.missing_recent(), vec![(hash256(&b[..80]), 156)]);
             assert_eq!(m.tip(), Some(a_id));
             assert!(!m.observation_window_ready());
             m.observe(156, &b).unwrap();
@@ -447,6 +448,7 @@ async fn honest_reorg_restores_witnessed_inputs_and_replaces_settlement_ancestry
             assert_eq!(m.tip(), Some(a_id));
             m.observe(157, &b2).unwrap();
         }
+        assert!(m.missing_recent().is_empty());
         assert_eq!(m.chain.reorgs, 1);
         assert_eq!(m.headers.len(), 3);
         assert!(m.observation_window_ready());

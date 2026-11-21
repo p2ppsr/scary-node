@@ -1,0 +1,90 @@
+{
+  "sv_reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "node_binary_sha256": "e8105699be0f125660d8a8920ee8100d24442159f1be40ee662d719c480fe3ec",
+  "rows": [
+    {
+      "height": 107,
+      "hash": "4f750ae7434a4f3f9742985925a37107d8cb00d188977b62f2e443ead69ededf",
+      "wire_bytes": 817248,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 235969875,
+      "durable_observed_ns": 540426500,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 108,
+      "hash": "27df3a77e9015a289204b89c482f1942f64fddec17e688ab228b5effcb25556a",
+      "wire_bytes": 817369,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 202607541,
+      "durable_observed_ns": 518987375,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 109,
+      "hash": "4d20b246cab1a3d6beb4927f08c20b4f484a95ae3ff222ac4f5e11d9636dffeb",
+      "wire_bytes": 817200,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 220242167,
+      "durable_observed_ns": 548006917,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 110,
+      "hash": "04c5ec574815924318db3702a479259d3bfa82c98c8d30878f477d9d1c80dc48",
+      "wire_bytes": 817266,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 209781834,
+      "durable_observed_ns": 583176834,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 111,
+      "hash": "38a3f5a2b6fe429fa74ffff6f266985152567bf57ebb2f8a895cf2a351ac7b12",
+      "wire_bytes": 817266,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 212912375,
+      "durable_observed_ns": 599177875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 112,
+      "hash": "60f0896d00856b56d9c72f693f82f4559cf7ee1eb6f6a32c6c8260e649127b84",
+      "wire_bytes": 817248,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 217863250,
+      "durable_observed_ns": 620031417,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 113,
+      "hash": "57545b7597b82fe32ca08d791f53cf98a7f0e1c8054a778d9c59e5cf01782e38",
+      "wire_bytes": 817278,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 222629000,
+      "durable_observed_ns": 638946292,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 114,
+      "hash": "77a10e6d04389d52643d63ba1e9fc3176639e0bfe2c4d1d252f2a5b4192b9341",
+      "wire_bytes": 817277,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 207566375,
+      "durable_observed_ns": 637644500,
+      "source": "live SV Node getdata/block"
+    }
+  ],
+  "total_transactions": 32768,
+  "total_wall_ns": 4686691959,
+  "transactions_per_second": 6991.711912508906,
+  "final_reference_tip": "77a10e6d04389d52643d63ba1e9fc3176639e0bfe2c4d1d252f2a5b4192b9341"
+}

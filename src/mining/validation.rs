@@ -21,6 +21,8 @@ pub(super) struct Checks {
     pub script_checks_passed: u64,
     pub script_checks_deferred: u64,
     pub script_checks_failed: u64,
+    #[serde(default)]
+    pub authorized_script_exemptions: u64,
     pub amount_checks_passed: u64,
     pub amount_checks_deferred: u64,
     pub amount_checks_failed: u64,
@@ -137,6 +139,7 @@ impl Checks {
         self.script_checks_passed += other.script_checks_passed;
         self.script_checks_deferred += other.script_checks_deferred;
         self.script_checks_failed += other.script_checks_failed;
+        self.authorized_script_exemptions += other.authorized_script_exemptions;
         self.amount_checks_passed += other.amount_checks_passed;
         self.amount_checks_deferred += other.amount_checks_deferred;
         self.amount_checks_failed += other.amount_checks_failed;
@@ -275,8 +278,13 @@ impl Mining {
                 }
             }
         }
-        a.checks.script_checks_deferred =
-            a.checks.known_inputs - a.checks.script_checks_passed - a.checks.script_checks_failed;
+        if is_authorized {
+            a.checks.authorized_script_exemptions = a.checks.known_inputs;
+        }
+        a.checks.script_checks_deferred = a.checks.known_inputs
+            - a.checks.script_checks_passed
+            - a.checks.script_checks_failed
+            - a.checks.authorized_script_exemptions;
         if a.violation.is_none() {
             if supported_context
                 && finality == Some(true)
@@ -319,7 +327,7 @@ impl Mining {
 
     pub fn check_transaction(&self, raw: &[u8]) -> Result<Value> {
         ensure!(
-            raw.len() <= 100_000,
+            raw.len() <= transaction_limit(),
             "transaction exceeds dry-run size limit"
         );
         let Some(height) = self.height.and_then(|tip| tip.checked_add(1)) else {
@@ -421,7 +429,7 @@ impl Mining {
                                 // A body-order forward reference was already counted as unknown.
                                 // Avoid resurrecting its output when the producer appears later.
                                 spent_changes.push(((id, i), true));
-                            } else if self.coins.len() < MAX_WATCHED {
+                            } else if self.coins.len() < capacity().witnessed_outputs {
                                 let previous = self.coins.insert(
                                     (id, i),
                                     Coin {
@@ -440,6 +448,7 @@ impl Mining {
                     }
                 })?;
             }
+            ensure!(omitted==0,"witnessed-output capacity exhausted; increase SCARY_MAX_WITNESSED_OUTPUTS and retry the body");
             let reward = reward.ok_or(InvalidBody("coinbase value exceeds money range"))?;
             if let Some(fees) = fees {
                 if reward > subsidy(height, self.regtest).saturating_add(fees) {

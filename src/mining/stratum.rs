@@ -268,6 +268,7 @@ fn share(
             .try_reserve()
             .context("publication queue unavailable")?;
         state.solution_body = Some(super::SolvedBody {
+            verified_sequence: Some(state.applied_sequence),
             height: job.height,
             hash: digest,
             raw: Arc::from(block.as_slice()),

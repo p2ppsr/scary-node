@@ -1,6 +1,7 @@
 """Check the shipped result tables, solved bytes and independent peer outcomes."""
 
 import gzip
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -67,6 +68,60 @@ def verify(directory):
             )
             < 1
         )
+    mixed = json.loads((directory / "chronicle-mixed-peers.json").read_text())
+    reference = mixed["sv_reference"]
+    raw = bytes.fromhex(mixed["candidate_block_hex"])
+    assert txid(raw[:80]) == reference["active_hash"] == mixed["solved_hash"]
+    digest = hashlib.sha256(raw).hexdigest()
+    assert digest == reference["body_sha256"] and all(
+        r["body_sha256"] == digest for r in mixed["independent_receipts"]
+    )
+    assert (
+        len(reference["successors"]) == 2
+        and reference["successors"][0] == mixed["successor"]
+    )
+    assert reference["successors"][-1] == reference["settlement_tip"]
+    for name, count in (("workload", 8), ("sustained", 128)):
+        data = json.loads((directory / f"chronicle-native-{name}.json").read_text())
+        timed = data["rows"]
+        assert len(timed) == count and [r["height"] for r in timed] == list(
+            range(107, 107 + count)
+        )
+        assert all(
+            r["transactions"] == r["known_signature_checks"] == 4096 for r in timed
+        )
+        assert all(
+            0 < r["reference_return_ns"] <= r["durable_observed_ns"] for r in timed
+        )
+        assert (
+            data["final_reference_tip"] == timed[-1]["hash"]
+            and len({r["hash"] for r in timed}) == count
+        )
+        assert sum(r["transactions"] for r in timed) == data["total_transactions"]
+        assert (
+            abs(
+                data["transactions_per_second"]
+                - data["total_transactions"] * 1e9 / data["total_wall_ns"]
+            )
+            < 0.001
+        )
+    recovery = json.loads((directory / "chronicle-capacity-recovery.json").read_text())
+    for phase in ("before", "exhausted", "restored"):
+        row = recovery[phase]
+        assert (
+            row["height"] == 106
+            and row["tip_hash"] == recovery["before"]["tip_hash"]
+            and row["witnessed_outputs"] == 1
+        )
+    assert not recovery["exhausted"]["observation_window_ready"]
+    assert (
+        recovery["repaired"]["tip_hash"] == recovery["reference_tip"]
+        and recovery["repaired"]["height"] == 108
+    )
+    assert (
+        recovery["repaired"]["witnessed_outputs"] == 3
+        and recovery["repaired"]["observation_window_ready"]
+    )
     print(
         f"Verified {len(rows)} differential cases, both solved DAR bodies, reorg dispositions and both directive orderings."
     )

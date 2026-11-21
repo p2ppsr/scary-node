@@ -188,6 +188,8 @@ def compose(*args, capture=False):
     base = ["docker", "compose", "-f", str(Path(__file__).with_name("compose.yaml"))]
     if os.environ.get("SCARY_LAB_SCENARIO") == "1":
         base += ["-f", str(Path(__file__).with_name("scenario.compose.yaml"))]
+    if os.environ.get("SCARY_LAB_MIXED") == "1":
+        base += ["-f", str(Path(__file__).with_name("mixed.compose.yaml"))]
     if os.environ.get("SCARY_LAB_RACES") == "1":
         base += ["-f", str(Path(__file__).with_name("races.compose.yaml"))]
     if os.environ.get("SCARY_LAB_RELIABILITY") == "1":
@@ -195,6 +197,47 @@ def compose(*args, capture=False):
     result = subprocess.run([*base, *args],
                             stdout=subprocess.PIPE if capture else sys.stderr, text=True, check=True)
     return result.stdout
+
+
+def mixed_sv(method, *args):
+    return compose("exec", "-T", "svref", "bitcoin-cli", "-regtest", "-datadir=/data",
+                   method, *map(str, args), capture=True).strip()
+
+
+def synchronize_mixed_parent(source, parent):
+    # Import the shared fixture history into the full-state observer only. The
+    # worker stays idle until both native receiving paths have the same parent.
+    end = rpc(source, "getblock", parent, 1)["height"]
+    for height in range(int(mixed_sv("getblockcount")) + 1, end + 1):
+        h = rpc(source, "getblockhash", height)
+        raw, _, _ = block(source, h)
+        result = mixed_sv("submitblock", raw.hex())
+        if result or mixed_sv("getbestblockhash") != h:
+            raise RuntimeError(f"SV fixture ancestry disagrees at {height}: {result}")
+    if mixed_sv("getbestblockhash") != parent:
+        raise RuntimeError("SV observer did not reach the common parent")
+
+
+def mixed_settlement(source, info, first_successor):
+    # Only successors are fed by the reference driver. The solved block must
+    # already have been selected and read back on the independent SV P2P path.
+    if mixed_sv("getbestblockhash") != info["active_hash"]:
+        raise RuntimeError("SV had not selected the native solution")
+    second = rpc(source, "generate", 1)[0]
+    for n in NODES:
+        wait("Teranode depth-two settlement", lambda: assert_tip(n, second))
+    for expected in (first_successor, second):
+        raw, _, _ = wait("settling body", lambda: block(source, expected))
+        if mixed_sv("submitblock", raw.hex()) or mixed_sv("getbestblockhash") != expected:
+            raise RuntimeError("SV and Teranode settlement disagreement")
+    for node in NODES:
+        if rpc(node, "getblockhash", info["height"]) != info["active_hash"]:
+            raise RuntimeError("Teranode selected different solution ancestry")
+    if mixed_sv("getblockhash", info["height"]) != info["active_hash"]:
+        raise RuntimeError("SV selected different solution ancestry")
+    info["successors"] = [first_successor, second]
+    info["settlement_tip"] = second
+    info["successor_delivery"] = "Teranode native peer and SV fixture RPC"
 
 
 def assert_tip(node, expected):
@@ -345,6 +388,9 @@ def prove():
         parent_raw, _, _ = wait("creating block successor body", lambda: block(b, parent))
         if parent_raw[4:36][::-1].hex() != funding_block:
             raise ValueError("funding successor extends a different block")
+        mixed = os.environ.get("SCARY_LAB_MIXED") == "1"
+        if mixed:
+            synchronize_mixed_parent(a, parent)
         admitted = json.loads(request(API + "/transactions", child, {"Content-Type": "application/octet-stream"}))
         if admitted["txid"] != child_id:
             raise ValueError("entrant admission txid mismatch")
@@ -368,6 +414,15 @@ def prove():
             results.append({"node": name, "height": info["height"], "hash": solved_hash,
                             "native_block_sources": sources,
                             "body_sha256": hashlib.sha256(raw).hexdigest(), "transaction_count": len(txs)})
+        sv_result = None
+        if mixed:
+            wait("independent SV P2P adoption", lambda: mixed_sv("getbestblockhash") == solved_hash)
+            sv_raw = bytes.fromhex(mixed_sv("getblock", solved_hash, 0))
+            if sv_raw != candidate:
+                raise RuntimeError("SV observer returned different solved bytes")
+            sv_result = {"height": int(mixed_sv("getblockcount")), "active_hash": solved_hash,
+                         "body_sha256": hashlib.sha256(sv_raw).hexdigest(),
+                         "receiver": "SV Node 1.2.3 direct P2P", "common_parent": parent}
         print(f"Both references adopted {solved_hash} and served the identical body.", file=sys.stderr)
         wait("second reference ready to extend candidate",
              lambda: rpc(b, "getminingcandidate")["prevhash"] == solved_hash)
@@ -376,6 +431,8 @@ def prove():
         next_block, _, _ = wait("successor body", lambda: block(b, descendant))
         if next_block[4:36][::-1].hex() != solved_hash:
             raise ValueError("successor did not extend exact Rust block")
+        if mixed:
+            mixed_settlement(b, sv_result, descendant)
         requests = set()
         for line in compose("logs", "--no-color", "--no-log-prefix", "scary-node", capture=True).splitlines():
             try:
@@ -401,6 +458,7 @@ def prove():
                           "child_transaction_hex": child.hex(), "child_fee_satoshis": 1000,
                           "child": child_id, "stratum_job": job, "solved_header": header.hex(),
                           "solved_hash": solved_hash, "native_announcement_verified": native_publish,
+                          **({"sv_reference": sv_result} if mixed else {}),
                           "candidate_block_hex": candidate.hex(), "candidate_asset_requests": sorted(requests),
                           "successor_header_hex": next_block[:80].hex(), "independent_receipts": results,
                           "successor": descendant}, indent=2))

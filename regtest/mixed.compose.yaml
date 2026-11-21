@@ -1,0 +1,17 @@
+services:
+  svref:
+    image: bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33
+    platform: linux/amd64
+    entrypoint: [bitcoind]
+    command: [-regtest, -datadir=/data, -listen=1, -dnsseed=0, -discover=0, -server=1, -txindex=1, -minminingtxfee=0.00000500, -genesisactivationheight=1, -chronicleactivationheight=2, -excessiveblocksize=20000000, -maxstackmemoryusageconsensus=100000000]
+    networks: [regtest]
+    volumes: [sv-data:/data]
+  scary-node:
+    depends_on: [svref]
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - 'address=$$(getent ahostsv4 svref | head -n1 | cut -d" " -f1); test -n "$$address"; exec scary-node --sv-peer "$$address:18444" "$$@"'
+      - scary-node
+volumes:
+  sv-data:

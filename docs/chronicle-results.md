@@ -26,6 +26,19 @@ The host was an Apple M3 Max with 16 CPU cores and 128 GB RAM. Docker ran the Li
 
 Checkpoint size grew from 3.70 MB to 10.09 MB over the signed rounds. Rewriting the snapshot accounts for much of the growing end-to-end time. The measurements apply to these four in-process bodies and this filesystem. They establish neither sustained live network throughput nor a supported hardware envelope. [Per-body measurements](evidence/chronicle-signed-body-throughput.json) · [Linux build identity](evidence/chronicle-linux-bdk.json)
 
+A separate test used the macOS ARM64 release executable and a pinned Linux AMD64 SV Node v1.2.3 running under Docker Desktop on the same workstation. SV Node received each prepared body through RPC, validated it and announced it over native TCP. The timer ran through Scary Node's observed durable tip. The signed data and headers were constructed before timing. All ordinary inputs were witnessed P2PK outputs. The per-body rows include RPC-return and durable-observation latency with an 80 ms polling interval. The 128-block run checked every one of its 524,288 signatures and reached the full node's exact final tip.
+
+| Native workload | Signed transactions | Wire MB | Time (seconds) | Transactions/s |
+| --- | ---: | ---: | ---: | ---: |
+| 8 consecutive bodies | 32,768 | 6.54 | 4.687 | 6,992 |
+| 128 consecutive bodies | 524,288 | 104.61 | 110.651 | 4,738 |
+
+The 128-block median durable-observation latency was 794 ms. These runs establish capacity for 4,096 signed spends per approximately 817 kB body on this host and reference path. They leave sustained multi-gigabyte bodies, broader scripts, production mempool intake, simultaneous ASIC clients and WAN propagation unmeasured. The short and long runs identify their respective release executable digests. [Eight-block measurements](evidence/chronicle-native-workload.json) · [128-block measurements](evidence/chronicle-native-sustained.json)
+
+On a separate fresh mixed network, two Teranodes selected the solution through their gossip and Asset network. An independent SV Node received the same solution directly from the entrant over Bitcoin SV P2P. All three returned body SHA-256 `941107d0b0b4b3c61a735a8335b641aa33906e3e855addfdc0d0508b03c708df` at height 104. Teranode generated the two successors and the lab supplied those successor bytes to the SV reference. All three full nodes selected the original solution in their depth-two ancestry. [Mixed native receipt](evidence/chronicle-mixed-peers.json)
+
+A resource-fault run exhausted a one-output witness budget on a valid incoming block. Scary Node withheld work at height 106, preserved the one known output and restored that exact checkpoint on restart. With capacity increased, the next child announcement triggered retrieval of the missing parent over SV P2P. Scary Node resumed at the reference tip, height 108, with three witnessed outputs. [Capacity and recovery receipt](evidence/chronicle-capacity-recovery.json)
+
 ## Mainnet observation and production status
 
 A passive observer started with an empty mainnet data directory. It verified a contemporary body at height 976422, hash `000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528`. Its BDK build was identified and Stratum was disabled. At that observation it had one body in its difficulty window, zero pending transactions and no synchronized Alert System peer. It issued no candidate. Startup of the upstream receiver and its DHT connections alone did not establish a verified signed tip. The 1,008-block operating qualification remains open. [First shadow observation](evidence/chronicle-shadow-first.json)

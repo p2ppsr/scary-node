@@ -1,0 +1,58 @@
+{
+  "binary_sha256": "f2635009c9196bac12f30e499a9ebc5cd0cd0429c13e37f284f54c5867685ee8",
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "before": {
+    "height": 106,
+    "tip_hash": "5f799569b51026308a8dcd66d0da914ae309be1e8e5e857180b17af1115ef4dd",
+    "witnessed_outputs": 1,
+    "observation_window_ready": true,
+    "readiness_reasons": [],
+    "capacity": {
+      "block_bytes": 268435456,
+      "transaction_bytes": 16777216,
+      "witnessed_outputs": 1
+    }
+  },
+  "exhausted": {
+    "height": 106,
+    "tip_hash": "5f799569b51026308a8dcd66d0da914ae309be1e8e5e857180b17af1115ef4dd",
+    "witnessed_outputs": 1,
+    "observation_window_ready": false,
+    "readiness_reasons": [
+      "body coverage interrupted"
+    ],
+    "capacity": {
+      "block_bytes": 268435456,
+      "transaction_bytes": 16777216,
+      "witnessed_outputs": 1
+    }
+  },
+  "restored": {
+    "height": 106,
+    "tip_hash": "5f799569b51026308a8dcd66d0da914ae309be1e8e5e857180b17af1115ef4dd",
+    "witnessed_outputs": 1,
+    "observation_window_ready": false,
+    "readiness_reasons": [
+      "body coverage interrupted"
+    ],
+    "capacity": {
+      "block_bytes": 268435456,
+      "transaction_bytes": 16777216,
+      "witnessed_outputs": 64
+    }
+  },
+  "repaired": {
+    "height": 108,
+    "tip_hash": "75472b5c07625c7da02b804dc162bcbaa09d95f1839a33ef052a3005970ad49b",
+    "witnessed_outputs": 3,
+    "observation_window_ready": true,
+    "readiness_reasons": [],
+    "capacity": {
+      "block_bytes": 268435456,
+      "transaction_bytes": 16777216,
+      "witnessed_outputs": 64
+    }
+  },
+  "retrieved_parent": "7516d0ce94bd66c70ce08041ed0928459e66ec316608129c0b984016f0f96441",
+  "reference_tip": "75472b5c07625c7da02b804dc162bcbaa09d95f1839a33ef052a3005970ad49b"
+}

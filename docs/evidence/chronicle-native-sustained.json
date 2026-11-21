@@ -1,0 +1,1290 @@
+{
+  "sv_reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "node_binary_sha256": "f2635009c9196bac12f30e499a9ebc5cd0cd0429c13e37f284f54c5867685ee8",
+  "rows": [
+    {
+      "height": 107,
+      "hash": "5bf9f329223919f62c61981e41a1b83ab728443bad4431b038f58fb24612113c",
+      "wire_bytes": 817265,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 255973458,
+      "durable_observed_ns": 480570750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 108,
+      "hash": "337d6e9eb498a83634483fcca571286b5d37e2f3b6baa572f8cb5143dbebb8ee",
+      "wire_bytes": 817277,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 225265792,
+      "durable_observed_ns": 583645667,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 109,
+      "hash": "62a57cdb6481ef61fffec66c27d1f7cf93849770599a088e940614a3f545e4f0",
+      "wire_bytes": 817231,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 216347417,
+      "durable_observed_ns": 590741750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 110,
+      "hash": "6fab1fc02839c43572ab194e9308e3e35720a273c8587ed32f9271e9a519ade6",
+      "wire_bytes": 817315,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 209391417,
+      "durable_observed_ns": 634464209,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 111,
+      "hash": "26d1f27e065815f6124d14f2ab1df43f317d093e4d71105a6ca01883875a15b7",
+      "wire_bytes": 817341,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 227594833,
+      "durable_observed_ns": 662283750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 112,
+      "hash": "10ad9520061f62a36c3233293d417f63656bf3421a12b77f1ecce6832a68a692",
+      "wire_bytes": 817266,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 225610333,
+      "durable_observed_ns": 712379042,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 113,
+      "hash": "052264a5b4d7f300eadaf597d00a07cf9ab8674d48eda499300c4c9fed5cd2fd",
+      "wire_bytes": 817324,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 223270417,
+      "durable_observed_ns": 727107667,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 114,
+      "hash": "2ca00f0d46bb5808106d8adc20b91aac00396229ae2385b248c982e12e932bad",
+      "wire_bytes": 817302,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 206750208,
+      "durable_observed_ns": 733038333,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 115,
+      "hash": "31a56ad7598fa0a6b74c5e673585c999f943ef7196bf0dfe75f7722ac5646ff6",
+      "wire_bytes": 817311,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 221059834,
+      "durable_observed_ns": 791066625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 116,
+      "hash": "093bffac6b386dedabb686456ea68b494f1875a8ba725796427c3a1213de96a2",
+      "wire_bytes": 817299,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 202475291,
+      "durable_observed_ns": 751440625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 117,
+      "hash": "28f270b0ee0d5bc14f39e6bf850b79721973cd124d9b9a93e8e4826dfb2baaf5",
+      "wire_bytes": 817273,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 223202208,
+      "durable_observed_ns": 794358125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 118,
+      "hash": "6df91e8b5a18d2486f6e46e0bf19df6cc88ebbf1eb1d575264e5f8fc44de2a93",
+      "wire_bytes": 817283,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 222007916,
+      "durable_observed_ns": 809785791,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 119,
+      "hash": "5d4c595ce90f2cf268599bd62d84a3e1d18dc3efb1ea56562bb11298f1777cb3",
+      "wire_bytes": 817275,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219916500,
+      "durable_observed_ns": 805756042,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 120,
+      "hash": "33a240a754a2b650616b61d64b1dbc75edb1884ad82f451adb557540912deb17",
+      "wire_bytes": 817232,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 204779250,
+      "durable_observed_ns": 832329125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 121,
+      "hash": "36b2f0f7a2c87f4b46a75337b2952b6b14e105bd8c72593ada1423a023996ccd",
+      "wire_bytes": 817271,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 209770500,
+      "durable_observed_ns": 828996083,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 122,
+      "hash": "6d7280292619ac221a65b42b8425555d5b7ebcb3334ded2d95fe71d275a48cbf",
+      "wire_bytes": 817242,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 227078666,
+      "durable_observed_ns": 844241583,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 123,
+      "hash": "3f168db431d442daf0d407e7014e556858883599dec60e87544ce1e6dcade5ca",
+      "wire_bytes": 817261,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 217904917,
+      "durable_observed_ns": 879376875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 124,
+      "hash": "03a1d5d4d55957be9347469a97098f627c14af62f4a79a6637b431973cdee768",
+      "wire_bytes": 817277,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 220036959,
+      "durable_observed_ns": 901286917,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 125,
+      "hash": "279fe6ae1df262c84363f17af797e813a5826483a57b07ced9e7881341580723",
+      "wire_bytes": 817274,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 217088708,
+      "durable_observed_ns": 879808500,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 126,
+      "hash": "180cad49f755e1628f1b8810f973913427287ef94e2ee26a4f925d29c342d6f2",
+      "wire_bytes": 817298,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219264125,
+      "durable_observed_ns": 883568542,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 127,
+      "hash": "0f116f71de94ba8ef6b9e1cc85c01c985437e5797deecca7cfd15c0dcc28e581",
+      "wire_bytes": 817237,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 213988041,
+      "durable_observed_ns": 907646250,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 128,
+      "hash": "1bbc55bcdf64c37e9199671f617e50ac8eb7bbdc871d88d19f60a156a14c8a0c",
+      "wire_bytes": 817279,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 225254792,
+      "durable_observed_ns": 1002519250,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 129,
+      "hash": "293b4c895dc1e863c6d88423aaafcc74b064d307a0a8f798f655838d4c52598f",
+      "wire_bytes": 817257,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 226103916,
+      "durable_observed_ns": 1014408833,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 130,
+      "hash": "5354a12551a6e6dcd6bbecd54d9a161a1673ea6c8187683a605a1c1c58e8d7d0",
+      "wire_bytes": 817293,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 216948333,
+      "durable_observed_ns": 929204375,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 131,
+      "hash": "5c03841c1f24b864568d9019b5ff94d6cc1e303bdb3eaef119d0c9dee4cd13b7",
+      "wire_bytes": 817235,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 226634334,
+      "durable_observed_ns": 1095861292,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 132,
+      "hash": "730fdf5f90559a06d28e89f5af5cb652239ea17272eb0cd3b71e16fb0a85bd84",
+      "wire_bytes": 817233,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 216592209,
+      "durable_observed_ns": 1046316959,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 133,
+      "hash": "4bf58fc699b1aab18c300e9b9036316ebb790157732ceaa26c3e910d00885f70",
+      "wire_bytes": 817237,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 216162375,
+      "durable_observed_ns": 1030742625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 134,
+      "hash": "1ec004506246af70a38d50bc465de08eb2f2e27a565ff9e37919aec267758e3c",
+      "wire_bytes": 817341,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 206363750,
+      "durable_observed_ns": 1033554417,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 135,
+      "hash": "3eab0ec236caf927eb4331444c11a3f1974a6cf0f25a494e94ed1ac4abb4dac9",
+      "wire_bytes": 817255,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 227069291,
+      "durable_observed_ns": 1078931000,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 136,
+      "hash": "6ea5b7f6ea42cb6ede63de80bc7af7bc4f9b4e8a234dd7d63bb97b06da7992db",
+      "wire_bytes": 817290,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 218688500,
+      "durable_observed_ns": 1238973667,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 137,
+      "hash": "56f1ab880671e272ff9e7652cf70f1b932e1fc502c771cb6e83620646ff756a4",
+      "wire_bytes": 817286,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 213225250,
+      "durable_observed_ns": 1232421584,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 138,
+      "hash": "0e30e8219288adcc2b028efb6da803fe636dd50cd7169890f0b49e4f2d99608e",
+      "wire_bytes": 817292,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 249798625,
+      "durable_observed_ns": 1026764541,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 139,
+      "hash": "6093fc5ed3265030bf11b46e455b5f321d0c08621c6a79363e4c3a4b85c1f896",
+      "wire_bytes": 817286,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 218448334,
+      "durable_observed_ns": 1176184834,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 140,
+      "hash": "568c5095101b0d1c332292ea97a5bd9103131029372089013f51b87f8901c99d",
+      "wire_bytes": 817285,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 237213000,
+      "durable_observed_ns": 1002133667,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 141,
+      "hash": "447cd6e3087e8990fa2cb14567e24aa1cd26ffdd74bea03d44e2d88afe4fbf30",
+      "wire_bytes": 817268,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 214868042,
+      "durable_observed_ns": 1134426125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 142,
+      "hash": "01589f0b4a8d2e2d588ea454eb2d8f127507190ec1c01df66ad0877f450ca426",
+      "wire_bytes": 817320,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 209127666,
+      "durable_observed_ns": 1553947333,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 143,
+      "hash": "53d196f2e40df8514e317b23854a139421e6c067174c66eceec7fe650b2d9b7d",
+      "wire_bytes": 817250,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 204795833,
+      "durable_observed_ns": 1014324125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 144,
+      "hash": "344a5dd6fc6f669364ef3420ca015f233d6180564ffcf51d6ded956e9551da70",
+      "wire_bytes": 817307,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 267216000,
+      "durable_observed_ns": 1150795917,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 145,
+      "hash": "23abeb312c401e32a66a79e46f7b15f8bfebf214ae96d59cb249f2816843d824",
+      "wire_bytes": 817270,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 245070708,
+      "durable_observed_ns": 965049625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 146,
+      "hash": "57a611da3f7c124be1a45b51a58ec8450e62721dc2e1c1b8b751b46bd8f33a75",
+      "wire_bytes": 817263,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219741375,
+      "durable_observed_ns": 969155292,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 147,
+      "hash": "59e69bc273a66fc87b528c5caa3e36a46fb1628229e155a59a2aa69b388735a3",
+      "wire_bytes": 817267,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 238771041,
+      "durable_observed_ns": 1052703291,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 148,
+      "hash": "452d4c99132ea15f4da6128be63ae364bc1c2915feaccee2b69895ca7cab3298",
+      "wire_bytes": 817254,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 226709667,
+      "durable_observed_ns": 1013495833,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 149,
+      "hash": "0571f09f4af0287c5eb8f9d8f7b8aafe652034fbbc7aef524be83915ea7df239",
+      "wire_bytes": 817217,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 234635708,
+      "durable_observed_ns": 1038593041,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 150,
+      "hash": "4ae3d48df386161aa72a37ed3f7faf83ebaf01ac3934b796bd8ddadba0eff34a",
+      "wire_bytes": 817240,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 244917542,
+      "durable_observed_ns": 1012102583,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 151,
+      "hash": "4f90b6d045945cf55abe80c50a215c975a81ea68b82fce14e5caad763d30dad5",
+      "wire_bytes": 817248,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219738875,
+      "durable_observed_ns": 1035909500,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 152,
+      "hash": "446a332e1e6b834defe32d503973161dfb4d5dfb8e6362baf93d41c1071466d3",
+      "wire_bytes": 817262,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 220350916,
+      "durable_observed_ns": 1010166916,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 153,
+      "hash": "66cae95c4e05bba414ddc63195ce6993dbc40ea39f3ff44af37095b4289ebcb7",
+      "wire_bytes": 817290,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 231214625,
+      "durable_observed_ns": 1075547208,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 154,
+      "hash": "623d721aeb210bf918b190e0045a6217dfc7646b7970c7beb6f4436d0cbe549d",
+      "wire_bytes": 817313,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 233799333,
+      "durable_observed_ns": 1088712208,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 155,
+      "hash": "3b43dfda0b0493368df77e2906f452d41ca5a9bd1efa3f73a1198214485369ce",
+      "wire_bytes": 817333,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 258627375,
+      "durable_observed_ns": 1053070667,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 156,
+      "hash": "542b42b3d51270a6e7b79fd127759822501538543dd1e2a76156a444e65907f2",
+      "wire_bytes": 817319,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 251550208,
+      "durable_observed_ns": 1019072875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 157,
+      "hash": "29992521d582f0a8ec38bfeb4735a59a6f4c6a484b88fcf36d277b67a258521e",
+      "wire_bytes": 817274,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 229384084,
+      "durable_observed_ns": 1019065459,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 158,
+      "hash": "222c18415f3a17a5848d36b0ba5f7aa67940e5683318d930b2f0ff13fbeb2a8c",
+      "wire_bytes": 817277,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 215148208,
+      "durable_observed_ns": 986925583,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 159,
+      "hash": "696dfe3ce107972622b137bf7371d9fe3ef8e27453872092643f78cbd60affd0",
+      "wire_bytes": 817293,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 234849833,
+      "durable_observed_ns": 1001647875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 160,
+      "hash": "5abde21ece1cd1bfa6a57f7c4898ff8cc5567d578aac538825fabda2566c4630",
+      "wire_bytes": 817292,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 215216959,
+      "durable_observed_ns": 1005995625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 161,
+      "hash": "6d1f69e51ccb1a99f00979ca0f785e6be7a750288a833d466fdd5238cd09fc63",
+      "wire_bytes": 817264,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 233237625,
+      "durable_observed_ns": 1000952792,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 162,
+      "hash": "179b3e27a22240e3e251b55bc04d6d309536634925be3370573f4f9c400bdd2e",
+      "wire_bytes": 817237,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 220368750,
+      "durable_observed_ns": 975931708,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 163,
+      "hash": "52dd31e783464ffeb51ad3eac3387b73d4de704dff816f9f17f8a66e80202442",
+      "wire_bytes": 817264,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 212263792,
+      "durable_observed_ns": 996086833,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 164,
+      "hash": "23f6b94906e1ef34beb0099412302974526735a8ba6819a1b6e10ce0feaf86d2",
+      "wire_bytes": 817280,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 220344166,
+      "durable_observed_ns": 984946000,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 165,
+      "hash": "0ca24d20991d76d4d440cd76c6d31071c91a7a650102cf4bdfa81a02086566c0",
+      "wire_bytes": 817283,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 235072209,
+      "durable_observed_ns": 1028323000,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 166,
+      "hash": "7afca0c0f7bfc51fcdc2deb2ee3e9a81889676edd2362f0de14fdd9bcc65a257",
+      "wire_bytes": 817289,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 227370291,
+      "durable_observed_ns": 989801333,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 167,
+      "hash": "72b08f8e2bc9017c44cd3f2e65a82488c872644b83793564b4a978fdda233cee",
+      "wire_bytes": 817246,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 258307375,
+      "durable_observed_ns": 1024934208,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 168,
+      "hash": "3fb09d3dfa3f681f08770f7d4f6b1f2bfa3f48925cbd26d2b82557e4751eea46",
+      "wire_bytes": 817262,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 255568167,
+      "durable_observed_ns": 951103292,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 169,
+      "hash": "649f51432967c24ee68871e8bbf221d4d33bc08dd46c126c3a3774da0dbf92a1",
+      "wire_bytes": 817285,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 284864542,
+      "durable_observed_ns": 1068661750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 170,
+      "hash": "25e57670af12cae4ca3288a7c418adf5f9968c16970fc851a60e62fca41d12d8",
+      "wire_bytes": 817292,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 245409000,
+      "durable_observed_ns": 1038762291,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 171,
+      "hash": "174d8d24343becfe7656e3d6c53141b0924a79c8118d230b676a99aba6e34e5c",
+      "wire_bytes": 817309,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 322549750,
+      "durable_observed_ns": 1158378417,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 172,
+      "hash": "640d91614c8c1004188abed6784aee3320e8cd3d3753e18d216d77f6c98c7c13",
+      "wire_bytes": 817276,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 327118333,
+      "durable_observed_ns": 1143407750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 173,
+      "hash": "749265adf16a1b7794197258c96fd2c886987a0d7c4a068444c854b4ffc8dce5",
+      "wire_bytes": 817191,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 249325000,
+      "durable_observed_ns": 949838875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 174,
+      "hash": "1a1a7108661f1df44d09d80312ce38db90ba80d0631048a6d5ebb6075f35e3cd",
+      "wire_bytes": 817230,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 253318666,
+      "durable_observed_ns": 1126666500,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 175,
+      "hash": "257eaad1b45b87b7b81e5cc5ea29e1f350f57d7e8b85af6f1273aed8551c708c",
+      "wire_bytes": 817253,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 218385000,
+      "durable_observed_ns": 994998750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 176,
+      "hash": "2d6abd6e1d60d1a439717fef61e26672b5c9c3978f407bbdc80a768f908cff10",
+      "wire_bytes": 817233,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 231977375,
+      "durable_observed_ns": 929392833,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 177,
+      "hash": "110b3a34975595401d884747427b7b279360fe2596b9c0c7607b5849064b1ee8",
+      "wire_bytes": 817275,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 211291542,
+      "durable_observed_ns": 932871417,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 178,
+      "hash": "2c27e460f0f19910cc91bfad87941341ada9fb813da22d2c338a63b29747afe4",
+      "wire_bytes": 817252,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 242635459,
+      "durable_observed_ns": 914883709,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 179,
+      "hash": "6d8f32f79c4ef0dbd88eed4628624e662a6eb1990ba00ea4e0a0d8069c29b7c4",
+      "wire_bytes": 817231,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 231299166,
+      "durable_observed_ns": 814738083,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 180,
+      "hash": "45df5b006db5249ab00c580eead20db163f10834c467214b099d7f50b9c5f9be",
+      "wire_bytes": 817294,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 213336250,
+      "durable_observed_ns": 793656625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 181,
+      "hash": "14427c2917bc57dd823ae8f31082056ae2c67da5a3939f8213ea8f3c74478fc7",
+      "wire_bytes": 817271,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 207064209,
+      "durable_observed_ns": 760299125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 182,
+      "hash": "1e7d9dde0aac040f36abf3c055d1a02aedb0d95640da4c8df639fa0e6482c994",
+      "wire_bytes": 817304,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 216201959,
+      "durable_observed_ns": 750129625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 183,
+      "hash": "350903d9156e64a230f9983ec6fe74f9acfb0ae370784d017ee66420830929e4",
+      "wire_bytes": 817353,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 210561167,
+      "durable_observed_ns": 747533750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 184,
+      "hash": "01267a6a2c4e356a0e4dee49b2c0871d9b309c7d9546e72920095c0ad7ae0015",
+      "wire_bytes": 817195,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 206837667,
+      "durable_observed_ns": 807335917,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 185,
+      "hash": "5c0eb941a1c77a4cdbf04c1927bfd8ae352cdf6e8319891288130200c9c6ee44",
+      "wire_bytes": 817210,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 198242667,
+      "durable_observed_ns": 728885917,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 186,
+      "hash": "32a4911dbe9b0682124ac653cc320ca765f4455e8f7abd027838d57705299c7f",
+      "wire_bytes": 817323,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 203478458,
+      "durable_observed_ns": 727406625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 187,
+      "hash": "709e5aff4e657a143aacfd5d34004c554ab2f15c86c013828e6008f4fdd2c821",
+      "wire_bytes": 817272,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 196908667,
+      "durable_observed_ns": 717610583,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 188,
+      "hash": "5395f167f8335323e41048a83c6a37e2e13e85d574a6606346778cf5d1197fb0",
+      "wire_bytes": 817246,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 211005875,
+      "durable_observed_ns": 722338667,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 189,
+      "hash": "64563d202284893b340d2e73f61f7a2c7c288badfee0246a74a1c25b348f6c48",
+      "wire_bytes": 817229,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 186236792,
+      "durable_observed_ns": 700647125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 190,
+      "hash": "6203b7ae726a8b6e1a5fd15d84b13867a767504df4c9616e78e348ea31328e64",
+      "wire_bytes": 817290,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 193506541,
+      "durable_observed_ns": 707743000,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 191,
+      "hash": "3e2d3695644eb7c9b34c05a5e2f46f25c311811040812d87811a7aaebee375cd",
+      "wire_bytes": 817304,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219894750,
+      "durable_observed_ns": 734949041,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 192,
+      "hash": "6ae435d814d963a2da70c8f6c551920fcf9ea55b96665ea4d5c71c21b92b48ce",
+      "wire_bytes": 817294,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 211873417,
+      "durable_observed_ns": 728928584,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 193,
+      "hash": "071f415be85a001941cc04117851f21197d73005c7baeaebcf7928d0710ac9b0",
+      "wire_bytes": 817240,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 207195375,
+      "durable_observed_ns": 752370959,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 194,
+      "hash": "5f52ace3410b98f375062be2dff2a340340c96e6d2df85ff87e787e062a5497e",
+      "wire_bytes": 817306,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 250997458,
+      "durable_observed_ns": 693432875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 195,
+      "hash": "5afb392316fcf15f6169003bfc1513488b8b4434d8359eb8188696e0e9f77bdb",
+      "wire_bytes": 817203,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 240211541,
+      "durable_observed_ns": 782564125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 196,
+      "hash": "6068ae5181894afc721af832162b0e5a063829cbc79274f1c0e6c035fa89eadf",
+      "wire_bytes": 817241,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 304215584,
+      "durable_observed_ns": 742372250,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 197,
+      "hash": "24307ad1271b14cfb473d3c43ebafd741adb81937d469e0d5eda2a514610731c",
+      "wire_bytes": 817241,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 291206125,
+      "durable_observed_ns": 731895334,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 198,
+      "hash": "55e9e38e20f5c408d7f733ccb83279dae814900538e9d69301722fa02576e01a",
+      "wire_bytes": 817258,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 237383583,
+      "durable_observed_ns": 791546166,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 199,
+      "hash": "0525e597d13abe302cc37037aa3033c473ef68c82d200637f06b6f926514d027",
+      "wire_bytes": 817311,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 265707250,
+      "durable_observed_ns": 790735041,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 200,
+      "hash": "68727088d5aa33302e9c7f0c8a7df4e01a33f0729a47e3bb84597c80a0a8399f",
+      "wire_bytes": 817273,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 261495875,
+      "durable_observed_ns": 788188792,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 201,
+      "hash": "55331eaf056ab814f46c4c8cb4ef627a4a2119988f7ca1b30e1874b8874233e9",
+      "wire_bytes": 817316,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 232916875,
+      "durable_observed_ns": 742475000,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 202,
+      "hash": "3159e690089fe2bfb0d50c255b90e3331cb63668a395a6965ef4c0a150a65f4a",
+      "wire_bytes": 817304,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 214132875,
+      "durable_observed_ns": 728476250,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 203,
+      "hash": "0e9479099d41fd3c047381a2d6c3df70dca69f6cdf1ff2539883f5ab614283dc",
+      "wire_bytes": 817262,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 230137167,
+      "durable_observed_ns": 740231208,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 204,
+      "hash": "0caa2006508fb54773769b26b3b0da60fb89d4269ee4e3c2273f9d1d59e86ef6",
+      "wire_bytes": 817262,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 210182666,
+      "durable_observed_ns": 737274333,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 205,
+      "hash": "05c83a0680b3d5b1bc0c2d705e975ad8cc4488c2d9d238fd81f17245e9ed8f4c",
+      "wire_bytes": 817321,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 197189875,
+      "durable_observed_ns": 714521292,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 206,
+      "hash": "524bdc8ab2654871e0aa850510424c29911931b8154131da04940fe2bedb3233",
+      "wire_bytes": 817229,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 232798459,
+      "durable_observed_ns": 650503709,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 207,
+      "hash": "5c85e2983996d198b5c6fd70930551e3c49d7c97c96b98281e336e293792d7eb",
+      "wire_bytes": 817288,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 214228166,
+      "durable_observed_ns": 734218833,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 208,
+      "hash": "694088e7e176dc4999c394c2b3e2690db6ef52f5d15770c4fa0eab8980739cdb",
+      "wire_bytes": 817269,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 228269875,
+      "durable_observed_ns": 743834042,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 209,
+      "hash": "687309180e31d32c1af92bd0db597b5a9f7fbfc71de2e47857fa2270840157d4",
+      "wire_bytes": 817274,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 205833833,
+      "durable_observed_ns": 724449833,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 210,
+      "hash": "7ec4ec05a701420861619a96f533df1a79074e289920f867145993a8591e0826",
+      "wire_bytes": 817343,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 230255000,
+      "durable_observed_ns": 744722917,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 211,
+      "hash": "2b2b7b89f307466b981b21d941a1b1f3c57d9b686997a54fc5e622d6348a772b",
+      "wire_bytes": 817259,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 209387750,
+      "durable_observed_ns": 741545666,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 212,
+      "hash": "530a1a2805f8afb182549050d0e87c60fd77f4c106eeae8328b8841c650dc371",
+      "wire_bytes": 817220,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219339792,
+      "durable_observed_ns": 738462833,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 213,
+      "hash": "553f90111dbd360c38c57904cc7841982b49d5f90046d027084375de61f437df",
+      "wire_bytes": 817260,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 200003000,
+      "durable_observed_ns": 718762625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 214,
+      "hash": "1ceac7ce79254518843b4bcb8658d9587b974306241a43486309194373760a9a",
+      "wire_bytes": 817204,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 209399292,
+      "durable_observed_ns": 723790208,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 215,
+      "hash": "36579fca7af128c08614cbf9a7c43543736d64613f262413a5aa438d2f8d0926",
+      "wire_bytes": 817264,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 213140750,
+      "durable_observed_ns": 733073625,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 216,
+      "hash": "19f9fe12a2b3bd9f9c199387d09e134102ed2de13e8b5d0269748cbee43bd177",
+      "wire_bytes": 817260,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 217881625,
+      "durable_observed_ns": 735252958,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 217,
+      "hash": "7dcc619fda3f1906ef8f36d69bbde0f3e53fde04aabebb3f315521eb90d96860",
+      "wire_bytes": 817270,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 204439542,
+      "durable_observed_ns": 715917875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 218,
+      "hash": "37e2cb3356a2fda679d83b29567305f04676b39d08be964fe612c43ba794877e",
+      "wire_bytes": 817228,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 213356583,
+      "durable_observed_ns": 725784667,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 219,
+      "hash": "41f6c00820f82d16f0728ada8a9566d9a057de81e6afa5fe9f1c971dc7b04fed",
+      "wire_bytes": 817310,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 203232333,
+      "durable_observed_ns": 716750583,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 220,
+      "hash": "5c071c6abcd3f13864c16d8aee5819e7356b1bf31d14e0034b6f81c0608f0377",
+      "wire_bytes": 817243,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 231223209,
+      "durable_observed_ns": 744669042,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 221,
+      "hash": "52e1808f18d7076a7aa685d5aa94f934b233a98980979ec94530fdcc7bd6a5b3",
+      "wire_bytes": 817281,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 207896291,
+      "durable_observed_ns": 721645041,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 222,
+      "hash": "69fc0164e7019acd6b036555cc0cad2d7f266b21d3390390d009c4452a270a9f",
+      "wire_bytes": 817229,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 201666417,
+      "durable_observed_ns": 720341000,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 223,
+      "hash": "1c524c8897eb662010647ad7b67044c3f103a86b7d77ee2c5a3e75180c0e9e2d",
+      "wire_bytes": 817314,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 190395292,
+      "durable_observed_ns": 757516334,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 224,
+      "hash": "0c17f164a8bc84184cdf5c75a889054fef5b2a49bf27947b3058fbab23169cee",
+      "wire_bytes": 817246,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 214862292,
+      "durable_observed_ns": 735123875,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 225,
+      "hash": "6480d80a24adaad23f3e4bd4db46ec6832a8fad9605b5db3cbb6dea9c91ce1b2",
+      "wire_bytes": 817283,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 270453333,
+      "durable_observed_ns": 790141708,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 226,
+      "hash": "6056d50ce235e912dab18489ca307a9ec7fedfb14532e9384427865683743b01",
+      "wire_bytes": 817309,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 233645500,
+      "durable_observed_ns": 751755959,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 227,
+      "hash": "2bae5bf9927cc8c059d684c0e27aea114a40c0ae40b42d80fb3b9accc505a9fe",
+      "wire_bytes": 817230,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 222386625,
+      "durable_observed_ns": 740420750,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 228,
+      "hash": "45ea6815ccfd5a7c2903a0af00d958168be1171414a9799b9b020a74be9a1709",
+      "wire_bytes": 817259,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 220278750,
+      "durable_observed_ns": 742153083,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 229,
+      "hash": "7159bf0894c8540059024f00048d175904509dda0478e60f7e3ddb2654bc5c63",
+      "wire_bytes": 817292,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 216591000,
+      "durable_observed_ns": 747928458,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 230,
+      "hash": "34ffe4a9b43827e5c83aec22a9f5284477017d5dd7302e7262ee85846d957c42",
+      "wire_bytes": 817258,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 224007417,
+      "durable_observed_ns": 766416792,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 231,
+      "hash": "037dd7f1109da86b3564dc83d6e886d75c695adae85d7e8562c9c66a6ce56179",
+      "wire_bytes": 817331,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 198897167,
+      "durable_observed_ns": 716005125,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 232,
+      "hash": "03882af8f8aba5ac016f651f8ae457912836c167d4226f1ba3cb48779f373b37",
+      "wire_bytes": 817261,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219840792,
+      "durable_observed_ns": 642201792,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 233,
+      "hash": "468bdc4b32f54ec928ca203f450a9a4e3435748efbf7840f1c3bbfbe72ed03c6",
+      "wire_bytes": 817248,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 237763417,
+      "durable_observed_ns": 661441417,
+      "source": "live SV Node getdata/block"
+    },
+    {
+      "height": 234,
+      "hash": "027dcd5ef55c17e3c4f90a8745d2ac15f5c6cfb432367fe65b3028d165127c12",
+      "wire_bytes": 817271,
+      "transactions": 4096,
+      "known_signature_checks": 4096,
+      "reference_return_ns": 219525625,
+      "durable_observed_ns": 732412875,
+      "source": "live SV Node getdata/block"
+    }
+  ],
+  "total_transactions": 524288,
+  "total_wall_ns": 110650860917,
+  "transactions_per_second": 4738.218895497543,
+  "final_reference_tip": "027dcd5ef55c17e3c4f90a8745d2ac15f5c6cfb432367fe65b3028d165127c12"
+}

@@ -18,15 +18,56 @@ use bsv::transaction::transaction::Transaction;
 use serde_json::{json, Value};
 use wire::{Event, Hash};
 
+#[derive(serde::Serialize)]
+pub(crate) struct Capacity {
+    pub block_bytes: usize,
+    pub transaction_bytes: usize,
+    pub witnessed_outputs: usize,
+}
+impl Capacity {
+    fn load() -> Result<Self> {
+        fn read(key: &str, default: usize) -> Result<usize> {
+            let n = match std::env::var(key) {
+                Ok(v) => v.parse().with_context(|| format!("invalid {key}"))?,
+                Err(std::env::VarError::NotPresent) => default,
+                Err(e) => return Err(e.into()),
+            };
+            ensure!(n > 0, "{key} must be positive");
+            Ok(n)
+        }
+        let block_bytes = read("SCARY_MAX_BLOCK_BYTES", 256 << 20)?;
+        ensure!(
+            block_bytes >= 1024,
+            "block capacity must be at least 1024 bytes"
+        );
+        let transaction_bytes = read("SCARY_MAX_TRANSACTION_BYTES", (16 << 20).min(block_bytes))?;
+        ensure!(
+            transaction_bytes <= block_bytes,
+            "transaction capacity exceeds block capacity"
+        );
+        Ok(Self {
+            block_bytes,
+            transaction_bytes,
+            witnessed_outputs: read("SCARY_MAX_WITNESSED_OUTPUTS", 1_000_000)?,
+        })
+    }
+}
+static CAPACITY: std::sync::OnceLock<Capacity> = std::sync::OnceLock::new();
+pub(crate) fn configure_capacity() -> Result<()> {
+    if CAPACITY.get().is_none() {
+        let cap = Capacity::load()?;
+        let _ = CAPACITY.set(cap);
+    }
+    Ok(())
+}
+fn capacity() -> &'static Capacity {
+    CAPACITY.get_or_init(|| Capacity::load().expect("checked process capacity"))
+}
 pub(crate) fn body_limit() -> usize {
-    static LIMIT: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
-    *LIMIT.get_or_init(|| {
-        std::env::var("SCARY_MAX_BLOCK_BYTES")
-            .ok()
-            .and_then(|v| v.parse::<usize>().ok())
-            .filter(|n| *n >= 1024)
-            .unwrap_or(256 << 20)
-    })
+    capacity().block_bytes
+}
+pub(crate) fn transaction_limit() -> usize {
+    capacity().transaction_bytes
 }
 const MAX_WATCHED: usize = 100_000;
 const MAX_PENDING: usize = 65_536;
@@ -59,6 +100,8 @@ struct Entry {
 
 #[derive(serde::Serialize, serde::Deserialize)]
 struct SolvedBody {
+    #[serde(default)]
+    verified_sequence: Option<u32>,
     height: u32,
     hash: Hash,
     #[serde(with = "store::arc_bytes")]
@@ -384,6 +427,10 @@ impl Mining {
                 && timestamp(&header) <= now()?.saturating_add(7200),
             "candidate time out of range"
         );
+        ensure!(
+            raw.len() <= body_limit(),
+            "candidate exceeds configured body capacity"
+        );
         if solved {
             let hash = hash256(&header);
             ensure!(
@@ -498,8 +545,8 @@ impl Mining {
 
     fn admit(&mut self, raw: &[u8]) -> Result<String> {
         ensure!(
-            raw.len() <= 100_000,
-            "transaction exceeds alpha admission size"
+            raw.len() <= transaction_limit(),
+            "transaction exceeds configured admission size"
         );
         let mut framing = raw;
         wire::transaction(&mut framing, |_| {})?;
@@ -653,16 +700,30 @@ impl Mining {
             .filter(|s| s.hash == *hash)
             .map(|b| b.raw.as_ref())
     }
+    pub(crate) fn solution_height(&self, id: Hash) -> Option<u32> {
+        self.solution_body
+            .as_ref()
+            .filter(|s| s.hash == id)
+            .map(|s| s.height)
+    }
+
     pub(crate) fn relayable_solution(&self) -> Option<Hash> {
         let s = self.solution_body.as_ref()?;
         if !self.observation_window_ready()
-            || s.height != self.height?.checked_add(1)?
-            || s.raw[4..36] != self.tip()?
+            || self.applied_sequence != self.directives.applied()
             || self.directives.invalid.contains(&s.hash)
         {
             return None;
         }
-        (self.applied_sequence == self.directives.applied()
+        let height = self.height?;
+        let tip = self.tip()?;
+        if s.hash == tip && height == s.height && s.verified_sequence == Some(self.applied_sequence)
+        {
+            // Another transport may have delivered and adopted these exact bytes first.
+            return Some(s.hash);
+        }
+        (s.height == height.checked_add(1)?
+            && s.raw[4..36] == tip
             && self.verify_own_block(s.height, &s.raw, true).is_ok())
         .then_some(s.hash)
     }
@@ -703,7 +764,7 @@ impl Mining {
             .and_then(|h| h.checked_sub(self.headers.len().saturating_sub(1) as u32));
 
         json!({
-            "coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
+            "capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
             "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
             "observation_window_ready": self.observation_window_ready(), "headers": self.headers.len(), "awaiting_height": self.awaiting_height,
             "witnessed_outputs": self.coins.len(), "omitted_outputs": self.omitted_outputs,

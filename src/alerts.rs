@@ -195,7 +195,7 @@ impl Book {
         let message = hex::encode(data);
         let hash = BigNumber::from_bytes(&BSM::magic_hash(message.as_bytes()), Endian::Big);
         let mut seen = HashSet::new();
-        for sig in raw[end..].chunks_exact(65) {
+        for sig in raw[end..].as_chunks::<65>().0 {
             let (s, r, compressed) = Signature::from_compact_bsm(sig)?;
             ensure!(
                 compressed
@@ -332,7 +332,7 @@ impl Book {
                 self.invalid.insert(hash);
             }
             8 => {
-                let keys: Vec<_> = body.chunks_exact(33).map(hex::encode).collect();
+                let keys: Vec<_> = body.as_chunks::<33>().0.iter().map(hex::encode).collect();
                 ensure!(body.len() == 165, "wrong key set length");
                 check_keys(&keys)?;
                 self.keys = keys;

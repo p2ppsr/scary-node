@@ -86,6 +86,8 @@ async fn receive(
     }
     let cap = if cmd == "block" {
         limit
+    } else if cmd == "tx" {
+        crate::mining::transaction_limit()
     } else {
         limit.min(32 << 20)
     };
@@ -126,7 +128,9 @@ fn items(mut raw: &[u8]) -> Result<Vec<(u32, Hash)>> {
         n <= 50000 && raw.len() == 36 * n,
         "invalid inventory length"
     );
-    raw.chunks_exact(36)
+    raw.as_chunks::<36>()
+        .0
+        .iter()
         .map(|e| Ok((u32::from_le_bytes(e[..4].try_into()?), e[4..].try_into()?)))
         .collect()
 }
@@ -211,6 +215,7 @@ async fn session(
     let _guard = Abort(reader);
     let mut prefers_headers = false;
     let mut advertised = None;
+    let mut last_repair = tokio::time::Instant::now();
     let mut handshake = false;
     let mut saw_version = false;
     let mut due = tokio::time::interval(Duration::from_secs(1));
@@ -219,6 +224,10 @@ async fn session(
             _=due.tick()=>{
                 let s=state.lock().await;
                 ensure!(!s.directives.peer_banned(&addr.ip()),"peer banned");
+                if handshake && last_repair.elapsed()>=Duration::from_secs(3) {
+                    let missing=s.missing_recent();last_repair=tokio::time::Instant::now();
+                    for (id,_) in missing{send(&mut w,regtest,"getdata",&inventory(2,id)).await?;}
+                }
                 if handshake {if let Some(hash)=s.relayable_solution(){
                     if advertised!=Some(hash){
                         let raw=s.solution_bytes(&hash).expect("selected stored solution");
@@ -247,7 +256,7 @@ async fn session(
                         if let Some(id)=s.relayable_solution(){
                             let b=s.solution_bytes(&id).expect("selected stored solution");
                             let stop=&locator[n*32..];
-                            if (stop==id || stop==[0;32]) && (locator[..n*32].chunks_exact(32).any(|h|h==&b[4..36]) || (n==0 && stop==id)){
+                            if (stop==id || stop==[0;32]) && (locator[..n*32].as_chunks::<32>().0.iter().any(|h|h==&b[4..36]) || (n==0 && stop==id)){
                                 reply[0]=1;reply.extend(&b[..80]);reply.push(0);
                             }
                         }

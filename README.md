@@ -68,7 +68,7 @@ The reliability proof submits an older Stratum job after a same-parent update, c
 
 ## Verify Chronicle validation and asset recovery
 
-Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. [Reproduction](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md)
+Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. Run `regtest/mixed.sh` for independent SV Node and Teranode adoption, or the native workload driver to reproduce the 524,288-spend capacity measurement. [Reproduction](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md)
 
 ## Point an ASIC at your node
 

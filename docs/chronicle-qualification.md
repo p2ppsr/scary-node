@@ -37,6 +37,18 @@ Each oracle receives the same serialized transaction and its actual previous out
 
 The throughput driver constructs four 4,096-transaction bodies that spend distinct witnessed P2PKH outputs. Each spend has a valid signature and a known fee. The timer starts before decoding the block and stops after atomic checkpoint replacement and directory sync. The first funding round has unknown inputs and is reported separately. Signing the fixtures and transporting blocks are outside that measurement. The benchmark exercises the release-profile validation and storage code in a test executable. Mixed-validator propagation, sustained queueing and worker opportunity loss require the network workload.
 
+To measure SV Node validation, native transfer, Rust BDK checks and durable tip updates together, use the release binary and the pinned functional-test Python environment. Each body spends 4,096 distinct P2PK outputs. The 128-round run measures more than half a million signed transactions. The mixed lab starts two independent Teranode stores, one SV Node store, the Rust entrant and its Stratum worker. The SV reference receives the initial common history before the race and receives the actual solution directly on its P2P socket.
+
+```sh
+cargo build --locked --release
+.native/py/bin/python qualification/native_workload.py .native/native-workload.json
+.native/py/bin/python qualification/native_workload.py --rounds 128 .native/native-sustained.json
+./regtest/mixed.sh > .native/mixed.json
+python3 regtest/verify_receipt.py .native/mixed.json
+python3 qualification/capacity_recovery.py .native/capacity-recovery.json
+./regtest/mixed.sh --down
+```
+
 ## Operating the signed alert receiver
 
 Run the maintained `go-alert-system` v0.3.5 receiver with its official environment-specific configuration. Keep its raw HTTP API on a private network or behind a loopback-only port mapping. Give its SQLite datastore and P2P key durable storage. Retain the official five mainnet trust keys. The genesis packet is common to the release and the environment selects the trust keys. Configure its node RPC user as `scary`, the password from the gateway token file, and the host as the gateway address reachable from the receiver. The gateway listens on loopback. Co-locate it with the receiver or use a private authenticated tunnel. During an empty-state bootstrap the receiver can disable its initial best-block RPC probe. [Upstream receiver release](https://github.com/bsv-blockchain/go-alert-system/releases/tag/v0.3.5) · [Mainnet configuration](https://github.com/bsv-blockchain/go-alert-system/blob/c19f9959fb979f9def944807bd4e58ecadf25717/app/config/envs/mainnet.json)
