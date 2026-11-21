@@ -123,3 +123,30 @@ python3 qualification/linux_shadow_candidate.py \
 ```
 
 The summary contains the committed receipt digest, confirmed parent and successor, fees, transaction counts, interpreter identities, agreement and ordinary validation outcomes. The journal identifies the originating station executable separately from the Linux image used for the independent replay. The driver compares policy and consensus outcomes and individual script-rejection details between platforms, then counts confiscations separately. The optional `--private-decisions` path retains detailed results locally if investigation is required. An incomplete candidate, mismatched receipt or unrecognized executable fails verification.
+
+## Recover eligible payments across a controlled stop
+
+The Linux ARM64 release restored an immutable copy of the live macOS checkpoint at height **976534**. It opened 113 headers, 33,394 witnessed outputs, signed sequence 1 and all 73 eligible payments on disk. Docker disabled external networking. Both native intake counters stayed at zero, the receiver was disconnected and mining readiness stayed false. This isolates payment recovery from peer retransmission. The checkpoint and its unconfirmed payments stay in operator custody. The public receipt identifies the source image, binary, BDK archive, whole checkpoint, payload, witnessed outputs and eligible transaction set by digest. [Isolated Linux restore](evidence/chronicle-shadow-before-stop-offline.json)
+
+The live passive observer then upgraded at height **976535**, with 114 headers, 36,321 witnessed outputs and 71 eligible payments. It restored the same parent and all 71 payments, and data peers reconfirmed the tip within two seconds. The old process had two additional offers awaiting their funding block’s successor. That queue reopened empty. [Live upgrade and reconfirmation](evidence/chronicle-shadow-shutdown-upgrade.json)
+
+To check an operator’s own checkpoint, keep an immutable link to the atomic state file in a private directory on the same filesystem. Use the qualification Python environment, its pinned SV test framework and a local Linux image built from the release source. The existing regtest controlled-stop fixtures supply public signed payment and block bytes for both signal tests. [Reference builds and lab environment](chronicle-qualification.md) · [Regtest stop and restore](operations.md#stop-and-restore-the-miner)
+
+```sh
+umask 077
+ln "$DATA_DIR/mainnet/witness.state" "$PRIVATE_EVIDENCE/earlier.state"
+.native/py/bin/pip install 'msgpack==1.1.2'
+.native/py/bin/python qualification/shadow_restore_boot.py \
+  "$PRIVATE_EVIDENCE/earlier.state" "$DATA_DIR/mainnet/alerts" \
+  "$LINUX_BUILD_RECEIPT" "$PRIVATE_EVIDENCE/offline-restore.json"
+```
+
+To measure the controlled stop, retain the earlier checkpoint, wait for eligible peer admissions on the same parent, send the observer SIGTERM and wait for it to exit. Link the resulting `witness.state` as `closed.state` before relaunching. Compare the two immutable files, run the isolated Linux restore on the closed file and compare its count with the live process after restart. If a new block or directive changed the boundary during the stop, record that event and assess it separately. The comparison verifies each signed transaction ID against its stored bytes and requires every earlier payment to appear in the closed pool. The input-set digests use sorted 32-byte transaction hashes in internal byte order.
+
+```sh
+.native/py/bin/python qualification/shadow_pending_restore.py \
+  "$PRIVATE_EVIDENCE/earlier.state" "$PRIVATE_EVIDENCE/closed.state"
+.native/py/bin/python qualification/shadow_restore_boot.py \
+  "$PRIVATE_EVIDENCE/closed.state" "$DATA_DIR/mainnet/alerts" \
+  "$LINUX_BUILD_RECEIPT" "$PRIVATE_EVIDENCE/closed-offline.json"
+```

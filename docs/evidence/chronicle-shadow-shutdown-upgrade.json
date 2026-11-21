@@ -1,0 +1,138 @@
+{
+  "source_commit": "10b93b4f0ff798a7b14813443addf2348beeee41",
+  "release_sha256": "0aab15b07c706b9cbf49d26b68b4ce3675eb0ee308fb92fc8d294675157b0b36",
+  "started_unix_s": 1795303914,
+  "verified_unix_s": 1795303916,
+  "passive_mainnet": true,
+  "recovered_start_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+  "before": {
+    "height": 976535,
+    "tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+    "coverage_start": 976422,
+    "coverage_end": 976535,
+    "headers": 114,
+    "witnessed_outputs": 36321,
+    "pending_transactions": 71,
+    "waiting_for_successor": 2,
+    "waiting_for_successor_bytes": 418,
+    "peer_transaction_intake": {
+      "sv": {
+        "admitted": 920,
+        "awaiting_successor": 492,
+        "discarded_after_recheck": 481,
+        "duplicate": 3109,
+        "ineligible": 7384,
+        "promoted_after_successor": 9
+      },
+      "teranode_subtree": {
+        "admitted": 215,
+        "awaiting_successor": 13,
+        "discarded_after_recheck": 12,
+        "duplicate": 392079,
+        "ineligible": 613218,
+        "promoted_after_successor": 1
+      }
+    },
+    "window_chainwork": "3a0d4fb9eb1a1cd630f",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "difficulty history incomplete"
+    ],
+    "storage_failure": null,
+    "tip_confirmed_since_disconnect": true,
+    "connected_data_peers": 9,
+    "alert_ready": true,
+    "alert_connected": true,
+    "alert_verified": 1,
+    "alert_applied": 1
+  },
+  "restored": {
+    "height": 976535,
+    "tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+    "coverage_start": 976422,
+    "coverage_end": 976535,
+    "headers": 114,
+    "witnessed_outputs": 36321,
+    "pending_transactions": 71,
+    "waiting_for_successor": 0,
+    "waiting_for_successor_bytes": 0,
+    "peer_transaction_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "window_chainwork": "3a0d4fb9eb1a1cd630f",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "awaiting current tip from a connected data peer",
+      "difficulty history incomplete"
+    ],
+    "storage_failure": null,
+    "tip_confirmed_since_disconnect": false,
+    "connected_data_peers": 1,
+    "alert_ready": true,
+    "alert_connected": true,
+    "alert_verified": 1,
+    "alert_applied": 1
+  },
+  "reconfirmed": {
+    "height": 976535,
+    "tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+    "coverage_start": 976422,
+    "coverage_end": 976535,
+    "headers": 114,
+    "witnessed_outputs": 36321,
+    "pending_transactions": 71,
+    "waiting_for_successor": 0,
+    "waiting_for_successor_bytes": 0,
+    "peer_transaction_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "window_chainwork": "3a0d4fb9eb1a1cd630f",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "difficulty history incomplete"
+    ],
+    "storage_failure": null,
+    "tip_confirmed_since_disconnect": true,
+    "connected_data_peers": 2,
+    "alert_ready": true,
+    "alert_connected": true,
+    "alert_verified": 1,
+    "alert_applied": 1
+  },
+  "receiver": {
+    "active_peers": 2,
+    "synced": true,
+    "sequence": 1,
+    "unprocessed_alerts": 0
+  }
+}

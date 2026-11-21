@@ -1,0 +1,43 @@
+{
+  "network": "mainnet",
+  "docker_network_mode": "none",
+  "source_commit": "10b93b4f0ff798a7b14813443addf2348beeee41",
+  "image_id": "sha256:1953814b38f891e4f42b9a4ba1df9e87325d5d36e2a848011e42c694ac21fd9d",
+  "executable_sha256": "4b623365dcdc664473156992e6119eb7fe51f92aef838a9f946281ec31b7c536",
+  "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+  "checkpoint_sha256": "0d777eb5add0f3f46c4f07d1acf528af84d2bdceee71626edbf18a94f3027946",
+  "payload_sha256": "75bab879456db368631213e8f6a56c3ddfee78edf3aa6eaa1e798a8f218a1068",
+  "height": 976534,
+  "parent": "00000000000000001f56cf6ea634ec572c1ead1ad6e82524ac9e7bf3be003f7c",
+  "headers": 113,
+  "headers_sha256": "b02a3c47836d13cb5df2aef7aa913c7ede06cfbb22e79cc3f2ba1de21a328129",
+  "witnessed_outputs": 33394,
+  "witnessed_outputs_sha256": "9b1089a3274a9c7398594642efbb5f0175393a36b39888269f6abf2cf3d428ff",
+  "directive_sequence": 1,
+  "expected_eligible": 73,
+  "restored_eligible": 73,
+  "input_eligible_ids_sha256": "9fbe333f5c9400984db831dda9017b12d9520658959b750f322e954abcec2cbc",
+  "connected_data_peers": 0,
+  "tip_reconfirmed": false,
+  "directive_connected": false,
+  "directive_ready": false,
+  "peer_intake": {
+    "sv": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    },
+    "teranode_subtree": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    }
+  },
+  "work_ready": false
+}

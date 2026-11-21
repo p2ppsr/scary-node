@@ -141,6 +141,39 @@ def extract(cid, uri, dest):
             require(proc.wait() == 0, "private archive extraction failed")
 
 
+def restored_status(cid):
+    deadline = time.monotonic() + 120
+    while True:
+        try:
+            return json.loads(
+                docker(
+                    "run",
+                    "--rm",
+                    "--read-only",
+                    "--network",
+                    "container:" + cid,
+                    "--log-driver",
+                    "none",
+                    "--pull=never",
+                    "--entrypoint",
+                    "curl",
+                    HELPER,
+                    "-fsS",
+                    "--max-time",
+                    "3",
+                    "http://127.0.0.1:8080/status",
+                    stderr=subprocess.DEVNULL,
+                )
+            )
+        except subprocess.CalledProcessError:
+            if (
+                time.monotonic() > deadline
+                or docker("inspect", "--format", "{{.State.Running}}", cid) != "true"
+            ):
+                raise
+            time.sleep(0.5)
+
+
 def boot(image, settings, data, leases, observation_path):
     reference = observation(observation_path)
     release, wanted, measured_blocks = expected(reference)
@@ -210,38 +243,7 @@ def boot(image, settings, data, leases, observation_path):
         wire_sha = docker("exec", cid, "sha256sum", path).split()[0]
         size = int(docker("exec", cid, "stat", "-c", "%s", path))
         docker("exec", cid, "touch", "/run/restore/start")
-        deadline = time.monotonic() + 120
-        while True:
-            try:
-                status = json.loads(
-                    docker(
-                        "run",
-                        "--rm",
-                        "--read-only",
-                        "--network",
-                        "container:" + cid,
-                        "--log-driver",
-                        "none",
-                        "--pull=never",
-                        "--entrypoint",
-                        "curl",
-                        HELPER,
-                        "-fsS",
-                        "--max-time",
-                        "3",
-                        "http://127.0.0.1:8080/status",
-                        stderr=subprocess.DEVNULL,
-                    )
-                )
-                break
-            except subprocess.CalledProcessError:
-                if (
-                    time.monotonic() > deadline
-                    or docker("inspect", "--format", "{{.State.Running}}", cid)
-                    != "true"
-                ):
-                    raise
-                time.sleep(0.5)
+        status = restored_status(cid)
         m = status["mining"]
         require(
             {k: m[k] for k in wanted} == wanted
