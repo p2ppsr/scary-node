@@ -130,6 +130,7 @@ def fixture():
         "funding_proofs": {block: funding},
         "headers": [h.hex() for h in headers],
         "successor": {
+            "observed_at": now,
             "height": n,
             "hash": txid(successor),
             "header_hex": successor.hex(),
@@ -192,6 +193,22 @@ class NativeQualificationTests(unittest.TestCase):
         mutated["headers"][-2] = terminal.hex()
         with self.assertRaisesRegex(ValueError, "gap"):
             assess(mutated)
+
+    @patch("shadow_first_candidate.checked_header", side_effect=fixture_header)
+    def test_two_hour_limit_uses_corroborated_clock_and_timed_successor(self, _):
+        r = fixture()
+        candidate = r["decision"]["unsigned_candidate"]
+        wire = bytearray.fromhex(candidate["header_hex"])
+        wire[68:72] = struct.pack("<I", r["decision"]["observed_at"] + 7190)
+        candidate["header_hex"] = wire.hex()
+        r["clock"]["peer_clock"]["offset_from_wall_seconds"] = -20
+        with self.assertRaisesRegex(ValueError, "corroborated future limit"):
+            assess(r)
+        r["clock"]["peer_clock"]["offset_from_wall_seconds"] = 0
+        self.assertTrue(assess(r)["complete"])
+        r["successor"]["observed_at"] -= 7201
+        with self.assertRaisesRegex(ValueError, "successor time"):
+            assess(r)
 
     def test_selection_preserves_the_original_even_after_a_gap(self):
         rows = [

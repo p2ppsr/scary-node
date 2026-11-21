@@ -395,7 +395,14 @@ def assess(rec):
     successor = rec.get("successor")
     matched = False
     if successor:
-        h = checked_header(bytes.fromhex(successor["header_hex"]), successor["height"])
+        raw = bytes.fromhex(successor["header_hex"])
+        h = checked_header(raw, successor["height"])
+        timestamp = int.from_bytes(raw[68:72], "little")
+        median = sorted(t for t, _ in recent[-11:])[5]
+        require(
+            median < timestamp <= successor["observed_at"] + 7200,
+            "successor time outside observed bounds",
+        )
         matched = (
             h["previous"] == d["hash"]
             and h["hash"] == successor["hash"]
@@ -420,6 +427,13 @@ def assess(rec):
             and abs(pc["offset_from_wall_seconds"]) <= pc["hold_threshold_seconds"]
             and abs(c["clock_step"]) <= c["clock_step_limit"]
         )
+        if clock_ok:
+            stamp = int.from_bytes(bytes.fromhex(j["header_hex"])[68:72], "little")
+            adjusted = d["observed_at"] + min(0, pc["offset_from_wall_seconds"])
+            require(
+                stamp <= adjusted + 7200,
+                "candidate time exceeds corroborated future limit",
+            )
     total = len(rec["witnessed"])
     return {
         "parent_height": d["height"],
@@ -543,7 +557,9 @@ def step(args, work, bases, prior):
         data["clock"] = save_clock(args, work, first["hash"])
     if len(rows) > idx + 1:
         nxt = rows[idx + 1]
-        data["successor"] = {k: nxt[k] for k in ("height", "hash", "header_hex")}
+        data["successor"] = {
+            k: nxt[k] for k in ("height", "hash", "header_hex", "observed_at")
+        }
     # Preserve prospective evidence before potentially unavailable older Asset reads.
     atomic_write(path, pack(data))
     data["earlier_headers"] = earlier_headers(
