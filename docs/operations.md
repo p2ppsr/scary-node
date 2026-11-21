@@ -35,9 +35,32 @@ Use `--sv-peer IP:PORT` to add an independent current-tip Bitcoin SV path. Mainn
 
 A competing branch beyond the retained undo data can establish a fresh witnessed boundary from a common eligible ancestor and greater verified work. Inspect the signed exclusion, recovery locator, body budget and rebuilt coverage when a deep fork interrupts work. [Deep recovery procedure and stock-node evidence](deep-recovery.md)
 
+## Size the node for the measured workload
+
+The four-node large-block trial used the following three overrides. Set them in the node's environment before startup and check the effective values under `/status` → `mining.capacity`.
+
+```sh
+export SCARY_MAX_BLOCK_BYTES=536870912
+export SCARY_MAX_JOURNAL_BYTES=1073741824
+export SCARY_MAX_UNDO_ITEMS=8000000
+```
+
+The 359,090,376-byte fixture exceeds the default 256 MiB body allowance. With the settings above, the entrant checked all 1.8 million signatures and payment values in that block. Scary's peak sampled container memory was 3.00 GiB. Stock SV Node, two Teranodes, two Aerospike databases and the entrant shared a 16-vCPU Linux ARM64 VM on a 16-core M3 Max with 128 GiB of physical RAM. The slowest of the four nodes selected the block after 86.93 seconds. The separate continuous-wallet trial settled 3,037.51 payments/s over 1,820.44 seconds. Stock mined its 75 offer-period blocks, and Scary had no eligible work in its 225 scheduled slots. Budget separately for simultaneous wallet intake, work issuance, persistent storage and block verification. [Single-body memory and timing](live-cadence-block.md) · [Sustained-wallet operating envelope](sustained-native-replication.md)
+
 ## Stop and restore the miner
 
 Send SIGINT or, on Unix, SIGTERM for a controlled stop. The node closes new transaction admission and work issuance and writes an atomic checkpoint when its eligible transaction pool has gained payments since the last durable boundary. Allow enough time for a large outstanding snapshot to sync before a service manager escalates to a forced kill. On startup, inspect the restored parent and wait for a connected data peer to reconfirm it. An abrupt process or storage failure restores the last durable checkpoint. A native offer awaiting its funding block's first successor lives in the bounded in-memory waiting queue.
+
+An independent regtest halted the process after stock SV Node gossiped one eligible signed payment. The replacement stock peer held the same confirmed chain, had an empty mempool and sent zero transaction bytes. The original release reopened with zero eligible payments after both signals, and an authorized worker received no job. The corrected release exited successfully on both signals and restored the payment in both cases. The worker solved two separate 1,100-satoshi-fee blocks. The replacement stock node selected and extended each one. [Original release observations](evidence/chronicle-shutdown-original.json) · [Restored payments and stock-selected wires](evidence/chronicle-shutdown-fixed.json) · [macOS test binary](evidence/chronicle-shutdown-macos-build.json) · [Linux release build](evidence/chronicle-shutdown-linux-build.json)
+
+The following commands first replay the recorded signals, signatures and stock selections. The second pair needs Docker, the pinned SV Node image and archive-built binaries from the named releases. Each signal test uses two fresh stock nodes, separate chain data, and an empty entrant directory. The original receipt contains the funding and parent headers. The corrected receipt also contains the original funding block and both stock-selected successor headers across the two trials.
+
+```sh
+.native/py/bin/python qualification/verify_pending_shutdown.py docs/evidence/chronicle-shutdown-original.json --baseline
+.native/py/bin/python qualification/verify_pending_shutdown.py docs/evidence/chronicle-shutdown-fixed.json
+.native/py/bin/python qualification/pending_shutdown.py "$BINARY_C2A36D5" before-stop.json --baseline
+.native/py/bin/python qualification/pending_shutdown.py "$BINARY_10B93B4" after-stop.json
+```
 
 ## Inspect what the entrant knows
 
