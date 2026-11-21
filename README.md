@@ -70,7 +70,7 @@ The reliability proof submits an older Stratum job after a same-parent update, c
 
 ## Verify Chronicle validation and asset recovery
 
-Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. Run `regtest/mixed.sh` for independent SV Node and Teranode adoption, or `regtest/mixed.sh --stream sustained` to reproduce 24 mixed-network Stratum rounds. The native workload driver covers 524,288 signed spends. [Reproduction](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md)
+Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. Run `regtest/mixed.sh` for independent SV Node and Teranode adoption, or `regtest/mixed.sh --stream sustained` to reproduce 24 mixed-network Stratum rounds. The four-store block replay covers 524,288 signed spends. The separate 30-minute lab uses native wallet connections and 300 scheduled mining opportunities. [Reproduction and production acceptance](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md) · [Native wallet and Stratum lab](docs/sustained-native-trial.md)
 
 ## Point an ASIC at your node
 
