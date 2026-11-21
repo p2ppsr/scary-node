@@ -3,12 +3,16 @@
 import copy
 import gzip
 import json
-from pathlib import Path
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
+from urllib.error import URLError
 
 from shadow import digest, merkle
 from shadow_checkpoint import current_run
-from shadow_inclusion import compare, read_block
+from shadow_inclusion import compare, packed, read_block
+from shadow_inclusion_follow import cached_pairs, finish, gather
 
 
 class InclusionTests(unittest.TestCase):
@@ -97,6 +101,95 @@ class InclusionTests(unittest.TestCase):
                 bytes.fromhex(tip["header_hex"])[36:68],
             )
 
+    def test_retry_and_restart_use_verified_earlier_successors(self):
+        evidence = Path(__file__).resolve().parents[1] / "docs/evidence"
+        with gzip.open(evidence / "chronicle-shadow-journal.json.gz") as f:
+            snapshot = json.load(f)
+        with gzip.open(
+            evidence / "chronicle-shadow-reference-transactions.json.gz"
+        ) as f:
+            references = json.load(f)
+        tips = current_run(snapshot["records"])
+        by_height = {r["height"]: r for r in tips}
+        pairs = []
+        for r in references:
+            c = by_height[r["height"]]
+            parent = by_height[c["height"] - 1]
+            # Only the test template is synthetic. All successors have real public IDs/PoW.
+            header = bytearray.fromhex(c["header_hex"])
+            header[36:68] = merkle(
+                [digest(b"fixture"), bytes.fromhex(r["transactions"][1])[::-1]]
+            )
+            parent.update(
+                ready=True,
+                pending=1,
+                expected_next_bits=c["bits"],
+                unsigned_candidate={
+                    "height": c["height"],
+                    "bits": c["bits"],
+                    "header_hex": header.hex(),
+                    "coinbase": b"fixture".hex(),
+                    "transactions": [r["transactions"][1]],
+                },
+            )
+            pairs.append((parent, c))
+        errors, calls = {}, []
+
+        def first(child):
+            calls.append(child["hash"])
+            if child == pairs[1][1]:
+                raise URLError("temporarily unavailable")
+            return references[0]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            cache = work / "blocks"
+            cache.mkdir()
+            waiting = cached_pairs(pairs, cache, errors, read=first, now=lambda: 0)
+            self.assertEqual([h["height"] for h in waiting], [pairs[1][1]["height"]])
+            cached_pairs(pairs, cache, errors, read=first, now=lambda: 30)
+            self.assertEqual(len(calls), 2)
+
+            # New process retains the verified first result; it asks only for the missing child.
+            def repaired(child):
+                self.assertEqual(child["hash"], pairs[1][1]["hash"])
+                return references[1]
+
+            with (
+                patch("shadow_inclusion_follow.SAMPLE", 2),
+                patch("shadow_inclusion.SAMPLE", 2),
+            ):
+                planned = gather(snapshot, work, {}, read=repaired)
+                self.assertEqual(planned, [c["hash"] for _, c in pairs])
+                self.assertEqual(finish(snapshot, work, planned[::-1]), None)
+
+                # The checkpoint replay has separate real-header tests; these fixture
+                # choices predate any live eligible parent. Exercise the final bundle.
+                def fixture_checkpoint(s, path, _):
+                    path.write_bytes(packed(s))
+
+                with patch(
+                    "shadow_inclusion_follow.checkpoint", side_effect=fixture_checkpoint
+                ):
+                    final = finish(snapshot, work, planned)
+                self.assertEqual(
+                    (final["sample_complete"], final["measured_pairs"]), (True, 2)
+                )
+                self.assertEqual(json.loads((work / "summary.json").read_text()), final)
+                self.assertEqual(
+                    json.loads((work / "progress.json").read_text())[
+                        "cached_successors"
+                    ],
+                    2,
+                )
+            events = [
+                json.loads(l)
+                for l in (work / "attempts.jsonl").read_text().splitlines()
+            ]
+            self.assertEqual(
+                [v["outcome"] == "verified" for v in events], [True, False, True]
+            )
+
     def test_pagination_checks_order_prefix_and_reference_tip(self):
         route = "/block/hash/" + self.child["hash"]
         pages = [route + "/page/1", route + "/page/2"]
@@ -117,7 +210,7 @@ class InclusionTests(unittest.TestCase):
         self.assertEqual(
             read_block(self.child, suffix_pages.__getitem__)["transactions"], self.txs
         )
-        for patch in (
+        for changes in (
             {"confirmations": 0},
             {"tx": self.txs[1:2]},
             {"pages": {"uri": pages[::-1]}},
@@ -125,7 +218,7 @@ class InclusionTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 read_block(
                     self.child,
-                    dict(reference, **{route: dict(block, **patch)}).__getitem__,
+                    dict(reference, **{route: dict(block, **changes)}).__getitem__,
                 )
 
 

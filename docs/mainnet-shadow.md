@@ -64,6 +64,14 @@ python3 qualification/shadow_inclusion.py capture .native/shadow-final.json.gz .
 python3 qualification/shadow_inclusion.py verify .native/shadow-final.json.gz .native/shadow-successors.json.gz
 ```
 
+A finite collector can save each independently read successor as soon as the observed pair exists. It verifies the full ordered transaction list against the observed header before writing it to the local cache. A later outage or a collector restart can then retry the missing block without downloading previously verified blocks again. `progress.json` lists outstanding heights and `attempts.jsonl` retains failed and successful readbacks. The collector rereads the live journal before fixing the final sample and replays every cached list against its selected header.
+
+```sh
+python3 qualification/shadow_inclusion_follow.py "$SHADOW_LOG" "$FAILOVER_RECEIPT" "$PRIVATE_SUCCESSOR_DIR"
+python3 qualification/shadow_inclusion.py verify \
+  "$PRIVATE_SUCCESSOR_DIR/checkpoint.json.gz" "$PRIVATE_SUCCESSOR_DIR/successors.json.gz"
+```
+
 The published 90-block entry checkpoint yields zero candidate-bearing pairs. It predates the first unsigned template. Two independent reference reads returned all 668 transactions at height 976467 and all four at height 976511. Both sets reconstruct the locally observed header commitments. The regression test uses a synthetic transaction choice at the second height to check the counting procedure. [Public reference readbacks](evidence/chronicle-shadow-reference-transactions.json.gz)
 
 
