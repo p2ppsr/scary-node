@@ -137,3 +137,15 @@ python3 qualification/replay_sustained_assets.py offer-assets workload/sustained
 ```
 
 On the original frozen Docker project, `uv run --with msgpack==1.1.2 python qualification/sustained_frozen.py .native/sustained-run/receipt.json.gz .native/sustained-run/quiesced.json` reads copies of the project-specific volumes. The dedicated [production-settings replication](sustained-native-replication.md) uses the same signed population, a distinct stock configuration and inventory/request-based wallet delivery. Both studies use one physical workstation and accelerated regtest work.
+
+## Reconstruct either workload from the signed source
+
+Once the signed source is unpacked, the compact archives add **9,880,099 bytes** for the two trials combined. They reconstruct 134 direct-wallet blocks (228,078,164 bytes) and 77 inventory-relay blocks (1,103,139,534 bytes). Both public archives were downloaded without credentials and matched their recorded SHA-256 digests. An independent pack of the inventory data from the full original wires, with the lab's local membership indexes removed, produced the identical archive. [Compact downloads and commands](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-block-index-v1) · [Public asset readbacks](evidence/chronicle-workload-block-indexes.json) · [Rebuild the stock nodes](workload-recovery.md)
+
+```sh
+gh release download native-workload-block-index-v1 --repo p2ppsr/scary-node --dir indexes
+python3 qualification/sustained_block_archive.py verify \
+  docs/evidence/chronicle-sustained-direct.json.gz workload/sustained-signed indexes/direct.zip
+python3 qualification/sustained_block_archive.py verify \
+  docs/evidence/chronicle-sustained-inventory.json.gz workload/sustained-signed indexes/inventory.zip
+```

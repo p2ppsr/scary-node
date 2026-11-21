@@ -1,0 +1,21 @@
+{
+  "release": "https://github.com/p2ppsr/scary-node/releases/tag/native-workload-block-index-v1",
+  "target": "597a4a3a3678ebc4b071f635a4cffe6d00b865ba",
+  "verified_utc": "2026-11-21T23:00:12.238607+00:00",
+  "assets": [
+    {
+      "name": "direct.zip",
+      "bytes": 1954533,
+      "sha256": "3bfb01bde5a401d74195fbdbff10f7f4dcb0f2c8d68d26690225a4602373cfe9",
+      "verified_body_bytes": 228078164,
+      "unique_blocks": 134
+    },
+    {
+      "name": "inventory.zip",
+      "bytes": 7925566,
+      "sha256": "e012e2414c768465ddde932698a98139fc965fc768a01e03384927ed7c74ae62",
+      "verified_body_bytes": 1103139534,
+      "unique_blocks": 77
+    }
+  ]
+}
