@@ -1,0 +1,193 @@
+{
+  "kind": "unopposed continuation transport",
+  "build": {
+    "source_commit": "8c41f89850ea906fb4ae43bd39a17a884bd0eb62",
+    "source_tree": "b4826a5a4efc44c85944a7da23ec1efafe96a0cf",
+    "source_archive_sha256": "48b7fdccc41765888e4dd70342676c47e2fcbbc1e9133e6e449c502231841355",
+    "executable_sha256": "8f99871ba04a9f0c234d1b9520fc021396689ac7924c02a28666db9c9f3b52c9",
+    "platform": "darwin_arm64"
+  },
+  "planned_receivers": [
+    0,
+    1
+  ],
+  "reference_image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "rows": [
+    {
+      "plan": {
+        "successor_receiver": 0
+      },
+      "parent": "44c4aaa69d206a36d07a4900984548522abd0da6eb0ead56ae158e4e9a63bec8",
+      "height": 108,
+      "native_continuation": {
+        "source_receiver": 0,
+        "hashes": [
+          "22a9d8cbc0d2fddaa02dd172be70febd6f8513f97d6ec42e5e999cd336d305ad",
+          "6cdbbfa372528dd0b4d97dbb152cd41f62c76ba6a7dd7d8da16e6e118d5bdc73",
+          "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0"
+        ],
+        "body_sha256": [
+          "a0f143c940befbbbf3ab2ca85c4801af3f5d6c254aad3a59719d36313c977f3f",
+          "0de22809a51f278eae71c8d75b2f2b3f2bd8ee83143094dd32318bc382896ec7",
+          "35e1db54f1282b143975afde0f76ba5b371ab72e3414ece7924bc648c95e5fd4"
+        ],
+        "other_stock_active_tips": [
+          "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0",
+          "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0",
+          "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0"
+        ]
+      },
+      "generated_hashes": [
+        "22a9d8cbc0d2fddaa02dd172be70febd6f8513f97d6ec42e5e999cd336d305ad",
+        "6cdbbfa372528dd0b4d97dbb152cd41f62c76ba6a7dd7d8da16e6e118d5bdc73",
+        "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0"
+      ],
+      "receiver_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "receiver_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "raw_hex": [
+        "00000020c8be639a4e8e15ae56ad0eeba60dbd2a5248459800497ad0366a209da6aac444069b5eb24c06a1b77c2cd019eae71d0e0b3b90b07f63c9778accf16f03b66bf33d0c026bffff7f20020000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016c0101ffffffff014cf6052a0100000023210203fc773745c5e99ca90deb6379740ba12ea62ec58774778f7baa1508b6b71e72ac000000000100000001e9ac69b625b1457169a4265c09c541856851e2ddc2cd6edc304117565324911400000000494830450221009a6f3de97bb97a85240964a61c43fec9dcfb20ba41b9c05638a9cc1e3e27893902204f6a0b8c5b7c6fd00d1e1fe2cf12938c3b09d875a0d091520179256e07cb4b294100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+        "00000020ad05d336d39c995e2ec46e7df913856fbdfe70be72d12da0dafdd2c0cbd8a92287313e58c9363f3cddd155b9609330da6642e72f589eeafa4d3f0a99680bdc853d0c026bffff7f20000000000102000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016d0101ffffffff0100f2052a0100000023210203fc773745c5e99ca90deb6379740ba12ea62ec58774778f7baa1508b6b71e72ac00000000",
+        "0000002073dc5b8d116e6ea18d7ddda7a66bc7621fd42c15bb7dd9b4d08d5272a3bfdb6c71cb7971c2b257631e46aac2e368e3262f689fd795b430523efce42c67237b433e0c026bffff7f20000000000102000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016e0101ffffffff0100f2052a0100000023210203fc773745c5e99ca90deb6379740ba12ea62ec58774778f7baa1508b6b71e72ac00000000"
+      ],
+      "payment_txid": "461b18d282f15d72418ab245529af005dad6961ec872b82528178a99ec0f85ae",
+      "all_stock_active_hashes": [
+        "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0",
+        "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0",
+        "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0",
+        "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0"
+      ]
+    },
+    {
+      "plan": {
+        "successor_receiver": 1
+      },
+      "parent": "2d33161bbb420f31f1f34e1842bfdb3fc756e97adc41d73ee75d18f64c6363d0",
+      "height": 111,
+      "native_continuation": {
+        "source_receiver": 1,
+        "hashes": [
+          "26a22609d7da40ba9e23fb8bc25c5e5248c5cacddf0fdd5c53833dca1b4365b5",
+          "232dc522ed0fd77db29991ec39aeca0eca45e6b21575c1b2db75cc29edc35508",
+          "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e"
+        ],
+        "body_sha256": [
+          "1830acb801ced70b1facc897192f8a19756e7b3085855cbf476cbe57e6b09d55",
+          "6767c9ccd76c0833f19182cd7eb09826ce258f16e8486344f18f835d670b56fe",
+          "3f2d4879f9e6ec078c3fce6ead7c04fc720bfc2998d60b30699724eded57daf8"
+        ],
+        "other_stock_active_tips": [
+          "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e",
+          "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e",
+          "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e"
+        ]
+      },
+      "generated_hashes": [
+        "26a22609d7da40ba9e23fb8bc25c5e5248c5cacddf0fdd5c53833dca1b4365b5",
+        "232dc522ed0fd77db29991ec39aeca0eca45e6b21575c1b2db75cc29edc35508",
+        "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e"
+      ],
+      "receiver_roster": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "receiver_roster_after": [
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r0/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r0/"
+          }
+        ],
+        [
+          {
+            "connection": 0,
+            "agent": "/scary-regtest-propagation-l0-r1/"
+          },
+          {
+            "connection": 1,
+            "agent": "/scary-regtest-propagation-l1-r1/"
+          }
+        ]
+      ],
+      "raw_hex": [
+        "00000020d063634cf6185de73ed741dc7ae956c73fdbbf42184ef3f1310f42bb1b16332d9524c295abbebdcedf2a33909665f606ecff6271bd1a762b640d224a2c8b363c3e0c026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016f0101ffffffff014cf6052a010000002321025596bd7634c9c8e62bd805272306a5a1ef54c3735c472199e4bed2fb0f816cb6ac000000000100000001e9ac69b625b1457169a4265c09c541856851e2ddc2cd6edc3041175653249114010000004847304402205030efb77e9b00e3ced331d51ed9a9b4918f1e9042a70ae011209520ecb9f4200220070841690d2da413a7be5bd3d0b36e4620539d521697ce2817caacf5a6d648544100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+        "00000020b565431bca3d83535cdd0fdfcdcac548525e5cc28bfb239eba40dad70926a226bdb2285fbd6772e224835f53f98d838080c64604b8acf10d858606a205aeb1863e0c026bffff7f20010000000102000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0401700101ffffffff0100f2052a010000002321025596bd7634c9c8e62bd805272306a5a1ef54c3735c472199e4bed2fb0f816cb6ac00000000",
+        "000000200855c3ed29cc75dbb2c17515b2e645ca0ecaae39ec9199b27dd70fed22c52d23c18db030ec6087930bd43e1aaefa4441617b98623c45d52e667f4c7618ea4c013e0c026bffff7f20030000000102000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0401710101ffffffff0100f2052a010000002321025596bd7634c9c8e62bd805272306a5a1ef54c3735c472199e4bed2fb0f816cb6ac00000000"
+      ],
+      "payment_txid": "ae27311c98c1629e6550026623cb3301df8af605d7ff92dab8f650d299ff7aaf",
+      "all_stock_active_hashes": [
+        "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e",
+        "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e",
+        "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e",
+        "2a1b8fd96fe5dd1ab335bcd38ae139ebca52d4223d4cc489411f8254042e821e"
+      ]
+    }
+  ],
+  "complete": true,
+  "external_quiescence_receipt_sha256": "9ba9fe884fe79d50e07887a3b2eef287ee08a2a3c6daa93b90777ce87533db37",
+  "base": "44c4aaa69d206a36d07a4900984548522abd0da6eb0ead56ae158e4e9a63bec8",
+  "private_stock_bridges": 4
+}
