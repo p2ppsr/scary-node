@@ -123,7 +123,7 @@ python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustain
   --corpus .native/sustained-signed --blocks .native/sustained-run/blocks
 ```
 
-The full offline replay rehashed all 5,529,600 signed source envelopes, recomputed every selected transaction Merkle commitment across 134 bodies, and recovered the same 1,143,159 distinct signed members. The source dataset and selected body archives can be unpacked into the `--corpus` and `--blocks` directories above. [Outcome asset digests](evidence/chronicle-sustained-direct-assets.json) · [Public workload release](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
+The full offline replay rehashed all 5,529,600 signed source envelopes, recomputed every selected transaction Merkle commitment across 134 bodies, and recovered the same 1,143,159 distinct signed members. The source dataset and selected body archives can be unpacked into the `--corpus` and `--blocks` directories above. [Verified clean extraction](evidence/chronicle-sustained-direct-restore.json) · [Outcome asset digests](evidence/chronicle-sustained-direct-assets.json) · [Public workload release](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
 
 To replay the public release in a new directory, use Python 3.12 or later and the GitHub CLI. The first verification reconstructs the 483-block funding history and checks every offered transaction envelope. The second reads the selected raw blocks from the downloaded archives, checks each against its independent stock readbacks and recounts confirmed payments. It extracts temporary bodies and removes them when verification finishes.
 

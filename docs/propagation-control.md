@@ -89,3 +89,5 @@ python3 qualification/matched_study.py check docs/evidence/chronicle-matched-obs
 ```
 
 The export packs up to 64 individually hashed gzip members per shard. Standard gzip readers can stream each shard as newline-delimited JSON, and the member index allows independent per-session extraction. Its summary commits to every complete session and any zero-opportunity preflight failure. The checker regenerates each randomized schedule, verifies worker and native wire bytes, reconstructs eligible nonce attempts and three-header settlements, and recomputes the counters and paired intervals. It refuses a phase with missing registered sessions or an unresolved measured partial.
+
+A separate stock-node readback qualification observed one stored body and three expected unknown-hash answers on two independent live processes. Both selected-tip checks succeeded. The transport regression also covers a truncated stock response and exhausted retries on the same hash. [Stock observer receipt](evidence/chronicle-matched-stock-observer.json)

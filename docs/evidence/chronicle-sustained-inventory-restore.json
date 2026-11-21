@@ -1,0 +1,7 @@
+{
+  "confirmed_and_wallet_served": 5529600,
+  "confirmed_without_recorded_wallet_serve": 0,
+  "signed_source_envelopes": 5529600,
+  "merkle_verified_bodies": 77,
+  "confirmed_distinct_memberships": 5529600
+}

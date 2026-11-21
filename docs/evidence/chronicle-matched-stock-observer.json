@@ -1,0 +1,126 @@
+{
+  "reference_image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "kind": "unopposed stock observer, resident and unknown hashes",
+  "resident_hash": "245fbc119fcf862cc91dad3be85e395142637fa5c6f792077c41f89e45a9cfe5",
+  "resident_wire_hex": "0000002006226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f3a4dc22e023ad95e2d83b152cffc26c7e2e188be825a9b61a6f08d3c7de4059a1b0f026bffff7f20040000000102000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03510101ffffffff0100f2052a01000000232103e791fffd9d456c52ff89bd36901ab5771587bfe3a7681a10dca98c5f43013decac00000000",
+  "unknown_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "sites": [
+    {
+      "active_hash": "245fbc119fcf862cc91dad3be85e395142637fa5c6f792077c41f89e45a9cfe5",
+      "active_query_ns": [
+        178375,
+        2081583
+      ],
+      "active_receipt": {
+        "active_hash": "245fbc119fcf862cc91dad3be85e395142637fa5c6f792077c41f89e45a9cfe5",
+        "attempts": [
+          {
+            "result": "observed",
+            "query_ns": [
+              178375,
+              2081583
+            ]
+          }
+        ],
+        "query_ns": [
+          178375,
+          2081583
+        ]
+      },
+      "bodies": {
+        "245fbc119fcf862cc91dad3be85e395142637fa5c6f792077c41f89e45a9cfe5": {
+          "body_sha256": "4c39fb7dc892ff83802ccc92f1027260d7e9b520bb8796af8ea13a69c3b2acf6",
+          "attempts": [
+            {
+              "result": "observed",
+              "query_ns": [
+                2084458,
+                5079833
+              ]
+            }
+          ],
+          "query_ns": [
+            2084458,
+            5079833
+          ]
+        },
+        "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": {
+          "rpc_code": -5,
+          "attempts": [
+            {
+              "result": "rpc_error",
+              "code": -5,
+              "query_ns": [
+                5082667,
+                5806375
+              ]
+            }
+          ],
+          "query_ns": [
+            5082667,
+            5806375
+          ]
+        }
+      }
+    },
+    {
+      "active_hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+      "active_query_ns": [
+        372625,
+        2150667
+      ],
+      "active_receipt": {
+        "active_hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+        "attempts": [
+          {
+            "result": "observed",
+            "query_ns": [
+              372625,
+              2150667
+            ]
+          }
+        ],
+        "query_ns": [
+          372625,
+          2150667
+        ]
+      },
+      "bodies": {
+        "245fbc119fcf862cc91dad3be85e395142637fa5c6f792077c41f89e45a9cfe5": {
+          "rpc_code": -5,
+          "attempts": [
+            {
+              "result": "rpc_error",
+              "code": -5,
+              "query_ns": [
+                2153458,
+                3307875
+              ]
+            }
+          ],
+          "query_ns": [
+            2153458,
+            3307875
+          ]
+        },
+        "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": {
+          "rpc_code": -5,
+          "attempts": [
+            {
+              "result": "rpc_error",
+              "code": -5,
+              "query_ns": [
+                3310292,
+                4501750
+              ]
+            }
+          ],
+          "query_ns": [
+            3310292,
+            4501750
+          ]
+        }
+      }
+    }
+  ]
+}

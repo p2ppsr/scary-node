@@ -81,3 +81,12 @@ python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustain
 ```
 
 The full raw replay verified all 5,529,600 signed native envelopes, every selected block's Merkle root, and exact inclusion of 5,529,600 distinct source IDs. The requested/served membership commitments match: every confirmed payment had been requested by stock SV and served by its wallet. The 9 selected-body archives unpack to `blocks/<hash>.block`. Place the two uncompressed bitmap files in that directory's parent. Run the final command above to verify the complete published graph and wallet membership independently. [Outcome asset and bitmap digests](evidence/chronicle-sustained-inventory-assets.json) · [Public native-workload release](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
+
+A clean extraction of the nine selected-body archives and two wallet bitmaps reproduced every requested, served and confirmed membership. The replay consumed the original signed corpus, verified the three stock readback digests for each of 77 bodies and counted 5,529,600 distinct confirmed payments. With the signed source unpacked as `workload/sustained-signed`, the following commands repeat the archive audit. [Restored outcome](evidence/chronicle-sustained-inventory-restore.json)
+
+```sh
+gh release download native-workload-regtest-v1 --repo p2ppsr/scary-node --dir inventory-assets \
+  --pattern 'native-sustained-inventory-*'
+python3 qualification/replay_sustained_assets.py inventory-assets workload/sustained-signed \
+  docs/evidence/chronicle-sustained-inventory.json.gz docs/evidence/chronicle-sustained-inventory-assets.json
+```
