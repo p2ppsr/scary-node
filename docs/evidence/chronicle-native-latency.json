@@ -1,0 +1,81 @@
+{
+  "sessions": 16,
+  "arms": {
+    "witnessed/full": [
+      {
+        "counts": {
+          "scheduled": 256,
+          "unready": 30,
+          "tie_discoveries": 80,
+          "tie_settled": 12,
+          "solo_discoveries": 65,
+          "solo_settled": 65
+        },
+        "first_active_median_ms": {
+          "solo": 589.747291,
+          "tie": 70.471271
+        },
+        "first_active_observations": {
+          "solo": 65,
+          "tie": 12
+        }
+      },
+      {
+        "counts": {
+          "scheduled": 256,
+          "unready": 0,
+          "tie_discoveries": 80,
+          "tie_settled": 68,
+          "solo_discoveries": 111,
+          "solo_settled": 111
+        },
+        "first_active_median_ms": {
+          "tie": 134.51975,
+          "solo": 125.775709
+        },
+        "first_active_observations": {
+          "tie": 68,
+          "solo": 111
+        }
+      }
+    ],
+    "full/full": [
+      {
+        "counts": {
+          "scheduled": 256,
+          "unready": 0,
+          "tie_discoveries": 85,
+          "tie_settled": 44,
+          "solo_discoveries": 78,
+          "solo_settled": 78
+        },
+        "first_active_median_ms": {
+          "tie": 127.7942295,
+          "solo": 125.2782915
+        },
+        "first_active_observations": {
+          "tie": 82,
+          "solo": 78
+        }
+      },
+      {
+        "counts": {
+          "scheduled": 256,
+          "unready": 0,
+          "tie_discoveries": 85,
+          "tie_settled": 41,
+          "solo_discoveries": 93,
+          "solo_settled": 93
+        },
+        "first_active_median_ms": {
+          "solo": 123.762167,
+          "tie": 125.966042
+        },
+        "first_active_observations": {
+          "solo": 93,
+          "tie": 77
+        }
+      }
+    ]
+  }
+}

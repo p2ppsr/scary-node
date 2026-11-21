@@ -1,30 +1,45 @@
 {
-  "image_id": "sha256:7276b9394fe9c99ed8673a8c41ffd482c39fb2ee00d0e362bb6e9c5ddf111a34",
+  "interrupted_write": {
+    "signal": "SIGKILL",
+    "bytes_read_from_inflight_checkpoint": 4096,
+    "previous_checkpoint_sha256": "27fc276abc5e413c3f7b6c5d4cc5dcdb169efaeba7924ff55b548146f1261c75",
+    "restored_parent": "0d8af46fa396ea02630e542ced05980555348f9c76fdc14a74dbfbf5d8295840",
+    "interrupted_block": "31a476f0cc8e0d75586e9229ad2e4efc3e2f2289ead41276c0d3f5d9348623a7",
+    "replayed_known_signatures": 1,
+    "repaired": {
+      "height": 111,
+      "tip_hash": "5cda04c22561aef4b6ade0d8d968b1fa1e4b9ff48b0413d264db23c2cb1acbf9",
+      "witnessed_outputs": 8,
+      "observation_window_ready": true
+    },
+    "reference_tip": "5cda04c22561aef4b6ade0d8d968b1fa1e4b9ff48b0413d264db23c2cb1acbf9"
+  },
+  "image_id": "sha256:7e3ea83f23aa383a9489081d3b3140ecf14df6311be8318ac3a8f9a31a8fe98f",
   "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
-  "binary_sha256": "ae982cc74759e0532513771caf3c4558be079f781838214d04a6213640323c15",
+  "binary_sha256": "d1f5b13ea1240dd47ec74469225400dc596116b11225407c0553010e33ae0fcd",
   "volume_bytes": 8388608,
-  "reference_tip": "68ee2b9a19a33a4b97f8b451893caabe09b9b2b4f470f27a5e44a1c746cbe6a3",
-  "missed_parent": "6ac11050586e095a2eb817c6c4be3b55cb2c7b134d79cd298ba42356171e0cfa",
+  "reference_tip": "3edf787c58e47f81fb33923a471b01987dfd0c67fe7f84587bf2256000bfdd4d",
+  "missed_parent": "5081a0dc594ed6d35371f8f4d490cebe1b7e9ed1d938995487d1364e977bcef4",
   "fault": "ENOSPC on checkpoint write",
   "process_exit": 1,
-  "committed_sha256_preserved": "63d8c4c09a0445d2fff84391c2c2563bcb286fa5e3e8a7de7e20c142a62ad876",
+  "committed_sha256_preserved": "039517d00a775bfef6b25bc1f4f93d90732fe20a8a70b39d2835df9635e6bbf3",
   "incomplete_temporary_bytes": 53,
   "concurrent_writer_refused": true,
   "before": {
     "height": 106,
-    "tip_hash": "3d74c6be281b6cd4720d769bcff18bf35c7cc1e53804683b79b32a8128998cca",
+    "tip_hash": "1dd0de1c72689a24fe535a91048d472134e8e1f6db5f75851f37e9a17bf6396e",
     "witnessed_outputs": 1,
     "observation_window_ready": true
   },
   "restored": {
     "height": 106,
-    "tip_hash": "3d74c6be281b6cd4720d769bcff18bf35c7cc1e53804683b79b32a8128998cca",
+    "tip_hash": "1dd0de1c72689a24fe535a91048d472134e8e1f6db5f75851f37e9a17bf6396e",
     "witnessed_outputs": 1,
-    "observation_window_ready": true
+    "observation_window_ready": false
   },
   "repaired": {
     "height": 108,
-    "tip_hash": "68ee2b9a19a33a4b97f8b451893caabe09b9b2b4f470f27a5e44a1c746cbe6a3",
+    "tip_hash": "3edf787c58e47f81fb33923a471b01987dfd0c67fe7f84587bf2256000bfdd4d",
     "witnessed_outputs": 3,
     "observation_window_ready": true
   }

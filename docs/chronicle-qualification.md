@@ -46,6 +46,7 @@ cargo build --locked --release
 ./regtest/mixed.sh > .native/mixed.json
 python3 regtest/verify_receipt.py .native/mixed.json
 python3 qualification/capacity_recovery.py .native/capacity-recovery.json
+.native/py/bin/python qualification/peer_loss.py .native/peer-loss.json
 .native/py/bin/python qualification/large_body.py .native/large-wire.json
 ./regtest/mixed.sh --down
 ```
@@ -54,10 +55,19 @@ To reproduce the 4,096-payment mixed Stratum block, start with fresh scoped volu
 
 ```sh
 ./regtest/mixed.sh --workload 4096 > .native/mixed-load.json
-python3 qualification/storage_fault.py .native/storage-fault.json
+.native/py/bin/python qualification/storage_fault.py .native/storage-fault.json --interrupt
 docker build -t scary-node:clock-lab -f qualification/clock.Dockerfile .
 .native/py/bin/python qualification/clock_fault.py .native/clock-fault.json
 python3 qualification/verify_chronicle.py
+./regtest/mixed.sh --down
+```
+
+The repeated mixed workload uses a separate fixed-cadence background client and includes all candidate and successor bytes. Run it on fresh volumes after stopping the prior mixed lab.
+
+```sh
+./regtest/mixed.sh --stream > .native/mixed-stream.json
+gzip -c .native/mixed-stream.json > .native/mixed-stream.json.gz
+python3 qualification/verify_stream.py .native/mixed-stream.json.gz
 ./regtest/mixed.sh --down
 ```
 
@@ -102,6 +112,7 @@ python3 qualification/shadow_failover.py --binary ./target/release/scary-node \
   --operator-token-file "$OPERATOR_TOKEN_FILE" --alert-token-file "$ALERT_TOKEN_FILE" \
   --alert-service-url http://127.0.0.1:19366
 python3 qualification/shadow.py "$SHADOW_LOG"
+python3 qualification/shadow_export.py "$SHADOW_LOG" "$FAILOVER_RECEIPT" .native/shadow-public.json
 ```
 
 ## Operator handling of notices

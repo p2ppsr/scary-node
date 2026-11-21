@@ -29,3 +29,13 @@ Run the sizing sessions serially to avoid competition between cohort sessions on
 ```
 
 The full nodes import fixture history before opening the cohort peer links. In sizing session 41007 a simultaneous native header arrival during the original fixture import returned `duplicate-inconclusive` before the entrant started. That attempt contained zero scheduled opportunities. The unchanged session seed was rerun after serializing these setup steps. The node binary, opportunity schedule, receiver links and analysis are identical across completed sizing sessions.
+
+## Publication latency comparison
+
+The frozen engineering pilot sized the fresh evaluation at 2,263 sessions. Both phases retain the same measured executable. A separate experiment tests the one-second SV publication poll against an otherwise matched executable with immediate notification after durable solve. Run four independently initialized pairs with seeds 62001–62004, 32 opportunities per session, alternating which build runs first. The native fixtures and opportunity semantics are identical. Preserve both control arms and all ties, missing jobs and sole discoveries. Report earliest independent active-tip observation over the receivers, conditional on a solution being observed. Timing includes polling and native ingress. Each process identifies the tested binary by digest. A local scheduling lock prevents these comparison sessions from overlapping the primary cohort.
+
+```sh
+.native/py/bin/python qualification/relay_comparison.py docs/evidence/chronicle-native-pilot
+.native/py/bin/python qualification/relay_comparison.py .native/relay-comparison \
+  --timer "$POLLED_BINARY" --immediate "$NOTIFIED_BINARY" > .native/relay-comparison.json
+```

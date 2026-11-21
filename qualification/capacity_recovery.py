@@ -73,8 +73,10 @@ def run(binary, directory):
             before = capture()
             missing = n.rpc("generate", 1)[0]
             until(
-                lambda: response(url)["peer"]["coverage_gaps"] > 0
-                and not view()["observation_window_ready"],
+                lambda: (
+                    response(url)["peer"]["coverage_gaps"] > 0
+                    and not view()["observation_window_ready"]
+                ),
                 "visible resource exhaustion",
             )
             blocked = capture()
@@ -87,12 +89,20 @@ def run(binary, directory):
                 lambda: response(url)["peer"]["connected_peer_ids_seen"],
                 "recovered handshake",
             )
-            restored = capture()
+            restored = next(
+                json.loads(line)
+                for line in reversed((directory / "log").read_text().splitlines())
+                if line.startswith('{"')
+                and json.loads(line).get("event") == "witness_restored"
+            )
+            restored.pop("event")
             assert restored["tip_hash"] == first
             next_block = n.rpc("generate", 1)[0]
             until(
-                lambda: view()["tip_hash"] == next_block
-                and view()["observation_window_ready"],
+                lambda: (
+                    view()["tip_hash"] == next_block
+                    and view()["observation_window_ready"]
+                ),
                 "missing ancestor and child",
             )
             repaired = capture()

@@ -1,9 +1,9 @@
 {
-  "binary_sha256": "f2635009c9196bac12f30e499a9ebc5cd0cd0429c13e37f284f54c5867685ee8",
+  "binary_sha256": "6ef1ce37208fcb33a762b1cbe6702c06ed11b51126af2533c6135c8ad04de9c9",
   "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
   "before": {
     "height": 106,
-    "tip_hash": "5f799569b51026308a8dcd66d0da914ae309be1e8e5e857180b17af1115ef4dd",
+    "tip_hash": "79e1e0a505e3273c7e03a10fd2647f58ee079901e7ff8550579d30e375bb3265",
     "witnessed_outputs": 1,
     "observation_window_ready": true,
     "readiness_reasons": [],
@@ -15,7 +15,7 @@
   },
   "exhausted": {
     "height": 106,
-    "tip_hash": "5f799569b51026308a8dcd66d0da914ae309be1e8e5e857180b17af1115ef4dd",
+    "tip_hash": "79e1e0a505e3273c7e03a10fd2647f58ee079901e7ff8550579d30e375bb3265",
     "witnessed_outputs": 1,
     "observation_window_ready": false,
     "readiness_reasons": [
@@ -28,22 +28,23 @@
     }
   },
   "restored": {
-    "height": 106,
-    "tip_hash": "5f799569b51026308a8dcd66d0da914ae309be1e8e5e857180b17af1115ef4dd",
-    "witnessed_outputs": 1,
-    "observation_window_ready": false,
-    "readiness_reasons": [
-      "body coverage interrupted"
-    ],
     "capacity": {
       "block_bytes": 268435456,
       "transaction_bytes": 16777216,
       "witnessed_outputs": 64
-    }
+    },
+    "height": 106,
+    "observation_window_ready": false,
+    "readiness_reasons": [
+      "awaiting current tip from a connected data peer",
+      "body coverage interrupted"
+    ],
+    "tip_hash": "79e1e0a505e3273c7e03a10fd2647f58ee079901e7ff8550579d30e375bb3265",
+    "witnessed_outputs": 1
   },
   "repaired": {
     "height": 108,
-    "tip_hash": "75472b5c07625c7da02b804dc162bcbaa09d95f1839a33ef052a3005970ad49b",
+    "tip_hash": "31587ae38ad2bbb680d06c9cbefcd378c688430198e1f20496ababac6cd0d472",
     "witnessed_outputs": 3,
     "observation_window_ready": true,
     "readiness_reasons": [],
@@ -53,6 +54,6 @@
       "witnessed_outputs": 64
     }
   },
-  "retrieved_parent": "7516d0ce94bd66c70ce08041ed0928459e66ec316608129c0b984016f0f96441",
-  "reference_tip": "75472b5c07625c7da02b804dc162bcbaa09d95f1839a33ef052a3005970ad49b"
+  "retrieved_parent": "40092d641c3f73a02485709956be77fac75fd50bc5da41c531ea660f73260f5e",
+  "reference_tip": "31587ae38ad2bbb680d06c9cbefcd378c688430198e1f20496ababac6cd0d472"
 }

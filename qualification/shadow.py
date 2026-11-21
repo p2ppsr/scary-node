@@ -67,6 +67,7 @@ def audit(lines):
     references = defaultdict(list)
     tips = []
     failures = []
+    gaps = []
     sources = set()
     for number, line in enumerate(lines, 1):
         row = json.loads(line)
@@ -78,6 +79,9 @@ def audit(lines):
             if previous and row.get("restored_tip") == previous["hash"]:
                 restored += 1
             transport = row.get("body_transport", "all")
+            continue
+        if event == "coverage_failure":
+            gaps.append({"record": number, "retained_height": row["retained_height"], "reason": row["reason"]})
             continue
         if event == "reference_tip":
             references[(row["height"], row["hash"])].append(row["observed_at"])
@@ -147,6 +151,7 @@ def audit(lines):
         "unsigned_templates": assembled,
         "directive_ready_transitions": directive_ready,
         "exceptions": failures,
+        "coverage_failures": gaps,
     }
 
 

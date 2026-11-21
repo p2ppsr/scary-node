@@ -1,5 +1,7 @@
 # Operating the alpha
 
+Loss of all eligible data-peer connections withdraws outstanding work. The node reconfirms the current tip after reconnecting. SV peers can return bounded recent headers and bodies from the restored contemporary boundary. The status reports `connected_data_peers` and `tip_confirmed_since_disconnect`.
+
 Synchronize the host clock before starting the node. The status fields `clock_step_seconds` and `clock_step_limit_seconds` compare wall time against monotonic elapsed time since startup. A step exceeding 120 seconds in either direction withholds Stratum work and solved publication until the clock comes back into range. A failed durable checkpoint stops the process. Preserve the committed checkpoint and free storage before restarting. A leftover temporary snapshot can be ignored. [Measured clock and storage recovery](chronicle-results.md)
 
 The default network is mainnet. The default API listens only on loopback. The peer identity persists in the data directory. Store that directory privately. Run one identity per node. A fresh identity has no special admission rights. Operators of other peers choose which announcements and assets they will consume.

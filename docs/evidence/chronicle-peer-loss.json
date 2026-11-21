@@ -1,0 +1,30 @@
+{
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "release_binary_sha256": "2e61cfae1ddb3bce3df0eb2283117dfc786506d6f7fc18996cb2c70a26ad2ccd",
+  "initial_parent": "7d865db65735fa07852803706904b320080c73c7d40acf303216c6112271ae1c",
+  "lost": {
+    "height": 107,
+    "tip_hash": "7d865db65735fa07852803706904b320080c73c7d40acf303216c6112271ae1c",
+    "connected_data_peers": 0,
+    "tip_confirmed_since_disconnect": false,
+    "observation_window_ready": false,
+    "readiness_reasons": [
+      "awaiting current tip from a connected data peer"
+    ],
+    "solved_blocks": 0,
+    "pending_transactions": 1
+  },
+  "advanced_while_disconnected": "465cf4c7bcd7442cceb6538e715779ad745cb923dde01dffd38b6dadc5383475",
+  "repaired": {
+    "height": 108,
+    "tip_hash": "465cf4c7bcd7442cceb6538e715779ad745cb923dde01dffd38b6dadc5383475",
+    "connected_data_peers": 1,
+    "tip_confirmed_since_disconnect": true,
+    "observation_window_ready": true,
+    "readiness_reasons": [],
+    "solved_blocks": 0,
+    "pending_transactions": 1
+  },
+  "new_solution": "7b42cba22e778b56fb1a273d3f0028e40d41429ea5001a4cc640a8653b63dcd1",
+  "full_active_tip": "7b42cba22e778b56fb1a273d3f0028e40d41429ea5001a4cc640a8653b63dcd1"
+}

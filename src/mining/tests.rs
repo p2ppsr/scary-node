@@ -754,3 +754,34 @@ fn distant_gap_needs_two_linked_bodies_and_restarts_with_empty_old_evidence() {
     assert_eq!(m.headers.len(), 2);
     assert_eq!(m.chain.applied.len(), 2);
 }
+
+#[test]
+fn failed_commit_fences_volatile_work_and_repeated_body_skips_unchanged_checkpoint() {
+    let directory = tempfile::tempdir().unwrap();
+    let mut state = Mining::new(true, vec![0x51]).unwrap();
+    state.open_store(directory.path()).unwrap();
+    let raw = make_block([0; 32], 151, &[]);
+    let body = crate::body::BlockBody::Memory(Arc::new(raw));
+    assert!(state.observe_body(151, body.clone()).unwrap());
+    state.save().unwrap();
+    assert!(!state.observe_body(151, body).unwrap());
+    assert!(state.observation_window_ready());
+    let persisted = state.tip();
+    let child = make_block(persisted.unwrap(), 152, &[]);
+    state.observe(152, &child).unwrap();
+    std::fs::create_dir(directory.path().join("witness.next")).unwrap();
+    assert!(state.save().is_err());
+    assert!(!state.observation_window_ready());
+    assert!(state.relayable_solution().is_none());
+    assert!(state
+        .submit_tx(&[])
+        .unwrap_err()
+        .to_string()
+        .contains("durable state"));
+    std::fs::remove_dir(directory.path().join("witness.next")).unwrap();
+    assert!(state.save().is_err());
+    let mut restored = Mining::new(true, vec![0x51]).unwrap();
+    restored.open_store(directory.path()).unwrap();
+    assert_eq!(restored.tip(), persisted);
+    assert!(restored.observation_window_ready());
+}

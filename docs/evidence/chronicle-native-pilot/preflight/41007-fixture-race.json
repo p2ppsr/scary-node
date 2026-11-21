@@ -1,0 +1,267 @@
+{
+  "schema": 1,
+  "seed": 41007,
+  "sv_image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "binary_sha256": "c5b08e6fdec47e29ce03e36c3233f07e38f75c0fedfd229fe840a2d94d951127",
+  "physical_swap": true,
+  "planned": [
+    {
+      "index": 0,
+      "arm": "full/full",
+      "nonce": 2044238762,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 1,
+      "arm": "witnessed/full",
+      "nonce": 364807895,
+      "swap_nonce": false,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 2,
+      "arm": "full/full",
+      "nonce": 1665420277,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 3,
+      "arm": "witnessed/full",
+      "nonce": 1964598384,
+      "swap_nonce": false,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 4,
+      "arm": "witnessed/full",
+      "nonce": 1877995407,
+      "swap_nonce": false,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 5,
+      "arm": "witnessed/full",
+      "nonce": 1998741772,
+      "swap_nonce": false,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 6,
+      "arm": "full/full",
+      "nonce": 1439620857,
+      "swap_nonce": false,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 7,
+      "arm": "full/full",
+      "nonce": 1464335106,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 8,
+      "arm": "witnessed/full",
+      "nonce": 961037818,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 9,
+      "arm": "witnessed/full",
+      "nonce": 627925264,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 10,
+      "arm": "full/full",
+      "nonce": 1583530363,
+      "swap_nonce": false,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 11,
+      "arm": "full/full",
+      "nonce": 1590894783,
+      "swap_nonce": false,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 12,
+      "arm": "witnessed/full",
+      "nonce": 1659054598,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 13,
+      "arm": "full/full",
+      "nonce": 515574394,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 14,
+      "arm": "witnessed/full",
+      "nonce": 2088159751,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 15,
+      "arm": "full/full",
+      "nonce": 51763927,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 16,
+      "arm": "witnessed/full",
+      "nonce": 1514286121,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 17,
+      "arm": "witnessed/full",
+      "nonce": 618806029,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 18,
+      "arm": "witnessed/full",
+      "nonce": 1057548231,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 19,
+      "arm": "witnessed/full",
+      "nonce": 1980680405,
+      "swap_nonce": false,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 20,
+      "arm": "witnessed/full",
+      "nonce": 253804218,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 21,
+      "arm": "full/full",
+      "nonce": 344241687,
+      "swap_nonce": false,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 22,
+      "arm": "full/full",
+      "nonce": 267113874,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 23,
+      "arm": "full/full",
+      "nonce": 2114744527,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 24,
+      "arm": "witnessed/full",
+      "nonce": 109009333,
+      "swap_nonce": false,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 25,
+      "arm": "witnessed/full",
+      "nonce": 1929921615,
+      "swap_nonce": true,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 26,
+      "arm": "full/full",
+      "nonce": 327012907,
+      "swap_nonce": false,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 27,
+      "arm": "full/full",
+      "nonce": 1981289648,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 28,
+      "arm": "full/full",
+      "nonce": 1799228242,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 29,
+      "arm": "witnessed/full",
+      "nonce": 1794182848,
+      "swap_nonce": false,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 30,
+      "arm": "full/full",
+      "nonce": 2075254022,
+      "swap_nonce": false,
+      "successor_receiver": 0,
+      "offer_delay_ms": 1200
+    },
+    {
+      "index": 31,
+      "arm": "full/full",
+      "nonce": 873312921,
+      "swap_nonce": true,
+      "successor_receiver": 1,
+      "offer_delay_ms": 1200
+    }
+  ],
+  "rows": [],
+  "complete": false
+}

@@ -240,6 +240,7 @@ pub async fn discover(
             Some(outcome)=pool.join_next(),if !pool.is_empty()=>{
                 let (addr,result)=outcome?;
                 in_use.remove(&addr);
+                events.send(Event::Disconnected(format!("sv:{addr}"))).await?;
                 if let Err(e)=result{
                     if e.downcast_ref::<IncompleteBody>().is_some(){events.send(Event::Gap(e.to_string())).await?;}
                     eprintln!("discovered SV peer {addr} disconnected: {e}");
@@ -263,6 +264,9 @@ pub async fn run(
                 }
                 eprintln!("SV peer {addr} disconnected: {e}");
             }
+            events
+                .send(Event::Disconnected(format!("sv:{addr}")))
+                .await?;
         }
         tokio::time::sleep(Duration::from_secs(3)).await;
     }
@@ -306,6 +310,7 @@ async fn session(
     let mut last_repair = tokio::time::Instant::now();
     let mut handshake = false;
     let mut saw_version = false;
+    let mut probe = None;
     let mut due = tokio::time::interval(Duration::from_secs(1));
     loop {
         tokio::select! {
@@ -334,7 +339,13 @@ async fn session(
                 let (cmd,body)=incoming.context("SV connection closed")??;
                 match cmd.as_str(){
                     "version"=>{ensure!(!saw_version && body.len()>=80,"invalid SV handshake");saw_version=true;send(&mut w,regtest,"verack",&[]).await?;}
-                    "verack"=>{ensure!(saw_version && !handshake && body.is_empty(),"unexpected verack");handshake=true;events.send(Event::Connected(format!("sv:{addr}"))).await?;}
+                    "verack"=>{ensure!(saw_version && !handshake && body.is_empty(),"unexpected verack");handshake=true;events.send(Event::Connected(format!("sv:{addr}"))).await?;
+                        probe=state.lock().await.header_probe();
+                        if let Some((parent,_,_))=probe {
+                            let mut locator=VERSION.to_le_bytes().to_vec();
+                            locator.push(1);locator.extend(parent);locator.extend([0u8;32]);
+                            send(&mut w,regtest,"getheaders",&locator).await?;
+                        }}
                     "sendheaders" if handshake && body.is_empty()=>{prefers_headers=true;}
                     "getheaders" if handshake=>{
                         let mut locator=&body[..];wire::take(&mut locator,4)?;
@@ -353,10 +364,21 @@ async fn session(
                     "headers" if handshake=>{
                         let mut input=&body[..];let n=wire::varint(&mut input)?;ensure!(n<=2000,"too many peer headers");
                         let mut req=vec![];
-                        for _ in 0..n {
+                        let mut last=None;
+                        let mut current=state.lock().await.tip();
+                        for i in 0..n {
                             let h=wire::take(&mut input,80)?;ensure!(wire::varint(&mut input)?==0,"headers has transactions");
-                            let s=state.lock().await;
-                            if s.tip().is_some_and(|t|h[4..36]==t){req.push(hash256(h));}
+                            let id=hash256(h);
+                            if i==0 && n==1 && probe.is_some_and(|(parent,tip,_)| h[4..36]==parent && id==tip) {
+                                last=probe.map(|(_,tip,height)|(tip,height));
+                            }
+                            if n<=24 && current.is_some_and(|tip|h[4..36]==tip) {
+                                req.push(id);current=Some(id);
+                            }
+                        }
+                        probe=None;
+                        if let Some((tip,height))=last {
+                            events.send(Event::Status{peer:format!("sv:{addr}"),height,hash:wire::display_hash(tip)}).await?;
                         }
                         ensure!(input.is_empty(),"trailing header bytes");
                         for id in req{send(&mut w,regtest,"getdata",&inventory(2,id)).await?;}

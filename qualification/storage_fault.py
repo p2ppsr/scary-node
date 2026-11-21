@@ -11,7 +11,7 @@ from scary_dar import response, until
 from sv_reference import IMAGE, Reference
 
 
-def run(image):
+def run(image, interrupt=False):
     full = Reference()
     name = "scary-storage-" + uuid.uuid4().hex
     bridge = name + "-net"
@@ -68,7 +68,7 @@ def run(image):
                 name,
                 "sh",
                 "-c",
-                '"$@" > /tmp/observer.log 2>&1; echo $? > /tmp/exit',
+                '"$@" > /tmp/observer.log 2>&1 & child=$!; echo "$child" > /tmp/observer.pid; wait "$child"; echo $? > /tmp/exit',
                 "observer",
                 *argv,
             )
@@ -81,6 +81,23 @@ def run(image):
             m = response(api)["mining"]
             return {
                 k: m[k]
+                for k in (
+                    "height",
+                    "tip_hash",
+                    "witnessed_outputs",
+                    "observation_window_ready",
+                )
+            }
+
+        def restored_snapshot():
+            row = next(
+                json.loads(line)
+                for line in shell("cat", "/tmp/observer.log").splitlines()
+                if line.startswith('{"')
+                and json.loads(line).get("event") == "witness_restored"
+            )
+            return {
+                k: row[k]
                 for k in (
                     "height",
                     "tip_hash",
@@ -136,7 +153,7 @@ def run(image):
         )
         partial_size = int(shell("stat", "-c", "%s", "/state/regtest/witness.next"))
         start()
-        restored = state()
+        restored = restored_snapshot()
         assert (
             restored["tip_hash"] == before["tip_hash"]
             and restored["witnessed_outputs"] == before["witnessed_outputs"]
@@ -151,7 +168,90 @@ def run(image):
             repaired["observation_window_ready"] and repaired["witnessed_outputs"] == 3
         )
         assert full.rpc("getblockhash", before["height"] + 1) == missed
+        interrupted = None
+        if interrupt:
+            from native_workload import solve
+            from chronicle import CTransaction, CTxOut, FromHex, ToHex
+            from test_framework.script import CScript, OP_FALSE, OP_RETURN
+
+            address = full.rpc("getnewaddress")
+            funding = full.rpc("sendtoaddress", address, 1)
+            parent = full.rpc("generate", 1)[0]
+            until(lambda: state()["tip_hash"] == parent, "funding checkpoint")
+            output = next(
+                v["n"]
+                for v in full.rpc("getrawtransaction", funding, 1)["vout"]
+                if v["value"] == 1
+            )
+            draft = full.rpc(
+                "createrawtransaction",
+                [{"txid": funding, "vout": output}],
+                {address: 0.99},
+            )
+            pay = FromHex(CTransaction(), draft)
+            pay.vout.append(CTxOut(0, CScript([OP_FALSE, OP_RETURN, bytes(256 << 10)])))
+            signed = full.rpc("signrawtransaction", ToHex(pay))
+            assert signed["complete"]
+            pay = FromHex(CTransaction(), signed["hex"])
+            height = full.rpc("getblockcount") + 1
+            body = solve(
+                parent, height, full.rpc("getblock", parent)["time"] + 1, [pay]
+            )
+            previous_digest = shell("sha256sum", committed).split()[0]
+            temp = "/state/regtest/witness.next"
+            shell("mkfifo", temp)
+            docker(
+                "exec",
+                "-d",
+                name,
+                "sh",
+                "-c",
+                'exec 3<"$1"; head -c 4096 <&3 > /tmp/written; touch /tmp/write-started; sleep 60',
+                "slow-reader",
+                temp,
+            )
+            assert (
+                full.rpc("submitblock", body.serialize().hex()) is None
+                and full.rpc("getbestblockhash") == body.hash
+            )
+            until(
+                lambda: shell(
+                    "sh", "-c", "test -e /tmp/write-started && echo yes || true"
+                ),
+                "checkpoint write started",
+            )
+            shell("sh", "-c", 'kill -KILL "$(cat /tmp/observer.pid)"')
+            assert until(exited, "terminated during serialization") == 137
+            actual = shell("stat", "-c", "%s", "/tmp/written")
+            assert (
+                int(actual) == 4096
+                and shell("sha256sum", committed).split()[0] == previous_digest
+            )
+            shell("rm", temp, "/tmp/exit")
+            shell("cp", "/tmp/written", temp)
+            start()
+            checkpoint = restored_snapshot()
+            assert checkpoint["tip_hash"] == parent
+            next_hash = full.rpc("generate", 1)[0]
+            until(
+                lambda: state()["tip_hash"] == next_hash,
+                "replayed interrupted large body",
+            )
+            last = response(api)["mining"]["validation_window"]
+            row = next(x for x in last if x["hash"] == body.hash)
+            assert row["script_checks_passed"] == 1
+            interrupted = {
+                "signal": "SIGKILL",
+                "bytes_read_from_inflight_checkpoint": int(actual),
+                "previous_checkpoint_sha256": previous_digest,
+                "restored_parent": parent,
+                "interrupted_block": body.hash,
+                "replayed_known_signatures": row["script_checks_passed"],
+                "repaired": state(),
+                "reference_tip": next_hash,
+            }
         return {
+            **({"interrupted_write": interrupted} if interrupted else {}),
             "image_id": docker("inspect", "--format", "{{.Image}}", name),
             "reference": IMAGE,
             "binary_sha256": shell("sha256sum", "/usr/local/bin/scary-node").split()[0],
@@ -173,5 +273,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("receipt", type=Path)
     parser.add_argument("--image", default="scary-node:local")
+    parser.add_argument(
+        "--interrupt",
+        action="store_true",
+        help="kill a live writer after 4 KiB and replay its signed body",
+    )
     args = parser.parse_args()
-    args.receipt.write_text(json.dumps(run(args.image), indent=2) + "\n")
+    args.receipt.write_text(
+        json.dumps(run(args.image, args.interrupt), indent=2) + "\n"
+    )

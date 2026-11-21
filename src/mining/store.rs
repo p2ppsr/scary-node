@@ -174,6 +174,10 @@ impl Mining {
             return Ok(());
         };
 
+        ensure!(
+            self.storage_failure.is_none(),
+            "a failed durable write requires restoring the committed boundary"
+        );
         let result = (|| -> Result<()> {
             let tmp = dir.join("witness.next");
             let mut io = BufWriter::new(File::create(&tmp)?);
@@ -191,6 +195,13 @@ impl Mining {
             File::open(dir)?.sync_all()?;
             Ok(())
         })();
+        if let Err(error) = &result {
+            // The caller still holds the mining lock. Fence every publication
+            // path before another task can inspect these uncommitted changes.
+            self.storage_failure = Some(error.to_string());
+            self.parent_epoch += 1;
+            self.revision += 1;
+        }
         result
     }
 }

@@ -358,6 +358,13 @@ def prove():
             value, lock = outputs[0][0]
             if lock != wallet.script:
                 raise ValueError("funding coinbase paid a different script")
+            background_history = []
+            if os.environ.get("SCARY_MIXED_STREAM"):
+                for _ in range(24):
+                    coin_block = rpc(a, "generatetoaddress", 1, wallet.address)[0]
+                    wait("historical background coin", lambda: assert_tip(b, coin_block))
+                    _, cb_txs, cb_outputs = block(a, coin_block)
+                    background_history.append((txid(cb_txs[0]), cb_outputs[0][0][0]))
             # Advance only after both independent stores have each preceding block.
             for _ in range(100):
                 matured_tip = rpc(a, "generate", 1)[0]
@@ -444,6 +451,10 @@ def prove():
         if mixed and os.environ.get("SCARY_MIXED_WORKLOAD"):
             from mixed_workload import run
             workload = run(wallet, child_id, value - 2000, int(os.environ["SCARY_MIXED_WORKLOAD"]))
+        streamed = None
+        if mixed and os.environ.get("SCARY_MIXED_STREAM"):
+            from mixed_workload import stream
+            streamed = stream(wallet, child_id, value - 2000, background_history)
         requests = set()
         for line in compose("logs", "--no-color", "--no-log-prefix", "scary-node", capture=True).splitlines():
             try:
@@ -471,6 +482,7 @@ def prove():
                           "solved_hash": solved_hash, "native_announcement_verified": native_publish,
                           **({"sv_reference": sv_result} if mixed else {}),
                           **({"mixed_workload": workload} if workload else {}),
+                          **({"stream": streamed} if streamed else {}),
                           "candidate_block_hex": candidate.hex(), "candidate_asset_requests": sorted(requests),
                           "successor_header_hex": next_block[:80].hex(), "independent_receipts": results,
                           "successor": descendant}, indent=2))

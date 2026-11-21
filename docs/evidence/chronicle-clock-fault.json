@@ -1,14 +1,14 @@
 {
   "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
-  "binary_sha256": "3017e34c25ab9daa2111ac8d4e2569f731b32cdbff583bda324d0825ee13dc08",
+  "binary_sha256": "d1f5b13ea1240dd47ec74469225400dc596116b11225407c0553010e33ae0fcd",
   "clock_library": "libfaketime:arm64\t0.9.10-2.1",
-  "parent": "1fc8b6e25662408efba16c4fb13d19eb0dd52d93d682d8c47ac383e54cb3367f",
+  "parent": "78177409bcea198ea4ec6e4e35e994f73768b3d0189b0891ca384848185a0080",
   "held_submissions": [
     {
       "offset": "+600s",
       "status": {
-        "tip_hash": "1fc8b6e25662408efba16c4fb13d19eb0dd52d93d682d8c47ac383e54cb3367f",
-        "clock_step_seconds": 600,
+        "tip_hash": "78177409bcea198ea4ec6e4e35e994f73768b3d0189b0891ca384848185a0080",
+        "clock_step_seconds": 601,
         "readiness_reasons": [
           "wall clock differs from monotonic elapsed time"
         ],
@@ -19,8 +19,8 @@
     {
       "offset": "-600s",
       "status": {
-        "tip_hash": "1fc8b6e25662408efba16c4fb13d19eb0dd52d93d682d8c47ac383e54cb3367f",
-        "clock_step_seconds": -600,
+        "tip_hash": "78177409bcea198ea4ec6e4e35e994f73768b3d0189b0891ca384848185a0080",
+        "clock_step_seconds": -599,
         "readiness_reasons": [
           "wall clock differs from monotonic elapsed time"
         ],
@@ -29,6 +29,6 @@
       }
     }
   ],
-  "solution": "56a0fd324bc84e6bbceefc8653e45d0182857b05d5798a7e22fb3942556f8898",
-  "reference_tip": "56a0fd324bc84e6bbceefc8653e45d0182857b05d5798a7e22fb3942556f8898"
+  "solution": "04c875a3c3d65871d26f1e7e9c94fca99fbdadd950688aeb68b5f593805b7740",
+  "reference_tip": "04c875a3c3d65871d26f1e7e9c94fca99fbdadd950688aeb68b5f593805b7740"
 }

@@ -1,0 +1,563 @@
+{
+  "records": [
+    {
+      "bits": 404771607,
+      "coverage": 1,
+      "directives": {
+        "connected": false,
+        "last_applied": 0,
+        "last_verified": 0,
+        "ready": false,
+        "reported_sequence": null
+      },
+      "expected_next_bits": null,
+      "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+      "height": 976422,
+      "observed_at": 1795227814,
+      "pending": 0,
+      "previous": "00000000000000001076543ba0f684404e1b03b04a38403e531db3f381dced9a",
+      "ready": false,
+      "unsigned_candidate": null
+    },
+    {
+      "at": 1795228317,
+      "binary_version": "0.1.0-alpha.4",
+      "event": "start",
+      "network": "mainnet",
+      "restored_tip": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+      "interpreter": {
+        "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+        "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+        "native_archive_sha256": "4f675dfe7df29b03de46b92a60ec10cb42f05580a2232476a40a4604cdbd398c",
+        "linked_bdk_version": "1.4.0",
+        "linked_sv_version": "1.2.3"
+      }
+    },
+    {
+      "at": 1795228392,
+      "binary_version": "0.1.0-alpha.4",
+      "event": "start",
+      "network": "mainnet",
+      "restored_tip": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+      "interpreter": {
+        "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+        "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+        "native_archive_sha256": "4f675dfe7df29b03de46b92a60ec10cb42f05580a2232476a40a4604cdbd398c",
+        "linked_bdk_version": "1.4.0",
+        "linked_sv_version": "1.2.3"
+      }
+    },
+    {
+      "bits": 404730267,
+      "coverage": 2,
+      "delivery_source": "asset:endpoint-1",
+      "directives": {
+        "connected": false,
+        "genesis_verified": false,
+        "last_applied": 0,
+        "last_verified": 0,
+        "ready": false,
+        "reported_sequence": null
+      },
+      "event": "tip",
+      "expected_next_bits": null,
+      "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+      "height": 976423,
+      "observed_at": 1795228615,
+      "pending": 0,
+      "previous": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+      "ready": false,
+      "receipt_trigger_hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+      "reported_tips": {
+        "peer-1": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-2": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-3": {
+          "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+          "height": 976422
+        },
+        "peer-4": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-5": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-6": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-7": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-8": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-9": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-10": {
+          "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+          "height": 976422
+        },
+        "peer-11": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        }
+      },
+      "unsigned_candidate": null
+    },
+    {
+      "at": 1795229168,
+      "binary_version": "0.1.0-alpha.4",
+      "event": "start",
+      "network": "mainnet",
+      "restored_tip": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+      "interpreter": {
+        "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+        "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+        "native_archive_sha256": "4f675dfe7df29b03de46b92a60ec10cb42f05580a2232476a40a4604cdbd398c",
+        "linked_bdk_version": "1.4.0",
+        "linked_sv_version": "1.2.3"
+      }
+    },
+    {
+      "at": 1795229237,
+      "binary_version": "0.1.0-alpha.4",
+      "event": "start",
+      "network": "mainnet",
+      "restored_tip": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+      "interpreter": {
+        "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+        "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+        "native_archive_sha256": "4f675dfe7df29b03de46b92a60ec10cb42f05580a2232476a40a4604cdbd398c",
+        "linked_bdk_version": "1.4.0",
+        "linked_sv_version": "1.2.3"
+      }
+    },
+    {
+      "bits": 404738427,
+      "coverage": 3,
+      "delivery_source": "asset:endpoint-2",
+      "directives": {
+        "connected": false,
+        "genesis_verified": true,
+        "last_applied": 1,
+        "last_peer_sync": {
+          "sequence": 1,
+          "unix_s": 1795229288
+        },
+        "last_verified": 1,
+        "peer_sync_required": true,
+        "ready": false,
+        "reported_sequence": 1
+      },
+      "event": "tip",
+      "expected_next_bits": null,
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229546,
+      "pending": 0,
+      "previous": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+      "ready": false,
+      "receipt_trigger_hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "reported_tips": {
+        "peer-1": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-2": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-3": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-4": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-5": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-6": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-7": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-8": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-9": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-10": {
+          "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+          "height": 976423
+        },
+        "peer-11": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        }
+      },
+      "unsigned_candidate": null
+    },
+    {
+      "at": 1795229585,
+      "binary_version": "0.1.0-alpha.4",
+      "body_transport": "sv_only",
+      "event": "start",
+      "network": "mainnet",
+      "restored_tip": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "interpreter": {
+        "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+        "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+        "native_archive_sha256": "4f675dfe7df29b03de46b92a60ec10cb42f05580a2232476a40a4604cdbd398c",
+        "linked_bdk_version": "1.4.0",
+        "linked_sv_version": "1.2.3"
+      }
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229587,
+      "peer": "peer-10"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229587,
+      "peer": "peer-3"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229588,
+      "peer": "peer-4"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229589,
+      "peer": "peer-11"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229589,
+      "peer": "peer-5"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229590,
+      "peer": "peer-7"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229591,
+      "peer": "peer-8"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229591,
+      "peer": "peer-6"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229591,
+      "peer": "peer-9"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229593,
+      "peer": "peer-2"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "height": 976424,
+      "observed_at": 1795229595,
+      "peer": "peer-1"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "peer": "peer-8"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "peer": "peer-6"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "peer": "peer-11"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "peer": "peer-2"
+    },
+    {
+      "bits": 404772962,
+      "coverage": 4,
+      "delivery_source": "sv:peer-12",
+      "directives": {
+        "connected": false,
+        "genesis_verified": false,
+        "last_applied": 1,
+        "last_peer_sync": null,
+        "last_verified": 1,
+        "peer_sync_required": true,
+        "ready": false,
+        "reported_sequence": null
+      },
+      "event": "tip",
+      "expected_next_bits": null,
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "header_hex": "00605d2315da49ad092ce7310dd54d8e28aaaef1ac4219e43c40b01800000000000000001de049af1b04df064df4e25cfb22ab6824303ab689094af6c1f07bdd147313c13008016b625820183d5c3bd5",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "pending": 0,
+      "previous": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "ready": false,
+      "receipt_trigger_hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "reported_tips": {
+        "peer-1": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-2": {
+          "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+          "height": 976425
+        },
+        "peer-3": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-4": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-5": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-6": {
+          "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+          "height": 976425
+        },
+        "peer-7": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-8": {
+          "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+          "height": 976425
+        },
+        "peer-9": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-10": {
+          "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+          "height": 976424
+        },
+        "peer-11": {
+          "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+          "height": 976425
+        }
+      },
+      "unsigned_candidate": null
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "peer": "peer-7"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "peer": "peer-4"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229745,
+      "peer": "peer-5"
+    },
+    {
+      "at": 1795229746,
+      "binary_version": "0.1.0-alpha.4",
+      "body_transport": "all",
+      "event": "start",
+      "network": "mainnet",
+      "restored_tip": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "interpreter": {
+        "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+        "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+        "native_archive_sha256": "4f675dfe7df29b03de46b92a60ec10cb42f05580a2232476a40a4604cdbd398c",
+        "linked_bdk_version": "1.4.0",
+        "linked_sv_version": "1.2.3"
+      }
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229747,
+      "peer": "peer-3"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229748,
+      "peer": "peer-4"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229749,
+      "peer": "peer-11"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229749,
+      "peer": "peer-5"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229749,
+      "peer": "peer-10"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229750,
+      "peer": "peer-7"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229751,
+      "peer": "peer-8"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229751,
+      "peer": "peer-6"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229751,
+      "peer": "peer-9"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229753,
+      "peer": "peer-2"
+    },
+    {
+      "event": "reference_tip",
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "height": 976425,
+      "observed_at": 1795229755,
+      "peer": "peer-1"
+    }
+  ],
+  "failover": [
+    {
+      "event": "restrict_body_transport",
+      "unix_s": 1795229584,
+      "height": 976424,
+      "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15"
+    },
+    {
+      "event": "sv_body_received",
+      "unix_s": 1795229745,
+      "height": 976425,
+      "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "restored": true,
+      "contiguous_failover": true
+    },
+    {
+      "event": "restore_all_body_transports",
+      "unix_s": 1795229745
+    }
+  ],
+  "audit": {
+    "observed_transitions": 4,
+    "longest_contiguous_run": 4,
+    "current_contiguous_run": 4,
+    "restart_boundaries_recovered": 6,
+    "process_starts": 6,
+    "headers_rechecked": 1,
+    "distinct_delivery_sources": 3,
+    "delivery_source_switches": 2,
+    "sv_only_failovers": 1,
+    "contemporaneous_peer_hash_matches": 3,
+    "unsigned_templates": 0,
+    "directive_ready_transitions": 0,
+    "exceptions": [],
+    "coverage_failures": []
+  }
+}

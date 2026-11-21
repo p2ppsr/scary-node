@@ -1,0 +1,18 @@
+{
+  "timestamp_utc": "2026-11-21T02:57:32.396550+00:00",
+  "official_receiver": "v0.3.5",
+  "genesis_sha256": "9915b1987b80e4373a08a65b285a172055b1d042bb477011989a254882de2ac1",
+  "signed_sequence": 1,
+  "signed_sha256": "10dc87ebdf11e8d3ddc32d9b185f1ed3b8a8334addbb5f0c46a848107e5def8a",
+  "verified_sequence": 1,
+  "durable_sequence": 1,
+  "genesis_verified": true,
+  "last_successful_sync_utc": "2026-11-21T02:56:06+00:00",
+  "receiver_active_peers": 2,
+  "unprocessed_alerts": 0,
+  "observer_height": 976425,
+  "observer_tip": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+  "remaining_readiness_reasons": [
+    "difficulty history incomplete"
+  ]
+}

@@ -4,6 +4,7 @@ cd "$(dirname "$0")"
 export SCARY_LAB_MIXED=1 COMPOSE_PROJECT_NAME=scary-node-mixed
 compose() { docker compose -f compose.yaml -f mixed.compose.yaml "$@"; }
 if [ "${1:-}" = --down ]; then compose down -v; exit; fi
+if [ "${1:-}" = --stream ]; then export SCARY_MIXED_STREAM=1; fi
 if [ "${1:-}" = --workload ]; then
     case "${2:-}" in 128|1024|4096) export SCARY_MIXED_WORKLOAD=$2;; *) echo 'Select 128, 1024 or 4096 signed payments.' >&2; exit 2;; esac
 fi

@@ -4,6 +4,7 @@ import argparse
 import contextlib
 import hashlib
 import json
+import os
 import random
 import subprocess
 import tempfile
@@ -299,10 +300,17 @@ def run(path, binary, seed, count, delay):
         "planned": plan,
         "rows": [],
         "complete": False,
+        "stage": "fixture",
     }
 
     def save():
-        path.write_text(json.dumps(result, indent=2) + "\n")
+        tmp = path.with_suffix(".writing")
+        with tmp.open("w") as file:
+            json.dump(result, file, indent=2)
+            file.write("\n")
+            file.flush()
+            os.fsync(file.fileno())
+        os.replace(tmp, path)
 
     if path.exists():
         raise ValueError("session output already exists")
@@ -352,18 +360,24 @@ def run(path, binary, seed, count, delay):
         life.enter_context(entrant(binary, r1, feed, d, api, stratum))
         url = f"http://127.0.0.1:{api}/status"
         until(
-            lambda: response(url)["peer"]["connected_peer_ids_seen"]
-            and response(url)["mining"]["directives"]["ready"],
+            lambda: (
+                response(url)["peer"]["connected_peer_ids_seen"]
+                and response(url)["mining"]["directives"]["ready"]
+            ),
             "governed entrant",
         )
         f, offers = funding_transactions(a, count)
         a.rpc("sendrawtransaction", f)
         parent = a.rpc("generate", 1)[0]
         until(
-            lambda: all(n.rpc("getbestblockhash") == parent for n in nodes)
-            and response(url)["mining"]["tip_hash"] == parent,
+            lambda: (
+                all(n.rpc("getbestblockhash") == parent for n in nodes)
+                and response(url)["mining"]["tip_hash"] == parent
+            ),
             "funding observations",
         )
+        result["stage"] = "opportunities"
+        save()
         for schedule, payment in zip(plan, offers):
             with contextlib.ExitStack() as jobs:
                 row = opportunity(schedule, nodes, api, stratum, jobs, payment, parent)
@@ -374,6 +388,7 @@ def run(path, binary, seed, count, delay):
             row["session_final_ancestry"] = [
                 rx.rpc("getblockhash", row["height"]) for rx in (r1, r2)
             ]
+        result["stage"] = "closed"
         result["complete"] = True
         save()
 

@@ -112,6 +112,16 @@ struct SolvedBody {
 pub struct Mining {
     #[serde(skip)]
     path: Option<std::path::PathBuf>,
+    #[serde(skip)]
+    storage_failure: Option<String>,
+    #[serde(skip)]
+    live_peers: HashSet<String>,
+    #[serde(skip)]
+    supervise_peers: bool,
+    #[serde(skip)]
+    sv_bodies_only: bool,
+    #[serde(skip)]
+    confirmed_since_disconnect: bool,
     applied_sequence: u32,
     solution_body: Option<SolvedBody>,
     #[serde(skip, default = "crate::alerts::unconfigured")]
@@ -197,6 +207,11 @@ impl Mining {
         );
         Ok(Self {
             path: None,
+            storage_failure: None,
+            live_peers: HashSet::new(),
+            supervise_peers: false,
+            sv_bodies_only: false,
+            confirmed_since_disconnect: false,
             applied_sequence: 0,
             solution_body: None,
             directives: crate::alerts::Book::new(
@@ -243,7 +258,9 @@ impl Mining {
     }
 
     fn observation_window_ready(&self) -> bool {
-        clock_ready()
+        self.peer_ready()
+            && self.storage_failure.is_none()
+            && clock_ready()
             && self.directives.ready()
             && self.applied_sequence == self.directives.applied()
             && !self.blocked
@@ -251,6 +268,44 @@ impl Mining {
             && self.awaiting_height.is_none()
             && self.headers.len() >= self.min_observed_blocks
             && (self.regtest || self.headers.len() >= HEADER_WINDOW)
+    }
+
+    pub(crate) fn supervise_data_peers(&mut self, sv_bodies_only: bool) {
+        self.supervise_peers = true;
+        self.sv_bodies_only = sv_bodies_only;
+    }
+    fn peer_ready(&self) -> bool {
+        !self.supervise_peers || (!self.live_peers.is_empty() && self.confirmed_since_disconnect)
+    }
+    pub(crate) fn peer_connection(&mut self, peer: &str, connected: bool) {
+        if self.sv_bodies_only && !peer.starts_with("sv:") {
+            return;
+        }
+        if connected {
+            self.live_peers.insert(peer.to_owned());
+        } else if self.live_peers.remove(peer) && self.live_peers.is_empty() {
+            self.confirmed_since_disconnect = false;
+            self.parent_epoch += 1;
+            self.revision += 1;
+        }
+    }
+    pub(crate) fn confirm_current_tip(&mut self, hash: &str, height: u32) {
+        if !self.live_peers.is_empty()
+            && self.height == Some(height)
+            && self.tip().is_some_and(|id| wire::display_hash(id) == hash)
+            && !self.confirmed_since_disconnect
+        {
+            self.confirmed_since_disconnect = true;
+            self.revision += 1;
+        }
+    }
+    pub(crate) fn header_probe(&self) -> Option<(Hash, Hash, u32)> {
+        let header = self.headers.back()?;
+        Some((
+            header[4..36].try_into().ok()?,
+            hash256(header),
+            self.height?,
+        ))
     }
 
     pub fn suspend(&mut self) {
@@ -558,6 +613,7 @@ impl Mining {
         }
     }
     pub fn submit_tx(&mut self, raw: &[u8]) -> Result<String> {
+        ensure!(self.storage_failure.is_none(), "durable state write failed");
         ensure!(self.directives.ready(), "directive state is not ready");
         ensure!(
             !self.blocked && self.awaiting_height.is_none(),
@@ -753,6 +809,11 @@ impl Mining {
     pub fn status(&self) -> Value {
         let readiness: Vec<&str> = [
             (
+                !self.peer_ready(),
+                "awaiting current tip from a connected data peer",
+            ),
+            (self.storage_failure.is_some(), "durable state write failed"),
+            (
                 !clock_ready(),
                 "wall clock differs from monotonic elapsed time",
             ),
@@ -792,7 +853,7 @@ impl Mining {
 
         let (mapped_count, mapped_bytes) = self.chain.mapped_bodies();
         json!({
-            "clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,
+            "connected_data_peers":self.live_peers.len(),"tip_confirmed_since_disconnect":self.confirmed_since_disconnect,"storage_failure":self.storage_failure,"clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,
             "mapped_bodies":mapped_count,"mapped_body_bytes":mapped_bytes,"capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
             "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
             "observation_window_ready": self.observation_window_ready(), "headers": self.headers.len(), "awaiting_height": self.awaiting_height,

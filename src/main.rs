@@ -242,11 +242,15 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
     while let Some(event) = events.recv().await {
         match event {
             Event::Connected(id) => {
+                app.mining.lock().await.peer_connection(&id, true);
                 let mut p = app.peer.lock().await;
                 if p.seen.len() < 4096 {
                     p.seen.insert(id.clone());
                 }
                 log(json!({"event":"peer_connected","peer":id}));
+            }
+            Event::Disconnected(id) => {
+                app.mining.lock().await.peer_connection(&id, false);
             }
             Event::Delivery {
                 peer,
@@ -261,6 +265,7 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
             Event::Status { peer, height, hash } => {
                 {
                     let mut s = app.mining.lock().await;
+                    s.confirm_current_tip(&hash, height);
                     if s.reported_tip(&peer, &hash, height) {
                         s.save()?;
                     }
@@ -310,7 +315,14 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 let mut m = app.mining.lock().await;
                 let previous = m.tip();
                 let result = m.observe_body(height, raw.clone());
-                m.save().context("committing witnessed branch")?;
+                if result.is_ok() && raw.len() >= 80 {
+                    let hash =
+                        mining::wire::display_hash(bsv::primitives::hash::hash256(&raw[..80]));
+                    m.confirm_current_tip(&hash, height);
+                }
+                if !matches!(result, Ok(false)) {
+                    m.save().context("committing witnessed branch")?;
+                }
                 if result.is_ok() && m.tip() != previous {
                     if let Some(ref file) = app.shadow {
                         let mut row = m.shadow_decision()?;
@@ -326,8 +338,15 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 }
                 let _ = validated.send(result.is_ok());
                 match result {
-                    Ok(()) => log(json!({"event":"body_observed","height":height})),
+                    Ok(_) => log(json!({"event":"body_observed","height":height})),
                     Err(err) => {
+                        if let Some(file) = &app.shadow {
+                            shadow_record(
+                                file,
+                                &json!({"event":"coverage_failure","observed_at":mining::now()?,
+                                "offered_height":height,"retained_height":m.height_hint(),"reason":err.to_string()}),
+                            )?;
+                        }
                         drop(m);
                         app.peer.lock().await.gaps += 1;
                         log(
@@ -341,6 +360,13 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                     let mut m = app.mining.lock().await;
                     m.wait_for_body(reason.clone());
                     m.save()?;
+                    if let Some(file) = &app.shadow {
+                        shadow_record(
+                            file,
+                            &json!({"event":"coverage_failure","observed_at":mining::now()?,
+                            "retained_height":m.height_hint(),"reason":reason}),
+                        )?;
+                    }
                 }
                 app.peer.lock().await.gaps += 1;
                 log(json!({"event":"coverage_reset","reason":reason}));
@@ -430,6 +456,15 @@ async fn main() -> Result<()> {
     }
     mining.set_min_observed_blocks(args.min_observed_blocks as usize)?;
     mining.open_store(&dir)?;
+    mining.supervise_data_peers(args.sv_bodies_only);
+    if mining.tip().is_some() {
+        let s = mining.status();
+        log(
+            json!({"event":"witness_restored","height":s["height"],"tip_hash":s["tip_hash"],
+            "witnessed_outputs":s["witnessed_outputs"],"observation_window_ready":s["observation_window_ready"],
+            "capacity":s["capacity"],"readiness_reasons":s["readiness_reasons"]}),
+        );
+    }
     if args.alert_service_url.is_some() {
         alerts::recover(&dir.join("alerts"), &mut mining)?;
     }

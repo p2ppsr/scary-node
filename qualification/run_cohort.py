@@ -1,17 +1,34 @@
 """Execute fresh native receiver sessions serially and retain all attempts and receipts."""
 
 import argparse
+import contextlib
 import gzip
+import fcntl
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from cohort_estimate import analyze, count_session, read
 from native_cohort import ROOT, run
 
 
+@contextlib.contextmanager
+def session_lock():
+    # Independent cohort sessions on this workstation share a scheduling lock.
+    with (ROOT / ".native/cohort-session.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        yield
+
+
 def batch(directory, binary, phase, pilot):
     directory.mkdir(parents=True, exist_ok=True)
+    with (directory / ".writer.lock").open("a") as writer:
+        fcntl.flock(writer, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return execute(directory, binary, phase, pilot)
+
+
+def execute(directory, binary, phase, pilot):
     start = 41001 if phase == "pilot" else 51001
     n = 16 if phase == "pilot" else read(pilot)["fresh_evaluation_sessions"]
     for seed in range(start, start + n):
@@ -21,10 +38,18 @@ def batch(directory, binary, phase, pilot):
             continue
         partial = directory / f"{seed}.partial"
         if partial.exists():
-            raise RuntimeError(
-                f"incomplete attempt retained at {partial}; investigate before resuming"
-            )
-        run(partial, binary, seed, 32, 1200)
+            previous = read(partial)
+            if previous.get("stage") == "fixture" and not previous["rows"]:
+                failed = directory / "preflight"
+                failed.mkdir(exist_ok=True)
+                os.rename(partial, failed / f"{seed}-{time.time_ns()}.json")
+            elif not previous["complete"]:
+                raise RuntimeError(
+                    f"measured partial retained at {partial}; review the missing observations"
+                )
+        if not partial.exists():
+            with session_lock():
+                run(partial, binary, seed, 32, 1200)
         record = read(partial)
         count_session(record)
         tmp = final.with_suffix(".next")

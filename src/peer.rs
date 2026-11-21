@@ -49,6 +49,7 @@ pub struct Config {
 #[derive(Debug)]
 pub enum Event {
     Connected(String),
+    Disconnected(String),
     Delivery {
         peer: String,
         hash: String,
@@ -603,7 +604,7 @@ pub async fn run(
                 }
                 SwarmEvent::ConnectionClosed { connection_id,peer_id, num_established, .. } => {
                     endpoints.remove(&connection_id);
-                    if num_established==0 { identified.remove(&peer_id); }
+                    if num_established==0 && identified.remove(&peer_id) { events.send(Event::Disconnected(peer_id.to_string())).await?; }
                 }
                 SwarmEvent::NewListenAddr { address, .. } => {
                     eprintln!("peer listener {address}/p2p/{}", swarm.local_peer_id());

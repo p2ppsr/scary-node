@@ -74,7 +74,7 @@ def run(binary, journal, output, options):
                 process.send_signal(signal.SIGINT)
             process.wait(timeout=45)
 
-    def next_row(file, process):
+    def next_row(file, process, deadline=None):
         while True:
             if process.poll() is not None:
                 raise RuntimeError(
@@ -85,6 +85,8 @@ def run(binary, journal, output, options):
             if line.endswith("\n"):
                 return json.loads(line)
             file.seek(position)
+            if deadline is not None and time.monotonic() >= deadline:
+                return None
             time.sleep(0.25)
 
     def terminate(signum, frame):
@@ -104,10 +106,18 @@ def run(binary, journal, output, options):
                         before = row
         append("restrict_body_transport", height=before["height"], hash=before["hash"])
         with observer(True) as process:
-            ahead_since = None
+            deadline = None
+            ahead_height = None
             restored = False
             while True:
-                row = next_row(source, process)
+                row = next_row(source, process, deadline)
+                if row is None:
+                    append(
+                        "sv_body_unavailable",
+                        reference_height=ahead_height,
+                        restored=restored,
+                    )
+                    break
                 if row.get("event") == "start":
                     restored = row.get("restored_tip") == before["hash"]
                 elif direct(row):
@@ -129,11 +139,9 @@ def run(binary, journal, output, options):
                     row.get("event") == "reference_tip"
                     and row["height"] > before["height"]
                 ):
-                    ahead_since = ahead_since or row["observed_at"]
-                    if (
-                        row["height"] > before["height"] + 1
-                        or row["observed_at"] - ahead_since > 90
-                    ):
+                    deadline = deadline or time.monotonic() + 90
+                    ahead_height = row["height"]
+                    if ahead_height > before["height"] + 1:
                         append(
                             "sv_body_unavailable",
                             reference_height=row["height"],

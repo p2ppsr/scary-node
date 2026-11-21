@@ -90,6 +90,15 @@ pub(super) fn work(header: &[u8; 80]) -> Result<BigUint> {
 }
 
 impl Mining {
+    fn retained_copy(&self, height: u32, raw: &[u8]) -> bool {
+        self.chain
+            .applied
+            .iter()
+            .rev()
+            .find(|b| b.height == height)
+            .is_some_and(|b| &b.raw[..] == raw)
+    }
+
     pub fn tip(&self) -> Option<Hash> {
         self.headers.back().map(|h| hash256(h))
     }
@@ -156,10 +165,12 @@ impl Mining {
             height,
             crate::body::BlockBody::Memory(Arc::new(raw.to_vec())),
         )
+        .map(|_| ())
     }
-    pub fn observe_body(&mut self, height: u32, raw: crate::body::BlockBody) -> Result<()> {
+    /// Returns false when the input left the durable observation state unchanged.
+    pub fn observe_body(&mut self, height: u32, raw: crate::body::BlockBody) -> Result<bool> {
         if height < interpreter::activation(self.regtest) {
-            return Ok(());
+            return Ok(false);
         }
         let header = self.inspect_header(&raw)?;
         let hash = hash256(&header);
@@ -188,14 +199,22 @@ impl Mining {
             anyhow::bail!("known rejected block or ancestor: {reason}");
         }
         if self.active_height(hash) == Some(height) {
-            return Ok(());
+            if self.retained_copy(height, &raw) {
+                return Ok(false);
+            }
+            let (_, error) = self.inspect_body(height, &header, &raw)?;
+            ensure!(
+                error.is_none(),
+                "active header received with different coinbase framing"
+            );
+            return Ok(false);
         }
         let old_tip = self.tip();
         if let Some(tip) = self.height {
             // An older body outside the window proves nothing about the
             // current branch. Ignore it without resetting usable work.
             if height < tip.saturating_sub(REORG_DEPTH as u32) {
-                return Ok(());
+                return Ok(false);
             }
         }
         let direct = old_tip.is_none() || old_tip == Some(previous);
@@ -252,7 +271,7 @@ impl Mining {
                     self.suspended_reason = None;
                     self.revision += 1;
                     self.lifecycle.observe(&self.headers, height);
-                    return Ok(());
+                    return Ok(true);
                 }
             }
             let mut held = quarantined;
@@ -300,7 +319,7 @@ impl Mining {
         self.chain
             .buffered
             .retain(|b| !self.headers.iter().any(|h| h == &b.header));
-        result
+        result.map(|_| true)
     }
 
     fn active_height(&self, hash: Hash) -> Option<u32> {

@@ -2,6 +2,7 @@
 
 import gzip
 import hashlib
+import io
 import json
 import sys
 from pathlib import Path
@@ -10,6 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "regtest"))
 from prove import decode_block, dsha, txid
 from verify_receipt import check_header, single_input
+from cohort_estimate import analyze
+from shadow import audit
+from verify_stream import verify as verify_stream
 
 
 def verify(directory):
@@ -172,12 +176,24 @@ def verify(directory):
         and previous == workload["settlement"]["settlement_tip"]
     )
     fault = json.loads((directory / "chronicle-storage-fault.json").read_text())
-    assert fault["process_exit"] == 1 and fault["before"] == fault["restored"]
+    assert fault["process_exit"] == 1 and all(
+        fault["before"][k] == fault["restored"][k]
+        for k in ("height", "tip_hash", "witnessed_outputs")
+    )
     assert (
         fault["concurrent_writer_refused"] and fault["incomplete_temporary_bytes"] > 0
     )
     assert fault["repaired"]["tip_hash"] == fault["reference_tip"]
     assert fault["repaired"]["height"] == fault["before"]["height"] + 2
+    crash = fault["interrupted_write"]
+    assert (
+        crash["signal"] == "SIGKILL"
+        and crash["bytes_read_from_inflight_checkpoint"] == 4096
+    )
+    assert (
+        crash["repaired"]["tip_hash"] == crash["reference_tip"]
+        and crash["replayed_known_signatures"] == 1
+    )
     clock = json.loads((directory / "chronicle-clock-fault.json").read_text())
     assert clock["solution"] == clock["reference_tip"]
     assert [r["offset"] for r in clock["held_submissions"]] == ["+600s", "-600s"]
@@ -247,6 +263,67 @@ def verify(directory):
         large["rollback"]["restored_tip"] == large["successor"]
         and large["rollback"]["reference_tip"] == large["rollback"]["next_active_tip"]
     )
+    shadow = json.loads((directory / "chronicle-shadow-progress.json").read_text())
+    journal = io.StringIO("\n".join(json.dumps(r) for r in shadow["records"]))
+    assert audit(journal) == shadow["audit"]
+    assert shadow["audit"]["sv_only_failovers"] >= 1
+    restricted, received, restored = shadow["failover"]
+    assert (restricted["event"], received["event"], restored["event"]) == (
+        "restrict_body_transport",
+        "sv_body_received",
+        "restore_all_body_transports",
+    )
+    assert received["contiguous_failover"] and received["restored"]
+    assert any(
+        r.get("event") == "tip"
+        and r["hash"] == received["hash"]
+        and r["previous"] == restricted["hash"]
+        and r["height"] == restricted["height"] + 1
+        for r in shadow["records"]
+    )
+    assert (
+        verify_stream(directory / "chronicle-mixed-stream.json.gz")[
+            "active_wire_matches"
+        ]
+        == 24
+    )
+    live = json.loads((directory / "chronicle-mainnet-alert-sync.json").read_text())
+    assert (
+        live["genesis_sha256"]
+        == hashlib.sha256(
+            bytes.fromhex(
+                (ROOT / "qualification/alert-genesis.hex").read_text().strip()
+            )
+        ).hexdigest()
+    )
+    assert (
+        live["signed_sequence"]
+        == live["verified_sequence"]
+        == live["durable_sequence"]
+        == 1
+    )
+    assert (
+        live["genesis_verified"]
+        and live["receiver_active_peers"] >= 1
+        and live["unprocessed_alerts"] == 0
+    )
+    assert analyze(directory / "chronicle-native-pilot", "pilot") == json.loads(
+        (directory / "chronicle-native-sizing.json").read_text()
+    )
+    loss = json.loads((directory / "chronicle-peer-loss.json").read_text())
+    assert (
+        loss["lost"]["tip_hash"] == loss["initial_parent"]
+        and loss["lost"]["connected_data_peers"] == 0
+    )
+    assert (
+        not loss["lost"]["observation_window_ready"]
+        and loss["lost"]["solved_blocks"] == 0
+    )
+    assert (
+        loss["repaired"]["tip_hash"] == loss["advanced_while_disconnected"]
+        and loss["repaired"]["observation_window_ready"]
+    )
+    assert loss["new_solution"] == loss["full_active_tip"]
     print(
         f"Verified {len(rows)} differential cases, both solved DAR bodies, reorg dispositions and both directive orderings."
     )
