@@ -3,7 +3,7 @@ use super::*;
 use num_bigint::BigUint;
 
 const REORG_DEPTH: usize = 8;
-const BUFFERED_BLOCKS: usize = 24;
+const REPAIR_BATCH: usize = 24;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub(super) struct AppliedBlock {
@@ -74,7 +74,7 @@ impl RecentChain {
     fn buffer(&mut self, body: Body) {
         self.buffered.retain(|b| b.hash != body.hash);
         self.buffered.push_back(body);
-        while self.buffered.len() > BUFFERED_BLOCKS
+        while self.buffered.len() > HEADER_WINDOW
             || self.buffered.iter().map(|b| b.raw.len()).sum::<usize>() > capacity().journal_bytes
         {
             self.buffered.pop_front();
@@ -110,8 +110,8 @@ impl Mining {
             let Some(height) = b.height.checked_sub(1) else {
                 continue;
             };
-            if height > tip.saturating_add(BUFFERED_BLOCKS as u32)
-                || height < tip.saturating_sub(self.chain.applied.len() as u32)
+            if height > tip.saturating_add(REPAIR_BATCH as u32)
+                || height < tip.saturating_sub(HEADER_WINDOW as u32)
             {
                 continue;
             }
@@ -125,6 +125,88 @@ impl Mining {
             }
         }
         missing.into_iter().collect()
+    }
+
+    pub(crate) fn repair_locator(&self) -> Vec<Hash> {
+        if self.peer_ready()
+            && !self.blocked
+            && self.awaiting_height.is_none()
+            && !self.invalidated_boundary
+        {
+            return Vec::new();
+        }
+        // Dense near the tip; spaced further back, retaining the oldest
+        // observed header. Stock locators permit at most 101 entries.
+        let mut ids: Vec<_> = self
+            .headers
+            .iter()
+            .rev()
+            .enumerate()
+            .filter(|(i, _)| *i < 32 || *i % 4 == 0 || i + 1 == self.headers.len())
+            .map(|(_, h)| hash256(h))
+            .filter(|id| {
+                !self.directives.invalid.contains(id) && !self.invalid_descendants.contains(id)
+            })
+            .collect();
+        if let Some(eligible) = self.first_invalid_height().and_then(|h| h.checked_sub(1)) {
+            if let Some((id, _)) = self
+                .active_since_entry
+                .iter()
+                .find(|(_, h)| **h == eligible)
+            {
+                if !ids.contains(id) {
+                    ids.insert(0, *id);
+                }
+            }
+        }
+        ids
+    }
+
+    /// Interpret only a contiguous header response rooted in locally
+    /// observed ancestry. A remote peer's genesis fallback never starts IBD.
+    /// Only complete validated bodies advance the spend-coverage boundary.
+    pub(crate) fn repair_headers(&mut self, headers: &[[u8; 80]]) -> Result<Vec<Hash>> {
+        let Some(first) = headers.first() else {
+            return Ok(vec![]);
+        };
+        let mut previous: Hash = first[4..36].try_into()?;
+        let Some(&start) = self.active_since_entry.get(&previous) else {
+            return Ok(vec![]);
+        };
+        if self.invalid_descendants.contains(&previous)
+            || self.directives.invalid.contains(&previous)
+        {
+            return Ok(vec![]);
+        }
+        let mut height = start;
+        let mut requests = Vec::new();
+        for header in headers {
+            height = height
+                .checked_add(1)
+                .context("peer header height overflow")?;
+            ensure!(
+                header[4..36] == previous,
+                "discontinuous peer repair headers"
+            );
+            self.inspect_header(height, header)?;
+            let id = hash256(header);
+            if self.directives.invalid.contains(&id) || self.invalid_descendants.contains(&id) {
+                return Ok(vec![]);
+            }
+            if requests.len() < REPAIR_BATCH
+                && !self.active_since_entry.contains_key(&id)
+                && !self.chain.buffered.iter().any(|b| b.hash == id)
+            {
+                requests.push(id);
+            }
+            previous = id;
+        }
+        let waiting = self.awaiting_height;
+        self.announced_height(height);
+        if self.awaiting_height != waiting {
+            self.save()?;
+        }
+        Ok(requests)
     }
 
     /// An alternate transport can fail after the same body has been committed.
@@ -231,8 +313,9 @@ impl Mining {
             anyhow::bail!("explicitly invalidated ancestry");
         }
         ensure!(
-            !self.invalidated_boundary,
-            "explicit invalidation exceeds reversible ancestry"
+            !self.headers.is_empty()
+                || (!self.invalidated_boundary && self.invalid_descendants.is_empty()),
+            "no eligible ancestry retained after signed invalidation"
         );
         if let Some((id, _, reason)) = self
             .recent_invalid
@@ -260,11 +343,16 @@ impl Mining {
         if let Some(tip) = self.height {
             // An older body outside the window proves nothing about the
             // current branch. Ignore it without resetting usable work.
-            if height < tip.saturating_sub(REORG_DEPTH as u32) {
+            if height < tip.saturating_sub(HEADER_WINDOW as u32)
+                && !(self.invalidated_boundary
+                    && self.first_invalid_height().is_some_and(|invalid| {
+                        height >= invalid.saturating_sub(HEADER_WINDOW as u32)
+                    }))
+            {
                 return Ok(false);
             }
         }
-        let direct = old_tip.is_none() || old_tip == Some(previous);
+        let direct = !self.invalidated_boundary && (old_tip.is_none() || old_tip == Some(previous));
         let existing_hold = self.held_by_soft_freeze(hash, previous);
         let newly_frozen = direct
             && !existing_hold
@@ -286,51 +374,12 @@ impl Mining {
             if newly_frozen {
                 self.soft_freezes.insert(hash);
             }
-            let deep_gap = self
-                .height
-                .is_some_and(|tip| height > tip.saturating_add(BUFFERED_BLOCKS as u32));
             let candidate = Body {
                 height,
                 header,
                 hash,
                 raw,
             };
-            if deep_gap && !quarantined && !self.soft_frozen(&candidate.raw, height)? {
-                let anchor = self
-                    .chain
-                    .buffered
-                    .iter()
-                    .find(|p| p.hash == previous && p.height.checked_add(1) == Some(height))
-                    .cloned();
-                if let Some(p) = anchor {
-                    ensure!(
-                        !self.soft_frozen(&p.raw, p.height)?
-                            && !self.held_by_soft_freeze(p.hash, p.previous())
-                            && !self.directives.invalid.contains(&p.hash)
-                            && !self.invalid_descendants.contains(&p.hash),
-                        "ineligible re-entry boundary"
-                    );
-                    // Validate the replacement boundary in isolation. Failure leaves
-                    // the previous snapshot and its readiness gate intact.
-                    let mut trial = Mining::new(self.regtest, self.payout.clone())?;
-                    trial.directives = self.directives.clone();
-                    trial.connect(p.height, p.raw, p.header)?;
-                    trial.connect(height, candidate.raw, header)?;
-                    self.suspend();
-                    self.height = trial.height;
-                    self.headers = trial.headers;
-                    self.active_since_entry = trial.active_since_entry;
-                    self.chain = trial.chain;
-                    self.coins = trial.coins;
-                    self.spent = trial.spent;
-                    self.omitted_outputs += trial.omitted_outputs;
-                    self.validation_window = trial.validation_window;
-                    self.suspended_reason = None;
-                    self.revision += 1;
-                    self.lifecycle.observe(&self.headers, height);
-                    return Ok(true);
-                }
-            }
             self.chain.buffer(candidate);
             if quarantined && self.awaiting_height.is_some_and(|h| h <= height) {
                 self.awaiting_height = None;
@@ -396,6 +445,78 @@ impl Mining {
         tip.checked_sub(offset as u32)
     }
 
+    fn adopt_new_boundary(&mut self, ancestor: u32, path: Vec<Body>) -> Result<()> {
+        let mut trial = Mining::new(self.regtest, self.payout.clone())?;
+        trial.directives = self.directives.clone();
+        let height = path.last().context("empty replacement branch")?.height;
+        let length = path.len();
+        if let Some(tip) = self.height {
+            let anchor = ancestor;
+            let depth = tip
+                .checked_sub(anchor)
+                .context("replacement ancestor above tip")? as usize;
+            if depth < self.headers.len() {
+                trial
+                    .headers
+                    .extend(self.headers.iter().take(self.headers.len() - depth));
+                trial.height = Some(anchor);
+            }
+        }
+        for b in path {
+            if let Err(error) = trial.connect(b.height, b.raw, b.header) {
+                self.chain.buffered.retain(|other| other.hash != b.hash);
+                if error.downcast_ref::<validation::InvalidBody>().is_some() {
+                    self.remember_invalid(b.hash, b.height, error.to_string());
+                }
+                return Err(error);
+            }
+            // Only the recent journal is needed after a successful atomic
+            // switch. Older trial undo is unnecessary even for a long fork.
+            trial.chain.prune();
+        }
+        // The shared ancestor supplies contextual header checks during replay.
+        // Spend coverage and undo start at the first newly verified body.
+        while trial.headers.len() > length {
+            trial.headers.pop_front();
+        }
+        for entry in &mut trial.chain.applied {
+            entry.previous_header = None;
+        }
+        trial.chain.prune();
+        // Also migrate a boundary quarantined by versions that retained only
+        // the signed root and the active-height index in their checkpoint.
+        if self.invalidated_boundary {
+            if let Some(invalid) = self.first_invalid_height() {
+                self.mark_invalid_descendants(invalid);
+            }
+        }
+        let known_prefix = std::mem::take(&mut self.active_since_entry);
+        let mut buffered = std::mem::take(&mut self.chain.buffered);
+        buffered.retain(|b| !trial.active_since_entry.contains_key(&b.hash));
+        let reorgs = self.chain.reorgs + 1;
+        // An ordinary partial repair cannot clear a farther announced height.
+        // A signed invalidation disqualifies the old suffix and its reports.
+        let awaiting = self.awaiting_height.filter(|_| !self.invalidated_boundary);
+        self.suspend();
+        self.awaiting_height = awaiting.filter(|h| *h > height);
+        self.height = trial.height;
+        self.headers = trial.headers;
+        self.active_since_entry = trial.active_since_entry;
+        self.active_since_entry
+            .extend(known_prefix.into_iter().filter(|(_, n)| *n <= ancestor));
+        self.chain = trial.chain;
+        self.chain.buffered = buffered;
+        self.chain.reorgs = reorgs;
+        self.coins = trial.coins;
+        self.spent = trial.spent;
+        self.omitted_outputs += trial.omitted_outputs;
+        self.validation_window = trial.validation_window;
+        self.invalidated_boundary = false;
+        self.suspended_reason = None;
+        self.lifecycle.observe(&self.headers, height);
+        Ok(())
+    }
+
     fn best_buffered_branch(&self) -> Result<Option<(u32, Vec<Body>)>> {
         let Some(height) = self.height else {
             return Ok(None);
@@ -410,6 +531,13 @@ impl Mining {
             .enumerate()
             .filter_map(|(offset, h)| height.checked_sub(offset as u32).map(|n| (hash256(h), n)))
             .collect();
+        let invalid_height = self
+            .invalidated_boundary
+            .then(|| self.first_invalid_height())
+            .flatten();
+        if self.invalidated_boundary && invalid_height.is_none() {
+            return Ok(None);
+        }
         let bodies: HashMap<_, _> = self.chain.buffered.iter().map(|b| (b.hash, b)).collect();
         let mut best = None;
         let mut best_gain = BigUint::default();
@@ -423,12 +551,17 @@ impl Mining {
                 path.push(b);
                 parent = b.previous();
             }
-            let Some(&ancestor) = active.get(&parent) else {
+            let Some(&ancestor) = active
+                .get(&parent)
+                .or_else(|| invalid_height.and_then(|_| self.active_since_entry.get(&parent)))
+            else {
                 continue;
             };
             let depth = (height - ancestor) as usize;
-            if depth > self.chain.applied.len()
-                || ancestor.checked_add(1) != Some(path.last().unwrap().height)
+            if ancestor.checked_add(1) != Some(path.last().unwrap().height)
+                || invalid_height.is_some_and(|invalid| ancestor >= invalid)
+                || ((self.invalidated_boundary || depth > self.chain.applied.len())
+                    && path.len() < 2)
             {
                 continue;
             }
@@ -443,11 +576,21 @@ impl Mining {
             let candidate = path.iter().try_fold(BigUint::default(), |sum, b| {
                 Ok::<_, anyhow::Error>(sum + work(&b.header)?)
             })?;
+            // Compare each fork against exactly the same eligible incumbent.
+            // When signed invalidation disqualifies the tail, its parent still
+            // has accumulated work. A fork from *earlier* must overtake it.
+            let eligible = invalid_height.map_or(height, |bad| bad.saturating_sub(1));
+            let skip = (height - eligible) as usize;
+            let compare = (eligible - ancestor) as usize;
+            if compare > 0 && skip + compare > self.headers.len() {
+                continue; // The common-prefix work difference cannot be reconstructed.
+            }
             let incumbent = self
                 .headers
                 .iter()
                 .rev()
-                .take(depth)
+                .skip(skip)
+                .take(compare)
                 .try_fold(BigUint::default(), |sum, h| {
                     Ok::<_, anyhow::Error>(sum + work(h)?)
                 })?;
@@ -536,17 +679,28 @@ impl Mining {
 }
 
 impl Mining {
-    pub(super) fn apply_invalidations(&mut self) {
-        let invalid = self
-            .directives
+    fn first_invalid_height(&self) -> Option<u32> {
+        self.directives
             .invalid
             .iter()
             .filter_map(|id| self.active_since_entry.get(id))
             .copied()
-            .min();
-        let Some(height) = invalid else {
+            .min()
+    }
+
+    fn mark_invalid_descendants(&mut self, height: u32) {
+        self.invalid_descendants.extend(
+            self.active_since_entry
+                .iter()
+                .filter_map(|(hash, h)| (*h >= height).then_some(*hash)),
+        );
+    }
+
+    pub(super) fn apply_invalidations(&mut self) {
+        let Some(height) = self.first_invalid_height() else {
             return;
         };
+        self.mark_invalid_descendants(height);
         let depth = self
             .height
             .map(|tip| tip.saturating_sub(height) as usize + 1)
@@ -589,7 +743,12 @@ impl Mining {
                 }
             }
             if !held {
-                self.switch_branch(ancestor, path)?;
+                let depth = self.height.unwrap() - ancestor;
+                if self.invalidated_boundary || depth as usize > self.chain.applied.len() {
+                    self.adopt_new_boundary(ancestor, path)?;
+                } else {
+                    self.switch_branch(ancestor, path)?;
+                }
             }
         }
         Ok(())
@@ -601,7 +760,7 @@ impl Mining {
         if kind == 7 {
             self.apply_invalidations();
         }
-        if matches!(kind, 2..=4 | 7) && !self.invalidated_boundary {
+        if matches!(kind, 2..=4 | 7) {
             // The directive also governs future branches. If a buffered peer
             // body cannot connect, fence its coverage independently so that it
             // cannot prevent the signed sequence from advancing.

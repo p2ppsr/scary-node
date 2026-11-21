@@ -1,0 +1,109 @@
+{
+  "binary_sha256": "b832675aeb5af003d72b837ea8771a5e3d1f829cf4ae591fc19b3e5edb8e9be2",
+  "cases": [
+    {
+      "case": "greater_work",
+      "before": {
+        "height": 119,
+        "tip_hash": "4859dd055b864b9dffbe1ea81a6b241ac066a819d0b17d5d59af28e00d84df31",
+        "coverage_start": 106,
+        "headers": 14,
+        "witnessed_outputs": 16,
+        "observation_window_ready": true,
+        "job_preconditions_met": true,
+        "pending_transactions": 1,
+        "readiness_reasons": [],
+        "durable_directive_sequence": 0
+      },
+      "held": null,
+      "restart": {
+        "height": 119,
+        "tip_hash": "4859dd055b864b9dffbe1ea81a6b241ac066a819d0b17d5d59af28e00d84df31",
+        "coverage_start": 106,
+        "headers": 14,
+        "witnessed_outputs": 16,
+        "observation_window_ready": true,
+        "job_preconditions_met": false,
+        "pending_transactions": 0,
+        "readiness_reasons": [],
+        "durable_directive_sequence": 0
+      },
+      "stock_tip": "3e71cb25844bfe426c9bf6b962cdf9053eaf87ef4e4cefa7af90c23788966d75",
+      "withheld": {
+        "height": 119,
+        "tip_hash": "4859dd055b864b9dffbe1ea81a6b241ac066a819d0b17d5d59af28e00d84df31",
+        "coverage_start": 106,
+        "headers": 14,
+        "witnessed_outputs": 16,
+        "observation_window_ready": false,
+        "job_preconditions_met": false,
+        "pending_transactions": 0,
+        "readiness_reasons": [
+          "missing newer announced bodies"
+        ],
+        "durable_directive_sequence": 0
+      }
+    },
+    {
+      "case": "signed",
+      "before": {
+        "height": 119,
+        "tip_hash": "12be4a6735f5f71a3548bff992994a9b7081bdd68b603cde7bf51714eccc8b75",
+        "coverage_start": 106,
+        "headers": 14,
+        "witnessed_outputs": 16,
+        "observation_window_ready": true,
+        "job_preconditions_met": true,
+        "pending_transactions": 1,
+        "readiness_reasons": [],
+        "durable_directive_sequence": 0
+      },
+      "held": {
+        "height": 119,
+        "tip_hash": "12be4a6735f5f71a3548bff992994a9b7081bdd68b603cde7bf51714eccc8b75",
+        "coverage_start": 106,
+        "headers": 14,
+        "witnessed_outputs": 16,
+        "observation_window_ready": false,
+        "job_preconditions_met": false,
+        "pending_transactions": 1,
+        "readiness_reasons": [
+          "directive invalidated ancestry beyond undo coverage",
+          "body coverage interrupted"
+        ],
+        "durable_directive_sequence": 1
+      },
+      "restart": {
+        "height": 119,
+        "tip_hash": "12be4a6735f5f71a3548bff992994a9b7081bdd68b603cde7bf51714eccc8b75",
+        "coverage_start": 106,
+        "headers": 14,
+        "witnessed_outputs": 16,
+        "observation_window_ready": false,
+        "job_preconditions_met": false,
+        "pending_transactions": 1,
+        "readiness_reasons": [
+          "directive invalidated ancestry beyond undo coverage",
+          "body coverage interrupted"
+        ],
+        "durable_directive_sequence": 1
+      },
+      "stock_tip": "01ba286f29dc8573182a0be80c37add9b67fc5a8e267842bf6ee67fc6628e753",
+      "withheld": {
+        "height": 119,
+        "tip_hash": "12be4a6735f5f71a3548bff992994a9b7081bdd68b603cde7bf51714eccc8b75",
+        "coverage_start": 106,
+        "headers": 14,
+        "witnessed_outputs": 16,
+        "observation_window_ready": false,
+        "job_preconditions_met": false,
+        "pending_transactions": 1,
+        "readiness_reasons": [
+          "directive invalidated ancestry beyond undo coverage",
+          "body coverage interrupted"
+        ],
+        "durable_directive_sequence": 1
+      }
+    }
+  ]
+}

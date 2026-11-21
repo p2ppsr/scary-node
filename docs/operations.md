@@ -33,6 +33,8 @@ The pending candidate pool defaults to 65,536 transactions and the smaller of 12
 
 Use `--sv-peer IP:PORT` to add an independent current-tip Bitcoin SV path. Mainnet body observation with no static SV peers uses the three SV Node v1.2.3 mainnet DNS seeds and up to four simultaneous discovery sessions. With explicit peers, `--sv-discovery` also enables rotating native SV paths. [SV Node DNS seeds](https://github.com/bitcoin-sv/bitcoin-sv/blob/6504a3aff65ba97c0f6c80962b033e35ecbfed4b/src/chainparams.cpp) Ordinary inputs need a witnessed creation and successor on the active branch or a validated in-template parent. BDK checks both policy and candidate consensus. Authorized confiscations are bound to exact bytes and height. Their recovered outputs can be spent 1,000 blocks after inclusion. [Build, receiver setup and operating contract](chronicle-qualification.md)
 
+A competing branch beyond the retained undo data can establish a fresh witnessed boundary from a common eligible ancestor and greater verified work. Inspect the signed exclusion, recovery locator, body budget and rebuilt coverage when a deep fork interrupts work. [Deep recovery procedure and stock-node evidence](deep-recovery.md)
+
 ## Inspect what the entrant knows
 
 `--min-observed-blocks N` sets the minimum number of contiguous observed bodies before Stratum issues work. It accepts 1 through 147 and defaults to 1. The realistic regtest sets it to 13. Mainnet still requires the complete difficulty window. A ready observation window by itself supplies neither a payout script nor eligible transactions.

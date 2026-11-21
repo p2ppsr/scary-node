@@ -461,12 +461,19 @@ async fn session(
             _=async { tokio::select! { _=due.tick()=>{}, _=solved.changed()=>{} } }=>{
                 let s=state.lock().await;
                 ensure!(!s.directives.peer_banned(&addr.ip()),"peer banned");
-                let missing = if handshake && last_repair.elapsed()>=Duration::from_secs(3) {
+                let (missing, locator) = if handshake && last_repair.elapsed()>=Duration::from_secs(3) {
                     last_repair=tokio::time::Instant::now();
-                    s.missing_recent()
-                } else { Vec::new() };
+                    (s.missing_recent(), s.repair_locator())
+                } else { (Vec::new(),Vec::new()) };
                 let offer = if handshake { s.relayable_solution() } else { None };
                 drop(s);
+                if !locator.is_empty() {
+                    let mut payload=VERSION.to_le_bytes().to_vec();
+                    wire::put_varint(&mut payload,locator.len());
+                    for id in locator { payload.extend(id); }
+                    payload.extend([0;32]);
+                    send(&mut w,regtest,"getheaders",&payload).await?;
+                }
                 for (id,_) in missing{send(&mut w,regtest,"getdata",&inventory(2,id)).await?;}
                 if handshake {if let Some(hash)=offer{
                     if advertised!=Some(hash){
@@ -526,21 +533,19 @@ async fn session(
                     }
                     "headers" if handshake=>{
                         let mut input=&body[..];let n=wire::varint(&mut input)?;ensure!(n<=2000,"too many peer headers");
-                        let mut req=vec![];
+                        let mut headers=Vec::with_capacity(n);
                         let mut last=None;
-                        let mut current=state.lock().await.tip();
                         for i in 0..n {
                             let h=wire::take(&mut input,80)?;ensure!(wire::varint(&mut input)?==0,"headers has transactions");
                             let id=hash256(h);
                             if i==0 && n==1 && probe.is_some_and(|(parent,tip,_)| h[4..36]==parent && id==tip) {
                                 last=probe.map(|(_,tip,height)|(tip,height));
                             }
-                            if n<=24 && current.is_some_and(|tip|h[4..36]==tip) {
-                                req.push(id);current=Some(id);
-                            }
+                            headers.push(h.try_into()?);
                         }
                         probe=None;
                         ensure!(input.is_empty(),"trailing header bytes");
+                        let req=state.lock().await.repair_headers(&headers)?;
                         if let Some((tip,height))=last {
                             if let Some(check) = readback.as_mut().filter(|r| r.hash == tip) {
                                 check.reported_active = true;

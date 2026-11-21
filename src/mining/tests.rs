@@ -838,8 +838,10 @@ fn checkpoint_interruption_preserves_previous_boundary() {
 }
 
 #[test]
-fn distant_gap_needs_two_linked_bodies_and_restarts_with_empty_old_evidence() {
+fn two_unlinked_high_bodies_cannot_replace_an_established_boundary() {
+    let dir = tempfile::tempdir().unwrap();
     let mut m = Mining::new(true, vec![]).unwrap();
+    m.open_store(dir.path()).unwrap();
     let old = make_block([10; 32], 100, &[]);
     m.observe(100, &old).unwrap();
     let new = make_block([52; 32], 150, &[]);
@@ -848,9 +850,63 @@ fn distant_gap_needs_two_linked_bodies_and_restarts_with_empty_old_evidence() {
     assert_eq!(m.height, Some(100));
     let child = make_block(hash256(&new[..80]), 151, &[]);
     m.observe(151, &child).unwrap();
-    assert_eq!(m.tip(), Some(hash256(&child[..80])));
-    assert_eq!(m.headers.len(), 2);
-    assert_eq!(m.chain.applied.len(), 2);
+    assert_eq!(m.tip(), Some(hash256(&old[..80])));
+    assert!(!m.observation_window_ready());
+    assert_eq!(m.chain.buffered_len(), 2);
+    m.save().unwrap();
+    let mut restored = Mining::new(true, vec![]).unwrap();
+    restored.open_store(dir.path()).unwrap();
+    assert_eq!(restored.tip(), Some(hash256(&old[..80])));
+    assert_eq!(restored.chain.buffered_len(), 2);
+    assert!(!restored.observation_window_ready());
+}
+
+#[test]
+fn anchored_header_repair_batches_bodies_and_keeps_work_fenced_until_caught_up() {
+    let mut m = Mining::new(true, vec![]).unwrap();
+    let base = make_block([21; 32], 180, &[]);
+    m.observe(180, &base).unwrap();
+    let ancestor = hash256(&base[..80]);
+    let mut a = ancestor;
+    for n in 181..=212 {
+        let body = make_block(a, n, &[]);
+        m.observe(n, &body).unwrap();
+        a = hash256(&body[..80]);
+    }
+    let mut alt = vec![];
+    let mut b = ancestor;
+    for n in 181..=216 {
+        let payment = tx(
+            &hex::encode([n as u8; 32]),
+            1,
+            LockingScript::from_binary(&[0x51]),
+        )
+        .to_bytes()
+        .unwrap();
+        let body = make_block(b, n, &[payment]);
+        b = hash256(&body[..80]);
+        alt.push(body);
+    }
+    let headers: Vec<_> = alt.iter().map(|b| b[..80].try_into().unwrap()).collect();
+    assert!(m.repair_headers(&headers[1..]).unwrap().is_empty());
+    let first = m.repair_headers(&headers).unwrap();
+    assert!(m.repair_locator().contains(&ancestor));
+    assert_eq!(first.len(), 24);
+    for (index, body) in alt[0..24].iter().enumerate() {
+        assert_eq!(hash256(&body[..80]), first[index]);
+        m.observe(181 + index as u32, body).unwrap();
+    }
+    let next = m.repair_headers(&headers).unwrap();
+    assert_eq!(next.len(), alt.len() - 24);
+    assert_eq!(m.tip(), Some(a));
+    for (i, body) in alt[24..].iter().enumerate() {
+        m.observe(205 + i as u32, body).unwrap();
+        if m.height != Some(216) {
+            assert!(!m.observation_window_ready());
+        }
+    }
+    assert_eq!(m.tip(), Some(b));
+    assert!(m.observation_window_ready());
 }
 
 #[test]
@@ -989,4 +1045,120 @@ fn invalidation_selects_an_already_buffered_eligible_tip() {
         m.outpoint(&other_tx.id().unwrap(), 0).unwrap()["known"],
         true
     );
+}
+
+#[test]
+fn deep_signed_invalidation_recovers_only_from_a_known_predecessor() {
+    let mut m = Mining::new(true, vec![0x51]).unwrap();
+    let mut prev = [9; 32];
+    let mut early = prev;
+    for h in 147..150 {
+        let body = make_block(prev, h, &[]);
+        prev = hash256(&body[..80]);
+        m.observe(h, &body).unwrap();
+        if h == 147 {
+            early = prev;
+        }
+    }
+    let anchor = make_block(prev, 150, &[]);
+    let common = hash256(&anchor[..80]);
+    m.observe(150, &anchor).unwrap();
+    let mut old = common;
+    let mut forbidden = old;
+    for height in 151..=162 {
+        let b = make_block(old, height, &[]);
+        old = hash256(&b[..80]);
+        if height == 151 {
+            forbidden = old;
+        }
+        m.observe(height, &b).unwrap();
+    }
+    m.directives.invalid.insert(forbidden);
+    m.apply_invalidations();
+    assert!(m.invalidated_boundary);
+    assert!(m.invalid_descendants.contains(&old));
+    let unrelated = make_block([22; 32], 191, &[]);
+    let next = make_block(hash256(&unrelated[..80]), 192, &[]);
+    m.observe(191, &unrelated).unwrap();
+    m.observe(192, &next).unwrap();
+    assert!(m.invalidated_boundary && !m.observation_window_ready());
+    assert_eq!(m.tip(), Some(old));
+    let alternate_payment = tx(&"11".repeat(32), 1, LockingScript::from_binary(&[0x51]))
+        .to_bytes()
+        .unwrap();
+    let lower_work = make_block(early, 148, std::slice::from_ref(&alternate_payment));
+    m.observe(148, &lower_work).unwrap();
+    m.observe(149, &make_block(hash256(&lower_work[..80]), 149, &[]))
+        .unwrap();
+    assert!(m.invalidated_boundary, "less work than the eligible prefix");
+    let alt = make_block(common, 151, &[alternate_payment]);
+    let alt_id = hash256(&alt[..80]);
+    let second = make_block(alt_id, 152, &[]);
+    let second_id = hash256(&second[..80]);
+    m.observe(152, &second).unwrap();
+    assert!(m.invalidated_boundary);
+    m.observe(151, &alt).unwrap();
+    assert_eq!(m.tip(), Some(second_id));
+    assert_eq!(m.headers.len(), 2);
+    assert!(m.active_since_entry.contains_key(&common));
+    assert!(m.directives.invalid.contains(&forbidden) && m.invalid_descendants.contains(&old));
+    assert!(m.observe(163, &make_block(old, 163, &[])).is_err());
+    // Even after recovery, later high bodies alone cannot justify adopting an
+    // unknown branch under a signed invalidation. No retrospective UTXOs enter.
+    m.observe(191, &unrelated).unwrap();
+    m.observe(192, &next).unwrap();
+    assert_eq!(m.tip(), Some(second_id));
+}
+
+#[test]
+fn recovering_an_indexed_signed_parent_older_than_retained_headers() {
+    let mut m = Mining::new(true, vec![0x51]).unwrap();
+    let anchor = make_block([41; 32], 151, &[]);
+    m.observe(151, &anchor).unwrap();
+    let mut old = hash256(&anchor[..80]);
+    let first = make_block(old, 152, &[]);
+    let invalid = hash256(&first[..80]);
+    m.observe(152, &first).unwrap();
+    old = invalid;
+    for h in 153..=315 {
+        let b = make_block(old, h, &[]);
+        old = hash256(&b[..80]);
+        m.observe(h, &b).unwrap();
+    }
+    m.directives.invalid.insert(invalid);
+    m.apply_invalidations();
+    assert!(m.invalidated_boundary);
+    let parent = hash256(&anchor[..80]);
+    assert_eq!(m.repair_locator(), vec![parent]);
+    let payment = tx(&"31".repeat(32), 1, LockingScript::from_binary(&[0x51]))
+        .to_bytes()
+        .unwrap();
+    let first = make_block(parent, 152, &[payment]);
+    let next = make_block(hash256(&first[..80]), 153, &[]);
+    let headers = [
+        first[..80].try_into().unwrap(),
+        next[..80].try_into().unwrap(),
+    ];
+    assert_eq!(m.repair_headers(&headers).unwrap().len(), 2);
+    m.observe(153, &next).unwrap();
+    assert!(m.invalidated_boundary);
+    m.observe(152, &first).unwrap();
+    assert_eq!(m.tip(), Some(hash256(&next[..80])));
+    assert_eq!(m.headers.len(), 2);
+    assert!(m.invalid_descendants.contains(&old));
+}
+
+#[test]
+fn invalidating_the_first_observation_requires_external_ancestry_evidence() {
+    let mut m = Mining::new(true, vec![0x51]).unwrap();
+    let initial = make_block([3; 32], 150, &[]);
+    m.observe(150, &initial).unwrap();
+    m.directives.invalid.insert(hash256(&initial[..80]));
+    m.apply_invalidations();
+    let unrelated = make_block([17; 32], 178, &[]);
+    m.observe(178, &unrelated).unwrap();
+    m.observe(179, &make_block(hash256(&unrelated[..80]), 179, &[]))
+        .unwrap();
+    assert!(m.invalidated_boundary && !m.observation_window_ready());
+    assert_eq!(m.tip(), Some(hash256(&initial[..80])));
 }
