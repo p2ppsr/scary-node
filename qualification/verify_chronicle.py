@@ -15,6 +15,7 @@ from cohort_estimate import analyze
 from relay_comparison import paired_report
 from verify_native_workers import verify as verify_workers, verify_retained
 from shadow import audit
+from verify_dar_history import verify as verify_dar_history
 from verify_stream import verify as verify_stream
 from verify_peer_intake import verify as verify_peer_intake
 from verify_retained_delivery import verify as verify_retained_delivery
@@ -149,6 +150,67 @@ def verify_acceptance(rows, dar, native, race):
 
 
 def verify(directory):
+    with gzip.open(directory / "chronicle-receiver-dar-history.json.gz", "rt") as file:
+        dar_history = verify_dar_history(json.load(file))
+    replay = json.loads((directory / "chronicle-receiver-dar-replay.json").read_text())
+    fresh_reference = replay.pop("independent_replay")
+    assert replay == dar_history
+    assert fresh_reference == {
+        "fresh_sv_active_tip": dar_history["sv_final_active_tip"],
+        "confirmed_detached_blocks": dar_history["detached_blocks"],
+        "confirmed_active_blocks": dar_history["active_blocks"],
+    }
+    linux, second, mac, restart = (
+        json.loads((directory / filename).read_text())
+        for filename in (
+            "chronicle-qualification-linux-release.json",
+            "chronicle-second-linux-build.json",
+            "chronicle-qualification-macos-release.json",
+            "chronicle-shadow-native-intake-restart.json",
+        )
+    )
+    assert linux["image_id"] != second["image_id"]
+    assert linux["source_commit"] != second["source_commit"]
+    assert linux["release"] == second["release"]
+    assert linux["interpreter"] == second["interpreter"]
+    assert (
+        linux["cargo_lock_sha256"]
+        == second["cargo_lock_sha256"]
+        == mac["cargo_lock_sha256"]
+    )
+    assert second["source_commit"] == mac["source_commit"] == restart["source_commit"]
+    assert (
+        mac["executable_sha256"]
+        == mac["operator_probe"]["release_sha256"]
+        == restart["release_sha256"]
+    )
+    for key in ("bdk_commit", "sv_node_commit"):
+        assert mac["native_build"][key] == linux["interpreter"][key]
+    assert restart["passive_mainnet"] and restart["receiver"]["synced"]
+    before, restored, after = (
+        restart[key] for key in ("before", "restored", "reconfirmed")
+    )
+    for key in (
+        "height",
+        "tip_hash",
+        "coverage_start",
+        "coverage_end",
+        "headers",
+        "witnessed_outputs",
+        "window_chainwork",
+        "durable_directive_sequence",
+    ):
+        assert before[key] == restored[key] == after[key]
+    assert restart["recovered_start_hash"] == after["tip_hash"]
+    assert after["coverage_end"] - after["coverage_start"] + 1 == after["headers"]
+    assert (
+        not restored["tip_confirmed_since_disconnect"]
+        and after["tip_confirmed_since_disconnect"]
+    )
+    assert after["connected_data_peers"] > 0 and after["alert_ready"]
+    assert after["durable_directive_sequence"] == restart["receiver"]["sequence"]
+    assert restart["receiver"]["unprocessed_alerts"] == 0
+
     verify_retained_delivery(
         json.loads((directory / "chronicle-retained-delivery.json").read_text())
     )

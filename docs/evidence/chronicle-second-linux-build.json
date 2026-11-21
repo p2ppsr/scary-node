@@ -1,0 +1,48 @@
+{
+  "source_commit": "af9b605ad8da96d041a540111d46a7c0105209f7",
+  "source_tree": "3ebeb6beebfec54411783539591cd42087971348",
+  "build_inputs": [
+    ".dockerignore",
+    "Dockerfile",
+    "Cargo.toml",
+    "Cargo.lock",
+    "native",
+    "scripts/build-bdk.sh",
+    "src"
+  ],
+  "source_archive_sha256": "7eaf952bcbb04eb3c3ae45b180ffde35e435ff26dcd1166be4e30de1d04fa57c",
+  "cargo_lock_sha256": "49d8e303e370c713576a774237ae828e874cb85f7e2826e6564047618c9265fa",
+  "cargo_command": "cargo build --locked --release",
+  "rustc_verbose": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: aarch64-unknown-linux-gnu",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "platform": "linux/arm64",
+  "image_id": "sha256:d590b87bc948b7ee59310ed99efa3a12209fe2774b0c23151cfd381ec6d68310",
+  "release": {
+    "executable_sha256": "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528",
+    "version": "0.1.0-alpha.4"
+  },
+  "interpreter": {
+    "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+    "cmake": "cmake version 3.25.1",
+    "compiler": "c++ (Debian 12.2.0-14+deb12u1) 12.2.0",
+    "cxx_flags": "-O3 -g0 -DNDEBUG",
+    "cxx_standard": 20,
+    "dependencies_sha256": "ba52bbaea6b8c31f44679dad53ca57d3021654779d9e4d9d71da25c3dece8578",
+    "linked_bdk_commit": "8a4e1d3",
+    "linked_bdk_version": "1.4.0",
+    "linked_sv_commit": "6504a3a",
+    "linked_sv_version": "1.2.3",
+    "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+    "platform": "linux_aarch64",
+    "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+    "type": "Release"
+  }
+}

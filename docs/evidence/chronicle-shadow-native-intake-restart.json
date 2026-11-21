@@ -1,0 +1,78 @@
+{
+  "source_commit": "af9b605ad8da96d041a540111d46a7c0105209f7",
+  "release_sha256": "5c1fbe433746e338a47afa38001aa697dea989ad620db86c999e54104d6ed5ef",
+  "started_unix_s": 1795289636,
+  "verified_unix_s": 1795289638,
+  "passive_mainnet": true,
+  "recovered_start_hash": "000000000000000013301bf287ad68741bd4c341a8b22522a85a329a85a7ac32",
+  "before": {
+    "height": 976518,
+    "tip_hash": "000000000000000013301bf287ad68741bd4c341a8b22522a85a329a85a7ac32",
+    "coverage_start": 976422,
+    "coverage_end": 976518,
+    "headers": 97,
+    "witnessed_outputs": 31369,
+    "pending_transactions": 89,
+    "window_chainwork": "31c50e7f5717503d911",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "difficulty history incomplete"
+    ],
+    "storage_failure": null,
+    "tip_confirmed_since_disconnect": true,
+    "connected_data_peers": 9,
+    "alert_ready": true,
+    "alert_connected": true,
+    "alert_verified": 1,
+    "alert_applied": 1
+  },
+  "restored": {
+    "height": 976518,
+    "tip_hash": "000000000000000013301bf287ad68741bd4c341a8b22522a85a329a85a7ac32",
+    "coverage_start": 976422,
+    "coverage_end": 976518,
+    "headers": 97,
+    "witnessed_outputs": 31369,
+    "pending_transactions": 51,
+    "window_chainwork": "31c50e7f5717503d911",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "awaiting current tip from a connected data peer",
+      "difficulty history incomplete"
+    ],
+    "storage_failure": null,
+    "tip_confirmed_since_disconnect": false,
+    "connected_data_peers": 0,
+    "alert_ready": true,
+    "alert_connected": true,
+    "alert_verified": 1,
+    "alert_applied": 1
+  },
+  "reconfirmed": {
+    "height": 976518,
+    "tip_hash": "000000000000000013301bf287ad68741bd4c341a8b22522a85a329a85a7ac32",
+    "coverage_start": 976422,
+    "coverage_end": 976518,
+    "headers": 97,
+    "witnessed_outputs": 31369,
+    "pending_transactions": 51,
+    "window_chainwork": "31c50e7f5717503d911",
+    "durable_directive_sequence": 1,
+    "readiness_reasons": [
+      "difficulty history incomplete"
+    ],
+    "storage_failure": null,
+    "tip_confirmed_since_disconnect": true,
+    "connected_data_peers": 4,
+    "alert_ready": true,
+    "alert_connected": true,
+    "alert_verified": 1,
+    "alert_applied": 1
+  },
+  "receiver": {
+    "active_peers": 2,
+    "synced": true,
+    "sequence": 1,
+    "unprocessed_alerts": 0
+  }
+}

@@ -19,6 +19,8 @@ A subsequent release restart at height 976512 restored the same 91 headers, 30,1
 
 At height 976516 the observer upgraded to commit `ddd82d3`. The release's stricter restore checks reopened the same 95-header window, 29,364 witnessed outputs, accumulated work and applied alert sequence. The operator API first reported that current-tip confirmation was outstanding. Two data peers reattached and confirmed the tip. Difficulty history was the remaining readiness condition. The receiver independently reported sequence 1, two alert peers and zero unprocessed alerts. [Measured checkpoint restore on the released binary](evidence/chronicle-shadow-checkpoint-restore.json)
 
+The native transaction-intake release at `af9b605` subsequently reopened the observation boundary at height 976518, restored 97 consecutive headers and 31,369 witnessed outputs, and recovered the same accumulated work and signed sequence. Four data peers reconfirmed the tip. The mainnet process then resumed collecting bodies and native transaction gossip. The receiver had two alert peers and zero outstanding messages. The release was compiled from the committed source archive into a fresh macOS Cargo target directory. [Restart receipt](evidence/chronicle-shadow-native-intake-restart.json) · [Exact running build](evidence/chronicle-qualification-macos-release.json)
+
 ## Replay the checkpoint
 
 Run from the repository root with Python 3. The replay reads only the bundled evidence.

@@ -79,6 +79,47 @@ python3 qualification/cohort_estimate.py .native/immediate-cohort/evaluation --s
 
 The combined command writes a timestamped registration before the first session, verifies saved receipt identities on resume, and publishes the evaluation summary once the last planned session closes. The published [registration](evidence/chronicle-immediate-registration.json) identifies the executable measured on this workstation.
 
+## Closing and auditing a fixed-size phase
+
+The archive exporter checks the exact registered session filenames before reading race outcomes. It preserves every complete raw receipt in deterministic gzip shards of up to 128 sessions. The accompanying CSV gives the scheduled opportunities, readiness, hashes, discoveries, settlements, stales and later detachments for each lane in each independent session. A measured partial or an unclassified attempt holds the export open. The manifest includes every retained setup retry and its original zero-row receipt.
+
+The offline verifier regenerates the schedule and physical link orientation from each seed, checks the reference image and binary digest, decodes the full solved blocks, verifies proof of work and Merkle commitments, and checks both receivers’ depth-two and session-final ancestors. For a successful lane it also rehashes all preceding nonces on the recorded winning work. A lane with no discovery records its effort and readiness. Its unsuccessful candidate header is unavailable for independent rehashing in these fixtures.
+
+For the primary difference, pool stale and discovered counts by role, compute the paired influence of each whole session, then take the Student-t interval across sessions with one degree of freedom consumed. The archive also calculates paired intervals for readiness, discoveries, settlements and stales per scheduled opportunity. Unready lanes contribute a zero to the event count and one to the scheduled denominator. A missing discovery denominator leaves the conditional comparison and its sizing undefined. The full/full arm uses the same calculations. The one-point target applies to the witnessed/full primary difference. Report the achieved interval after the complete fresh sample, even if its half-width exceeds the target. A finite confidence interval quantifies uncertainty about a difference under the measured topology.
+
+```sh
+python3 qualification/cohort_archive.py export docs/evidence/chronicle-native-pilot \
+  .native/original-pilot-archive --phase pilot
+python3 qualification/cohort_archive.py verify .native/original-pilot-archive
+
+python3 qualification/cohort_archive.py export "$STUDY/pilot" \
+  docs/evidence/chronicle-immediate-pilot --phase pilot \
+  --registration docs/evidence/chronicle-immediate-registration.json
+python3 qualification/cohort_archive.py export "$STUDY/evaluation" \
+  docs/evidence/chronicle-immediate-evaluation --phase evaluation \
+  --registration docs/evidence/chronicle-immediate-registration.json \
+  --pilot-summary "$STUDY/pilot-summary.json" \
+  --pilot-archive docs/evidence/chronicle-immediate-pilot
+python3 qualification/cohort_archive.py verify docs/evidence/chronicle-immediate-evaluation
+```
+
+## Registering a different release
+
+Changes to publication or readback timing can alter the time until the next worker job. For example, commit `af9b605` adds active-header readback after sending a solution. Register each materially different executable as a new experiment before sampling. Keep the original and immediate-wake studies on their original binaries.
+
+Choose an unused positive namespace from the published registrations, build the intended release, and retain its executable at a dedicated path. The registration records the actual binary digest, nominated release commit, measurement harness commit and file digests, Python version, reference image, pilot size, evaluation sizing rule and seed allocations. Each namespace reserves 2³² consecutive seeds above the legacy studies. Pilot seeds occupy the first 16 positions after the base. Fresh evaluation begins at the next position. Publish the registration before running the following second command; the runner also stores a local copy and resumes only from matching receipts.
+
+```sh
+.native/py/bin/python qualification/cohort_registration.py register \
+  --namespace "$UNUSED_NAMESPACE" --release-commit "$RELEASE_COMMIT" --binary "$FROZEN_BINARY"
+
+.native/py/bin/python qualification/cohort_registration.py run \
+  "docs/evidence/chronicle-release-${UNUSED_NAMESPACE}-registration.json" \
+  "$NEW_STUDY" --binary "$FROZEN_BINARY"
+```
+
+The runner uses the existing native experiment and the same workstation session lock. After session 16 it writes the sizing summary and starts exactly the calculated number of fresh evaluation sessions. For a new release, use its registration with the export commands above and give the verifier its corresponding pilot archive.
+
 ## Simultaneous Stratum workers
 
 One Scary process accepts independent TCP Stratum sessions while two stock SV receivers follow the same regtest branch. Each authenticated CPU worker checks its own extranonce, constructs a coinbase, and hashes two successive templates for one parent. The first job contains a witnessed payment. A second payment triggers a same-parent refresh. Every worker submits a known below-target share, then all release different network-target solutions from a barrier. Successive rounds assign everyone to the earlier job, everyone to the refreshed job, or half to each. Exactly one accepted solution per parent must match the winning worker's reconstructed header, coinbase and ordered payments. Both SV nodes supply its full bytes and headers for two successors. The node's local solution record supplies the job identifier and settlement transition.

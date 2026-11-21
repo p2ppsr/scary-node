@@ -21,6 +21,19 @@ To identify an exact source build, run the following from a Git checkout with Do
 python3 qualification/release_build.py 781ddd73ac78bd1887138fad331eeace21488509 .native/release-build.json
 ```
 
+On Linux ARM64, the `af9b605` build and the fresh Cargo target build at `6ad4152` produced the same executable SHA-256, `833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528`. Both running nodes reported BDK 1.4.0 and SV Node 1.2.3, and the build-stage native archive matched the embedded digest. Reproduce either build by passing its commit to the command above. [Fresh target build](evidence/chronicle-qualification-linux-release.json) · [Second image with matching executable](evidence/chronicle-second-linux-build.json)
+
+To build the macOS observer from the same committed Rust source, build the pinned native archive first. Run the following in the repository root with the Rust 1.98.1 toolchain on `PATH`. This uses a fresh Cargo target and independently checks the operator interface on the resulting executable. Its manifest records the platform compiler and archive digest. [Measured macOS build](evidence/chronicle-qualification-macos-release.json)
+
+```sh
+release_source=$(mktemp -d)
+release_target=$(mktemp -d)
+git archive af9b605ad8da96d041a540111d46a7c0105209f7 -- Cargo.toml Cargo.lock examples native scripts/build-bdk.sh src | tar -x -C "$release_source"
+ln -s "$(cd .native && pwd -P)" "$release_source/.native"
+CARGO_TARGET_DIR="$release_target" cargo build --offline --manifest-path "$release_source/Cargo.toml" --locked --release
+python3 qualification/operator_access.py --binary "$release_target/release/scary-node" .native/host-build-probe.json
+```
+
 ## Reproduce the reference comparisons
 
 Start Docker. The DAR driver gives a fresh SV Node private regtest funds, signs messages with three distinct lab keys, and starts Scary Node empty on its native SV TCP peer. The lab API fixture serves the signed records in the maintained receiver's read format. It includes a freeze predating entry. The worker mines the authorized confiscation, Scary Node restarts, then the test visits both sides of the 1,000-block maturity boundary. SV Node selects the recipient's solved block as its active tip. A longer branch restores the recovered outpoint, and re-inclusion consumes it again. The last assertions compare tip hashes and solution dispositions.
