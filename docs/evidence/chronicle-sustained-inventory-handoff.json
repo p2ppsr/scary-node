@@ -1,0 +1,120 @@
+{
+  "registration": "3ec961ef81881b83d4cc1ecc646250a2d8d200f9",
+  "project": "scary-node-sustained-production",
+  "query_ports_verified_against_enrolled_ingress": {
+    "tn1": 22441,
+    "tn2": 22442,
+    "scary": 22480
+  },
+  "final_measured_sample": {
+    "sv": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "read_ns": 1819154859375
+    },
+    "tn1": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "read_ns": 1819157737958
+    },
+    "tn2": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "read_ns": 1819160022458
+    },
+    "scary": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "read_ns": 1820002755708
+    }
+  },
+  "receipt_seen_wall_ns": 1795296293817452000,
+  "first_scheduled_offer_wall_ns": 1795294472959407250,
+  "observation_duration_ns": 1820436948125,
+  "audited_blocks": 77,
+  "confirmed_payments": 5529600,
+  "post_window_stock_observation": {
+    "wall_ns": 1795296293921346000,
+    "finished_wall_ns": 1795296294337063000,
+    "getmempoolinfo": {
+      "size": 0,
+      "journalsize": 0,
+      "nonfinalsize": 0,
+      "bytes": 0,
+      "usage": 681856,
+      "usagedisk": 0,
+      "usagecpfp": 0,
+      "nonfinalusage": 256,
+      "maxmempool": 1000000000,
+      "maxmempoolsizedisk": 0,
+      "maxmempoolsizecpfp": 100000000,
+      "mempoolminfee": 0.0
+    },
+    "getblockchainactivity": {
+      "blocks": 0,
+      "transactions": 0
+    },
+    "getorphaninfo": {
+      "size": 0
+    },
+    "peers": {
+      "teranode": {
+        "connections": 1,
+        "recv_inv_bytes": 147483,
+        "recv_getdata_bytes": 199285452,
+        "recv_tx_bytes": 0,
+        "recv_reject_bytes": 0,
+        "sent_inv_bytes": 199289160,
+        "sent_getdata_bytes": 0,
+        "sent_tx_bytes": 1235835473,
+        "sent_reject_bytes": 0
+      },
+      "scary-node": {
+        "connections": 1,
+        "recv_inv_bytes": 0,
+        "recv_getdata_bytes": 199258266,
+        "recv_tx_bytes": 0,
+        "recv_reject_bytes": 0,
+        "sent_inv_bytes": 199258266,
+        "sent_getdata_bytes": 0,
+        "sent_tx_bytes": 1235835697,
+        "sent_reject_bytes": 0
+      }
+    }
+  },
+  "post_window_selected_tips": {
+    "sv": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "wall_ns": 1795296294432383000
+    },
+    "tn1": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "wall_ns": 1795296294449657000
+    },
+    "tn2": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "wall_ns": 1795296294451496000
+    },
+    "scary": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "wall_ns": 1795296294454117000
+    }
+  },
+  "post_window_entrant_observed_above_audited_prefix": [],
+  "pause_started_wall_ns": 1795296294454127000,
+  "pause_verified_wall_ns": 1795296294620093000,
+  "paused_services": {
+    "wallet-ingress": true,
+    "scary-node": true,
+    "ingress": true,
+    "tn2": true,
+    "tn1": true,
+    "svref": true,
+    "as1": true,
+    "as2": true
+  }
+}

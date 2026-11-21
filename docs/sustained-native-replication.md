@@ -32,3 +32,48 @@ Use a fresh Docker project and the Python environment from the [qualification ru
 ```
 
 The executable must match the registered ELF digest even if Docker assigns the local packaging a different image ID. The run directory contains `setup.json`, the independent node and work observations, stock queue gauges, inventory request and delivery counters, and each selected full block. `requested.bits` and `served.bits` are one-byte 0/1 vectors indexed by the original signed corpus's ordinal. Their SHA-256 commitments are in `inventory-final.json`. An inventory send, a fully written signed body, a stock mempool entry and a confirmed payment represent four different events.
+
+## Results on November 21, 2026
+
+**All 5,529,600 distinct payments were requested, served, selected and independently confirmed in 1,820.437 seconds, or 3,037.51 payments/s through settlement. Scary Node validated every included payment and originated zero blocks.** The full-state SV miner supplied all 75 payment blocks. At each of its 225 scheduled primary opportunities, Scary lacked an eligible pending transaction. The trial met its four-node adoption target. It measured no entrant mining throughput in this payment pattern. [Compact receipt](evidence/chronicle-sustained-inventory.json.gz)
+
+| Measurement | Observed |
+|---|---:|
+| Scheduled advertisements / successful four-wallet writes | 10,800 / 10,800 batches |
+| Original IDs requested / signed bodies supplied | 5,529,600 / 5,529,600 |
+| Repeat or unknown requests / reannouncements / explicit peer rejects | 0 / 0 / 0 |
+| Wallet disconnections / operator transaction submissions | 0 / 0 |
+| Signed Bitcoin transaction-message bytes served | 1,235,835,697 |
+| Selected payment blocks / successor blocks / independent full-node body reads | 75 / 2 / 231 |
+| Foreign payments / duplicate confirmations / missing source payments | 0 / 0 / 0 |
+| Scary Node successful script checks | 5,529,600 |
+| Body-read completion for the last payment block | 1,808.049 s |
+| Last payment block / settled final height | 559 / 561 |
+| Largest selected block / largest observed wire size | 74,752 ordinary payments / 14,912,541 bytes |
+| Lowest sampled free space, workstation / Docker | 33.64 / 45.29 GiB |
+
+Every five-minute source cohort contributed all 921,600 of its payments by closure. By the end of successive five-minute periods the independent body auditors had confirmed 885,760, 1,770,496, 2,728,960, 3,613,696, 4,572,160 and 5,456,896 distinct payments. The last 72,704 completed readback during drain. One additional Scary slot lacked work before the two stock successors. All 77 headers linked the archived funding to the final hash `73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599`. The entered wallets' median announcement lateness was 2.04 ms and the 95th percentile was 6.17 ms. A solved primary SV call took a median 1.65 seconds and a maximum 1.94 seconds.
+
+![Production-settings wallet advertisements, independent confirmations and stock validation queue through settlement](evidence/chronicle-sustained-inventory.png)
+
+The stock node's 62 read-only samples saw a maximum of 1,024 transactions in or awaiting validation, a maximum mempool of 73,216, and zero sampled orphans. The direct-wallet trial with regtest diagnostics reached 5,228,885 queued validation items. The production-settings run changed the stock consistency settings, its inventory capacity and the wallet delivery protocol together. The measurements establish two operating envelopes and their queues. Isolating a single change would require a controlled comparison. The fixed run used a single physical workstation and a maximum 14.9 MB block. [Direct-wallet result and timings](sustained-native-trial.md) · [Separate live-cadence large-block registration](live-cadence-block.md)
+
+### Why the receiver had no work
+
+All 1,566 observed Scary Node status samples had ready body coverage and the work reason `no eligible pending transactions`. Its SV route counted 5,529,600 ineligible deliveries. The Teranode subtree route counted 10,093,930 ineligible deliveries, including offers of the same payments. Neither route admitted a transaction. The three-socket data routes remained capable of carrying blocks and transactions, and the entrant validated the selected 1,103,139,534 bytes of native blocks. A completed readback recorded three matching stock wire SHA-256 digests and the entrant's active hash and witnessed checks.
+
+The first payments spent the tip's newly funded h484 outputs. An ordinary locally mined spend of a confirmed output requires the creation block to have at least one observed successor. A same-template child may use an output of an independently admitted parent. Here the same 65,536 payment chains turned over every 21.33 seconds and the full miner received a work opportunity every 24 seconds while the entrant had zero ready slots. Admitting one chain from pending state would first have required an eligible starting transaction. The network-wide count of confirmed payments measures the entrant's incoming block path in this run. The 225-slot denominator captures the cost of its conservative template policy. [Pinned admission rule](https://github.com/p2ppsr/scary-node/blob/af9b605ad8da96d041a540111d46a7c0105209f7/src/mining.rs#L790-L798)
+
+### Operating envelope and handoff
+
+The seven measured services shared the paired trial's 16-vCPU Docker VM on one 16-core M3 Max workstation with 128 GiB RAM. Peak sampled container memory was 4.26 GiB at SV, 1.41 GiB at Scary, 10.15 and 9.52 GiB at the two Teranodes, and 6.84 and 7.11 GiB at the two Aerospike stores. The 1,821 resource samples include namespace usage, container CPU and filesystem headroom. The initial untimed setup tried SV RPC before the stock daemon was ready and resumed using the same previously empty volumes with all three references still at genesis. At h12 the stock legacy peer redialed during archive replay. The receipt retains those events, the effective stock arguments, all independent mount names, image identities and witnessed setup history. The timed wallet interval began after all four nodes selected h484. [Paired machine and image evidence](mixed-storage-trial.md)
+
+The final scheduled sample and four independently addressed postwindow queries agreed at h561. SV reported zero transactions in validation and zero in the mempool. The handoff verified the enrolled project's Docker loopback mappings, queried stock SV by its own container identity, and paused all eight project containers with volumes intact. Use the compact verifier and handoff verifier to check those records. [Postwindow handoff](evidence/chronicle-sustained-inventory-handoff.json)
+
+```sh
+python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustained-inventory.json.gz
+python3 qualification/quiesce_sustained.py docs/evidence/chronicle-sustained-inventory.json.gz \
+  --handoff docs/evidence/chronicle-sustained-inventory-handoff.json
+python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustained-inventory.json.gz \
+  --corpus .native/sustained-signed --blocks .native/sustained-production-run/blocks --parent-ages
+```
