@@ -1,0 +1,46 @@
+x-store: &store
+  image: ghcr.io/bsv-blockchain/aerospike-server:8.1.2.0-1@sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc
+  entrypoint: [asd, --foreground, --config-file, /etc/aerospike/qualification.conf]
+  ulimits:
+    nofile: {soft: 15000, hard: 15000}
+
+services:
+  as1:
+    <<: *store
+    networks: [tn1-store]
+    volumes:
+      - ./aerospike-qualification.conf:/etc/aerospike/qualification.conf:ro
+      - as1-data:/opt/aerospike/data
+      - as1-meta:/opt/aerospike/smd
+  as2:
+    <<: *store
+    networks: [tn2-store]
+    volumes:
+      - ./aerospike-qualification.conf:/etc/aerospike/qualification.conf:ro
+      - as2-data:/opt/aerospike/data
+      - as2-meta:/opt/aerospike/smd
+  tn1:
+    networks: [regtest, tn1-store]
+    environment:
+      utxostore: aerospike://as1:3000/test?WarmUp=0&ConnectionQueueSize=128&LimitConnectionsToQueueSize=true&MinConnectionsPerNode=16&IdleTimeout=60s&set=utxo&externalStore=file:///app/data/external%3FhashPrefix=2
+  tn2:
+    networks: [regtest, tn2-store]
+    environment:
+      utxostore: aerospike://as2:3000/test?WarmUp=0&ConnectionQueueSize=128&LimitConnectionsToQueueSize=true&MinConnectionsPerNode=16&IdleTimeout=60s&set=utxo&externalStore=file:///app/data/external%3FhashPrefix=2
+  ingress:
+    ports: !override
+      - 127.0.0.1:21441:19441
+      - 127.0.0.1:21442:19442
+      - 127.0.0.1:21451:19451
+      - 127.0.0.1:21452:19452
+      - 127.0.0.1:21480:19480
+      - 127.0.0.1:21433:19433
+
+networks:
+  tn1-store: {internal: true}
+  tn2-store: {internal: true}
+volumes:
+  as1-data:
+  as1-meta:
+  as2-data:
+  as2-meta:
