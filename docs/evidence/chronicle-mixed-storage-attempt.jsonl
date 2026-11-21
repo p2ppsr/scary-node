@@ -1,0 +1,69 @@
+{"event": "preflight", "wall_ns": 1795290361191399000, "corpus": {"genesis": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206", "funding_height": 451, "final_height": 483, "sha256_of_ordered_wire_digests": "3d04e4fa099e49dbe556b9d7d83d06f44264507e54f62a0d9653a3a50833a0b3", "wire_bytes_including_setup": 225186597}}
+{"event": "entrant_verified", "binary_sha256": "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528", "image_id": "sha256:5d3fe94ee11ed4170cc39a074967c220757ed6078b0df623d7054b35afc55f4a", "height": 451, "parent": "0e3d2d34a15a063b9b23867fd18918d219916b155258d8a72ae9f428198ceec5"}
+{"event": "measurement_started", "wall_ns": 1795290365522169000, "monotonic_ns": 1857477708828000}
+{"event": "offered", "height": 452, "hash": "67555ad5ed2408050ff5afca0c09100a0a37ac8dedb0dddf4f4fe4edb27a88fc", "ns": 572958}
+{"event": "source_accepted", "height": 452, "ns": 554143458}
+{"event": "offered", "height": 453, "hash": "75a20b99814ef9303938b9243db5e335e21205b9320629add99f46722adb5756", "ns": 555297291}
+{"event": "source_accepted", "height": 453, "ns": 1147485708}
+{"event": "offered", "height": 454, "hash": "7632f4635ee4c1676bddeb08a9b4475fd513ec0bf02a6f8013569d83fb9100d2", "ns": 1148177875}
+{"event": "source_accepted", "height": 454, "ns": 1807119750}
+{"event": "offered", "height": 455, "hash": "3256c27d2395426903e5e7635cde68bff6424e146feff4f654ec83727342aad6", "ns": 1808213958}
+{"event": "source_accepted", "height": 455, "ns": 2489796416}
+{"event": "offered", "height": 456, "hash": "09bcf53f1a39359cc5ad71cb06f66964c61db3e1d9aa213dc625819ddd1ada1b", "ns": 2703324625}
+{"event": "source_accepted", "height": 456, "ns": 3372422666}
+{"event": "offered", "height": 457, "hash": "79ee806627322ad4daa95b8fa7219ed3f5e496f08ff8ddcc449facfbddbeb75b", "ns": 3537369208}
+{"event": "source_accepted", "height": 457, "ns": 4196066583}
+{"event": "offered", "height": 458, "hash": "7428ab6423f27635777961370a6474f6e7b7eed00ffbc7573b0843a8249bce53", "ns": 4447051458}
+{"event": "source_accepted", "height": 458, "ns": 5072849750}
+{"event": "offered", "height": 459, "hash": "0d15012df34941deb0733cc3709056303e4942e5b62c7ea776b346c3331c7d63", "ns": 5410953458}
+{"event": "source_accepted", "height": 459, "ns": 6037368291}
+{"event": "offered", "height": 460, "hash": "0b8e33c1aab2d1fbf4677ea1610836c7fdc8a8a9d5ef0a99dbeb800ea1799e89", "ns": 6429092916}
+{"event": "source_accepted", "height": 460, "ns": 7038662208}
+{"event": "offered", "height": 461, "hash": "0e8d3e4ed4187b1e49abaff99ac26bd5beba90e2ab561f30edfeb3cc6578aaa1", "ns": 7483113166}
+{"event": "source_accepted", "height": 461, "ns": 8121564958}
+{"event": "offered", "height": 462, "hash": "7f5086b15de91f4f1a52b31ecc497ae0b1110715d61221f97f5e0a964ba8d6ec", "ns": 8549579458}
+{"event": "source_accepted", "height": 462, "ns": 9173514291}
+{"event": "offered", "height": 463, "hash": "0de011c474d1dff2ae49d0bcd1ed4cc28a5fcd74478a5ca0b3eba0c483f48ecc", "ns": 9624073250}
+{"event": "source_accepted", "height": 463, "ns": 10239608291}
+{"event": "offered", "height": 464, "hash": "57c62225acc99ab15a08058202928d86d7de5ea73c519346e961889781d464ad", "ns": 10708660666}
+{"event": "source_accepted", "height": 464, "ns": 11329594500}
+{"event": "offered", "height": 465, "hash": "58b204ed1fe2fcbd5c58bdc068f82c5c88dbfc00021cf3e8f6b29c082e801e58", "ns": 11802158125}
+{"event": "source_accepted", "height": 465, "ns": 12421279666}
+{"event": "offered", "height": 466, "hash": "4317b2f0b7f2c8fca9827eb67f8f32a3785ba0844cd9807288011dec8cf0d4ca", "ns": 12945931916}
+{"event": "source_accepted", "height": 466, "ns": 13579094750}
+{"event": "offered", "height": 467, "hash": "5702ee91b212ab9ec55c7e6d0353f79de95b7b9a2090d8fe47c8278e0fa8e02b", "ns": 14038857625}
+{"event": "source_accepted", "height": 467, "ns": 14682327458}
+{"event": "offered", "height": 468, "hash": "5194964b66155bdf575e401f5263a08085fd18690ce2b2d0a98c446b3eb7a95c", "ns": 15142566333}
+{"event": "source_accepted", "height": 468, "ns": 15771765208}
+{"event": "offered", "height": 469, "hash": "7e707e7b22a5cf8994b06bc5b3e9d38ade5a2944ae58756631990e90d8039af4", "ns": 16251674666}
+{"event": "source_accepted", "height": 469, "ns": 16852354083}
+{"event": "offered", "height": 470, "hash": "5274c8240fb3f55d33ef93050f33d968b9fcf4b39d573a8fbe3269c989b1e95c", "ns": 17362873041}
+{"event": "source_accepted", "height": 470, "ns": 17957748875}
+{"event": "offered", "height": 471, "hash": "6e4ed49236dc9d090f0a4b6269e034274688b751cc2d72cf77cb51a45bf2cd68", "ns": 18444948791}
+{"event": "source_accepted", "height": 471, "ns": 19062891333}
+{"event": "offered", "height": 472, "hash": "64cf6c91129402e32f00b00deb0d4bb13ce6c35f6c16f2496b75ca2bb473b1c5", "ns": 19544994041}
+{"event": "source_accepted", "height": 472, "ns": 20165912666}
+{"event": "offered", "height": 473, "hash": "7276481dbbbff2d63ebdcc53544d06afa7f2ba9e04f99121162348d67625fc17", "ns": 20666501875}
+{"event": "source_accepted", "height": 473, "ns": 21305742250}
+{"event": "offered", "height": 474, "hash": "63d32d7aa82a3a3fd296a1bf4f042bfb05915dea3c709e1d2de3e54eddc33e75", "ns": 21787740791}
+{"event": "source_accepted", "height": 474, "ns": 22409844458}
+{"event": "offered", "height": 475, "hash": "6050ab1e0affc1c6f9257c5cf05b33002d8cd0805e4738a3574db00ae013e11c", "ns": 22926010458}
+{"event": "source_accepted", "height": 475, "ns": 23545916416}
+{"event": "offered", "height": 476, "hash": "45f5b34fc21ad66a39d3c2789aaeb23b5acb26adb957fb7868d4ddfdefe659c1", "ns": 24039478875}
+{"event": "source_accepted", "height": 476, "ns": 24666841500}
+{"event": "offered", "height": 477, "hash": "5a16bc91786863b9bd1bfb727d67e13ea32f75158b04f4ba8f99abff84e53d50", "ns": 25169075166}
+{"event": "source_accepted", "height": 477, "ns": 25792883541}
+{"event": "offered", "height": 478, "hash": "08647c037883d39f8b4f3bd1403eab7b234814c7706dc2ea6b8198de461d8a41", "ns": 26254496541}
+{"event": "source_accepted", "height": 478, "ns": 26882988291}
+{"event": "offered", "height": 479, "hash": "175f80b8a6166ac3b3d81ebfdeede8987d8d98a0b49c73edff5ac6601bf13aab", "ns": 27389242000}
+{"event": "source_accepted", "height": 479, "ns": 28008485625}
+{"event": "offered", "height": 480, "hash": "50f4803510781e3ea03c48051298e1a28c0f44b63806b4206cf2351a21eb696c", "ns": 28563665375}
+{"event": "source_accepted", "height": 480, "ns": 29189056583}
+{"event": "offered", "height": 481, "hash": "34e24d6b8c2b13a336efac97fd7ea6149aba1f5e8f9ae692c08541042d4f35f0", "ns": 29690836291}
+{"event": "source_accepted", "height": 481, "ns": 30336065291}
+{"event": "offered", "height": 482, "hash": "048a7b66ad79236aa9300522d75218825a4fcb2dd6ae49fed5dbc9b69939f077", "ns": 30809034125}
+{"event": "source_accepted", "height": 482, "ns": 31428628208}
+{"event": "offered", "height": 483, "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945", "ns": 31920231958}
+{"event": "source_accepted", "height": 483, "ns": 32540748250}
+{"event": "all_stores_active", "ns": 34629301541, "observations": {"tn2": {"height": 483, "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945", "first_observed_ns": 33533208625}, "scary_node": {"height": 483, "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945", "first_observed_ns": 34117241250}, "tn1": {"height": 483, "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945", "first_observed_ns": 34624499708}}}
+{"event": "verified", "wall_ns": 1795290421708004000, "summary": {"blocked_polls": 0, "tied_lowest_polls": 0, "lowest_observed_height_counts": {"scary_node": 0, "tn1": 0, "tn2": 0}, "seconds_after_final_source_acceptance": {"scary_node": 1.576493, "tn1": 2.083751458, "tn2": 0.992460375}, "blocks": 32, "median_source_submit_ms": 623.8716039999999, "seconds_to_final_adoption_after_source": 2.088553291, "signed_spends": 524288, "wire_bytes": 104597251, "full_node_readbacks": 96, "seconds": 34.629301541, "transactions_per_second": 15140.01081942873}}

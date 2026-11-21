@@ -1,0 +1,69 @@
+{
+  "sample_utc": "2026-11-21T19:49:19.579474+00:00",
+  "scope": "Post-trial readings on one physical host. Cgroup peak includes setup, measured workload and post-trial readbacks. Current memory includes charged cache. Data usage is sampled after final readback.",
+  "host": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "model": "Mac15,9",
+    "processor": "Apple M3 Max",
+    "physical_cpu_cores": 16,
+    "logical_cpus": 16,
+    "memory_bytes": 137438953472,
+    "system_version": "27.2"
+  },
+  "docker": {
+    "vcpus": 16,
+    "memory_bytes": 102380195840,
+    "architecture": "aarch64",
+    "server_version": "27.3.1",
+    "kernel_version": "6.10.14-linuxkit"
+  },
+  "services": {
+    "as1": {
+      "cgroup_current_bytes": 1858371584,
+      "cgroup_peak_bytes_since_container_start": 1910685696,
+      "utxo_namespace": {
+        "objects": 861345,
+        "data_total_bytes": 9663676416,
+        "data_used_bytes": 631733024,
+        "data_used_pct": 6,
+        "data_avail_pct": 90
+      },
+      "data_file_logical_bytes": 9663676416,
+      "data_file_allocated_bytes": 905449472
+    },
+    "as2": {
+      "cgroup_current_bytes": 1798148096,
+      "cgroup_peak_bytes_since_container_start": 1800445952,
+      "utxo_namespace": {
+        "objects": 861345,
+        "data_total_bytes": 9663676416,
+        "data_used_bytes": 631733024,
+        "data_used_pct": 6,
+        "data_avail_pct": 90
+      },
+      "data_file_logical_bytes": 9663676416,
+      "data_file_allocated_bytes": 903090176
+    },
+    "tn1": {
+      "cgroup_current_bytes": 1880846336,
+      "cgroup_peak_bytes_since_container_start": 1907621888
+    },
+    "tn2": {
+      "cgroup_current_bytes": 2208256000,
+      "cgroup_peak_bytes_since_container_start": 2607144960
+    },
+    "svref": {
+      "cgroup_current_bytes": 659746816,
+      "cgroup_peak_bytes_since_container_start": 709742592
+    },
+    "scary-node": {
+      "cgroup_current_bytes": 279003136,
+      "cgroup_peak_bytes_since_container_start": 364351488
+    },
+    "ingress": {
+      "cgroup_current_bytes": 2793472,
+      "cgroup_peak_bytes_since_container_start": 6266880
+    }
+  }
+}

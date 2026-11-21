@@ -11,7 +11,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "regtest"))
-os.environ["COMPOSE_PROJECT_NAME"] = "scary-node-mixed"
+os.environ.setdefault("COMPOSE_PROJECT_NAME", "scary-node-mixed")
 os.environ["SCARY_LAB_MIXED"] = "1"
 from prove import NODES, assert_tip, block, mixed_sv, rpc, status, txid, wait
 
@@ -23,7 +23,7 @@ def run():
         assert_tip(a, parent)
         and status()["mining"]["tip_hash"] == parent
     )
-    command = ["docker", "compose", "-p", "scary-node-mixed"]
+    command = ["docker", "compose", "-p", os.environ["COMPOSE_PROJECT_NAME"]]
     for layer in ["compose.yaml", "mixed.compose.yaml", "mixed-native.compose.yaml"]:
         command += ["-f", str(ROOT / "regtest" / layer)]
     subprocess.run(command + ["up", "-d", "--no-deps", "tn2"], check=True)

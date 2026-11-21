@@ -1,0 +1,1068 @@
+{
+  "network": "regtest",
+  "reference_ingress": "SV submitblock",
+  "native_reference_link": "SV wire to Teranode legacy, Teranode native gossip",
+  "funding_block": "0e3d2d34a15a063b9b23867fd18918d219916b155258d8a72ae9f428198ceec5",
+  "funding_header": "00000020857bdc142329cfffc943a790d9461b96b219100aa878f7c02ff9cc57856fd33a19b0ec74ae798564a83a4128afe33873dc3bc2602edc786111d8d1802b9c523eb6e9016bffff7f2000000000",
+  "receiver_window": 4,
+  "final_native_observations": {
+    "tn2": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "first_observed_ns": 33533208625
+    },
+    "scary_node": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "first_observed_ns": 34117241250
+    },
+    "tn1": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "first_observed_ns": 34624499708
+    }
+  },
+  "sampled_scary_availability_changes": [
+    {
+      "ns": 2702395291,
+      "state": {
+        "connected_data_peers": 3,
+        "observation_window_ready": true,
+        "storage_failed": false
+      }
+    }
+  ],
+  "transactions_per_block": 16384,
+  "rounds": 32,
+  "measured_wall_ns": 34629301541,
+  "transactions_per_second": 15140.01081942873,
+  "rows": [
+    {
+      "height": 452,
+      "hash": "67555ad5ed2408050ff5afca0c09100a0a37ac8dedb0dddf4f4fe4edb27a88fc",
+      "header_hex": "00000020c5ee8c1928f4e92aa7d85852156b9119d21889d17f86239b3b065aa1342d3d0e8a084cbf4010117d6f4fd843d37bbe4d9153b3391db3d0aa77f05630653d3c9eb7e9016bffff7f2000000000",
+      "bytes": 3268587,
+      "wire_sha256": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2",
+      "offered_ns": 572958,
+      "source_accepted_ns": 554143458,
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2",
+        "tn2": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2",
+        "sv": "d76d26390da488eacd4fada82826ef5b94d51b6462013365b0d9962468fc2cb2"
+      }
+    },
+    {
+      "height": 453,
+      "hash": "75a20b99814ef9303938b9243db5e335e21205b9320629add99f46722adb5756",
+      "header_hex": "00000020fc887ab2ede44f4fdfddb0ed8dac370a0a10090ccaaff50f050824edd55a5567bf0a211c8c377c669eebb0b1cc98351f3848393d73a1e3361ecd583818a2811eb8e9016bffff7f2000000000",
+      "bytes": 3268658,
+      "wire_sha256": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e",
+      "offered_ns": 555297291,
+      "source_accepted_ns": 1147485708,
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e",
+        "tn2": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e",
+        "sv": "95b27b40c97b44d4f8bbf6c463dbfc07bccb417cdf05521eb64faa1a6a6eb56e"
+      }
+    },
+    {
+      "height": 454,
+      "hash": "7632f4635ee4c1676bddeb08a9b4475fd513ec0bf02a6f8013569d83fb9100d2",
+      "header_hex": "000000205657db2a72469fd9ad290632b90512e235e3b53d24b9383930f94e81990ba2755ce85b843f9e1c08e0947812171485d69e61e510750dfb27a8442cd11cd8589fb9e9016bffff7f2000000000",
+      "bytes": 3268696,
+      "wire_sha256": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197",
+      "offered_ns": 1148177875,
+      "source_accepted_ns": 1807119750,
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197",
+        "tn2": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197",
+        "sv": "02964a320d72ef5415b34b498f8dc9c43b8811ec6e5fb27f8fe13d345820b197"
+      }
+    },
+    {
+      "height": 455,
+      "hash": "3256c27d2395426903e5e7635cde68bff6424e146feff4f654ec83727342aad6",
+      "header_hex": "00000020d20091fb839d5613806f2af00bec13d55f47b4a908ebdd6b67c1e45e63f43276918340aacf1f81dba33ed097eaf2e5f0c053516d44b61bdfb31e9339287d2d1dbae9016bffff7f2000000000",
+      "bytes": 3268692,
+      "wire_sha256": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59",
+      "offered_ns": 1808213958,
+      "source_accepted_ns": 2489796416,
+      "receiver_polls": [
+        {
+          "read_ns": 2702411500,
+          "heights": {
+            "tn1": 452,
+            "tn2": 453,
+            "scary_node": 454
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59",
+        "tn2": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59",
+        "sv": "d95107f7530c7d9bcebe5390fa17096dcdaf6681c0821a4d99cff15a64ac0c59"
+      }
+    },
+    {
+      "height": 456,
+      "hash": "09bcf53f1a39359cc5ad71cb06f66964c61db3e1d9aa213dc625819ddd1ada1b",
+      "header_hex": "00000020d6aa42737283ec54f6f4ef6f144e42f6bf68de5c63e7e503694295237dc25632feba5cb35a09939ebe169ddf060fe72d7e4c96b154b1ec4fff949c66c61e3fc9bbe9016bffff7f2001000000",
+      "bytes": 3268589,
+      "wire_sha256": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93",
+      "offered_ns": 2703324625,
+      "source_accepted_ns": 3372422666,
+      "receiver_polls": [
+        {
+          "read_ns": 3536336958,
+          "heights": {
+            "tn1": 454,
+            "tn2": 454,
+            "scary_node": 455
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93",
+        "tn2": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93",
+        "sv": "cfe1bdd7c9178ad3569b768e49a63e40eac7924fa2c788e811848b0206e8ba93"
+      }
+    },
+    {
+      "height": 457,
+      "hash": "79ee806627322ad4daa95b8fa7219ed3f5e496f08ff8ddcc449facfbddbeb75b",
+      "header_hex": "000000201bda1add9d8125c63d21aad9e1b31dc66469f606cb71adc59c35391a3ff5bc09e6cfcd8af881d35bf0380fd6429bd9f00c558e6f2d1b56e504e9c51ed2c49a49bce9016bffff7f2004000000",
+      "bytes": 3268628,
+      "wire_sha256": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f",
+      "offered_ns": 3537369208,
+      "source_accepted_ns": 4196066583,
+      "receiver_polls": [
+        {
+          "read_ns": 4446459291,
+          "heights": {
+            "tn1": 455,
+            "tn2": 456,
+            "scary_node": 456
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f",
+        "tn2": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f",
+        "sv": "65cdd0ddb3ca42839e15b5ee92a1398437309d9cfc74f09ba19ae21c167d6f1f"
+      }
+    },
+    {
+      "height": 458,
+      "hash": "7428ab6423f27635777961370a6474f6e7b7eed00ffbc7573b0843a8249bce53",
+      "header_hex": "000000205bb7beddfbac9f44ccddf88ff096e4f5d39e21a78f5ba9dad42a32276680ee7907b73d0ff2170690de92476d1dfd2063bfc6b893cf737aea6b587c4e2d6177fcbde9016bffff7f2001000000",
+      "bytes": 3268620,
+      "wire_sha256": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22",
+      "offered_ns": 4447051458,
+      "source_accepted_ns": 5072849750,
+      "receiver_polls": [
+        {
+          "read_ns": 5410019791,
+          "heights": {
+            "tn1": 456,
+            "tn2": 457,
+            "scary_node": 457
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22",
+        "tn2": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22",
+        "sv": "aa639a17842219d448f53427729b032a2577d6a6c24408ca18c5c3b7e7b53f22"
+      }
+    },
+    {
+      "height": 459,
+      "hash": "0d15012df34941deb0733cc3709056303e4942e5b62c7ea776b346c3331c7d63",
+      "header_hex": "0000002053ce9b24a843083b57c7fb0fd0eeb7e7f674640a376179773576f22364ab28747686a343b1c89cce5998a440936dbb3890e9da2a9901a37c74792b506dc76b6ebee9016bffff7f2000000000",
+      "bytes": 3268754,
+      "wire_sha256": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5",
+      "offered_ns": 5410953458,
+      "source_accepted_ns": 6037368291,
+      "receiver_polls": [
+        {
+          "read_ns": 6428092541,
+          "heights": {
+            "tn1": 457,
+            "tn2": 458,
+            "scary_node": 458
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5",
+        "tn2": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5",
+        "sv": "fb577ca8638852373c32015cf9bd6107deeb3a2189ea923e1f9b226a3dc8ebd5"
+      }
+    },
+    {
+      "height": 460,
+      "hash": "0b8e33c1aab2d1fbf4677ea1610836c7fdc8a8a9d5ef0a99dbeb800ea1799e89",
+      "header_hex": "00000020637d1c33c346b376a77e2cb6e542493e30569070c33c73b0de4149f32d01150dc31eec423908456d6f3c92aed4d7aa67c8ab94910a52c7b69d89df5972ecb5f4bfe9016bffff7f2001000000",
+      "bytes": 3268590,
+      "wire_sha256": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f",
+      "offered_ns": 6429092916,
+      "source_accepted_ns": 7038662208,
+      "receiver_polls": [
+        {
+          "read_ns": 7481679833,
+          "heights": {
+            "tn1": 458,
+            "tn2": 459,
+            "scary_node": 459
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f",
+        "tn2": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f",
+        "sv": "66d4f0f0775363677a48b33d4289e51578bcd39b688d37b152077ee23785e55f"
+      }
+    },
+    {
+      "height": 461,
+      "hash": "0e8d3e4ed4187b1e49abaff99ac26bd5beba90e2ab561f30edfeb3cc6578aaa1",
+      "header_hex": "00000020899e79a10e80ebdb990aefd5a9a8c8fdc7360861a17e67f4fbd1b2aac1338e0be977290563ce5e61e6dc8d811ba5199a6bc40c8486488c066d059209646ad092c0e9016bffff7f2003000000",
+      "bytes": 3268589,
+      "wire_sha256": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa",
+      "offered_ns": 7483113166,
+      "source_accepted_ns": 8121564958,
+      "receiver_polls": [
+        {
+          "read_ns": 8548608125,
+          "heights": {
+            "tn1": 460,
+            "tn2": 460,
+            "scary_node": 460
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa",
+        "tn2": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa",
+        "sv": "56328d29b140b56eaf722a0cdefa2242201cff2d076166d18f8469d1b1bc23aa"
+      }
+    },
+    {
+      "height": 462,
+      "hash": "7f5086b15de91f4f1a52b31ecc497ae0b1110715d61221f97f5e0a964ba8d6ec",
+      "header_hex": "00000020a1aa7865ccb3feed301f56abe290babed56bc29af9afab491e7b18d44e3e8d0e46d6fbeabe88c3880a377de04009d3adf27cbeb0d9958bee3973cd21c525a3ecc1e9016bffff7f2005000000",
+      "bytes": 3268679,
+      "wire_sha256": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8",
+      "offered_ns": 8549579458,
+      "source_accepted_ns": 9173514291,
+      "receiver_polls": [
+        {
+          "read_ns": 9623395250,
+          "heights": {
+            "tn1": 460,
+            "tn2": 461,
+            "scary_node": 461
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8",
+        "tn2": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8",
+        "sv": "a9b5cc1e9be17b50f6482bb86d2e07e219dbc8ec8e24e9e84fb322cd5eb4b4d8"
+      }
+    },
+    {
+      "height": 463,
+      "hash": "0de011c474d1dff2ae49d0bcd1ed4cc28a5fcd74478a5ca0b3eba0c483f48ecc",
+      "header_hex": "00000020ecd6a84b960a5e7ff92112d6150711b1e07a49cc1eb3521a4f1fe95db186507fbade981e7d1ec9f2b365c850dfea9a56010a568ef26c63160b7b812cc4e7ef6bc2e9016bffff7f2000000000",
+      "bytes": 3268674,
+      "wire_sha256": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76",
+      "offered_ns": 9624073250,
+      "source_accepted_ns": 10239608291,
+      "receiver_polls": [
+        {
+          "read_ns": 10707084541,
+          "heights": {
+            "tn1": 462,
+            "tn2": 462,
+            "scary_node": 462
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76",
+        "tn2": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76",
+        "sv": "0e65e43fa0f19734727af1c1820e2f50101eda6d3af256449997a4c289c81a76"
+      }
+    },
+    {
+      "height": 464,
+      "hash": "57c62225acc99ab15a08058202928d86d7de5ea73c519346e961889781d464ad",
+      "header_hex": "00000020cc8ef483c4a0ebb3a05c8a4774cd5f8ac24cedd1bcd049aef2dfd174c411e00d3a652943b5ad1475d948f2583aec60aeca9317edd5c36c76ff7f0f5cc874f85dc3e9016bffff7f2002000000",
+      "bytes": 3268609,
+      "wire_sha256": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5",
+      "offered_ns": 10708660666,
+      "source_accepted_ns": 11329594500,
+      "receiver_polls": [
+        {
+          "read_ns": 11801159625,
+          "heights": {
+            "tn1": 463,
+            "tn2": 463,
+            "scary_node": 463
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5",
+        "tn2": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5",
+        "sv": "0cdaafe0229fa0578c8903e145792d396c407016e3807022f9bab38298ba16f5"
+      }
+    },
+    {
+      "height": 465,
+      "hash": "58b204ed1fe2fcbd5c58bdc068f82c5c88dbfc00021cf3e8f6b29c082e801e58",
+      "header_hex": "00000020ad64d481978861e94693513ca75eded7868d92028205085ab19ac9ac2522c657e87874fdbea140487efd5e3bf1e6b1bdfcc5cd6879094c20c1a9c37ccb70ee3ac4e9016bffff7f2001000000",
+      "bytes": 3268750,
+      "wire_sha256": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6",
+      "offered_ns": 11802158125,
+      "source_accepted_ns": 12421279666,
+      "receiver_polls": [
+        {
+          "read_ns": 12944857875,
+          "heights": {
+            "tn1": 464,
+            "tn2": 464,
+            "scary_node": 464
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6",
+        "tn2": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6",
+        "sv": "88791d93b0cbf8d406fdd56a456cfcecf9259133dedccfdf76e242d2d74762d6"
+      }
+    },
+    {
+      "height": 466,
+      "hash": "4317b2f0b7f2c8fca9827eb67f8f32a3785ba0844cd9807288011dec8cf0d4ca",
+      "header_hex": "00000020581e802e089cb2f6e8f31c0200fcdb885c2cf868c0bd585cbdfce21fed04b258360dcd599c26b39f5e131404226d3b470b490d773f45a0c483a1aa67bb2e13d8c5e9016bffff7f2002000000",
+      "bytes": 3268730,
+      "wire_sha256": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110",
+      "offered_ns": 12945931916,
+      "source_accepted_ns": 13579094750,
+      "receiver_polls": [
+        {
+          "read_ns": 14037925625,
+          "heights": {
+            "tn1": 465,
+            "tn2": 465,
+            "scary_node": 465
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110",
+        "tn2": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110",
+        "sv": "a531e11b7ea9cb30849fbcc89bfdf97d436222d71cc403502864cd8edf68d110"
+      }
+    },
+    {
+      "height": 467,
+      "hash": "5702ee91b212ab9ec55c7e6d0353f79de95b7b9a2090d8fe47c8278e0fa8e02b",
+      "header_hex": "00000020cad4f08cec1d01887280d94c84a05b78a3328f7fb67e82a9fcc8f2b7f0b2174362ad8046500c96f479559ef3e557205558f5489b21f40b71b7a00845c8ad1901c6e9016bffff7f2000000000",
+      "bytes": 3268695,
+      "wire_sha256": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7",
+      "offered_ns": 14038857625,
+      "source_accepted_ns": 14682327458,
+      "receiver_polls": [
+        {
+          "read_ns": 15141900791,
+          "heights": {
+            "tn1": 466,
+            "tn2": 466,
+            "scary_node": 466
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7",
+        "tn2": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7",
+        "sv": "ff6549c68406e12c90e28f46803834a822d9fb28f41b31ee555c01fa8f1a25e7"
+      }
+    },
+    {
+      "height": 468,
+      "hash": "5194964b66155bdf575e401f5263a08085fd18690ce2b2d0a98c446b3eb7a95c",
+      "header_hex": "000000202be0a80f8e27c847fed890209a7b5be99df753036d7e5cc59eab12b291ee02573ea08c79561f2deddf90255c2a85e1ece6df6f0d867fd4be8c358bebd71b8103c7e9016bffff7f2001000000",
+      "bytes": 3268709,
+      "wire_sha256": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a",
+      "offered_ns": 15142566333,
+      "source_accepted_ns": 15771765208,
+      "receiver_polls": [
+        {
+          "read_ns": 16250754958,
+          "heights": {
+            "tn1": 467,
+            "tn2": 467,
+            "scary_node": 467
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a",
+        "tn2": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a",
+        "sv": "e42ec3611a7a2c9205a8186123da6e559aae8a0dfa0c6acda75cf8200bc7b44a"
+      }
+    },
+    {
+      "height": 469,
+      "hash": "7e707e7b22a5cf8994b06bc5b3e9d38ade5a2944ae58756631990e90d8039af4",
+      "header_hex": "000000205ca9b73e6b448ca9d0b2e20c6918fd8580a063521f405e57df5b15664b96945131e437bed2afdd8a3a0b5bebeec0014b534e4a317747514eaea4aeb35116731bc8e9016bffff7f2002000000",
+      "bytes": 3268701,
+      "wire_sha256": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4",
+      "offered_ns": 16251674666,
+      "source_accepted_ns": 16852354083,
+      "receiver_polls": [
+        {
+          "read_ns": 17361955458,
+          "heights": {
+            "tn1": 468,
+            "tn2": 468,
+            "scary_node": 468
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4",
+        "tn2": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4",
+        "sv": "faa2c2c442f0ddf88998aa3180c27f8dd83635c429a3517bb883f91507c9d3e4"
+      }
+    },
+    {
+      "height": 470,
+      "hash": "5274c8240fb3f55d33ef93050f33d968b9fcf4b39d573a8fbe3269c989b1e95c",
+      "header_hex": "00000020f49a03d8900e9931667558ae44295ade8ad3e9b3c56bb09489cfa5227b7e707e8c30d1e1dd31b98a7292d4239cb00b73728141a7e430abcf36eecfe7d505effec9e9016bffff7f2000000000",
+      "bytes": 3268538,
+      "wire_sha256": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1",
+      "offered_ns": 17362873041,
+      "source_accepted_ns": 17957748875,
+      "receiver_polls": [
+        {
+          "read_ns": 18444302833,
+          "heights": {
+            "tn1": 469,
+            "tn2": 469,
+            "scary_node": 469
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1",
+        "tn2": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1",
+        "sv": "645ed81f7745a9404ead6809f54c2b903d8d41ae89df6bb48f4093f381c271a1"
+      }
+    },
+    {
+      "height": 471,
+      "hash": "6e4ed49236dc9d090f0a4b6269e034274688b751cc2d72cf77cb51a45bf2cd68",
+      "header_hex": "000000205ce9b189c96932be8f3a579db3f4fcb968d9330f0593ef335df5b30f24c87452897b3503b77a32caaf1e69bf57a00c770a763839b92d29aacb328ef007f1f5eccae9016bffff7f2000000000",
+      "bytes": 3268812,
+      "wire_sha256": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5",
+      "offered_ns": 18444948791,
+      "source_accepted_ns": 19062891333,
+      "receiver_polls": [
+        {
+          "read_ns": 19544331541,
+          "heights": {
+            "tn1": 470,
+            "tn2": 470,
+            "scary_node": 470
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5",
+        "tn2": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5",
+        "sv": "9e971764ee0af5b9887c9cbdced10963f1f82adb0fc5d636edcd6b24765207e5"
+      }
+    },
+    {
+      "height": 472,
+      "hash": "64cf6c91129402e32f00b00deb0d4bb13ce6c35f6c16f2496b75ca2bb473b1c5",
+      "header_hex": "0000002068cdf25ba451cb77cf722dcc51b788462734e069624b0a0f099ddc3692d44e6ea78515e5fe5edc806b992f6aa1ffce6fad8a61f4d2e404fa3ceb17dfdd07b33acbe9016bffff7f2000000000",
+      "bytes": 3268648,
+      "wire_sha256": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba",
+      "offered_ns": 19544994041,
+      "source_accepted_ns": 20165912666,
+      "receiver_polls": [
+        {
+          "read_ns": 20665492375,
+          "heights": {
+            "tn1": 471,
+            "tn2": 471,
+            "scary_node": 471
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba",
+        "tn2": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba",
+        "sv": "0349c99c6acaeb5c3c75fc57c80f0133e7b5d4c69ae2bbe6755f5d9ec0bcf5ba"
+      }
+    },
+    {
+      "height": 473,
+      "hash": "7276481dbbbff2d63ebdcc53544d06afa7f2ba9e04f99121162348d67625fc17",
+      "header_hex": "00000020c5b173b42bca756b49f2166c5fc3e63cb14b0deb0db0002fe3029412916ccf6415f02e8717395be945cf2bec780af624d4f368d0115cbca6cdafb345dd7fd5c7cce9016bffff7f2002000000",
+      "bytes": 3268699,
+      "wire_sha256": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042",
+      "offered_ns": 20666501875,
+      "source_accepted_ns": 21305742250,
+      "receiver_polls": [
+        {
+          "read_ns": 21786693375,
+          "heights": {
+            "tn1": 472,
+            "tn2": 472,
+            "scary_node": 472
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042",
+        "tn2": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042",
+        "sv": "5ffbedef3e86556164e9a82384b8f21507f7390017e33225f3ca07f892920042"
+      }
+    },
+    {
+      "height": 474,
+      "hash": "63d32d7aa82a3a3fd296a1bf4f042bfb05915dea3c709e1d2de3e54eddc33e75",
+      "header_hex": "0000002017fc2576d64823162191f9049ebaf2a7af064d5453ccbd3ed6f2bfbb1d487672281a13c40f3e5ff627aaef67dc9aff2377daa5c31bede4e948f384f7e941722acde9016bffff7f2002000000",
+      "bytes": 3268656,
+      "wire_sha256": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b",
+      "offered_ns": 21787740791,
+      "source_accepted_ns": 22409844458,
+      "receiver_polls": [
+        {
+          "read_ns": 22925180500,
+          "heights": {
+            "tn1": 473,
+            "tn2": 473,
+            "scary_node": 473
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b",
+        "tn2": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b",
+        "sv": "933f33a413063dd18223b7bd08d2613640944b7e8b2c3fb6c14efcda1bb5753b"
+      }
+    },
+    {
+      "height": 475,
+      "hash": "6050ab1e0affc1c6f9257c5cf05b33002d8cd0805e4738a3574db00ae013e11c",
+      "header_hex": "00000020753ec3dd4ee5e32d1d9e703cea5d9105fb2b044fbfa196d23f3a2aa87a2dd3637c45816a2c8ce593511f2f3a5f3ed990277608fee5f7db85bfc724931bb5af1acee9016bffff7f2001000000",
+      "bytes": 3268692,
+      "wire_sha256": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38",
+      "offered_ns": 22926010458,
+      "source_accepted_ns": 23545916416,
+      "receiver_polls": [
+        {
+          "read_ns": 24038345291,
+          "heights": {
+            "tn1": 474,
+            "tn2": 474,
+            "scary_node": 474
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38",
+        "tn2": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38",
+        "sv": "95d1687b46074a7b2b2eb8e2d6029ef133eb0e9c96a73fdf583b252b77657c38"
+      }
+    },
+    {
+      "height": 476,
+      "hash": "45f5b34fc21ad66a39d3c2789aaeb23b5acb26adb957fb7868d4ddfdefe659c1",
+      "header_hex": "000000201ce113e00ab04d57a338475e80d08c2d00335bf05c7c25f9c6c1ff0a1eab506011d4562f84d7d832b265403dbff77950ca9f7231ffb0efbf16a88e5c0c2e16cfcfe9016bffff7f2000000000",
+      "bytes": 3268667,
+      "wire_sha256": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316",
+      "offered_ns": 24039478875,
+      "source_accepted_ns": 24666841500,
+      "receiver_polls": [
+        {
+          "read_ns": 25167799416,
+          "heights": {
+            "tn1": 475,
+            "tn2": 475,
+            "scary_node": 475
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316",
+        "tn2": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316",
+        "sv": "3b741e7588ffdaf3432ebb3e762590f1c7ac1b83724fe550fe94e7bd1d01f316"
+      }
+    },
+    {
+      "height": 477,
+      "hash": "5a16bc91786863b9bd1bfb727d67e13ea32f75158b04f4ba8f99abff84e53d50",
+      "header_hex": "00000020c159e6effdddd46878fb57b9ad26cb5a3bb2ae9a78c2d3396ad61ac24fb3f545f9404a328c2e1d0f9647570405e6c811131102464720f2f74e23b142b2176449d0e9016bffff7f2000000000",
+      "bytes": 3268708,
+      "wire_sha256": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a",
+      "offered_ns": 25169075166,
+      "source_accepted_ns": 25792883541,
+      "receiver_polls": [
+        {
+          "read_ns": 26253866125,
+          "heights": {
+            "tn1": 476,
+            "tn2": 476,
+            "scary_node": 476
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a",
+        "tn2": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a",
+        "sv": "7ff1ee1fa82c6f5d06617980e0eafa878d939fb0ad9e6a1ed44b27792656772a"
+      }
+    },
+    {
+      "height": 478,
+      "hash": "08647c037883d39f8b4f3bd1403eab7b234814c7706dc2ea6b8198de461d8a41",
+      "header_hex": "00000020503de584ffab998fbaf4048b15752fa33ee1677d72fb1bbdb963687891bc165a6767eb95a4b87be5399201ee5d02df3134fa70a6b55818fc985664066ab427e0d1e9016bffff7f2001000000",
+      "bytes": 3268565,
+      "wire_sha256": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991",
+      "offered_ns": 26254496541,
+      "source_accepted_ns": 26882988291,
+      "receiver_polls": [
+        {
+          "read_ns": 27388250541,
+          "heights": {
+            "tn1": 477,
+            "tn2": 477,
+            "scary_node": 477
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991",
+        "tn2": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991",
+        "sv": "fe72652e64e8b013d1f928baf03e6987b593ca960237a0ba8dc92fbe7601b991"
+      }
+    },
+    {
+      "height": 479,
+      "hash": "175f80b8a6166ac3b3d81ebfdeede8987d8d98a0b49c73edff5ac6601bf13aab",
+      "header_hex": "00000020418a1d46de98816beac26d70c71448237bab3e40d13b4f8b9fd38378037c6408efaa050a5318da8148aa8d97614839e728f5b14cf717b3003ee665210f99c1a6d2e9016bffff7f2000000000",
+      "bytes": 3268707,
+      "wire_sha256": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88",
+      "offered_ns": 27389242000,
+      "source_accepted_ns": 28008485625,
+      "receiver_polls": [
+        {
+          "read_ns": 28562680291,
+          "heights": {
+            "tn1": 478,
+            "tn2": 478,
+            "scary_node": 478
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88",
+        "tn2": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88",
+        "sv": "dfe03642325b43b7c163376b5a94f3c573657579bb7ea4b4b03b8a0fc6a10d88"
+      }
+    },
+    {
+      "height": 480,
+      "hash": "50f4803510781e3ea03c48051298e1a28c0f44b63806b4206cf2351a21eb696c",
+      "header_hex": "00000020ab3af11b60c65affed739cb4a0988d7d98e8eddebf1ed8b3c36a16a6b8805f172c4182ee357deffcfb30bd873b898b45e1e26a825faea9511936ac69bbc3d74ed3e9016bffff7f2000000000",
+      "bytes": 3268570,
+      "wire_sha256": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95",
+      "offered_ns": 28563665375,
+      "source_accepted_ns": 29189056583,
+      "receiver_polls": [
+        {
+          "read_ns": 29689819500,
+          "heights": {
+            "tn1": 478,
+            "tn2": 479,
+            "scary_node": 479
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95",
+        "tn2": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95",
+        "sv": "d0da837de521d858f8ba1f5b84af3f2e6acdcf2446c593624f8cf95019100a95"
+      }
+    },
+    {
+      "height": 481,
+      "hash": "34e24d6b8c2b13a336efac97fd7ea6149aba1f5e8f9ae692c08541042d4f35f0",
+      "header_hex": "000000206c69eb211a35f26c20b40638b6440f8ca2e1981205483ca03e1e78103580f450ca26fb8120e24dc0f84b4faa95de5f51155922ce9b692ea29aae77e426d1cc28d4e9016bffff7f2000000000",
+      "bytes": 3268733,
+      "wire_sha256": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9",
+      "offered_ns": 29690836291,
+      "source_accepted_ns": 30336065291,
+      "receiver_polls": [
+        {
+          "read_ns": 30808389208,
+          "heights": {
+            "tn1": 480,
+            "tn2": 480,
+            "scary_node": 480
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9",
+        "tn2": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9",
+        "sv": "4962b695942ae316251413d36a298f6aa2728b46b5af040436f25efd54ea8af9"
+      }
+    },
+    {
+      "height": 482,
+      "hash": "048a7b66ad79236aa9300522d75218825a4fcb2dd6ae49fed5dbc9b69939f077",
+      "header_hex": "00000020f0354f2d044185c092e69a8f5e1fba9a14a67efd97acef36a3132b8c6b4de234842f7bcbb7aff698c4ab76965e00fcedf203fcfb21dcd88bf7a22e31219945f7d5e9016bffff7f2001000000",
+      "bytes": 3268672,
+      "wire_sha256": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69",
+      "offered_ns": 30809034125,
+      "source_accepted_ns": 31428628208,
+      "receiver_polls": [
+        {
+          "read_ns": 31919211916,
+          "heights": {
+            "tn1": 481,
+            "tn2": 481,
+            "scary_node": 481
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69",
+        "tn2": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69",
+        "sv": "67b4b9b3901c64ef02d220ca8b2539c11439baa7dd0504f210641bae8e426e69"
+      }
+    },
+    {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "header_hex": "0000002077f03999b6c9dbd5fe49aed62dcb4f5a821852d7220530a96a2379ad667b8a041698fa2286a7b7cf44dce24e1bb9ad2e5eb9cea409f6a09288cca4ec99d02ebcd6e9016bffff7f2001000000",
+      "bytes": 3268634,
+      "wire_sha256": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6",
+      "offered_ns": 31920231958,
+      "source_accepted_ns": 32540748250,
+      "receiver_polls": [
+        {
+          "read_ns": 33013150666,
+          "heights": {
+            "tn1": 482,
+            "tn2": 482,
+            "scary_node": 482
+          }
+        }
+      ],
+      "witnessed_signature_checks": 16384,
+      "independent_wire_sha256": {
+        "tn1": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6",
+        "tn2": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6",
+        "sv": "5c749c42614d572cdff1654cabb525350c1efa11d39395b04ee6f655107ee9e6"
+      }
+    }
+  ],
+  "scary_binary_sha256": "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528",
+  "docker": {
+    "architecture": "aarch64",
+    "vcpus": 16,
+    "memory_bytes": 102380195840
+  },
+  "storage_trial": {
+    "registration": "9963c88d116095aa25adf934addf65173bba1e15",
+    "source_revision": "af9b605ad8da96d041a540111d46a7c0105209f7",
+    "corpus": {
+      "genesis": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+      "funding_height": 451,
+      "final_height": 483,
+      "sha256_of_ordered_wire_digests": "3d04e4fa099e49dbe556b9d7d83d06f44264507e54f62a0d9653a3a50833a0b3",
+      "wire_bytes_including_setup": 225186597
+    },
+    "topology": {
+      "as1": {
+        "image_ref": "ghcr.io/bsv-blockchain/aerospike-server:8.1.2.0-1@sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc",
+        "image_id": "sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc",
+        "repository_digests": [
+          "ghcr.io/bsv-blockchain/aerospike-server@sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc"
+        ],
+        "architecture": "arm64",
+        "memory_limit_bytes": 0,
+        "nano_cpus_limit": 0,
+        "cpu_quota": 0,
+        "cpu_period": 0,
+        "cpuset": "",
+        "mounts": [
+          {
+            "target": "/etc/aerospike/qualification.conf",
+            "type": "bind",
+            "volume": null,
+            "read_write": false
+          },
+          {
+            "target": "/opt/aerospike/smd",
+            "type": "volume",
+            "volume": "scary-node-throughput_as1-meta",
+            "read_write": true
+          },
+          {
+            "target": "/opt/aerospike/data",
+            "type": "volume",
+            "volume": "scary-node-throughput_as1-data",
+            "read_write": true
+          }
+        ],
+        "networks": [
+          "scary-node-throughput_tn1-store"
+        ],
+        "backing_size_bytes": 204403494912,
+        "backing_available_bytes": 81182728192,
+        "registered_datafile_bytes": 9663676416
+      },
+      "as2": {
+        "image_ref": "ghcr.io/bsv-blockchain/aerospike-server:8.1.2.0-1@sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc",
+        "image_id": "sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc",
+        "repository_digests": [
+          "ghcr.io/bsv-blockchain/aerospike-server@sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc"
+        ],
+        "architecture": "arm64",
+        "memory_limit_bytes": 0,
+        "nano_cpus_limit": 0,
+        "cpu_quota": 0,
+        "cpu_period": 0,
+        "cpuset": "",
+        "mounts": [
+          {
+            "target": "/etc/aerospike/qualification.conf",
+            "type": "bind",
+            "volume": null,
+            "read_write": false
+          },
+          {
+            "target": "/opt/aerospike/data",
+            "type": "volume",
+            "volume": "scary-node-throughput_as2-data",
+            "read_write": true
+          },
+          {
+            "target": "/opt/aerospike/smd",
+            "type": "volume",
+            "volume": "scary-node-throughput_as2-meta",
+            "read_write": true
+          }
+        ],
+        "networks": [
+          "scary-node-throughput_tn2-store"
+        ],
+        "backing_size_bytes": 204403494912,
+        "backing_available_bytes": 81182728192,
+        "registered_datafile_bytes": 9663676416
+      },
+      "scary-node": {
+        "image_ref": "scary-node:throughput-af9b605-5d3fe94e",
+        "image_id": "sha256:5d3fe94ee11ed4170cc39a074967c220757ed6078b0df623d7054b35afc55f4a",
+        "repository_digests": [
+          "scary-node@sha256:5d3fe94ee11ed4170cc39a074967c220757ed6078b0df623d7054b35afc55f4a"
+        ],
+        "architecture": "arm64",
+        "memory_limit_bytes": 0,
+        "nano_cpus_limit": 0,
+        "cpu_quota": 0,
+        "cpu_period": 0,
+        "cpuset": "",
+        "mounts": [
+          {
+            "target": "/data",
+            "type": "volume",
+            "volume": "scary-node-throughput_scary-data",
+            "read_write": true
+          },
+          {
+            "target": "/var/lib/scary-state",
+            "type": "volume",
+            "volume": "scary-node-throughput_scary-leases",
+            "read_write": true
+          }
+        ],
+        "networks": [
+          "scary-node-throughput_regtest"
+        ]
+      },
+      "svref": {
+        "image_ref": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+        "image_id": "sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+        "repository_digests": [
+          "bitcoinsv/bitcoin-sv@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33"
+        ],
+        "architecture": "amd64",
+        "memory_limit_bytes": 0,
+        "nano_cpus_limit": 0,
+        "cpu_quota": 0,
+        "cpu_period": 0,
+        "cpuset": "",
+        "mounts": [
+          {
+            "target": "/data",
+            "type": "volume",
+            "volume": "scary-node-throughput_sv-data",
+            "read_write": true
+          }
+        ],
+        "networks": [
+          "scary-node-throughput_regtest"
+        ]
+      },
+      "tn1": {
+        "image_ref": "ghcr.io/bsv-blockchain/teranode:v0.16.1@sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+        "image_id": "sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+        "repository_digests": [
+          "ghcr.io/bsv-blockchain/teranode@sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a"
+        ],
+        "architecture": "arm64",
+        "memory_limit_bytes": 0,
+        "nano_cpus_limit": 0,
+        "cpu_quota": 0,
+        "cpu_period": 0,
+        "cpuset": "",
+        "mounts": [
+          {
+            "target": "/app/data",
+            "type": "volume",
+            "volume": "scary-node-throughput_tn1-data",
+            "read_write": true
+          }
+        ],
+        "networks": [
+          "scary-node-throughput_regtest",
+          "scary-node-throughput_tn1-store"
+        ],
+        "utxo_store": "aerospike://as1:3000/test?WarmUp=0&ConnectionQueueSize=128&LimitConnectionsToQueueSize=true&MinConnectionsPerNode=16&IdleTimeout=60s&set=utxo&externalStore=file:///app/data/external%3FhashPrefix=2"
+      },
+      "tn2": {
+        "image_ref": "ghcr.io/bsv-blockchain/teranode:v0.16.1@sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+        "image_id": "sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+        "repository_digests": [
+          "ghcr.io/bsv-blockchain/teranode@sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a"
+        ],
+        "architecture": "arm64",
+        "memory_limit_bytes": 0,
+        "nano_cpus_limit": 0,
+        "cpu_quota": 0,
+        "cpu_period": 0,
+        "cpuset": "",
+        "mounts": [
+          {
+            "target": "/app/data",
+            "type": "volume",
+            "volume": "scary-node-throughput_tn2-data",
+            "read_write": true
+          }
+        ],
+        "networks": [
+          "scary-node-throughput_regtest",
+          "scary-node-throughput_tn2-store"
+        ],
+        "utxo_store": "aerospike://as2:3000/test?WarmUp=0&ConnectionQueueSize=128&LimitConnectionsToQueueSize=true&MinConnectionsPerNode=16&IdleTimeout=60s&set=utxo&externalStore=file:///app/data/external%3FhashPrefix=2"
+      },
+      "ingress": {
+        "image_ref": "nginx:1.27.4@sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab",
+        "image_id": "sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab",
+        "repository_digests": [
+          "nginx@sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab"
+        ],
+        "architecture": "arm64",
+        "memory_limit_bytes": 0,
+        "nano_cpus_limit": 0,
+        "cpu_quota": 0,
+        "cpu_period": 0,
+        "cpuset": "",
+        "mounts": [
+          {
+            "target": "/etc/nginx/nginx.conf",
+            "type": "bind",
+            "volume": null,
+            "read_write": false
+          }
+        ],
+        "networks": [
+          "scary-node-throughput_host-access",
+          "scary-node-throughput_regtest"
+        ]
+      }
+    },
+    "entry_state": {
+      "height": 451,
+      "tip_hash": "0e3d2d34a15a063b9b23867fd18918d219916b155258d8a72ae9f428198ceec5",
+      "interpreter": {
+        "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+        "cmake": "cmake version 3.25.1",
+        "compiler": "c++ (Debian 12.2.0-14+deb12u1) 12.2.0",
+        "cxx_flags": "-O3 -g0 -DNDEBUG",
+        "cxx_standard": 20,
+        "dependencies_sha256": "ba52bbaea6b8c31f44679dad53ca57d3021654779d9e4d9d71da25c3dece8578",
+        "linked_bdk_commit": "8a4e1d3",
+        "linked_bdk_version": "1.4.0",
+        "linked_sv_commit": "6504a3a",
+        "linked_sv_version": "1.2.3",
+        "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+        "platform": "linux_aarch64",
+        "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+        "type": "Release"
+      },
+      "connected_data_peers": 3,
+      "observation_window_ready": true,
+      "storage_failure": null
+    },
+    "first_offer_to_final_adoption_s": 34.628728583,
+    "first_offer_to_final_adoption_spends_per_s": 15140.261322137725,
+    "source_until_last_acceptance_s": 32.540175292,
+    "source_elapsed_spends_per_s": 16112.021379580465,
+    "target_spends_per_s": 3000,
+    "both_targets_met": true
+  }
+}

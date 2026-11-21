@@ -10,6 +10,34 @@ The registered target is 3,000 ordinary signed spends per second at both single-
 
 The downstream node was lowest or tied for lowest in all 838 below-window polls on SQLite. At height 483 the stock downstream service logged 9.74 seconds in transaction-level processing and 38 milliseconds in body persistence. The directly connected Teranode logged 15.80 seconds for complete legacy block processing at the same height. This motivates changing the UTXO storage backend while preserving full validation, route, workload and window. Different entrant release binaries and any differences in observed infrastructure are disclosed with the two results.
 
+## Measured result
+
+The first measured attempt met both registered thresholds. Single-source SV ingress accepted 524,288 signed spends in 32.540 seconds. All four nodes selected the final hash 34.629 seconds after the first offer. That is **16,112 spends/s at ingress and 15,140 spends/s through final adoption**, compared with 1,045 spends/s in the SQLite four-store trial. Both runs used the same 32 bodies, totaling 104,597,251 bytes. Every one of the 96 stock body readbacks in each run matched the offered bytes, and the entrant completed all 524,288 witnessed script checks. There were 32 offers, 32 SV acceptances, zero receiver poll errors and zero below-window polls in the Aerospike attempt. The first setup handshake occurred at genesis. One premeasurement redial at source height 12 allowed the stock sync peer to catch up. [Four-store receipt](evidence/chronicle-mixed-storage.json) · [Complete attempt log](evidence/chronicle-mixed-storage-attempt.jsonl)
+
+| Readback after the last SV acceptance | SQLite | Disk-backed Aerospike |
+|---|---:|---:|
+| Directly connected Teranode | 19.70 s | 0.99 s |
+| Scary Node | 1.22 s | 1.58 s |
+| Downstream Teranode | 41.77 s | 2.08 s |
+
+The directly connected Teranode reported a median 13.082 seconds processing the 16,384 missing transactions per block on SQLite and 0.305 seconds on Aerospike, covering all 32 heights in each run. The downstream node reported 10.952 seconds over the 13 SQLite heights still in its rotated logs and 0.359 seconds across all 32 Aerospike heights. Median block persistence took roughly 36–44 ms across these observations. The storage configuration affected the time to validate transactions on the stock peers; absolute throughput also reflects the shared host, the updated entrant release and this workload. [Stock timings with every retained height](evidence/chronicle-mixed-storage-phases.json)
+
+One Apple M3 Max (Mac15,9, 16 cores, 128 GiB RAM) ran all four nodes, the two separate databases and the loopback proxy. Docker Desktop Linux had 16 vCPUs and 102,380,195,840 bytes RAM. SV Node used its pinned AMD64 image; both Teranodes, both databases and Scary Node used ARM64. Each database used a separate persistent volume on the same physical host with a 9 GiB file. At the post-run snapshot each reported 861,345 records and 631,733,024 bytes of occupied namespace data. The entrant's cgroup reported 279,003,136 current bytes and a 364,351,488-byte peak since startup. These counters include charged cache. Peak memory covers preparation, measurement and readbacks; the storage readings were taken after the run. The underlying Docker filesystem reported 204,403,494,912 total and 81,182,728,192 available bytes before the timed run. Image IDs, platform digests, container CPU/memory limits, mounts, interpreter provenance and entrant executable SHA-256 are in the receipt. [Machine and per-service resource readings](evidence/chronicle-mixed-storage-resources.json)
+
+The measured interval is a 34.6-second burst of signed spends first offered inside blocks. Scary Node had live SV and Teranode peers; these readbacks establish the selected bytes and witnessed checks without identifying which peer supplied every body. WAN propagation, all-day capacity and a continuously arriving mempool are separate measurements.
+
 ## Reproducing the comparison
 
 Retain the SQLite mixed project after its large workload. Use the original workload receipt to export the selected wire bodies into a local directory. The export verifies the funding linkage, proof of work, transaction Merkle commitments and every measured body digest. A different fresh SQLite run produces its own matched corpus. Use that run's receipt for both export and replay. The named Docker project `scary-node-throughput` is separate from the SQLite project and binds its ingress ports to loopback.
+```sh
+.native/py/bin/python qualification/mixed_corpus.py .native/mixed-native-large.json .native/paired-corpus
+.native/py/bin/python qualification/mixed_storage_trial.py prepare .native/paired-corpus
+.native/py/bin/python qualification/mixed_storage_trial.py measure .native/paired-corpus \
+  --image scary-node:throughput-af9b605-5d3fe94e \
+  --image-id sha256:5d3fe94ee11ed4170cc39a074967c220757ed6078b0df623d7054b35afc55f4a \
+  --binary-sha256 833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528 \
+  --receipt .native/mixed-storage-result.json
+python3 qualification/verify_mixed_storage_trial.py .native/mixed-native-large.json .native/mixed-storage-result.json
+```
+
+The measured image is from the clean-target Linux ARM64 build. Use `python3 qualification/release_build.py 6ad4152ee517bc282ac70af4b0550ff6ba4458bc .native/storage-build.json` to build locally. Tag the resulting `image_id` with `docker tag IMAGE_ID scary-node:throughput-af9b605-5d3fe94e`. For an independent build, pass the actual image ID and `release.executable_sha256` from that build receipt to the driver. Supply the same file to the verifier with `--build-receipt .native/storage-build.json`. The driver checks both the immutable ID and executable digest and runs Compose with image pulls and builds disabled. Reference preparation leaves a pre-funding block for the entrant to establish its observation boundary. A JSON-lines attempt log is created alongside the receipt, including source offers, acceptances, receiver read errors and final verification. The host measurement lock covers both preparation and measurement. After preserving your artifacts, the dedicated lab can be removed with `docker compose -p scary-node-throughput -f regtest/compose.yaml -f regtest/mixed.compose.yaml -f regtest/mixed-native.compose.yaml -f regtest/mixed-aerospike.compose.yaml down -v`.

@@ -51,21 +51,59 @@ def run(directory, rounds, fanout):
         directory, case, key, funding, fanout, rounds, first.hash, height + 1, stamp + 1
     )
 
+    return measure(bodies, height, fanout, first.hash, first.serialize()[:80].hex())
+
+
+def measure(bodies, height, fanout, funding_hash, funding_header, *, progress=None):
+    rounds = len(bodies)
     rows = []
     start = time.monotonic_ns()
+    if progress is not None:
+        progress(
+            {
+                "event": "measurement_started",
+                "wall_ns": time.time_ns(),
+                "monotonic_ns": start,
+            }
+        )
     final = bodies[-1][0]
     final_observations = {}
+    availability_changes = []
+
+    def read_peer(name, read):
+        try:
+            return read()
+        except (OSError, RuntimeError, ValueError) as error:
+            if progress is not None:
+                progress(
+                    {
+                        "event": "receiver_poll_error",
+                        "receiver": name,
+                        "error_type": type(error).__name__,
+                        "ns": time.monotonic_ns() - start,
+                    }
+                )
+            raise
 
     def sample_receivers():
         tips = {}
         for label, node in zip(("tn1", "tn2"), NODES):
-            state = rpc(node, "getblockchaininfo")
+            state = read_peer(label, lambda: rpc(node, "getblockchaininfo"))
             tips[label] = (
                 state["blocks"],
                 state["bestblockhash"],
                 time.monotonic_ns() - start,
             )
-        mining = status()["mining"]
+        mining = read_peer("scary_node", status)["mining"]
+        readiness = {
+            "connected_data_peers": mining["connected_data_peers"],
+            "observation_window_ready": mining["observation_window_ready"],
+            "storage_failed": bool(mining["storage_failure"]),
+        }
+        if not availability_changes or availability_changes[-1]["state"] != readiness:
+            availability_changes.append(
+                {"ns": time.monotonic_ns() - start, "state": readiness}
+            )
         tips["scary_node"] = (
             mining["height"],
             mining["tip_hash"],
@@ -83,6 +121,15 @@ def run(directory, rounds, fanout):
     for i, (h, path) in enumerate(bodies):
         raw = path.read_bytes()
         offered = time.monotonic_ns()
+        if progress is not None:
+            progress(
+                {
+                    "event": "offered",
+                    "height": height + i + 1,
+                    "hash": h,
+                    "ns": offered - start,
+                }
+            )
         assert sv("submitblock", raw.hex()) is None
         rows.append(
             {
@@ -95,6 +142,14 @@ def run(directory, rounds, fanout):
                 "source_accepted_ns": time.monotonic_ns() - start,
             }
         )
+        if progress is not None:
+            progress(
+                {
+                    "event": "source_accepted",
+                    "height": rows[-1]["height"],
+                    "ns": rows[-1]["source_accepted_ns"],
+                }
+            )
         # Limit outstanding work without requiring that each receiver poll sees
         # every transient tip. Audit each selected active ancestor afterwards.
         if i >= 3:
@@ -117,6 +172,14 @@ def run(directory, rounds, fanout):
         ),
     )
     duration = time.monotonic_ns() - start
+    if progress is not None:
+        progress(
+            {
+                "event": "all_stores_active",
+                "ns": duration,
+                "observations": final_observations,
+            }
+        )
     obs = {r["height"]: r for r in status()["mining"]["validation_window"]}
     for row in rows:
         actual = obs[row["height"]]
@@ -148,10 +211,11 @@ def run(directory, rounds, fanout):
         "network": "regtest",
         "reference_ingress": "SV submitblock",
         "native_reference_link": "SV wire to Teranode legacy, Teranode native gossip",
-        "funding_block": first.hash,
-        "funding_header": first.serialize()[:80].hex(),
+        "funding_block": funding_hash,
+        "funding_header": funding_header,
         "receiver_window": 4,
         "final_native_observations": final_observations,
+        "sampled_scary_availability_changes": availability_changes,
         "transactions_per_block": fanout,
         "rounds": rounds,
         "measured_wall_ns": duration,
