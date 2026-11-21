@@ -3,6 +3,7 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 import socket
 import struct
 import subprocess
@@ -13,8 +14,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-NODES = [(19441, 19451), (19442, 19452)]
-API = "http://127.0.0.1:19480"
+PORT_SHIFT = int(os.environ.get("SCARY_LAB_PORT_SHIFT", "0"))
+NODES = [(19441 + PORT_SHIFT, 19451 + PORT_SHIFT), (19442 + PORT_SHIFT, 19452 + PORT_SHIFT)]
+API = f"http://127.0.0.1:{19480 + PORT_SHIFT}"
 AUTH = "Basic " + base64.b64encode(b"regtest:disposable-regtest-rpc").decode()
 ORDER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
 
@@ -163,6 +165,10 @@ class DisposableWallet:
         digest = dsha(version + dsha(outpoint) + dsha(sequence) + outpoint + script_code
                       + struct.pack("<Q", value) + sequence + dsha(output) + bytes(4)
                       + struct.pack("<I", hash_type))
+        unlocking = self.unlocking_script(digest, hash_type)
+        return version + b"\x01" + outpoint + bytes([len(unlocking)]) + unlocking + sequence + b"\x01" + output + bytes(4)
+
+    def unlocking_script(self, digest, hash_type=0x41):
         sig = openssl("pkeyutl", "-sign", "-inkey", self.path, data=digest)
         if sig[:1] != b"\x30" or sig[2] != 2 or sig[4 + sig[3]] != 2:
             raise ValueError("OpenSSL returned an unexpected DER signature")
@@ -175,12 +181,14 @@ class DisposableWallet:
             return b"\x02" + bytes([len(b)]) + b
         pair = der_int(r) + der_int(min(s, ORDER - s))
         signature = b"\x30" + bytes([len(pair)]) + pair + bytes([hash_type])
-        unlocking = bytes([len(signature)]) + signature + bytes([len(self.pubkey)]) + self.pubkey
-        return version + b"\x01" + outpoint + bytes([len(unlocking)]) + unlocking + sequence + b"\x01" + output + bytes(4)
+        return bytes([len(signature)]) + signature + bytes([len(self.pubkey)]) + self.pubkey
 
 
 def compose(*args, capture=False):
-    result = subprocess.run(["docker", "compose", "-f", str(Path(__file__).with_name("compose.yaml")), *args],
+    base = ["docker", "compose", "-f", str(Path(__file__).with_name("compose.yaml"))]
+    if os.environ.get("SCARY_LAB_SCENARIO") == "1":
+        base += ["-f", str(Path(__file__).with_name("scenario.compose.yaml"))]
+    result = subprocess.run([*base, *args],
                             stdout=subprocess.PIPE if capture else sys.stderr, text=True, check=True)
     return result.stdout
 
@@ -190,7 +198,7 @@ def assert_tip(node, expected):
 
 
 def solve(worker, parent, child):
-    with socket.create_connection(("127.0.0.1", 19433), timeout=60) as sock, sock.makefile("rwb") as stream:
+    with socket.create_connection(("127.0.0.1", 19433 + PORT_SHIFT), timeout=60) as sock, sock.makefile("rwb") as stream:
         def send(i, method, params):
             stream.write(json.dumps({"id": i, "method": method, "params": params}).encode() + b"\n")
             stream.flush()
@@ -217,8 +225,16 @@ def solve(worker, parent, child):
         prev = b"".join(prev[i:i + 4][::-1] for i in range(0, 32, 4))
         if prev[::-1].hex() != parent:
             raise ValueError("job parent differs from witnessed tip")
-        # This run admits exactly one child, so the first coinbase sibling must be its txid.
-        if branches != [bytes.fromhex(child)[::-1].hex()]:
+        # Rust's ordered pending map uses raw SHA digest bytes as its key.
+        ids = [child] if isinstance(child, str) else child
+        layer = [bytes(32)] + sorted(bytes.fromhex(t)[::-1] for t in ids)
+        expected_branches = []
+        while len(layer) > 1:
+            if len(layer) % 2:
+                layer.append(layer[-1])
+            expected_branches.append(layer[1].hex())
+            layer = [dsha(layer[i] + layer[i + 1]) for i in range(0, len(layer), 2)]
+        if branches != expected_branches:
             raise ValueError(f"unexpected job Merkle branch: {branches}")
         _, extranonce1, size = subscription
         extra = bytes(size).hex()

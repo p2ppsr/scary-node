@@ -1,5 +1,5 @@
 //! Direct Stratum V1 jobs for operator-owned equipment on a trusted network.
-use super::{now, subsidy, wire, Hash, Mining, HEADER_WINDOW};
+use super::{now, subsidy, wire, Hash, Mining};
 use anyhow::{bail, ensure, Context, Result};
 use bsv::primitives::hash::hash256;
 use serde_json::{json, Value};
@@ -30,10 +30,9 @@ struct Job {
 impl Job {
     fn from_state(state: &Mining) -> Result<Option<Self>> {
         if state.solved_on_tip
-            || state.awaiting_height.is_some()
+            || !state.observation_window_ready()
             || state.pending.is_empty()
             || state.payout.is_empty()
-            || (!state.regtest && state.headers.len() < HEADER_WINDOW)
         {
             return Ok(None);
         }

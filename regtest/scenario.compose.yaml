@@ -1,0 +1,30 @@
+services:
+  cold-observer:
+    image: scary-node:local
+    networks: [regtest]
+    tmpfs: [/data]
+    command:
+      - --network
+      - regtest
+      - --observe-bodies
+      - --peer
+      - /dns/tn1/tcp/9905/p2p/12D3KooWAFXWuxgdJoRsaA4J4RRRr8yu6WCrAPf8FaS7UfZg3ceG
+      - --peer
+      - /dns/tn2/tcp/9905/p2p/12D3KooWG6aCkDmi5tqx4G4AvVDTQdSVvTSzzQvk1vh9CtSR8KEW
+      - --api-bind
+      - 0.0.0.0:8080
+      - --data-dir
+      - /data
+  scary-node:
+    entrypoint: [/usr/local/bin/scary-node, --min-observed-blocks, "13"]
+  ingress:
+    volumes:
+      - ./scenario-status.conf:/etc/nginx/scary-lab/cold-status.conf:ro
+    ports: !override
+      - 127.0.0.1:19541:19441
+      - 127.0.0.1:19542:19442
+      - 127.0.0.1:19551:19451
+      - 127.0.0.1:19552:19452
+      - 127.0.0.1:19580:19480
+      - 127.0.0.1:19581:19481
+      - 127.0.0.1:19533:19433

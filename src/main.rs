@@ -5,7 +5,7 @@ mod peer;
 use anyhow::{bail, ensure, Context, Result};
 use axum::{
     body::Bytes,
-    extract::{DefaultBodyLimit, State},
+    extract::{DefaultBodyLimit, Path, State},
     http::StatusCode,
     routing::{get, post},
     Json, Router,
@@ -49,6 +49,9 @@ struct Args {
     /// Retrieve complete block bodies to build the witnessed working set.
     #[arg(long)]
     observe_bodies: bool,
+    /// Minimum contiguous observed block bodies before issuing mining work (1..147).
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=147))]
+    min_observed_blocks: u32,
     /// Trusted operator HTTP endpoint.
     #[arg(long, default_value = "127.0.0.1:8080")]
     api_bind: SocketAddr,
@@ -101,6 +104,29 @@ async fn status(State(app): State<App>) -> Json<Value> {
 async fn submit(State(app): State<App>, raw: Bytes) -> (StatusCode, Json<Value>) {
     match app.mining.lock().await.submit_tx(&raw) {
         Ok(txid) => (StatusCode::ACCEPTED, Json(json!({"txid":txid}))),
+        Err(err) => (
+            StatusCode::UNPROCESSABLE_ENTITY,
+            Json(json!({"error":err.to_string()})),
+        ),
+    }
+}
+
+async fn outpoint(
+    State(app): State<App>,
+    Path((id, index)): Path<(String, u32)>,
+) -> (StatusCode, Json<Value>) {
+    match app.mining.lock().await.outpoint(&id, index) {
+        Ok(result) => (StatusCode::OK, Json(result)),
+        Err(err) => (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error":err.to_string()})),
+        ),
+    }
+}
+
+async fn check_transaction(State(app): State<App>, raw: Bytes) -> (StatusCode, Json<Value>) {
+    match app.mining.lock().await.check_transaction(&raw) {
+        Ok(result) => (StatusCode::OK, Json(result)),
         Err(err) => (
             StatusCode::UNPROCESSABLE_ENTITY,
             Json(json!({"error":err.to_string()})),
@@ -209,9 +235,11 @@ async fn main() -> Result<()> {
         args.stratum_bind.is_none() || !payout.is_empty(),
         "mining requires a payout script"
     );
+    let mut mining = mining::Mining::new(regtest, payout)?;
+    mining.set_min_observed_blocks(args.min_observed_blocks as usize)?;
     let app = App {
         network,
-        mining: Arc::new(Mutex::new(mining::Mining::new(regtest, payout)?)),
+        mining: Arc::new(Mutex::new(mining)),
         peer: Arc::new(Mutex::new(PeerStats::default())),
     };
     let api = tokio::net::TcpListener::bind(args.api_bind)
@@ -219,6 +247,11 @@ async fn main() -> Result<()> {
         .context("operator API bind")?;
     let router = Router::new()
         .route("/status", get(status))
+        .route("/outpoints/{id}/{index}", get(outpoint))
+        .route(
+            "/check-transaction",
+            post(check_transaction).layer(DefaultBodyLimit::max(100_000)),
+        )
         .route("/transactions", post(submit))
         .layer(DefaultBodyLimit::max(4_000_000))
         .with_state(app.clone());

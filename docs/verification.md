@@ -1,4 +1,6 @@
-# Alpha verification
+# First alpha verification
+
+These receipts belong to the initial `0.1.0-alpha.1` release. The second alpha adds the active-chain workload, two matched observers and independently checked runs with two workload seeds. [Second alpha results](scenario-results.md)
 
 The two recorded Docker runs used two Teranode v0.16.1 processes, separate chain and UTXO databases, a Rust release binary and a CPU worker speaking Stratum V1 over TCP. Each process ran on the same isolated Docker host. The driver used reference RPC to mine funding and successor blocks and to read active tips. Rust built its own template and distributed its solved block over native gossip and Asset HTTP. Both reference nodes supplied the final wire bytes. [Topology and reproduction](regtest.md) · [Driver](../regtest/prove.py)
 

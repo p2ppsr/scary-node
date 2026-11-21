@@ -36,6 +36,18 @@ Install Docker with Compose v2, Python 3, and OpenSSL with secp256k1 support. Th
 
 The references establish a chain before the empty-state entrant joins. One reference mines a fresh funding output and the other builds on it. The driver sends its signed child to Scary Node and uses a CPU Stratum worker to return valid regtest proof of work. Both Teranodes must adopt the exact solved block, serve its bytes, and agree on a successor. The lab prints a JSON receipt you can verify offline. [Regtest procedure](docs/regtest.md) · [Recorded runs and verification](docs/verification.md)
 
+## Follow a newcomer on an active chain
+
+The longer lab starts two Teranodes, circulates hundreds of signed payments among four wallets, and then brings up Scary Node on a fresh volume. An independent replay measures how many live outputs Rust learns and how many reference-block inputs it can check. The same sixteen payment accounts submit work at each of three Stratum rounds. Compare which offers Rust can mine, the size of its solved blocks, and what the reference miners do with the remaining offers.
+
+```sh
+./regtest/scenario.sh --seed 7 > scenario-7.json
+python3 regtest/verify_scenario.py scenario-7.json
+./regtest/scenario.sh --down
+```
+
+[Workload and reproduction](docs/scenario.md) · [Measured results](docs/scenario-results.md)
+
 ## Point an ASIC at your node
 
 Set the payout locking script to an address you control. Run the node with a reachable advertised Asset URL so that peers can retrieve the block you announce. Enable the Stratum listener on a trusted mining LAN. The example expects the operator to supply the two environment variables.
