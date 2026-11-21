@@ -150,3 +150,12 @@ To measure the controlled stop, retain the earlier checkpoint, wait for eligible
   "$PRIVATE_EVIDENCE/closed.state" "$DATA_DIR/mainnet/alerts" \
   "$LINUX_BUILD_RECEIPT" "$PRIVATE_EVIDENCE/closed-offline.json"
 ```
+
+The corrected macOS observer subsequently received ten new eligible native payments at height 976535. Its controlled SIGTERM saved **81 eligible payments**, up from **71** in the earlier atomic snapshot. Independent comparison found all 71 original IDs, all ten additions, zero removals and identical header and outpoint commitments. The restarted process reported 81 before a data peer connected. Two peers reconfirmed within two seconds. A separate Linux ARM64 process reopened the exact closed snapshot using the same source release, with zero incoming transactions and 81 eligible payments. The live process also held **32 offers awaiting a successor** before stopping. That version reopened with zero waiting offers. These 32 had never qualified for its template. [Live process, snapshot comparison and isolated Linux reconstruction](evidence/chronicle-mainnet-controlled-stop.json)
+
+The independently reconciled journal through that restart contains **114 consecutive observed tips** from height 976422 to 976535. The anchor at 976421 and the selected tip agree with the observed work increment. The replay verifies the earlier native transport failover and reports no missing coverage height or unexplained template omission. The one recorded body-coverage interruption and its recovery remain in the journal. The node still lacked the 147 headers it needs for the first mainnet candidate. The `qualify` command exits with status 1 and lists the incomplete 1,008-block and candidate conditions at this checkpoint. [Redacted journal, work and independent headers](evidence/chronicle-mainnet-h976535.json.gz)
+
+```sh
+python3 qualification/shadow_checkpoint.py replay docs/evidence/chronicle-mainnet-h976535.json.gz
+python3 qualification/shadow_checkpoint.py qualify docs/evidence/chronicle-mainnet-h976535.json.gz
+```

@@ -1,0 +1,200 @@
+{
+  "live_restart": {
+    "source_commit": "10b93b4f0ff798a7b14813443addf2348beeee41",
+    "release_sha256": "0aab15b07c706b9cbf49d26b68b4ce3675eb0ee308fb92fc8d294675157b0b36",
+    "started_unix_s": 1795304127,
+    "verified_unix_s": 1795304129,
+    "passive_mainnet": true,
+    "recovered_start_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+    "before": {
+      "height": 976535,
+      "tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+      "coverage_start": 976422,
+      "coverage_end": 976535,
+      "headers": 114,
+      "witnessed_outputs": 36321,
+      "pending_transactions": 81,
+      "waiting_for_successor": 32,
+      "waiting_for_successor_bytes": 59487,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 9,
+          "awaiting_successor": 28,
+          "discarded_after_recheck": 0,
+          "duplicate": 91,
+          "ineligible": 256,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 1,
+          "awaiting_successor": 4,
+          "discarded_after_recheck": 0,
+          "duplicate": 2706,
+          "ineligible": 4277,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3a0d4fb9eb1a1cd630f",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": true,
+      "connected_data_peers": 9,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "restored": {
+      "height": 976535,
+      "tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+      "coverage_start": 976422,
+      "coverage_end": 976535,
+      "headers": 114,
+      "witnessed_outputs": 36321,
+      "pending_transactions": 81,
+      "waiting_for_successor": 0,
+      "waiting_for_successor_bytes": 0,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3a0d4fb9eb1a1cd630f",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "awaiting current tip from a connected data peer",
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": false,
+      "connected_data_peers": 0,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "reconfirmed": {
+      "height": 976535,
+      "tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+      "coverage_start": 976422,
+      "coverage_end": 976535,
+      "headers": 114,
+      "witnessed_outputs": 36321,
+      "pending_transactions": 81,
+      "waiting_for_successor": 0,
+      "waiting_for_successor_bytes": 0,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3a0d4fb9eb1a1cd630f",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": true,
+      "connected_data_peers": 2,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "receiver": {
+      "active_peers": 2,
+      "synced": true,
+      "sequence": 1,
+      "unprocessed_alerts": 0
+    }
+  },
+  "checkpoints": {
+    "height": 976535,
+    "parent": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+    "headers": 114,
+    "headers_sha256": "5d2d1749d46f1a2a42e0911fb979b00ef38eaab8814f5d8175d634643073a260",
+    "witnessed_outputs": 36321,
+    "witnessed_outputs_sha256": "85cf8c126aa0071b90829ff3605c805d0b5a6236bc8501c4169bd4117430f66e",
+    "directive_sequence": 1,
+    "earlier_payload_sha256": "c7ff8eefe93142db386344d34cef2d710666712dc68b827d8bdc32018db0a29d",
+    "closed_payload_sha256": "0a7fa3a00831278c7cc57b714171f72f2d8697f982440991fef59e11b05d4f12",
+    "earlier_eligible": 71,
+    "closed_eligible": 81,
+    "added_eligible": 10,
+    "removed_eligible": 0,
+    "earlier_ids_sha256": "44511d2c632f2011670193584a94a2a2147624402b5a2c945d0c156a911d0e5f",
+    "closed_ids_sha256": "aa06015ddeac32e8ab521d95d1b4ebdb909797301996925d0f0e81e242ee4e14"
+  },
+  "isolated_linux": {
+    "network": "mainnet",
+    "docker_network_mode": "none",
+    "source_commit": "10b93b4f0ff798a7b14813443addf2348beeee41",
+    "image_id": "sha256:1953814b38f891e4f42b9a4ba1df9e87325d5d36e2a848011e42c694ac21fd9d",
+    "executable_sha256": "4b623365dcdc664473156992e6119eb7fe51f92aef838a9f946281ec31b7c536",
+    "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+    "checkpoint_sha256": "65406be03d7931521f38803279aa736949723fc0e8c34a4f5d7ec93ca2d2c7eb",
+    "payload_sha256": "0a7fa3a00831278c7cc57b714171f72f2d8697f982440991fef59e11b05d4f12",
+    "height": 976535,
+    "parent": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+    "headers": 114,
+    "headers_sha256": "5d2d1749d46f1a2a42e0911fb979b00ef38eaab8814f5d8175d634643073a260",
+    "witnessed_outputs": 36321,
+    "witnessed_outputs_sha256": "85cf8c126aa0071b90829ff3605c805d0b5a6236bc8501c4169bd4117430f66e",
+    "directive_sequence": 1,
+    "expected_eligible": 81,
+    "restored_eligible": 81,
+    "input_eligible_ids_sha256": "aa06015ddeac32e8ab521d95d1b4ebdb909797301996925d0f0e81e242ee4e14",
+    "connected_data_peers": 0,
+    "tip_reconfirmed": false,
+    "directive_connected": false,
+    "directive_ready": false,
+    "peer_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "work_ready": false
+  }
+}
