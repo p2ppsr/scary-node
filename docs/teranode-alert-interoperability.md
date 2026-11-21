@@ -1,0 +1,26 @@
+# Stock Teranode alert interoperability
+
+The mixed mining lab leaves the alert service disabled by default. An ordinary payment accepted in that configuration establishes block delivery and acceptance. Measuring directive behavior requires the receiving Teranode to have the affected funding output, the same signed alert prefix and a verifiable result for each action.
+
+Teranode v0.16.1 embeds go-alert-system v0.3.3. Its normal alert intake uses the signed libp2p topic and sync protocol. The pinned Teranode gRPC service exposes health. Its schema provides neither a signed-message submission method nor a query for authorized confiscation transaction IDs. The standalone maintained receiver's HTTP endpoints expose health and alert readbacks. The isolated integration uses Teranode's supported genesis key, topic, protocol, private-address and datastore configuration on its stock image. [Teranode dependency](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/go.mod) · [Alert service settings](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/docs/references/settings/services/alert_settings.md) · [Teranode gRPC API](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/services/alert/alert_api/alert_api.proto)
+
+## Reproduce the ordinary signed-state comparison
+
+Build the release and maintained receiver harness from the [qualification runbook](chronicle-qualification.md). Use the Python environment with the pinned functional test dependencies.
+
+```sh
+python3 qualification/receiver/build.py
+.native/py/bin/python qualification/teranode_alerts.py --binary target/release/scary-node \
+  > .native/teranode-positive-alerts.json
+.native/py/bin/python qualification/verify_teranode_alerts.py .native/teranode-positive-alerts.json
+```
+
+The comparison uses a fresh private regtest network and five disposable lab signing keys. Two unmodified Teranodes bootstrap each other’s Alert Services inside that network. Teranode generates the common funding chain. SV Node imports the exact generated blocks. Scary Node enters near the tip and witnesses the funded output and successor. Three distinct signers sign each notice. One lab publisher sends the bytes to the stock Teranode Alert Service over its isolated GossipSub topic. A separate process passes precisely the same bytes to the maintained receiver and Scary Node. SV Node applies the corresponding height intervals through its authenticated administrative RPC. The run checks the same ordinary payment while frozen, after signed unfreeze and after block inclusion. It compares Teranode's closed SQLite store with the signed bytes and records the per-action processed flags.
+
+The initial comparison recorded three frozen-input rejections and the same released payment on all implementations. All four nodes selected block `59b577996a14421b26f9604492f7f128d8bd2070602f666d03920a089e447f3d`. Verify this receipt with `--outcomes-only`; it retains the signed actions and inclusion block. During one repeat the entrant reached the expected tip without the funded output and returned `input missing from witnessed spendable set`. That attempt did not establish a freeze outcome. The fixture now waits for the entrant to observe its pre-funding boundary and to validate the exact funding block before progressing. [Initial signed observations](evidence/chronicle-teranode-alerts-initial.json)
+
+## Scope of the earlier confiscation receipt
+
+The earlier comparison contains all ten signed messages, including the authorization for `af0120d2e50bc1d478db2e19009aab1e696882b6970aea6d09a526a715634c88`. It includes the Scary-originated confiscation block and final recipient block accepted by SV Node. Reconstructing the exact funding state also requires funding transaction `0fb96f4ada0ca71181f9c232934ed58059ce07c558b8c343107a5cfc5ad215e6` and the preceding chain. The original fixture generated those predecessors in an ephemeral SV Node volume. The published receipt includes their identifiers, without the funding body or full chain. [Signed DAR lifecycle](evidence/chronicle-receiver-dar.json)
+
+At this Teranode revision, the authorization handler immediately loads the referenced parent output and invokes reassignment in the UTXO store. There is no separate supported authorize-only receipt against the supplied txid. A stored signed message alone establishes receipt. A matched ownership-changing outcome would additionally require a funded frozen input, a per-item application result and an active-chain spend by the new owner. SV Node v1.2.3 remains the reference for that outcome. The independent stock-Teranode result for those exact historical bytes remains unmeasured. [Stock authorization implementation](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/services/alert/node.go#L434) · [Upstream scope of reassignment support](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/docs/topics/services/alert.md#24-utxo-reassignment)

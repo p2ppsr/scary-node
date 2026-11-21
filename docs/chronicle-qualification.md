@@ -15,6 +15,12 @@ cat .native/provenance.json
 
 The node reports native build provenance and linked runtime versions under `/status` → `mining.interpreter`. GoBDK v1.4.0 uses the pinned release archive as the independent binding oracle. Rust BDK and SV Node v1.2.3 supply the ordinary-script and DAR references respectively. Teranode v0.16.1 supplies the native gossip reference. [BDK](https://github.com/bitcoin-sv/bdk/tree/8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9) · [SV Node](https://github.com/bitcoin-sv/bitcoin-sv/tree/6504a3aff65ba97c0f6c80962b033e35ecbfed4b) · [Teranode](https://github.com/bsv-blockchain/teranode/tree/807f1bea39f52797c72fd157a543e8bb64622510)
 
+To identify an exact source build, run the following from a Git checkout with Docker and Python 3.12 or later. The builder archives the committed Docker inputs, builds the compiler and runtime stages, starts the executable on an isolated loopback network, and checks its reported identity against the binary and native archive on disk. The receipt includes the source tree, Cargo lock digest, Rust compiler, linked interpreter versions and executable digest. Docker image identifiers describe the local build and can vary with the builder and package mirror. [Linux ARM64 build receipt](evidence/chronicle-linux-release.json)
+
+```sh
+python3 qualification/release_build.py 781ddd73ac78bd1887138fad331eeace21488509 .native/release-build.json
+```
+
 ## Reproduce the reference comparisons
 
 Start Docker. The DAR driver gives a fresh SV Node private regtest funds, signs messages with three distinct lab keys, and starts Scary Node empty on its native SV TCP peer. The lab API fixture serves the signed records in the maintained receiver's read format. It includes a freeze predating entry. The worker mines the authorized confiscation, Scary Node restarts, then the test visits both sides of the 1,000-block maturity boundary. SV Node selects the recipient's solved block as its active tip. A longer branch restores the recovered outpoint, and re-inclusion consumes it again. The last assertions compare tip hashes and solution dispositions.
@@ -84,6 +90,15 @@ python3 qualification/verify_stream.py .native/mixed-sustained.json.gz
 
 To check native settlement between stock reference nodes, leave the mixed network running after a successful proof and run `python3 qualification/mixed_native.py .native/native-successors.json` before teardown. The fixture restarts the second Teranode on its same volume and connects its stock legacy service to SV Node. A container-local host route lets stock Teranode select a source address on the isolated bridge. The launcher drops its network administration capability before starting the daemon. Twelve alternating solves exercise both directions over native protocols. [Stock legacy service](https://github.com/bsv-blockchain/teranode/blob/807f1bea39f52797c72fd157a543e8bb64622510/docs/topics/services/legacy.md)
 
+With the same native link established, run the signed-block workload before tearing down the mixed network. The driver uses a single stock SV submission endpoint and gives the other three nodes only their normal peer connections. Its timer starts after signing and block construction and stops when all four stores select the final hash. It allows up to four blocks in flight and then checks every selected height, three full-node wire readbacks and the entrant’s signature counts. The shared workstation lock keeps race sessions outside the measurement.
+
+```sh
+.native/py/bin/python qualification/mixed_native_load.py .native/mixed-native-load.json
+python3 qualification/verify_mixed_native_load.py .native/mixed-native-load.json
+.native/py/bin/python qualification/mixed_native_load.py --rounds 32 --fanout 16384 .native/mixed-native-large.json
+python3 qualification/verify_mixed_native_load.py .native/mixed-native-large.json
+```
+
 Pass `--rollback-binary PATH` to the large-body driver to restore the new checkpoint with an older executable and verify its next active tip against SV Node. Pin the older build and retain its digest. The measured rollback uses a body below the MessagePack single-binary limit.
 
 ## Native receiver integration on regtest
@@ -94,6 +109,8 @@ Build the v0.3.5 synchronization harness from its pinned source. Its Go overlay 
 python3 qualification/receiver/build.py
 python3 qualification/receiver_dar.py --binary ./target/release/scary-node .native/receiver-dar.json
 ```
+
+Use the stock Teranode Alert Service fixture to compare signed notice, freeze, unfreeze and ordinary payment admission on two Teranodes, SV Node and Scary Node. The independent verification uses the pinned Python test environment. [Stock Teranode alert fixture and evidence](teranode-alert-interoperability.md)
 
 ## Operating the signed alert receiver
 

@@ -1,0 +1,80 @@
+// Publish lab-signed records to one regtest alert service over its normal topic.
+package main
+
+import (
+	"bufio"
+	"context"
+	"encoding/hex"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"time"
+
+	libp2p "github.com/libp2p/go-libp2p"
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	"github.com/libp2p/go-libp2p/core/peer"
+	ma "github.com/multiformats/go-multiaddr"
+)
+
+func main() {
+	if len(os.Args) != 3 {
+		log.Fatal("expected a loopback port and regtest peer ID")
+	}
+	port, err := strconv.ParseUint(os.Args[1], 10, 16)
+	if err != nil || port == 0 {
+		log.Fatal("invalid port")
+	}
+	addr, err := ma.NewMultiaddr(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d/p2p/%s", port, os.Args[2]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	peerInfo, err := peer.AddrInfoFromP2pAddr(addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	host, err := libp2p.New(libp2p.NoListenAddrs, libp2p.DisableRelay())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer host.Close()
+	mesh, err := pubsub.NewGossipSub(ctx, host)
+	if err != nil {
+		log.Fatal(err)
+	}
+	topic, err := mesh.Join("scary_node_qualification_regtest")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer topic.Close()
+	sub, err := topic.Subscribe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sub.Cancel()
+	dial, stop := context.WithTimeout(ctx, 30*time.Second)
+	err = host.Connect(dial, *peerInfo)
+	stop()
+	if err != nil {
+		log.Fatal(err)
+	}
+	input := bufio.NewScanner(os.Stdin)
+	for input.Scan() {
+		data, err := hex.DecodeString(input.Text())
+		if err != nil {
+			log.Fatal(err)
+		}
+		publish, stop := context.WithTimeout(ctx, 20*time.Second)
+		err = topic.Publish(publish, data, pubsub.WithReadiness(pubsub.MinTopicSize(1)))
+		stop()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("published")
+	}
+	if err = input.Err(); err != nil {
+		log.Fatal(err)
+	}
+}
