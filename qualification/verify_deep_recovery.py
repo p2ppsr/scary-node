@@ -134,7 +134,8 @@ def verify(case):
         assert row["observation_window_ready"]
     return {
         "case": case["case"],
-        "incumbent_suffix_work": work,
+        "observed_incumbent_suffix_work": work,
+        "eligible_incumbent_suffix_work": 0 if signed else work,
         "replacement_suffix_work": alternative_work,
         "recovered": alt[-1],
         "fee_satoshis": fee,
@@ -143,22 +144,35 @@ def verify(case):
     }
 
 
+CASES = {"signed", "greater_work", "offline_fork"}
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("receipt", type=Path)
+    p.add_argument("receipts", nargs="+", type=Path)
+    p.add_argument("--case", choices=sorted(CASES), help="verify exactly one case")
+    p.add_argument(
+        "--binary",
+        type=Path,
+        help="compare an optional local executable against the receipt",
+    )
     args = p.parse_args()
-    encoded = args.receipt.read_bytes()
-    if args.receipt.suffix == ".gz":
-        encoded = gzip.decompress(encoded)
-    result = json.loads(encoded)
     if not __debug__:
         raise RuntimeError("receipt verification requires enabled assertions")
-    assert (
-        len(bytes.fromhex(result["binary_sha256"])) == 32 and len(result["cases"]) == 3
-    )
-    assert {c["case"] for c in result["cases"]} == {
-        "signed",
-        "greater_work",
-        "offline_fork",
-    }
-    print(json.dumps([verify(c) for c in result["cases"]], indent=2))
+    cases = []
+    digests = set()
+    for path in args.receipts:
+        encoded = path.read_bytes()
+        if path.suffix == ".gz":
+            encoded = gzip.decompress(encoded)
+        receipt = json.loads(encoded)
+        digest = bytes.fromhex(receipt["binary_sha256"])
+        assert len(digest) == 32
+        digests.add(digest)
+        cases.extend(receipt["cases"])
+    expected = {args.case} if args.case else CASES
+    assert len(digests) == 1
+    if args.binary:
+        assert hashlib.sha256(args.binary.read_bytes()).digest() in digests
+    assert len(cases) == len(expected) and {c["case"] for c in cases} == expected
+    print(json.dumps([verify(c) for c in cases], indent=2))

@@ -1,0 +1,71 @@
+[
+  {
+    "order": "directive-first",
+    "parent": "7443b8f1620694dbb2473b837dc27fa58eb0d1f6fb67116b36079a6943ad6478",
+    "height": 108,
+    "candidate": "554a3441164d3972bf211237b4a1c7adbbb553b08aa06c56361ad6f019cf2e49",
+    "outcome": "ValueError",
+    "reference_tip": "7443b8f1620694dbb2473b837dc27fa58eb0d1f6fb67116b36079a6943ad6478",
+    "durable_sequence": 1,
+    "receipt": {
+      "active_height": 107,
+      "applied_revision": 7,
+      "kind": 2,
+      "prior_revision": 6,
+      "rpc_result": {
+        "notProcessed": []
+      },
+      "sequence": 1,
+      "signed_sha256": "77f9b76cb11ca884bb215929247436e7a8898cb98dd04cc64d23680e76c2c8f6"
+    },
+    "solutions": []
+  },
+  {
+    "order": "solution-first",
+    "parent": "3f5ea0f01764df30c32e89fa3c62edb991f8ef7829547ac008242d89f42abd92",
+    "height": 108,
+    "candidate": "62d5883a1e4b19fbab3fd5ef4ba155167e2efd694adb00e74db3d209bbe4ace4",
+    "outcome": "reference adopted before freeze",
+    "reference_tip": "62d5883a1e4b19fbab3fd5ef4ba155167e2efd694adb00e74db3d209bbe4ace4",
+    "durable_sequence": 1,
+    "receipt": {
+      "active_height": 107,
+      "applied_revision": 9,
+      "kind": 2,
+      "prior_revision": 7,
+      "rpc_result": {
+        "notProcessed": []
+      },
+      "sequence": 1,
+      "signed_sha256": "5ef9b5756504b0c5ede2896a7b63e59fbe3bb54bac4159803ea6235f421f1f41"
+    },
+    "solutions": [
+      {
+        "chain_state": "directive_retired",
+        "deliveries": {
+          "sv:127.0.0.1:61518": {
+            "sent_body": 1795294287154
+          }
+        },
+        "first_inclusion_at_ms": null,
+        "first_settlement_at_ms": null,
+        "hash": "62d5883a1e4b19fbab3fd5ef4ba155167e2efd694adb00e74db3d209bbe4ace4",
+        "height": 108,
+        "job": "5",
+        "parent": "3f5ea0f01764df30c32e89fa3c62edb991f8ef7829547ac008242d89f42abd92",
+        "peer_tip_reporters": [],
+        "publication_error": "NoPeersSubscribedToTopic",
+        "published_at_ms": null,
+        "queued_at_ms": 1795294287134,
+        "subtree": "1735d71fa9cbd5b31444ad8ace23c5b9a025bc2d29c29268c507fa7ed5fa3ccc",
+        "transitions": [
+          {
+            "at_ms": 1795294287861,
+            "height": 107,
+            "state": "directive_retired"
+          }
+        ]
+      }
+    ]
+  }
+]
