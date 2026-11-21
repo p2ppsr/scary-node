@@ -301,7 +301,17 @@ def sample_jobs(plan, offer_monotonic_ns, providers):
         return result if first == 0 else result[::-1]
 
 
-def opportunity(plan, samples, sources, destinations, *, parent, height, payment_txid):
+def opportunity(
+    plan,
+    samples,
+    sources,
+    destinations,
+    *,
+    parent,
+    height,
+    payment_txid,
+    receiver_probe=None,
+):
     """Measure one preplanned opportunity on two input and four receiver-native connections.
 
     jobs carry normal subscribed Stratum/full RPC submissions. sources are the
@@ -362,6 +372,10 @@ def opportunity(plan, samples, sources, destinations, *, parent, height, payment
         }
         for j, sample in samples
     ]
+    for job, lane in zip(jobs, lanes):
+        if job is not None:
+            lane["worker_header_prefix_hex"] = job.header(0)[:76].hex()
+            lane["worker_coinbase_hex"] = job.coinbase.hex()
     for tick in range(64):
         for i, j in enumerate(jobs):
             if j is None:
@@ -445,6 +459,7 @@ def opportunity(plan, samples, sources, destinations, *, parent, height, payment
     with (
         concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool,
         concurrent.futures.ThreadPoolExecutor(max_workers=4) as legs,
+        concurrent.futures.ThreadPoolExecutor(max_workers=1) as probe,
     ):
         in_flight = [
             (i, pool.submit(submit, i), pool.submit(relay, i, legs))
@@ -453,9 +468,15 @@ def opportunity(plan, samples, sources, destinations, *, parent, height, payment
         ]
         origin = time.monotonic_ns()
         ready.set()
+        if receiver_probe is not None:
+            due = origin + capture_window_ns + pong_timeout_ns - plan["probe_lead_ns"]
+            hashes = [lane["discovery"]["hash"] for lane in lanes if lane["discovery"]]
+            observation = probe.submit(receiver_probe, hashes, origin, due)
         for idx, sent, relayed in in_flight:
             lanes[idx]["native_submit"] = sent.result()
             lanes[idx].update(relayed.result())
+        if receiver_probe is not None:
+            row["predeadline_readbacks"] = observation.result()
     # Hold continuation to the same observation horizon on every scheduled
     # parent, including one where both issuers were unavailable.
     horizon = capture_window_ns + pong_timeout_ns
