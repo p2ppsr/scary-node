@@ -230,3 +230,25 @@ python3 qualification/shadow_bdk.py \
 ```
 
 The corpus reader rebuilds all extended transactions and input heights from the exact confirmed funding bodies of the live SV comparison. It runs both Go variants on those same bytes. To repeat the full live comparison, run `qualification/entrant_chronicle.py` as above, passing `--go-oracle .native/go-oracles/source-corpus` or `--go-oracle .native/go-oracles/distributed-corpus`. The regtest mode uses the original corpus configuration. The mainnet runner initializes GoBDK with `main`, keeps upstream mainnet policy defaults and accepts extended transactions only over local standard input. To check the original passive candidate once its successor and native funding proofs exist, replace the warm-up receipt with the private `first.json.gz` from the [shadow reader](mainnet-shadow.md). The script reports policy and consensus at their respective heights, resolves earlier same-template outputs in order and counts confiscations separately for signed authorization review.
+
+### Run both Go archives in the Linux ARM64 release image
+
+The Linux builder reuses the pinned native source stage from the release Dockerfile and the digest-pinned Go toolchain. It runs the additional compilation offline with two build jobs. The Go cache and CMake tree use two 2 GiB temporary memory filesystems. Only the four linked executables and their manifest are exported. The first build needs the release stage and the Go toolchain image available to BuildKit.
+
+```sh
+scripts/build-go-linux-oracles.sh .native/linux-arm64-go-oracles
+python3 qualification/linux_go_parity.py \
+  .native/linux-arm64-go-oracles/manifest.json .native/linux-go-parity.json.gz \
+  --capture .native/linux-arm64-go-oracles \
+  --release docs/evidence/chronicle-waiting-linux-build.json
+```
+
+The capture checks the local image ID and installed Scary Node executable against the selected release manifest, then runs the two oracles in a read-only container without a network interface for external traffic. It replays the funded corpus and signed mainnet control inside that container. The default release manifest requires the original local image ID. For a newly built release supply its matching manifest with `--release`. The optional `--image` can name a local alias for that exact image ID.
+
+The published Linux ARM64 capture has its own offline verifier. The archived corpus and confirmed funding proofs are already included in this checkout.
+
+```sh
+python3 qualification/linux_go_parity.py \
+  docs/evidence/chronicle-go-native-linux-arm64.json \
+  docs/evidence/chronicle-go-native-linux-arm64-parity.json.gz
+```

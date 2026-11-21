@@ -7,9 +7,9 @@ The Go module at BDK `8a4e1d3d` contains a precompiled macOS arm64 native archiv
 | Distributed with GoBDK v1.4.0 | `9d34cf2` | `ba574372509cf478dcca290f7ca1c205c84de24ed2e969fe6b8c3a159a1366d3` |
 | Built from the Rust BDK source pin | `8a4e1d3` | `9bbc1844ff6ca9a85ddf185c9e2326e25348e93c698e1adc8eb3509d68d3a9d1` |
 
-The two upstream revisions are siblings with parent `8796a0274e1c75458a3b427b3fa97dea896e523b`. Each Git tree contains 272 tracked blobs and gitlinks. The identities and modes match on 269 entries. The three different entries are the distributed Go native archives for macOS arm64, Linux arm64 and Linux x86-64. This comparison establishes that the tracked Rust, Go and C++ source was identical at the two revisions. The native differential tests below were run on macOS arm64. [Git-tree evidence](evidence/chronicle-go-native-trees.json) · [Distributed archive's reported upstream revision](https://github.com/bitcoin-sv/bdk/commit/9d34cf20a727185286a686a7800f964c34a55525) · [Pinned BDK release source](https://github.com/bitcoin-sv/bdk/commit/8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9)
+The two upstream revisions are siblings with parent `8796a0274e1c75458a3b427b3fa97dea896e523b`. Each Git tree contains 272 tracked blobs and gitlinks. The identities and modes match on 269 entries. The three different entries are the distributed Go native archives for macOS arm64, Linux arm64 and Linux x86-64. This comparison establishes that the tracked Rust, Go and C++ source was identical at the two revisions. [Git-tree evidence](evidence/chronicle-go-native-trees.json) · [Distributed archive's reported upstream revision](https://github.com/bitcoin-sv/bdk/commit/9d34cf20a727185286a686a7800f964c34a55525) · [Pinned BDK release source](https://github.com/bitcoin-sv/bdk/commit/8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9)
 
-## Same-byte Chronicle comparison
+## Same-byte Chronicle comparison on macOS ARM64
 
 Both Go variants replayed all 62 funded transactions from the original live four-way corpus on release `c2a36d5`. The verifier reconstructed the extended transaction bytes and creation heights from the funding bodies. It checked mempool policy at the observed parent and consensus at the actual containing height. Each native archive accepted **46 under policy** and **50 under consensus**. All **248** new decisions agreed with the live stock SV outcomes. All 56 rejected Go contexts reproduced the original Go script rejection reason. The four consensus-only cases remain visible under each archive. This is a deterministic comparison of those inputs and contexts. [Paired raw decisions](evidence/chronicle-go-native-parity.json.gz) · [Live funded corpus and block readbacks](evidence/chronicle-waiting-entrant-corpus.json.gz)
 
@@ -45,3 +45,24 @@ llvm-objdump --full-contents --section=.rodata.str1.1 .native/go-version.o
 ```
 
 For aarch64, use `libGoBDK_linux_aarch64.a` and string section `.rodata.str1.8`.
+
+## Dynamic comparison in the Linux ARM64 release image
+
+Both Go archives ran inside the frozen `c2a36d5` Linux ARM64 release image. The installed Scary Node executable had SHA-256 `4c9ef032f2ebf4c806331fbbbc53464c517da04cc497209bb9cdb5e4cc572faf`. The driver verified the image ID, executable, all four Linux Go drivers and each native runtime's reported revisions before reading any outcomes. The container used a read-only root filesystem and disabled external networking. Go 1.27.1 compiled the Go drivers. GCC 12.2.0 and CMake 3.25.1 built the exact-source native archive. [Linux ARM64 build manifest](evidence/chronicle-go-native-linux-arm64.json) · [Scary Node release image and executable](evidence/chronicle-waiting-linux-build.json)
+
+| Linux ARM64 native archive | Runtime BDK revision | Native archive SHA-256 |
+| --- | --- | --- |
+| Distributed with GoBDK v1.4.0 | `9d34cf2` | `3167d77e84633ea5547aed3e04adf40bebb79cd79fbca5a6237f997ef0fdc6fd` |
+| Built from the Rust BDK source pin | `8a4e1d3` | `c20d2e64c38a05724b3b7333d00744ba1223efe6b7dee38bfe620c896b25b42c` |
+
+For each archive, 46 of the 62 original funded payments passed policy and 50 passed consensus. All 248 decisions agreed with the stock SV outcomes recorded in the original live run. All 56 Go rejections included the original script rejection reason. The Linux trial reused those same recorded transactions, parents and input heights. The previously recorded Stratum blocks were produced by the original macOS entrant. Both Linux archives also accepted the confirmed mainnet spend at height 976522 under policy and consensus. Each rejected it in both contexts when the independently evidenced input amount was increased by one satoshi. Linux x86-64 coverage here is limited to the distributed archive metadata inspection above. [Linux ARM64 decisions and running identities](evidence/chronicle-go-native-linux-arm64-parity.json.gz) · [Original live funded corpus](evidence/chronicle-waiting-entrant-corpus.json.gz) · [Native mainnet funding and spending proofs](evidence/chronicle-shadow-native-fee-warmup.json.gz)
+
+Verify the published receipt offline using Python 3.11 or later.
+
+```sh
+python3 qualification/linux_go_parity.py \
+  docs/evidence/chronicle-go-native-linux-arm64.json \
+  docs/evidence/chronicle-go-native-linux-arm64-parity.json.gz
+```
+
+The qualification runbook also describes how to build all four Linux executables and repeat the capture on an independently built image. [Linux ARM64 reproduction](chronicle-qualification.md#run-both-go-archives-in-the-linux-arm64-release-image)

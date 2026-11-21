@@ -75,7 +75,7 @@ def ask(process, raw, coins, parent):
     return result
 
 
-def replay(record, executable, native="source"):
+def replay(record, executable, native="source", command=None):
     confirmed = record.get("kind") == "confirmed-warmup-spend"
     parent, raws, coins = warmup(record) if confirmed else candidate(record)
     policy_count = consensus_count = skipped = 0
@@ -83,7 +83,10 @@ def replay(record, executable, native="source"):
     with contextlib.ExitStack() as stack:
         proc = stack.enter_context(
             subprocess.Popen(
-                [executable], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True
+                command or [executable],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                text=True,
             )
         )
         stack.callback(lambda: proc.kill() if proc.poll() is None else None)

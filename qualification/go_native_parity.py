@@ -24,7 +24,7 @@ def reports(record):
     return record["opcodes"]["rows"] + record["signatures"]
 
 
-def collect(corpus, manifest, folder):
+def collect(corpus, manifest, folder, command=None):
     coins = outputs(corpus)
     rows = []
     for row in reports(corpus):
@@ -35,7 +35,7 @@ def collect(corpus, manifest, folder):
         for role in ROLES:
             binary = folder / f"{role}-corpus"
             args = [
-                str(binary),
+                *(command(binary) if command else [str(binary)]),
                 ef.hex(),
                 ",".join(map(str, heights)),
                 str(parent),

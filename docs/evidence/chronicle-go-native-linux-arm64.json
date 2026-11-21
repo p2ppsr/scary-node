@@ -1,0 +1,38 @@
+{
+  "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+  "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+  "source_dependency_bundle_sha256": "ba52bbaea6b8c31f44679dad53ca57d3021654779d9e4d9d71da25c3dece8578",
+  "platform": "linux_aarch64",
+  "go": "go1.27.1",
+  "go_launcher": "go version go1.27.1 linux/arm64",
+  "source_native_compiler": "c++ (Debian 12.2.0-14+deb12u1) 12.2.0",
+  "source_native_cmake": "cmake version 3.25.1",
+  "source_native_build_type": "Release",
+  "source_native_cxx_flags": "-O3 -g0 -DNDEBUG",
+  "variants": {
+    "distributed": {
+      "linked": {
+        "bdk_version": "1.4.0",
+        "network": "main",
+        "source": "9d34cf2",
+        "sv_source": "6504a3aff",
+        "sv_version": "1.2.3"
+      },
+      "native_archive_sha256": "3167d77e84633ea5547aed3e04adf40bebb79cd79fbca5a6237f997ef0fdc6fd",
+      "corpus_oracle_sha256": "bb2c6f26e63a7e32482f09e152fa6c7bfef59dac11051724347e43fdee5bc49e",
+      "mainnet_oracle_sha256": "2bc77525d163a54904998a696c4ae529078da60666e5bad4daadbe16598ed125"
+    },
+    "source": {
+      "linked": {
+        "bdk_version": "1.4.0",
+        "network": "main",
+        "source": "8a4e1d3",
+        "sv_source": "6504a3a",
+        "sv_version": "1.2.3"
+      },
+      "native_archive_sha256": "c20d2e64c38a05724b3b7333d00744ba1223efe6b7dee38bfe620c896b25b42c",
+      "corpus_oracle_sha256": "016f7b4bd74179860f9020e23607e84c9086073e78128abd244c3c422e9a6d7f",
+      "mainnet_oracle_sha256": "ef232b21a3270e5ffc6f752e77011f1cbd1489600aac731be4f5f978a6cbc18e"
+    }
+  }
+}
