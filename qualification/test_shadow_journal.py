@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from shadow import complete_lines
 from shadow_export import export
-from shadow_failover import read_tips
+from shadow_failover import current_tips, read_tips
 from shadow_first_candidate import journal_rows
 from shadow_reader_supervisor import supervise
 
@@ -59,6 +59,19 @@ class JournalTailTests(unittest.TestCase):
                 journal.write_bytes(b"")
                 with self.assertRaises((json.JSONDecodeError, UnicodeDecodeError)):
                     export(journal, actions)
+
+    def test_failover_live_cursor_stays_at_the_start_of_the_incomplete_record(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "live.jsonl"
+            first = b'{"event":"tip","hash":"a","receipt_trigger_hash":"a"}\n'
+            next_row = b'{"event":"tip","hash":"b","receipt_trigger_hash":"b"}\n'
+            path.write_bytes(first + next_row[:-1])
+            with path.open("rb") as source:
+                self.assertEqual([row["hash"] for row in current_tips(source)], ["a"])
+                self.assertEqual(source.tell(), len(first))
+                with path.open("ab") as writer:
+                    writer.write(b"\n")
+                self.assertEqual(source.readline(), next_row)
 
     def test_reader_nonzero_exit_recovers_but_an_invalid_complete_journal_holds(self):
         # An isolated child fails its first run before it can produce a result.

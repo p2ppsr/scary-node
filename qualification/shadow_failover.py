@@ -18,13 +18,21 @@ def direct(row):
     )
 
 
+def current_tips(source):
+    position = source.tell()
+    for line in complete_lines(source):
+        position += len(line)
+        row = json.loads(line)
+        if direct(row):
+            yield row
+    # Continue from the beginning of a partial row when switching to live reads.
+    source.seek(position)
+
+
 def read_tips(path):
     if path.exists():
         with path.open("rb") as file:
-            for line in complete_lines(file):
-                row = json.loads(line)
-                if direct(row):
-                    yield row
+            yield from current_tips(file)
 
 
 def run(binary, journal, output, options):
@@ -47,13 +55,6 @@ def run(binary, journal, output, options):
         str(journal.resolve()),
         *options,
     ]
-    before = None
-    for row in read_tips(journal):
-        before = row
-    if before and not before.get("delivery_source", "").startswith(
-        ("http://", "https://")
-    ):
-        before = None
     journal.touch(exist_ok=True)
 
     def append(event, **fields):
@@ -97,7 +98,13 @@ def run(binary, journal, output, options):
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, terminate)
     with journal.open("rb") as source:
-        source.seek(0, 2)
+        before = None
+        for row in current_tips(source):
+            before = row
+        if before and not before.get("delivery_source", "").startswith(
+            ("http://", "https://")
+        ):
+            before = None
         if before is None:
             with observer(False) as process:
                 while before is None:
