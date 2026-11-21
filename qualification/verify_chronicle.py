@@ -16,6 +16,7 @@ from relay_comparison import paired_report
 from verify_native_workers import verify as verify_workers, verify_retained
 from shadow import audit
 from verify_stream import verify as verify_stream
+from verify_retained_delivery import verify as verify_retained_delivery
 
 
 def verify_block_context(record):
@@ -70,7 +71,86 @@ def verify_block_context(record):
         history.append(body[:80])
 
 
+def verify_acceptance(rows, dar, native, race):
+    assert len(rows) == 62
+    for row in rows:
+        for mode in ("policy", "consensus"):
+            assert (
+                len({row["observations"][name][mode] for name in ("rust", "go", "sv")})
+                == 1
+            )
+        if "expected_consensus" in row:
+            assert row["observations"]["sv"]["consensus"] == row["expected_consensus"]
+    for block, raw, txn_id in [
+        ("confiscation_block", "confiscation_block_hex", "confiscation_txid"),
+        ("confirmed_hash", "recipient_block_hex", "recipient_spend"),
+    ]:
+        body = bytes.fromhex(dar[raw])
+        assert dsha(body[:80])[::-1].hex() == dar[block]
+        assert int.from_bytes(dsha(body[:80]), "little") <= 0x7FFFFF << 232
+        _, txs, _ = decode_block(body, dar[block])
+        assert len(txs) == 2 and txid(txs[1]) == dar[txn_id]
+        assert dsha(dsha(txs[0]) + dsha(txs[1])) == body[36:68]
+    assert dar["reorg_solutions"][-1]["chain_state"] == "stale_at_depth"
+    assert all(
+        item["chain_state"] == "settled" for item in dar["settlement_before_reorg"]
+    )
+    assert dar["scary_active_tip"] == dar["remined_spend_hash"]
+    receiver = native["receiver"]
+    assert (
+        receiver["active_peers"] > 0
+        and receiver["unprocessed_alerts"] == 0
+        and receiver["sequence"] == receiver["last_peer_sync"]["sequence"]
+    )
+    assert receiver["sequence"] == len(native["signed_records"]) == 10
+    assert [r["sequence_number"] for r in native["signed_records"]] == list(
+        range(1, 11)
+    )
+    lifecycle = native["directive_lifecycle"]
+    assert [r["kind"] for r in lifecycle] == [1, 2, 3, 5, 6, 7, 8, 1]
+    for r in lifecycle:
+        state = r["directive_state"]
+        assert (
+            state["ready"]
+            and state["last_applied"] == state["last_verified"] == r["sequence"]
+        )
+    assert [
+        r["reference_tcp_connections"] for r in lifecycle if r["kind"] in (5, 6)
+    ] == [0, 1]
+    released = native["ordinary_freeze_unfreeze"]
+    assert (
+        "frozen" in released["entrant_rejection"]
+        and "frozen" in released["sv_rejection"]
+    )
+    assert len(bytes.fromhex(released["inclusion"])) == 32
+    for raw, block in (
+        ("confiscation_block_hex", "confiscation_block"),
+        ("recipient_block_hex", "confirmed_hash"),
+    ):
+        assert txid(bytes.fromhex(native[raw])[:80]) == native[block]
+    assert native["scary_active_tip"] == native["remined_spend_hash"]
+    assert native["reorg_solutions"][-1]["chain_state"] == "stale_at_depth"
+    first, second = race
+    assert (
+        first["order"] == "directive-first"
+        and first["reference_tip"] == first["parent"]
+        and not first["solutions"]
+    )
+    assert (
+        second["order"] == "solution-first"
+        and second["reference_tip"] == second["candidate"]
+    )
+    for r in (first, second):
+        assert (
+            r["receipt"]["sequence"] == r["durable_sequence"] == 1
+            and r["receipt"]["kind"] == 2
+        )
+
+
 def verify(directory):
+    verify_retained_delivery(
+        json.loads((directory / "chronicle-retained-delivery.json").read_text())
+    )
     native = json.loads((directory / "chronicle-native-successors.json").read_text())
     assert len(native["rows"]) == 12
     parent = native["starting_parent"]
@@ -133,82 +213,22 @@ def verify(directory):
     rows = json.loads((directory / "chronicle-opcodes.json").read_text())["rows"]
     with gzip.open(directory / "chronicle-signatures.json.gz", "rt") as file:
         rows += json.load(file)["rows"]
-    for row in rows:
-        for mode in ("policy", "consensus"):
-            assert (
-                len({row["observations"][name][mode] for name in ("rust", "go", "sv")})
-                == 1
-            )
-        if "expected_consensus" in row:
-            assert row["observations"]["sv"]["consensus"] == row["expected_consensus"]
-    dar = json.loads((directory / "scary-dar-lifecycle.json").read_text())
-    for block, raw, txn_id in [
-        ("confiscation_block", "confiscation_block_hex", "confiscation_txid"),
-        ("confirmed_hash", "recipient_block_hex", "recipient_spend"),
-    ]:
-        body = bytes.fromhex(dar[raw])
-        assert dsha(body[:80])[::-1].hex() == dar[block]
-        assert int.from_bytes(dsha(body[:80]), "little") <= 0x7FFFFF << 232
-        _, txs, _ = decode_block(body, dar[block])
-        assert len(txs) == 2 and txid(txs[1]) == dar[txn_id]
-        assert dsha(dsha(txs[0]) + dsha(txs[1])) == body[36:68]
-    assert dar["reorg_solutions"][-1]["chain_state"] == "stale_at_depth"
-    assert all(
-        item["chain_state"] == "settled" for item in dar["settlement_before_reorg"]
+    verify_acceptance(
+        rows,
+        json.loads((directory / "scary-dar-lifecycle.json").read_text()),
+        json.loads((directory / "chronicle-receiver-dar.json").read_text()),
+        json.loads((directory / "chronicle-directive-race.json").read_text()),
     )
-    assert dar["scary_active_tip"] == dar["remined_spend_hash"]
-    native = json.loads((directory / "chronicle-receiver-dar.json").read_text())
-    receiver = native["receiver"]
-    assert (
-        receiver["active_peers"] > 0
-        and receiver["unprocessed_alerts"] == 0
-        and receiver["sequence"] == receiver["last_peer_sync"]["sequence"]
+    with gzip.open(directory / "chronicle-release-repeat.json.gz", "rt") as file:
+        repeat = json.load(file)
+    for key in ("node_release_sha256", "rust_oracle_sha256", "go_oracle_sha256"):
+        assert len(bytes.fromhex(repeat[key])) == 32
+    verify_acceptance(
+        repeat["chronicle"]["rows"] + repeat["signatures"]["rows"],
+        repeat["signed-receiver"],
+        repeat["signed-receiver"],
+        repeat["directive-race"],
     )
-    assert receiver["sequence"] == len(native["signed_records"]) == 10
-    assert [r["sequence_number"] for r in native["signed_records"]] == list(
-        range(1, 11)
-    )
-    lifecycle = native["directive_lifecycle"]
-    assert [r["kind"] for r in lifecycle] == [1, 2, 3, 5, 6, 7, 8, 1]
-    for r in lifecycle:
-        state = r["directive_state"]
-        assert (
-            state["ready"]
-            and state["last_applied"] == state["last_verified"] == r["sequence"]
-        )
-    assert [
-        r["reference_tcp_connections"] for r in lifecycle if r["kind"] in (5, 6)
-    ] == [0, 1]
-    released = native["ordinary_freeze_unfreeze"]
-    assert (
-        "frozen" in released["entrant_rejection"]
-        and "frozen" in released["sv_rejection"]
-    )
-    assert len(bytes.fromhex(released["inclusion"])) == 32
-    for raw, block in (
-        ("confiscation_block_hex", "confiscation_block"),
-        ("recipient_block_hex", "confirmed_hash"),
-    ):
-        assert txid(bytes.fromhex(native[raw])[:80]) == native[block]
-    assert native["scary_active_tip"] == native["remined_spend_hash"]
-    assert native["reorg_solutions"][-1]["chain_state"] == "stale_at_depth"
-    first, second = json.loads(
-        (directory / "chronicle-directive-race.json").read_text()
-    )
-    assert (
-        first["order"] == "directive-first"
-        and first["reference_tip"] == first["parent"]
-        and not first["solutions"]
-    )
-    assert (
-        second["order"] == "solution-first"
-        and second["reference_tip"] == second["candidate"]
-    )
-    for r in (first, second):
-        assert (
-            r["receipt"]["sequence"] == r["durable_sequence"] == 1
-            and r["receipt"]["kind"] == 2
-        )
     signed = json.loads(
         (directory / "chronicle-signed-body-throughput.json").read_text()
     )[1:]
@@ -426,7 +446,10 @@ def verify(directory):
     assert paired_report(directory / "chronicle-relay-comparison") == json.loads(
         (directory / "chronicle-relay-comparison.json").read_text()
     )
-    for name in ("chronicle-workers-32.json.gz", "chronicle-workers-32-revised.json.gz"):
+    for name in (
+        "chronicle-workers-32.json.gz",
+        "chronicle-workers-32-revised.json.gz",
+    ):
         with gzip.open(directory / name, "rt") as stream:
             summary = verify_workers(json.load(stream))
         assert summary["workers_per_parent"] == 32 and summary["parents"] == 12

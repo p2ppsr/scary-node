@@ -19,7 +19,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from sv_reference import Reference, IMAGE
+from sv_reference import Reference, IMAGE, RpcError
 from sv_dar import confiscate, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -175,10 +175,13 @@ class LabFeed:
 
 
 @contextlib.contextmanager
-def entrant(binary, node, feed, dir, port, stratum, *, extra_args=(), require_directives=True):
+def entrant(
+    binary, node, feed, dir, port, stratum, *, extra_args=(), require_directives=True,
+    asset_port=None,
+):
     peer = node.docker("port", node.container, "18444/tcp")
     log = (dir / "node.log").open("ab")
-    assets = get_port()
+    assets = get_port() if asset_port is None else asset_port
     p = subprocess.Popen(
         [
             str(binary),
@@ -230,7 +233,7 @@ def entrant(binary, node, feed, dir, port, stratum, *, extra_args=(), require_di
         log.close()
 
 
-def run(node, feed, dir, binary):
+def run(node, feed, dir, binary, *, retain_history=False):
     rpc = node.rpc
     rpc("generate", 105)
     source_address = rpc("getnewaddress")
@@ -335,6 +338,19 @@ def run(node, feed, dir, binary):
             and "immature confiscation" in immature["reason"],
             "premature spend passed",
         )
+        history = {}
+        if retain_history:
+            try:
+                rpc("sendrawtransaction", signed["hex"])
+            except RpcError as exc:
+                require("premature-spend-of-confiscation" in str(exc), str(exc))
+                history["sv_maturity_minus_one"] = {
+                    "candidate_height": start + 999,
+                    "parent": rpc("getbestblockhash"),
+                    "response": str(exc),
+                }
+            else:
+                raise RuntimeError("SV Node admitted the immature recipient spend")
         h = rpc("generate", 1)[0]
         tip(api, start + 999, h)
         mature = response(api + "/transactions", bytes.fromhex(signed["hex"]))
@@ -343,7 +359,12 @@ def run(node, feed, dir, binary):
         spend_block = mine_with_worker(
             api, port, stratum, node, bytes.fromhex(signed["hex"])
         )
-        final = rpc("generate", 2)[-1]
+        successors = rpc("generate", 2)
+        final = successors[-1]
+        if retain_history:
+            history["detached_recipient_branch"] = [
+                rpc("getblock", block_hash, 0) for block_hash in [spend_block, *successors]
+            ]
         tip(api, start + 1002, final)
         require(
             spend_id in rpc("getblock", spend_block)["tx"],
@@ -382,6 +403,7 @@ def run(node, feed, dir, binary):
             "entrant missed re-inclusion",
         )
         return {
+            **history,
             "reference": IMAGE,
             "confiscation_block_hex": rpc("getblock", ctx_block, 0),
             "recipient_block_hex": rpc("getblock", spend_block, 0),
