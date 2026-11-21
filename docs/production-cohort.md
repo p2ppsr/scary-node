@@ -154,3 +154,7 @@ A separate test kept one worker connected while 16 further signed payments produ
   --binary target/release/scary-node --refreshes 16
 python3 qualification/verify_native_workers.py .native/retained.json.gz
 ```
+
+![Paired stale-rate differences in the two sizing pilots and median submission-to-active times in the separate four-seed comparison](evidence/chronicle-native-pilots.png)
+
+The pilots used independent seed ranges. The paired timing comparison used the same four seeds with both executables. On that comparison the full-state miner’s median solo submission-to-active interval moved from 130 to 121 ms, while the witnessed miner’s moved from 533 to 46 ms. The full/full pilot intervals include zero. The matched-ingress study measures stale discoveries when the arrival of the competing block bytes is independently bounded. [Timer sizing receipt](evidence/chronicle-native-sizing.json) · [Immediate-notification sizing receipt](evidence/chronicle-immediate-sizing.json) · [Paired timing measurements](evidence/chronicle-relay-comparison.json) · [Figure reproduction](../qualification/plot_native_pilots.py)
