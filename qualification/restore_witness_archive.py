@@ -182,6 +182,10 @@ def boot(image, settings, data, leases, observation_path):
         "scary-node",
         "--network",
         "regtest",
+        # Regtest requires an explicit target. There is no listener on this private
+        # loopback address; the restored evidence must stand before any peer connects.
+        "--sv-peer",
+        "127.0.0.1:18444",
         "--listen",
         "/ip4/127.0.0.1/tcp/9905",
         "--api-bind",
@@ -357,6 +361,9 @@ def verify_boot(proof, original):
         "witnessed_outputs": boundary["witnessed_outputs"],
         "retained_window_rows": len(window),
         "matched_measured_blocks": checked,
+        "complete_original_window_rows_matched": len(window)
+        if "validation_window" in wanted
+        else None,
         "connected_data_peers": 0,
     }
 

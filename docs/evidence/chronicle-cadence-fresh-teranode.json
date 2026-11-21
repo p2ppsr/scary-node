@@ -1,0 +1,70 @@
+{
+  "action": "cadence",
+  "network": "regtest",
+  "transport": "fresh SV Node to fresh Teranode legacy peer; native Asset full readback",
+  "services": {
+    "svref": {
+      "image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+      "image_id": "sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+      "temporary_data": [
+        "/data"
+      ]
+    },
+    "tn2": {
+      "image": "ghcr.io/bsv-blockchain/teranode:v0.16.1@sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+      "image_id": "sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+      "temporary_data": [
+        "/app/data"
+      ]
+    },
+    "as2": {
+      "image": "ghcr.io/bsv-blockchain/aerospike-server:8.1.2.0-1@sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc",
+      "image_id": "sha256:83ac381fdad8b1ec73392c3811958b828ab0801fb032a9ec58e63e07e9fb1cbc",
+      "temporary_data": [
+        "/opt/aerospike/data",
+        "/opt/aerospike/smd"
+      ]
+    }
+  },
+  "starting_hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+  "starting_height": 0,
+  "common_history_wire_commitment": "3d04e4fa099e49dbe556b9d7d83d06f44264507e54f62a0d9653a3a50833a0b3",
+  "common_history_blocks": 483,
+  "funding_hash": "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9",
+  "preflight_guest_available_bytes": 61273096192,
+  "genesis_resume_redials": [
+    12
+  ],
+  "large_native_sv_events": [
+    "ready_to_announce",
+    "stock_requested",
+    "body_written",
+    "stock_pong"
+  ],
+  "measured_observation_sha256": "8d51207c676697728de9c421892bfeca81190052963006e5cf8b18093948746e",
+  "selected_readbacks": [
+    {
+      "height": 485,
+      "hash": "5edb616633f9539adb900bfc494358438bd921294e1cac93e64884bd012b1b8c",
+      "wire_sha256": "0862f9980261b5f5c55020c31a0fd620d28acd186c90855cd9b98fc7cfc6c737",
+      "wire_bytes": 359090376
+    },
+    {
+      "height": 486,
+      "hash": "642e48a4f1f5f3c279033c4da3092c79a70e750bff90339b411b50de0a5acb49",
+      "wire_sha256": "8b646a54a385cee62d782fcd857ecc19f84b41ad41e321116f67c5ea41a9485a",
+      "wire_bytes": 181
+    },
+    {
+      "height": 487,
+      "hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+      "wire_sha256": "a2b9ece97b72e8db5323251cc69da52b0b2c26aef45cbb92059fe824145455d7",
+      "wire_bytes": 181
+    }
+  ],
+  "separately_checked_detached": {},
+  "height": 487,
+  "tip_hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+  "sv_chainwork": "00000000000000000000000000000000000000000000000000000000000003d0",
+  "elapsed_s_including_setup": 180.2791619170457
+}

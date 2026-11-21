@@ -1,0 +1,124 @@
+{
+  "network": "regtest",
+  "project": "scary-node-live-cadence",
+  "timing": "untimed post-settlement inspection of the original eight paused services",
+  "resumed_at": "2026-11-21T23:04:51.969677+00:00",
+  "repaused_at": "2026-11-21T23:04:57.492958+00:00",
+  "all_eight_returned_to_pause": true,
+  "observations": [
+    {
+      "utc": "2026-11-21T23:04:53.959334+00:00",
+      "stock_sv": {
+        "selected_hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+        "selected_tips": [
+          {
+            "height": 487,
+            "hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+            "branchlen": 0,
+            "status": "active"
+          }
+        ],
+        "mempool_transactions": 0,
+        "validation_transactions": 0
+      },
+      "scary": {
+        "hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+        "pending_transactions": 0,
+        "witnessed_outputs": 69671
+      },
+      "teranodes": {
+        "tn1": {
+          "selected_hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+          "candidate": {
+            "prevhash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+            "height": 488,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        },
+        "tn2": {
+          "selected_hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+          "candidate": {
+            "prevhash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+            "height": 488,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-11-21T23:04:56.924233+00:00",
+      "stock_sv": {
+        "selected_hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+        "selected_tips": [
+          {
+            "height": 487,
+            "hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+            "branchlen": 0,
+            "status": "active"
+          }
+        ],
+        "mempool_transactions": 0,
+        "validation_transactions": 0
+      },
+      "scary": {
+        "hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+        "pending_transactions": 0,
+        "witnessed_outputs": 69671
+      },
+      "teranodes": {
+        "tn1": {
+          "selected_hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+          "candidate": {
+            "prevhash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+            "height": 488,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        },
+        "tn2": {
+          "selected_hash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+          "candidate": {
+            "prevhash": "21cf7e3c2d09d22ef983d1b3ecb484a76a804a08f4f2400fb93168e2876d841e",
+            "height": 488,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        }
+      }
+    }
+  ]
+}
