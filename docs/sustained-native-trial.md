@@ -97,6 +97,8 @@ Every primary opportunity is counted. During drain there were 12 more full SV so
 
 The sampler obtained 2,065 status readings from each of the four nodes. Scary had an unready observation window in 14 readings. It lacked an issuable job in 1,264 readings, including 1,139 with no eligible pending payment, 111 awaiting independent observation after its own solution, and the 14 unready-window readings. All initial funding rails were created on h484. Scary's candidate rule requires a successor for a newly witnessed confirmed output, so immediately spending those rails could not supply a first job while h484 remained the tip. The receipt also records admissions from both the stock SV and Teranode subtree routes. [Candidate admission rule](https://github.com/p2ppsr/scary-node/blob/af9b605ad8da96d041a540111d46a7c0105209f7/src/mining.rs#L790-L798)
 
+The signed-input replay traced every input in all 5,529,600 source transactions. Among the 1,143,159 confirmed payments, 279,327 used an output created in the same block, 519,151 used one from the immediately preceding block, and 344,681 used an output at least two heights older. All 64,475 payments in selected Scary blocks fell in that last group. The longest parent-to-spend inclusion distance was 33 heights. These counts describe the selected payment graph; the peer counters record deliveries separately. [Verified parent ages](evidence/chronicle-sustained-direct-parent-ages.json)
+
 ### Where the backlog formed
 
 ![Payment offers, confirmed payments, the stock validation queue and mempool through 30 minutes of offers and five minutes of drain](evidence/chronicle-sustained-direct.png)
@@ -122,5 +124,16 @@ python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustain
 ```
 
 The full offline replay rehashed all 5,529,600 signed source envelopes, recomputed every selected transaction Merkle commitment across 134 bodies, and recovered the same 1,143,159 distinct signed members. The source dataset and selected body archives can be unpacked into the `--corpus` and `--blocks` directories above. [Outcome asset digests](evidence/chronicle-sustained-direct-assets.json) · [Public workload release](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
+
+To replay the public release in a new directory, use Python 3.12 or later and the GitHub CLI. The first verification reconstructs the 483-block funding history and checks every offered transaction envelope. The second reads the selected raw blocks from the downloaded archives, checks each against its independent stock readbacks and recounts confirmed payments. It extracts temporary bodies and removes them when verification finishes.
+
+```sh
+gh release download native-workload-regtest-v1 --repo p2ppsr/scary-node --dir offer-assets \
+  --pattern 'paired-corpus.tar.gz' --pattern 'sustained-signed.tar.gz' --pattern 'native-sustained-direct-*'
+python3 qualification/sustained_dataset.py unpack offer-assets workload \
+  --receipt docs/evidence/chronicle-sustained-source-assets.json
+python3 qualification/replay_sustained_assets.py offer-assets workload/sustained-signed \
+  docs/evidence/chronicle-sustained-direct.json.gz docs/evidence/chronicle-sustained-direct-assets.json
+```
 
 On the original frozen Docker project, `uv run --with msgpack==1.1.2 python qualification/sustained_frozen.py .native/sustained-run/receipt.json.gz .native/sustained-run/quiesced.json` reads copies of the project-specific volumes. The dedicated [production-settings replication](sustained-native-replication.md) uses the same signed population, a distinct stock configuration and inventory/request-based wallet delivery. Both studies use one physical workstation and accelerated regtest work.

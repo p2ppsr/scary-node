@@ -1,0 +1,17 @@
+{
+  "network": "regtest",
+  "source": {
+    "linked_regtest_history_blocks": 483,
+    "history_wire_bytes": 225186597,
+    "history_digest": "3d04e4fa099e49dbe556b9d7d83d06f44264507e54f62a0d9653a3a50833a0b3",
+    "ordinary_funding_outputs": 65536,
+    "funding_block": "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9",
+    "signed_native_envelopes": 5529600,
+    "ordered_internal_txids_sha256": "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2"
+  },
+  "outcome": {
+    "signed_source_envelopes": 5529600,
+    "merkle_verified_bodies": 134,
+    "confirmed_distinct_memberships": 1143159
+  }
+}

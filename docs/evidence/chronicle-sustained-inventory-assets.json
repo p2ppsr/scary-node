@@ -1,0 +1,103 @@
+{
+  "registration": "3ec961ef81881b83d4cc1ecc646250a2d8d200f9",
+  "receipt_sha256": "23084d43bb5b7f6aa2acf295eb47d285e824ca1de4d6194d60489da973bd2d4d",
+  "source_ids_sha256": "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2",
+  "local_wire_verification": {
+    "confirmed_and_wallet_served": 5529600,
+    "confirmed_without_recorded_wallet_serve": 0,
+    "signed_source_envelopes": 5529600,
+    "merkle_verified_bodies": 77,
+    "confirmed_distinct_memberships": 5529600
+  },
+  "selected_blocks": 77,
+  "distinct_payments": 5529600,
+  "total_selected_wire_bytes": 1103139534,
+  "assets": [
+    {
+      "name": "native-sustained-inventory-bodies-001.tar.gz",
+      "bytes": 69531237,
+      "sha256": "e4a2b4e564ce98581828cef1e8bc0f184158636838d7b7314ec4f0ec7048d537",
+      "first_height": 485,
+      "last_height": 493,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-002.tar.gz",
+      "bytes": 70880453,
+      "sha256": "eb49a909b1ea74ccbd8220b87dc87d021b2e7823b10c3c107f0055e238d71e99",
+      "first_height": 494,
+      "last_height": 502,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-003.tar.gz",
+      "bytes": 70877037,
+      "sha256": "5adfc7a40944c6c21f27ec3c2c708b8e2dd0dca79747fa1cba16e5b858984309",
+      "first_height": 503,
+      "last_height": 511,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-004.tar.gz",
+      "bytes": 70882153,
+      "sha256": "198a546f125619aa337b78cefd2b4d6642c94107cc47632c1d6608459f9c5ea6",
+      "first_height": 512,
+      "last_height": 520,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-005.tar.gz",
+      "bytes": 70883024,
+      "sha256": "4fea5c66654b4447f02d45e8b489fe829ffdde6d8342ddaf19a2f3ab5cfbe4b0",
+      "first_height": 521,
+      "last_height": 529,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-006.tar.gz",
+      "bytes": 70886981,
+      "sha256": "b225e4c583858b631f33566f1fc37f41c67d4d4addeea7f115f8c1f1de81471e",
+      "first_height": 530,
+      "last_height": 538,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-007.tar.gz",
+      "bytes": 70884101,
+      "sha256": "13e5a58625de7d70584ed4234976c385222d30eacc46a77022c647ea37cc72f2",
+      "first_height": 539,
+      "last_height": 547,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-008.tar.gz",
+      "bytes": 70887790,
+      "sha256": "5c557980b4c3e4644677ac0c573b4926b006c11d82e9e0e3967d5a0950d3672a",
+      "first_height": 548,
+      "last_height": 556,
+      "blocks": 9
+    },
+    {
+      "name": "native-sustained-inventory-bodies-009.tar.gz",
+      "bytes": 23519127,
+      "sha256": "61202b782f291fe28734f57f1965c4d7b6479dae4d226523ee86463a566f82c3",
+      "first_height": 557,
+      "last_height": 561,
+      "blocks": 5
+    },
+    {
+      "name": "native-sustained-inventory-requested.bits.gz",
+      "bytes": 5406,
+      "sha256": "30eb25dda61a33e8548f6a0037fec61c8079d42afe7426fc7ae6aba5ed1155a8",
+      "original_name": "requested.bits",
+      "uncompressed_sha256": "d8fe867972d99f97a1a1501bc6092efc8971aed3e953fed4a17a6120eb5f2518"
+    },
+    {
+      "name": "native-sustained-inventory-served.bits.gz",
+      "bytes": 5406,
+      "sha256": "30eb25dda61a33e8548f6a0037fec61c8079d42afe7426fc7ae6aba5ed1155a8",
+      "original_name": "served.bits",
+      "uncompressed_sha256": "d8fe867972d99f97a1a1501bc6092efc8971aed3e953fed4a17a6120eb5f2518"
+    }
+  ]
+}

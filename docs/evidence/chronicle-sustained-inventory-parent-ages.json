@@ -1,0 +1,19 @@
+{
+  "registration": "3ec961ef81881b83d4cc1ecc646250a2d8d200f9",
+  "source_ids_sha256": "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2",
+  "parent_graph": {
+    "verified_source_outpoints": 5529600,
+    "funding_height": 484,
+    "confirmed_spends": 5529600,
+    "inclusion_height_minus_parent_creation_height": {
+      "0": 614400,
+      "1": 4915200
+    },
+    "distances_by_miner": {
+      "sv": {
+        "0": 614400,
+        "1": 4915200
+      }
+    }
+  }
+}
