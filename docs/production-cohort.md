@@ -78,3 +78,25 @@ python3 qualification/cohort_estimate.py .native/immediate-cohort/evaluation --s
 ```
 
 The combined command writes a timestamped registration before the first session, verifies saved receipt identities on resume, and publishes the evaluation summary once the last planned session closes. The published [registration](evidence/chronicle-immediate-registration.json) identifies the executable measured on this workstation.
+
+## Simultaneous Stratum workers
+
+One Scary process accepts independent TCP Stratum sessions while two stock SV receivers follow the same regtest branch. Each authenticated CPU worker checks its own extranonce, constructs a coinbase, and hashes two successive templates for one parent. The first job contains a witnessed payment. A second payment triggers a same-parent refresh. Every worker submits a known below-target share, then all release different network-target solutions from a barrier. Successive rounds assign everyone to the earlier job, everyone to the refreshed job, or half to each. Exactly one accepted solution per parent must match the winning worker's reconstructed header, coinbase and ordered payments. Both SV nodes supply its full bytes and headers for two successors. The node's local solution record supplies the job identifier and settlement transition.
+
+The regtest share target equals the network target. Accepted shares in this fixture produce blocks. The deliberately simultaneous submissions test job handling under contention. ASIC hash rate, ordinary sub-block shares at mainnet difficulty, and production stale frequency require different measurements.
+
+```sh
+.native/py/bin/python qualification/native_workers.py .native/workers.json.gz \
+  --binary target/release/scary-node --workers 32 --rounds 12
+python3 qualification/verify_native_workers.py .native/workers.json.gz
+```
+
+Each release completed 12 parent rounds with 32 simultaneous workers. For each executable the ledger contains 384 authenticated sessions, 384 below-threshold share rejections, 384 distinct target-valid submissions, 12 accepted solutions, and 372 explicit stale-work responses after another worker won. No worker lost its reply. The two SV receivers agreed on all 24 depth-two readbacks per build. The first job won six rounds on the identity-fenced executable and seven on the revised template-sharing executable. These counts reflect the planned contention scenario. [Identity-fenced release receipts](evidence/chronicle-workers-32.json.gz) · [Template-sharing release receipts](evidence/chronicle-workers-32-revised.json.gz)
+
+A separate test kept one worker connected while 16 further signed payments produced 16 new templates for the same parent. New authenticated connections independently read each revision. On release binary `910e079650b504d6733d00e542c1f973acb13853c7972546a30c278345981320`, the original worker received all 17 notifications. Each of its 16 below-target shares on the first job returned the expected difficulty error. Its network-target share on that same job produced block `4c2c80e91392bc444021a318ae70dc97a9f20028f9b990d162c384f6335634a0` containing exactly its original payment. Both SV nodes served identical bytes, and independently returned its active hash after two successors. [Retained-job receipt](evidence/chronicle-retained-job.json.gz)
+
+```sh
+.native/py/bin/python qualification/retained_job.py .native/retained.json.gz \
+  --binary target/release/scary-node --refreshes 16
+python3 qualification/verify_native_workers.py .native/retained.json.gz
+```

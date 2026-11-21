@@ -13,6 +13,7 @@ from prove import decode_block, dsha, txid
 from verify_receipt import check_header, single_input
 from cohort_estimate import analyze
 from relay_comparison import paired_report
+from verify_native_workers import verify as verify_workers, verify_retained
 from shadow import audit
 from verify_stream import verify as verify_stream
 
@@ -425,6 +426,12 @@ def verify(directory):
     assert paired_report(directory / "chronicle-relay-comparison") == json.loads(
         (directory / "chronicle-relay-comparison.json").read_text()
     )
+    for name in ("chronicle-workers-32.json.gz", "chronicle-workers-32-revised.json.gz"):
+        with gzip.open(directory / name, "rt") as stream:
+            summary = verify_workers(json.load(stream))
+        assert summary["workers_per_parent"] == 32 and summary["parents"] == 12
+    with gzip.open(directory / "chronicle-retained-job.json.gz", "rt") as stream:
+        assert verify_retained(json.load(stream))["same_parent_replacements"] == 16
     loss = json.loads((directory / "chronicle-peer-loss.json").read_text())
     assert (
         loss["lost"]["tip_hash"] == loss["initial_parent"]
