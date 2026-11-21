@@ -1,0 +1,108 @@
+{
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "binary_sha256": "1008833adfa1b7d702f1541225c3c1b103e59c4ae3a641d66f632f1ec69ef1df",
+  "clock_library": "libfaketime:arm64\t0.9.10-2.1",
+  "parent": "24f0be061e620b454490935ef69a778a026ba3019e9cf4474f0e664bdce4d229",
+  "held_submissions": [
+    {
+      "offset": "+600s",
+      "status": {
+        "tip_hash": "24f0be061e620b454490935ef69a778a026ba3019e9cf4474f0e664bdce4d229",
+        "clock_step_seconds": 601,
+        "peer_clock": {
+          "connected_endpoints": 1,
+          "connected_network_groups": 1,
+          "disagreeing_samples": false,
+          "hold_threshold_seconds": 120,
+          "minimum_groups": 1,
+          "offset_from_wall_seconds": -601
+        },
+        "pending_transactions": 1,
+        "readiness_reasons": [
+          "wall clock differs from monotonic elapsed time",
+          "SV peer times disagree with local clock or each other"
+        ],
+        "observation_window_ready": false,
+        "solved_blocks": 0
+      }
+    },
+    {
+      "offset": "-600s",
+      "status": {
+        "tip_hash": "24f0be061e620b454490935ef69a778a026ba3019e9cf4474f0e664bdce4d229",
+        "clock_step_seconds": -599,
+        "peer_clock": {
+          "connected_endpoints": 1,
+          "connected_network_groups": 1,
+          "disagreeing_samples": false,
+          "hold_threshold_seconds": 120,
+          "minimum_groups": 1,
+          "offset_from_wall_seconds": 599
+        },
+        "pending_transactions": 1,
+        "readiness_reasons": [
+          "wall clock differs from monotonic elapsed time",
+          "SV peer times disagree with local clock or each other"
+        ],
+        "observation_window_ready": false,
+        "solved_blocks": 0
+      }
+    }
+  ],
+  "solution": "7a324e20fc0e55fd7b0bac4382833ac4ece98b9f02689b35ab115c60a4be0e04",
+  "reference_tip": "7a324e20fc0e55fd7b0bac4382833ac4ece98b9f02689b35ab115c60a4be0e04",
+  "startup_holds": [
+    {
+      "offset": "+600s",
+      "status": {
+        "tip_hash": "7a324e20fc0e55fd7b0bac4382833ac4ece98b9f02689b35ab115c60a4be0e04",
+        "clock_step_seconds": 0,
+        "peer_clock": {
+          "connected_endpoints": 1,
+          "connected_network_groups": 1,
+          "disagreeing_samples": false,
+          "hold_threshold_seconds": 120,
+          "minimum_groups": 1,
+          "offset_from_wall_seconds": -600
+        },
+        "pending_transactions": 1,
+        "readiness_reasons": [
+          "SV peer times disagree with local clock or each other"
+        ],
+        "observation_window_ready": false,
+        "solved_blocks": 1
+      },
+      "worker_observation": {
+        "authorized": true,
+        "jobs_received": 0
+      }
+    },
+    {
+      "offset": "-600s",
+      "status": {
+        "tip_hash": "7a324e20fc0e55fd7b0bac4382833ac4ece98b9f02689b35ab115c60a4be0e04",
+        "clock_step_seconds": 0,
+        "peer_clock": {
+          "connected_endpoints": 1,
+          "connected_network_groups": 1,
+          "disagreeing_samples": false,
+          "hold_threshold_seconds": 120,
+          "minimum_groups": 1,
+          "offset_from_wall_seconds": 600
+        },
+        "pending_transactions": 1,
+        "readiness_reasons": [
+          "SV peer times disagree with local clock or each other"
+        ],
+        "observation_window_ready": false,
+        "solved_blocks": 1
+      },
+      "worker_observation": {
+        "authorized": true,
+        "jobs_received": 0
+      }
+    }
+  ],
+  "synchronized_start_solution": "5f8e25cfbcaa5e050467f7c90648b09057cd9f76ce23a45d8e56ed49ecc47da6",
+  "final_reference_tip": "5f8e25cfbcaa5e050467f7c90648b09057cd9f76ce23a45d8e56ed49ecc47da6"
+}
