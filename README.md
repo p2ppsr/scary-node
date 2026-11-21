@@ -48,6 +48,17 @@ python3 regtest/verify_scenario.py scenario-7.json
 
 [Workload and reproduction](docs/scenario.md) · [Measured results](docs/scenario-results.md)
 
+## Compare stale blocks under equal work
+
+The race lab gives a Scary Node Stratum job and a full-state Teranode job one SHA256d attempt each per tick. They mine on the same parent with the same signed payment. An independent SV Node receives every discovery through a shared relay. The run records both candidates in a simultaneous discovery and checks which branch still holds after two successors.
+
+```sh
+./regtest/races.sh --seed 1701 --trials 128 > races-1701.json
+./regtest/races.sh --down
+```
+
+[Experimental design and reproduction](docs/races.md) · [Stale rates and uncertainty](docs/race-results.md)
+
 ## Point an ASIC at your node
 
 Set the payout locking script to an address you control. Run the node with a reachable advertised Asset URL so that peers can retrieve the block you announce. Enable the Stratum listener on a trusted mining LAN. The example expects the operator to supply the two environment variables.

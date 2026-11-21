@@ -188,6 +188,8 @@ def compose(*args, capture=False):
     base = ["docker", "compose", "-f", str(Path(__file__).with_name("compose.yaml"))]
     if os.environ.get("SCARY_LAB_SCENARIO") == "1":
         base += ["-f", str(Path(__file__).with_name("scenario.compose.yaml"))]
+    if os.environ.get("SCARY_LAB_RACES") == "1":
+        base += ["-f", str(Path(__file__).with_name("races.compose.yaml"))]
     result = subprocess.run([*base, *args],
                             stdout=subprocess.PIPE if capture else sys.stderr, text=True, check=True)
     return result.stdout
