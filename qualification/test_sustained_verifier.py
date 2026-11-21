@@ -93,6 +93,18 @@ class SustainedVerifierTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "envelope"):
                 audit.read_source(d, source)
 
+    def test_parent_inclusion_distances_and_missing_confirmed_ancestor(self):
+        result = audit.parent_ages(
+            [485, 486, 485, 489], 484, {485: "sv", 486: "scary", 489: "sv"}, rails=2
+        )
+        self.assertEqual(
+            result["inclusion_height_minus_parent_creation_height"],
+            {0: 1, 1: 1, 2: 1, 3: 1},
+        )
+        self.assertEqual(result["distances_by_miner"]["scary"], {2: 1})
+        with self.assertRaisesRegex(ValueError, "child without its parent"):
+            audit.parent_ages([0, 485, 486], 484, {}, rails=2)
+
     def test_incomplete_attempt_preserves_missing_offers_and_failed_accounting(self):
         base = {"height": 108, "hash": self.block["hash"]}
         record = {

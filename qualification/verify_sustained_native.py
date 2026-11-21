@@ -1,6 +1,7 @@
 """Recompute the registered duration, primary opportunities and stock readbacks, optionally from raw wires."""
 
 import argparse
+from array import array
 from collections import Counter
 import gzip
 import hashlib
@@ -566,7 +567,7 @@ def verify(record, executable=REFERENCE_RELEASE):
     }
 
 
-def read_source(corpus, source):
+def read_source(corpus, source, *, funding=None):
     manifest = json.loads((corpus / "manifest.json").read_text())
     require(manifest == source, "source manifest differs from observed run")
     offsets = json.loads((corpus / "offsets.json").read_text())
@@ -613,7 +614,26 @@ def read_source(corpus, source):
                     "transaction differs from its envelope or ordered ID",
                 )
                 require(digest not in ordinals, "duplicate source transaction")
-                ordinals[digest] = len(ordinals)
+                ordinal = len(ordinals)
+                if funding is not None:
+                    require(len(raw) > 41 and raw[4] == 1, "expected one payment input")
+                    expected_vout = 0
+                    if ordinal < 65_536:
+                        require(
+                            raw[5:37] == funding[ordinal // 4],
+                            "payment does not spend signed funding split",
+                        )
+                        expected_vout = ordinal % 4
+                    else:
+                        require(
+                            ordinals.get(raw[5:37]) == ordinal - 65_536,
+                            "spend does not extend its registered payment rail",
+                        )
+                    require(
+                        struct.unpack_from("<I", raw, 37)[0] == expected_vout,
+                        "payment spends unexpected output",
+                    )
+                ordinals[digest] = ordinal
             require(wire.tell() == end, "source batch contains extra bytes")
         require(not ids.read(1) and not wire.read(1), "trailing source data")
     require(
@@ -624,7 +644,7 @@ def read_source(corpus, source):
     return ordinals
 
 
-def verify_block_membership(raw, block, ordinals, seen, cohort_size):
+def verify_block_membership(raw, block, ordinals, seen, cohort_size, *, heights=None):
     require(
         raw[:80].hex() == block["header_hex"]
         and len(raw) == block["wire_bytes"]
@@ -642,6 +662,8 @@ def verify_block_membership(raw, block, ordinals, seen, cohort_size):
             duplicates += 1
         else:
             seen[ordinal] = 1
+            if heights is not None:
+                heights[ordinal] = block["height"]
             counts[ordinal // cohort_size] += 1
     require(
         len(txs) - 1 == block["ordinary_transactions"]
@@ -653,8 +675,47 @@ def verify_block_membership(raw, block, ordinals, seen, cohort_size):
     )
 
 
-def verify_wires(record, corpus, blocks):
-    ordinals = read_source(corpus, record["source"])
+def parent_ages(heights, funding_height, miners, rails=65_536):
+    counts = Counter()
+    by_miner = {}
+    for i, height in enumerate(heights):
+        if height == 0:
+            continue
+        previous = funding_height if i < rails else heights[i - rails]
+        require(0 < previous <= height, "final branch has a child without its parent")
+        distance = height - previous
+        counts[distance] += 1
+        role = miners.get(height, "unattributed")
+        by_miner.setdefault(role, Counter())[distance] += 1
+    return {
+        "verified_source_outpoints": len(heights),
+        "funding_height": funding_height,
+        "confirmed_spends": sum(counts.values()),
+        "inclusion_height_minus_parent_creation_height": dict(sorted(counts.items())),
+        "distances_by_miner": {
+            role: dict(sorted(d.items())) for role, d in by_miner.items()
+        },
+    }
+
+
+def verify_wires(record, corpus, blocks, *, parent_graph=False):
+    funding = heights = None
+    if parent_graph:
+        raw = (corpus / "funding.block").read_bytes()
+        require(
+            record["baseline"]["hash"] == FUNDING
+            and record["baseline"]["height"] == 484
+            and hashlib.sha256(raw).hexdigest() == record["baseline"]["wire_sha256"],
+            "registered funding receipt differs",
+        )
+        _, txs, outputs = decode_block(raw, FUNDING)
+        require(
+            len(txs) == 16385 and all(len(o) == 4 for o in outputs[1:]),
+            "expected 65,536 split funding outputs",
+        )
+        funding = [dsha(tx) for tx in txs[1:]]
+        heights = array("I", [0]) * PAYMENTS
+    ordinals = read_source(corpus, record["source"], funding=funding)
     seen = bytearray(PAYMENTS)
     for b in record["blocks"]:
         verify_block_membership(
@@ -663,6 +724,7 @@ def verify_wires(record, corpus, blocks):
             ordinals,
             seen,
             PAYMENTS // COHORTS,
+            heights=heights,
         )
     require(
         sum(seen) == record["completion"]["unique_confirmed"],
@@ -671,8 +733,18 @@ def verify_wires(record, corpus, blocks):
     wallet = {}
     if record["registration"] == REPLICATION and record["inventory_final"]:
         wallet = inventory_membership(blocks.parent, record["inventory_final"], seen)
+    graph = {}
+    if parent_graph:
+        hashes = {s["hash"]: s["miner"] for s in record["slots"] if s.get("hash")}
+        miners = {
+            b["height"]: hashes.get(b["hash"], "unattributed") for b in record["blocks"]
+        }
+        graph["source_parent_ages"] = parent_ages(
+            heights, record["baseline"]["height"], miners
+        )
     return {
         **wallet,
+        **graph,
         "signed_source_envelopes": len(ordinals),
         "merkle_verified_bodies": len(record["blocks"]),
         "confirmed_distinct_memberships": sum(seen),
@@ -685,11 +757,18 @@ def main():
     parser.add_argument("--corpus", type=Path)
     parser.add_argument("--blocks", type=Path)
     parser.add_argument(
+        "--parent-ages",
+        action="store_true",
+        help="verify every signed source outpoint and measure parent/child active-chain height distances",
+    )
+    parser.add_argument(
         "--build-receipt",
         type=Path,
         help="Linux release-build provenance for an independent reproduced run",
     )
     args = parser.parse_args()
+    if args.parent_ages and not args.corpus:
+        parser.error("--parent-ages requires the original --corpus and --blocks")
     if bool(args.corpus) != bool(args.blocks):
         parser.error("--corpus and --blocks must be supplied together")
     expected = REFERENCE_RELEASE
@@ -705,7 +784,9 @@ def main():
         record = json.load(f)
     summary = verify(record, expected)
     if args.corpus:
-        summary["local_wire_replay"] = verify_wires(record, args.corpus, args.blocks)
+        summary["local_wire_replay"] = verify_wires(
+            record, args.corpus, args.blocks, parent_graph=args.parent_ages
+        )
     print(json.dumps(summary, indent=2))
 
 
