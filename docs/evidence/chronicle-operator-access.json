@@ -1,0 +1,11 @@
+{
+  "release_sha256": "6de4d8f20dab2a62ccfddd0560e6b5e634a9eeb994cc48dbc82b8a1a2342bf21",
+  "operator_status_authenticated": 200,
+  "operator_status_anonymous": 401,
+  "operator_status_worker_credential": 401,
+  "asset_status_route": 404,
+  "asset_block_write": 405,
+  "worker_operator_credential_error": 24,
+  "worker_authorized": true,
+  "mainnet_miner_missing_operator_credential_refused": true
+}

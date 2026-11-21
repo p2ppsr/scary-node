@@ -118,6 +118,7 @@ struct PeerStats {
 #[derive(Clone)]
 struct App {
     network: &'static str,
+    executable_sha256: Option<Arc<str>>,
     mining: Arc<Mutex<mining::Mining>>,
     peer: Arc<Mutex<PeerStats>>,
     shadow: Option<Arc<std::sync::Mutex<std::fs::File>>>,
@@ -173,11 +174,24 @@ pub(crate) fn credentials_match(actual: &str, expected: &str) -> bool {
     bool::from(Sha256::digest(actual.as_bytes()).ct_eq(&Sha256::digest(expected.as_bytes())))
 }
 
+fn executable_digest() -> Result<Arc<str>> {
+    use sha2::{Digest, Sha256};
+    #[cfg(target_os = "linux")]
+    let path = std::path::PathBuf::from("/proc/self/exe");
+    #[cfg(not(target_os = "linux"))]
+    let path = std::env::current_exe()?;
+    let mut binary =
+        std::fs::File::open(path).context("open running binary for release identity")?;
+    let mut digest = Sha256::new();
+    std::io::copy(&mut binary, &mut digest)?;
+    Ok(hex::encode(digest.finalize()).into())
+}
+
 async fn status(State(app): State<App>) -> Json<Value> {
     let mining = app.mining.lock().await.status();
     let p = app.peer.lock().await;
     Json(json!({
-        "network":app.network, "mining":mining, "peer":{
+        "network":app.network, "release":{"version":env!("CARGO_PKG_VERSION"), "executable_sha256":app.executable_sha256}, "mining":mining, "peer":{
             "connected_peer_ids_seen":p.seen.len(), "status_messages":p.statuses,
             "block_notices":p.notices, "subtree_notices":p.subtrees, "coverage_gaps":p.gaps,
             "last_peer_status":p.last_status, "last_block_notice":p.last_block,
@@ -526,8 +540,10 @@ async fn main() -> Result<()> {
         alerts::recover(&dir.join("alerts"), &mut mining)?;
     }
     ensure!(
-        regtest || args.api_bind.ip().is_loopback() || args.operator_token_file.is_some(),
-        "non-loopback mainnet operator API needs a token"
+        regtest
+            || args.operator_token_file.is_some()
+            || (args.stratum_bind.is_none() && args.api_bind.ip().is_loopback()),
+        "mainnet mining or a non-loopback operator API requires --operator-token-file"
     );
     ensure!(
         regtest || args.stratum_bind.is_none() || args.worker_password_file.is_some(),
@@ -546,6 +562,11 @@ async fn main() -> Result<()> {
         .transpose()?
         .map(|f| Arc::new(std::sync::Mutex::new(f)));
     let app = App {
+        executable_sha256: executable_digest()
+            .inspect_err(|e| {
+                eprintln!("release fingerprint unavailable: {e}");
+            })
+            .ok(),
         shadow,
         operator_token: secret_file(args.operator_token_file.as_ref())?,
         network,
@@ -558,7 +579,7 @@ async fn main() -> Result<()> {
             file,
             &json!({"event":"start","network":network,"at":mining::now()?,
             "body_transport":if args.sv_bodies_only {"sv_only"} else {"all"},
-            "restored_tip":m.tip().map(mining::wire::display_hash),"binary_version":env!("CARGO_PKG_VERSION"),
+            "restored_tip":m.tip().map(mining::wire::display_hash),"binary_version":env!("CARGO_PKG_VERSION"),"executable_sha256":app.executable_sha256,
             "interpreter":m.status()["interpreter"]}),
         )?;
     }
