@@ -533,6 +533,7 @@ fn apply_signed(dir: &Path, state: &mut crate::mining::Mining, raw: &[u8]) -> Re
         state.directives.pending = Some(format!("sequence {seq}: {e}"));
     } else {
         state.directives.pending = None;
+        state.reconsider_waiting();
     }
     result
 }

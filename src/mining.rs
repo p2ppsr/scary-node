@@ -7,6 +7,7 @@ mod lifecycle;
 mod store;
 mod stratum;
 mod validation;
+mod waiting;
 pub(crate) mod wire;
 pub use stratum::run_stratum;
 
@@ -126,6 +127,9 @@ struct IntakeCounts {
     admitted: u64,
     duplicate: u64,
     ineligible: u64,
+    awaiting_successor: u64,
+    promoted_after_successor: u64,
+    discarded_after_recheck: u64,
 }
 
 #[derive(Clone, Copy)]
@@ -178,6 +182,8 @@ pub struct Mining {
     headers: VecDeque<[u8; 80]>,
     coins: HashMap<Outpoint, Coin>,
     pending: BTreeMap<Hash, Entry>,
+    #[serde(skip)]
+    waiting: waiting::WaitingOffers,
     #[serde(skip)]
     pending_inputs: HashSet<Outpoint>,
     #[serde(skip)]
@@ -285,6 +291,7 @@ impl Mining {
             headers: VecDeque::new(),
             coins: HashMap::new(),
             pending: BTreeMap::new(),
+            waiting: waiting::WaitingOffers::default(),
             pending_inputs: HashSet::new(),
             pending_outputs: HashMap::new(),
             pending_bytes: 0,
@@ -396,6 +403,7 @@ impl Mining {
         self.headers.clear();
         self.active_since_entry.clear();
         self.coins.clear();
+        self.waiting = waiting::WaitingOffers::default();
         self.spent = validation::Spent::default();
         self.validation_window.clear();
         self.clear_pending();
@@ -710,24 +718,6 @@ impl Mining {
             let _ = self.admit(&raw);
         }
     }
-    pub(crate) fn has_pending(&self, id: &Hash) -> bool {
-        self.pending.contains_key(id)
-    }
-
-    pub(crate) fn peer_tx(&mut self, source: TxSource, raw: &[u8]) {
-        let count = self.pending.len();
-        let result = self.submit_tx(raw);
-        let stats = match source {
-            TxSource::Sv => &mut self.sv_intake,
-            TxSource::Subtree => &mut self.subtree_intake,
-        };
-        match result {
-            Ok(_) if self.pending.len() > count => stats.admitted += 1,
-            Ok(_) => stats.duplicate += 1,
-            Err(_) => stats.ineligible += 1,
-        }
-    }
-
     pub fn submit_tx(&mut self, raw: &[u8]) -> Result<String> {
         ensure!(self.storage_failure.is_none(), "durable state write failed");
         ensure!(self.directives.ready(), "directive state is not ready");
@@ -792,6 +782,7 @@ impl Mining {
         let mut used = HashSet::new();
         let mut inputs = Vec::new();
         let mut total_in = 0u64;
+        let mut needs_successor = false;
         for input in &tx.inputs {
             let source_id = input
                 .source_txid
@@ -812,10 +803,8 @@ impl Mining {
                 .get(&outpoint)
                 .or_else(|| self.pending_outputs.get(&outpoint))
                 .context("input missing from witnessed spendable set")?;
-            ensure!(
-                height > coin.height || self.pending_outputs.contains_key(&outpoint),
-                "creation block has no observed successor"
-            );
+            needs_successor |=
+                height <= coin.height && !self.pending_outputs.contains_key(&outpoint);
             ensure!(
                 !coin.coinbase || height - coin.height >= 99,
                 "immature coinbase"
@@ -862,6 +851,9 @@ impl Mining {
             interpreter::transaction(self.regtest, &ef, &heights, height, false)??;
             interpreter::transaction(self.regtest, &ef, &heights, candidate_height, true)??;
         }
+        if needs_successor {
+            return Err(waiting::AwaitingSuccessor(id).into());
+        }
         Self::collect_outputs(&mut self.pending_outputs, id, raw, candidate_height)?;
         self.pending_inputs.extend(inputs.iter().copied());
         self.pending_bytes += raw.len();
@@ -887,6 +879,7 @@ impl Mining {
     }
     pub(crate) fn refresh_work(&mut self) {
         self.revision += 1;
+        self.reconsider_waiting();
     }
     pub(crate) fn work_revision(&self) -> u64 {
         self.revision
@@ -986,7 +979,7 @@ impl Mining {
             .and_then(|h| h.checked_sub(self.headers.len().saturating_sub(1) as u32));
 
         let (mapped_count, mapped_bytes) = self.chain.mapped_bodies();
-        json!({
+        let mut status = json!({
             "connected_data_peers":self.live_peers.len(),"tip_confirmed_since_disconnect":self.confirmed_since_disconnect,"storage_failure":self.storage_failure,"clock_step_seconds":clock_step(),"clock_step_limit_seconds":MAX_CLOCK_STEP_SECONDS,"peer_clock":self.peer_clocks.status(self.regtest),
             "mapped_bodies":mapped_count,"mapped_body_bytes":mapped_bytes,"capacity":capacity(),"coverage_start":first,"coverage_end":self.height,"window_chainwork":window_work,"expected_next_bits":self.next_bits().ok(),"readiness_reasons":readiness,"durable_directive_sequence":self.applied_sequence,"directives":self.directives.status(),"interpreter": interpreter::build(), "height": self.height, "tip_hash": self.headers.back().map(|h| wire::display_hash(hash256(h))),
             "retired_prefix_height": self.height.filter(|_| self.blocked), "reorgs": self.chain.reorgs, "recoverable_blocks": self.chain.applied.len(), "buffered_bodies": self.chain.buffered_len(), "recent_invalid_blocks": self.recent_invalid.len(), "explicit_soft_freezes": self.soft_freezes.len(), "validation_window": self.validation_window, "min_observed_blocks": self.min_observed_blocks,
@@ -997,7 +990,10 @@ impl Mining {
             "peer_transaction_intake":{"sv":self.sv_intake,"teranode_subtree": self.subtree_intake},
             "pending_transactions": self.pending.len(), "accepted_shares": self.accepted_shares,
             "solved_blocks": self.solved_blocks, "suspended_reason": self.suspended_reason, "solutions": self.lifecycle.status()
-        })
+        });
+        status["waiting_for_successor"] = self.waiting.len().into();
+        status["waiting_for_successor_bytes"] = self.waiting.bytes().into();
+        status
     }
 }
 

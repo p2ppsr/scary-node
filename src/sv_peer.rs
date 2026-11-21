@@ -562,7 +562,7 @@ async fn session(
                             let s = state.lock().await;
                             let mut unique = std::collections::HashSet::new();
                             for (kind, hash) in entries {
-                                if (kind == 2 || (kind == 1 && !s.has_pending(&hash))) && unique.insert((kind, hash)) {
+                                if (kind == 2 || (kind == 1 && !s.knows_offer(&hash))) && unique.insert((kind, hash)) {
                                     req.extend(kind.to_le_bytes()); req.extend(hash); count += 1;
                                 }
                             }

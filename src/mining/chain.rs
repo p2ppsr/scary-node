@@ -410,6 +410,7 @@ impl Mining {
             self.parent_epoch += 1;
             self.revision += 1;
             self.recheck_pending();
+            self.reconsider_waiting();
             self.lifecycle.observe(&self.headers, height);
         }
         self.chain.prune();

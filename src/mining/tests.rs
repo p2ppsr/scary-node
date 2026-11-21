@@ -91,6 +91,51 @@ async fn witness_requires_successor_signature_and_unspent_coverage() {
     assert!(state.outpoint(&child.id().unwrap(), 0).unwrap()["known"] == true);
 }
 
+#[tokio::test]
+async fn native_payment_waits_for_endorsed_funding_and_rechecks_the_selected_spend() {
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcdef07").unwrap());
+    let lock = signer.lock().unwrap();
+    let source = tx(&"73".repeat(32), 100_000, lock.clone());
+    let funding = make_block([8; 32], 150, &[source.to_bytes().unwrap()]);
+    let mut payment = tx(&source.id().unwrap(), 90_000, lock.clone());
+    payment
+        .sign(0, &signer, 0x41, 100_000, &lock)
+        .await
+        .unwrap();
+    let wire = payment.to_bytes().unwrap();
+    let mut wrong = tx(&source.id().unwrap(), 88_000, lock.clone());
+    wrong.sign(0, &signer, 0x41, 99_999, &lock).await.unwrap();
+    for already_mined in [false, true] {
+        let mut miner = Mining::new(true, lock.to_binary()).unwrap();
+        miner.observe(150, &funding).unwrap();
+        miner.peer_tx(TxSource::Sv, &wrong.to_bytes().unwrap());
+        miner.peer_tx(TxSource::Sv, &wire);
+        miner.peer_tx(TxSource::Subtree, &wire);
+        assert_eq!(miner.sv_intake.ineligible, 1);
+        assert_eq!(miner.sv_intake.awaiting_successor, 1);
+        assert_eq!(miner.subtree_intake.duplicate, 1);
+        assert_eq!(miner.waiting.bytes(), wire.len());
+        assert!(miner.pending.is_empty());
+        let contents = if already_mined {
+            std::slice::from_ref(&wire)
+        } else {
+            &[]
+        };
+        let successor = make_block(hash256(&funding[..80]), 151, contents);
+        miner.observe(151, &successor).unwrap();
+        assert_eq!(miner.waiting.len(), 0);
+        assert_eq!(miner.pending.contains_key(&hash256(&wire)), !already_mined);
+        assert_eq!(
+            miner.sv_intake.promoted_after_successor,
+            u64::from(!already_mined)
+        );
+        assert_eq!(
+            miner.sv_intake.discarded_after_recheck,
+            u64::from(already_mined)
+        );
+    }
+}
+
 #[test]
 fn alternate_body_failure_respects_current_coverage_and_other_readiness_failures() {
     let mut state = Mining::new(true, Vec::new()).unwrap();
