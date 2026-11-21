@@ -1,0 +1,28 @@
+{
+  "height": 485,
+  "funding_parent": "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9",
+  "parent_timestamp": 1795287511,
+  "block_timestamp": 1795288111,
+  "header_hex": "00000020a90b66914fffff6e424ea1a6c00df3b3fa2f11045ca30118d9d68f4456a4b33f5ca78ef68f02fa96a8af7d6e7f5bbf88e4492c00ce29b6dde704ba1c3c16740c2fec016bffff7f2002000000",
+  "block_hash": "5edb616633f9539adb900bfc494358438bd921294e1cac93e64884bd012b1b8c",
+  "merkle_root_internal": "5ca78ef68f02fa96a8af7d6e7f5bbf88e4492c00ce29b6dde704ba1c3c16740c",
+  "funded_rails": 65536,
+  "rails_by_payment_count": {
+    "27": 35008,
+    "28": 30528
+  },
+  "payment_count": 1800000,
+  "distinct_block_transactions": 1800001,
+  "parent_inputs_from_funding": 65536,
+  "same_block_input_dependencies": 1734464,
+  "payment_wire_bytes": 359090161,
+  "wire_bytes": 359090376,
+  "ordered_prefix_txids_sha256": "a133fa75d77d8f76a9e1a0063746c6a1fbf8c7834a64d0f3079f6787312d6a5a",
+  "published_full_ordered_txids_sha256": "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2",
+  "wire_sha256": "0862f9980261b5f5c55020c31a0fd620d28acd186c90855cd9b98fc7cfc6c737",
+  "initial_funded_satoshis": 1577779200,
+  "final_rail_satoshis": 1217779200,
+  "fees_satoshis": 360000000,
+  "subsidy_satoshis": 625000000,
+  "coinbase_satoshis": 985000000
+}

@@ -3,6 +3,7 @@
 import argparse
 import concurrent.futures
 import hashlib
+from http.client import HTTPException
 import json
 import os
 import shutil
@@ -55,7 +56,7 @@ def plain_tips():
     }
 
 
-def prepare(history, payments, directory, image):
+def prepare(history, payments, directory, image, prepared_body=None):
     if (
         NODES != [(23441, 23451), (23442, 23452)]
         or os.environ["COMPOSE_PROJECT_NAME"] != PROJECT
@@ -75,7 +76,20 @@ def prepare(history, payments, directory, image):
             "ps", "-aq", "--filter", f"label=com.docker.compose.project={PROJECT}"
         ):
             raise ValueError("a new enrollment requires a fresh isolated project")
-        if shutil.disk_usage(directory).free < MIN_FREE + 14 * GIB:
+        # Part of staging can already occupy the host filesystem before setup.
+        # Credit only the allocated bytes of the independently verified fixture.
+        allocated_body = 0
+        if prepared_body is not None:
+            fixture = json.loads((ROOT / "docs/evidence/chronicle-live-cadence-body.json").read_bytes())
+            details = prepared_body.stat()
+            with prepared_body.open("rb") as stream:
+                valid = (details.st_size == fixture["wire_bytes"]
+                         and hashlib.file_digest(stream, "sha256").hexdigest() == fixture["wire_sha256"])
+            if not valid:
+                raise ValueError("prepared cadence body differs from the registered fixture")
+            if details.st_dev == directory.stat().st_dev:
+                allocated_body = min(details.st_size, details.st_blocks * 512)
+        if shutil.disk_usage(directory).free < MIN_FREE + 14 * GIB - allocated_body:
             raise ValueError(
                 "preparation needs space for two 5-GiB stores, staging and the 20-GiB reserve"
             )
@@ -84,6 +98,7 @@ def prepare(history, payments, directory, image):
             {
                 "project": PROJECT,
                 "starting_host_free_bytes": shutil.disk_usage(directory).free,
+                "fixture_bytes_already_allocated": allocated_body,
                 "events": [],
             },
         )
@@ -242,7 +257,7 @@ def measure(directory, body, fixture, image):
             ):
                 try:
                     value = read()
-                except (OSError, RuntimeError, ValueError) as exc:
+                except (OSError, HTTPException, subprocess.SubprocessError, RuntimeError, ValueError) as exc:
                     stamp("peer_poll_error", peer=name, error=type(exc).__name__)
                 else:
                     if value == expected:
@@ -298,6 +313,7 @@ def measure(directory, body, fixture, image):
                         result[bucket][name] = future.result()
                     except (
                         OSError,
+                        HTTPException,
                         RuntimeError,
                         ValueError,
                         subprocess.SubprocessError,
@@ -426,6 +442,7 @@ if __name__ == "__main__":
     pre = sub.add_parser("prepare")
     pre.add_argument("history", type=Path)
     pre.add_argument("payments", type=Path)
+    pre.add_argument("--prepared-body", type=Path, help="already allocated verified fixture on this filesystem")
     run = sub.add_parser("run")
     run.add_argument("body", type=Path)
     run.add_argument("manifest", type=Path)
@@ -440,7 +457,7 @@ if __name__ == "__main__":
     args.directory.mkdir(parents=True, exist_ok=True)
     with session_lock():
         if args.action == "prepare":
-            prepare(args.history, args.payments, args.directory, args.image)
+            prepare(args.history, args.payments, args.directory, args.image, args.prepared_body)
         else:
             measure(
                 args.directory,
