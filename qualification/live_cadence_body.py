@@ -465,9 +465,9 @@ if __name__ == "__main__":
     # Reuse the same file lock as the native studies without requiring their runtime dependencies.
     import fcntl
 
-    with (Path(__file__).resolve().parents[1] / ".native/cohort-session.lock").open(
-        "a"
-    ) as lock:
+    lock_path = Path(__file__).resolve().parents[1] / ".native/cohort-session.lock"
+    lock_path.parent.mkdir(exist_ok=True)
+    with lock_path.open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         result = (build if a.action == "build" else verify)(a.corpus, a.block)
         if a.manifest:

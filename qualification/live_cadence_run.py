@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import threading
 import time
 from pathlib import Path
@@ -288,60 +289,109 @@ def measure(directory, body, fixture, image):
             pending = {
                 pool.submit(until_tip, n, f, ident): n for n, f in readers.items()
             }
-            for fut in concurrent.futures.as_completed([producer, *pending]):
-                if fut is producer:
-                    producer.result()
-                else:
-                    result["observations"][pending[fut]] = fut.result()
+            result["errors"] = {}
+
+            def collect(futures, bucket):
+                for future in concurrent.futures.as_completed(futures):
+                    name = futures[future]
+                    try:
+                        result[bucket][name] = future.result()
+                    except (
+                        OSError,
+                        RuntimeError,
+                        ValueError,
+                        subprocess.SubprocessError,
+                    ) as error:
+                        key = bucket + "/" + name
+                        result["errors"][key] = str(error)[:300]
+                        stamp(
+                            "measurement_error",
+                            stage=bucket,
+                            peer=name,
+                            error=type(error).__name__,
+                        )
+
+            collect(pending, "observations")
+            try:
+                producer.result()
+            except (
+                OSError,
+                RuntimeError,
+                ValueError,
+                subprocess.SubprocessError,
+            ) as error:
+                result["errors"]["transport"] = str(error)[:300]
             result["transport"] = announcement
-            checks = next(
-                r for r in status()["mining"]["validation_window"] if r["hash"] == ident
-            )
-            result["witnessed_validation"] = checks
-            if (
-                any(
-                    checks[k] != COUNT
-                    for k in (
-                        "known_inputs",
-                        "script_checks_passed",
-                        "amount_checks_passed",
-                        "transactions_determinate",
-                    )
+            if resource_stop.is_set():
+                raise RuntimeError("workstation resource stop")
+            if "scary" in result["observations"]:
+                checks = next(
+                    r
+                    for r in status()["mining"]["validation_window"]
+                    if r["hash"] == ident
                 )
-                or checks["same_block_inputs"] != COUNT - 65536
-                or not checks["coinbase_reward_checked"]
-            ):
-                raise ValueError("witnessed checks did not cover every payment and fee")
+                result["witnessed_validation"] = checks
+                if (
+                    any(
+                        checks[k] != COUNT
+                        for k in (
+                            "known_inputs",
+                            "script_checks_passed",
+                            "amount_checks_passed",
+                            "transactions_determinate",
+                        )
+                    )
+                    or checks["same_block_inputs"] != COUNT - 65536
+                    or not checks["coinbase_reward_checked"]
+                ):
+                    result["errors"]["validation"] = (
+                        "incomplete witnessed input, fee or script accounting"
+                    )
             futures = {
-                pool.submit(reference_read, name): name for name in ("sv", "tn1", "tn2")
+                pool.submit(reference_read, name): name
+                for name in ("sv", "tn1", "tn2")
+                if name in result["observations"]
             }
-            for fut in concurrent.futures.as_completed(futures):
-                name = futures[fut]
-                item = result["reads"][name] = fut.result()
+            collect(futures, "reads")
+            for name, item in result["reads"].items():
                 if (item["wire_bytes"], item["wire_sha256"]) != (size, digest):
-                    raise ValueError("stored bytes differ at " + name)
-            successors = sv("generate", 2)
-            result["successors"] = [sv("getblockheader", s, 0) for s in successors]
+                    result["errors"]["reads/" + name] = (
+                        "stored body digest or length differs"
+                    )
+            result["settled"] = {}
+            if "sv" in result["observations"] and not resource_stop.is_set():
+                successors = sv("generate", 2)
+                result["successors"] = [sv("getblockheader", s, 0) for s in successors]
+                if (
+                    sv("getblockheader", successors[0])["previousblockhash"] != ident
+                    or sv("getblockheader", successors[1])["previousblockhash"]
+                    != successors[0]
+                ):
+                    raise ValueError("stock successors do not extend the fixture")
+                collect(
+                    {
+                        pool.submit(until_tip, n, f, successors[-1]): n
+                        for n, f in readers.items()
+                    },
+                    "settled",
+                )
             if (
-                sv("getblockheader", successors[0])["previousblockhash"] != ident
-                or sv("getblockheader", successors[1])["previousblockhash"]
-                != successors[0]
+                set(result["observations"]) == set(readers)
+                and "ready_to_announce" in announcement
             ):
-                raise ValueError("stock successors do not extend the fixture")
-            futures = {
-                pool.submit(until_tip, n, f, successors[-1]): n
-                for n, f in readers.items()
-            }
-            result["settled"] = {
-                futures[f]: f.result() for f in concurrent.futures.as_completed(futures)
-            }
-            duration = (
-                max(result["observations"].values()) - announcement["ready_to_announce"]
-            )
-            result.update(
-                four_node_elapsed_ns=duration,
-                payments_per_second=COUNT * 1e9 / duration,
-                completed=True,
+                duration = (
+                    max(result["observations"].values())
+                    - announcement["ready_to_announce"]
+                )
+                result.update(
+                    four_node_elapsed_ns=duration,
+                    payments_per_second=COUNT * 1e9 / duration,
+                )
+            result["completed"] = (
+                not result["errors"]
+                and len(result["settled"]) == 4
+                and len(result["reads"]) == 3
+                and "stock_pong" in announcement
             )
         except Exception as exc:
             result["failure"] = type(exc).__name__ + ": " + str(exc)[:500]
@@ -354,10 +404,19 @@ def measure(directory, body, fixture, image):
             sampler.join(10)
             result["resource_stop"] = resource_stop.is_set()
             result["completed"] = result["completed"] and not result["resource_stop"]
-            stamp("finished", completed=result["completed"])
+            result["cadence_target_met"] = (
+                result["completed"] and result["payments_per_second"] >= 3000
+            )
+            stamp(
+                "finished",
+                completed=result["completed"],
+                cadence_target_met=result["cadence_target_met"],
+            )
             save(directory / "result.json", result)
     if not result["completed"]:
-        raise ValueError("resource threshold interrupted the run")
+        raise ValueError(
+            "incomplete native cadence measurement; see the preserved receipt"
+        )
     return result
 
 
