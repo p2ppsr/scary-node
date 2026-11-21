@@ -1,6 +1,6 @@
 //! Direct Stratum V1 jobs for operator-owned equipment on a trusted network.
 use super::{now, subsidy, wire, Hash, Mining};
-use anyhow::{bail, ensure, Context, Result};
+use anyhow::{ensure, Context, Result};
 use bsv::primitives::hash::hash256;
 use serde_json::{json, Value};
 use std::collections::{HashSet, VecDeque};
@@ -64,9 +64,10 @@ impl Job {
             .context("coinbase overflow")?;
         let (prefix, suffix) = coinbase_parts(height, reward, &state.payout);
         let mut leaves = vec![[0; 32]];
-        leaves.extend(state.pending.keys().copied());
+        let ordered = state.ordered_pending();
+        leaves.extend(ordered.iter().map(|(id, _)| *id));
         let (_, branches) = wire::merkle(leaves)?;
-        Ok(Some(Self {
+        let job = Self {
             revision: state.revision,
             parent_epoch: state.parent_epoch,
             height,
@@ -76,8 +77,21 @@ impl Job {
             prefix,
             suffix,
             branches,
-            txs: state.pending.values().map(|e| e.raw.clone()).collect(),
-        }))
+            txs: ordered.iter().map(|(_, e)| e.raw.clone()).collect(),
+        };
+        let (header, coinbase) = job.work([0; 4], [0; 4], time, 0);
+        state.verify_own_block(height, &job.block(&header, &coinbase), false)?;
+        Ok(Some(job))
+    }
+
+    fn eligible(&self, state: &Mining) -> bool {
+        self.parent_epoch == state.parent_epoch
+            && self.txs.iter().all(|raw| {
+                state
+                    .pending
+                    .get(&hash256(raw))
+                    .is_some_and(|e| e.raw.as_ref() == raw.as_ref())
+            })
     }
 
     fn id(&self) -> String {
@@ -133,6 +147,23 @@ impl Job {
     }
 }
 
+impl Mining {
+    pub fn shadow_decision(&self) -> Result<Value> {
+        let tip = self.headers.back().context("shadow tip absent")?;
+        let job = Job::from_state(self)?;
+        let template=job.map(|j|{
+            let (header,coinbase)=j.work([0;4],[0;4],j.time,0);
+            json!({"height":j.height,"bits":j.bits,"header_hex":hex::encode(header),"coinbase":hex::encode(coinbase),
+                   "transactions":j.txs.iter().map(|t|wire::display_hash(hash256(t))).collect::<Vec<_>>()})
+        });
+        Ok(
+            json!({"observed_at":now()?,"height":self.height,"hash":wire::display_hash(hash256(tip)),
+            "previous":wire::display_hash(tip[4..36].try_into()?),"bits":super::bits(tip),"expected_next_bits":self.next_bits().ok(),
+            "ready":self.observation_window_ready(),"coverage":self.headers.len(),"pending":self.pending.len(),
+            "directives":self.directives.status(),"unsigned_candidate":template}),
+        )
+    }
+}
 fn coinbase_parts(height: u32, value: u64, payout: &[u8]) -> (Vec<u8>, Vec<u8>) {
     let height_push = wire::height_push(height);
     let tag = b"/scary-node/";
@@ -200,7 +231,7 @@ fn share(
     ensure!(params[0].as_str() == Some(worker), "unauthorized worker");
     ensure!(
         params[1].as_str() == Some(&job.id())
-            && state.parent_epoch == job.parent_epoch
+            && job.eligible(state)
             && state.tip() == Some(job.previous)
             && state.observation_window_ready()
             && !state.solved_on_tip,
@@ -231,15 +262,27 @@ fn share(
         "share replay window full; reconnect for a new extranonce"
     );
     if network {
-        solved
-            .try_send((job.height, job.block(&header, &coinbase)))
+        let block = job.block(&header, &coinbase);
+        state.verify_own_block(job.height, &block, true)?;
+        let permit = solved
+            .try_reserve()
             .context("publication queue unavailable")?;
+        state.solution_body = Some(super::SolvedBody {
+            height: job.height,
+            hash: digest,
+            raw: Arc::from(block.as_slice()),
+        });
         state
             .lifecycle
             .queue(digest, job.previous, job.height, job.id());
         state.solved_on_tip = true;
         state.solved_blocks += 1;
         state.revision += 1;
+        if let Err(e) = state.save() {
+            state.wait_for_body(format!("solution persistence failed: {e}"));
+            return Err(e);
+        }
+        permit.send((job.height, block));
     }
     seen.insert((x2, time, nonce));
     state.accepted_shares += 1;
@@ -251,6 +294,7 @@ async fn session(
     serial: u32,
     state: Arc<Mutex<Mining>>,
     solved: mpsc::Sender<(u32, Vec<u8>)>,
+    password: Option<Arc<str>>,
 ) -> Result<()> {
     let (input, mut output) = stream.into_split();
     let mut reader = BufReader::new(input);
@@ -299,7 +343,15 @@ async fn session(
                         .and_then(Value::as_str)
                         .filter(|s| subscribed && !s.is_empty() && s.len() <= 128)
                     {
-                        if worker.as_deref().is_some_and(|existing| existing != name) {
+                        if password.as_ref().is_some_and(|p| {
+                            !args
+                                .get(1)
+                                .and_then(Value::as_str)
+                                .is_some_and(|v| crate::credentials_match(v, p))
+                        }) {
+                            code = 24;
+                            Err(anyhow::anyhow!("worker authentication failed"))
+                        } else if worker.as_deref().is_some_and(|existing| existing != name) {
                             code = 24;
                             Err(anyhow::anyhow!(
                                 "worker is already authorized on this session"
@@ -353,6 +405,9 @@ async fn session(
             write_message(&mut output, response).await?;
         } else {
             let s = state.lock().await;
+            if !s.observation_window_ready() && !jobs.is_empty() {
+                return Ok(());
+            }
             if announced_revision == Some(s.revision) {
                 continue;
             }
@@ -363,12 +418,8 @@ async fn session(
                 // Stratum V1 has no cancellation without a replacement job.
                 return Ok(());
             }
-            let clean = jobs
-                .front()
-                .is_none_or(|(prior, _)| prior.parent_epoch != s.parent_epoch);
-            if clean {
-                jobs.clear();
-            }
+            jobs.retain(|(job, _)| job.eligible(&s));
+            let clean = jobs.is_empty();
             let regtest = s.regtest;
             drop(s);
             if first {
@@ -398,6 +449,7 @@ pub async fn run_stratum(
     addr: SocketAddr,
     state: Arc<Mutex<Mining>>,
     solved: mpsc::Sender<(u32, Vec<u8>)>,
+    password: Option<Arc<str>>,
 ) -> Result<()> {
     ensure!(
         !state.lock().await.payout.is_empty(),
@@ -405,21 +457,24 @@ pub async fn run_stratum(
     );
     let listener = TcpListener::bind(addr).await?;
     let sessions = Arc::new(Semaphore::new(32));
-    let mut serial = 0u32;
+    let mut next = 0u32;
+    let mut end = 0u32;
     loop {
         let (stream, _) = listener.accept().await?;
         let Ok(permit) = sessions.clone().try_acquire_owned() else {
             continue;
         };
-        let Some(next) = serial.checked_add(1) else {
-            bail!("extranonce space exhausted")
-        };
-        serial = next;
+        if next == end {
+            (next, end) = state.lock().await.extranonce_lease()?;
+        }
+        next = next.checked_add(1).context("extranonce space exhausted")?;
+        let serial = next;
         let shared = state.clone();
         let publisher = solved.clone();
+        let password = password.clone();
         tokio::spawn(async move {
             let _permit = permit;
-            if let Err(e) = session(stream, next, shared, publisher).await {
+            if let Err(e) = session(stream, serial, shared, publisher, password).await {
                 eprintln!("Stratum session ended: {e}");
             }
         });
@@ -460,7 +515,10 @@ mod tests {
     #[test]
     fn only_network_target_share_enqueues_and_retires_the_regtest_job() {
         let mut state = Mining::new(true, vec![0x51]).unwrap();
-        state.headers.push_back([5; 80]);
+        let mut parent = [0u8; 80];
+        parent[72..76].copy_from_slice(&0x207fffffu32.to_le_bytes());
+        state.headers.push_back(parent);
+        state.height = Some(25);
         let (prefix, suffix) = coinbase_parts(26, 5_000_000_000, &[0x51]);
         let time = now().unwrap();
         let job = Job {

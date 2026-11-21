@@ -1,5 +1,5 @@
 //! Read-only native Teranode assets for blocks this process has solved.
-use super::MAX_BODY;
+use super::body_limit;
 use crate::mining::wire::{display_hash, merkle, put_varint, take, transaction, varint, Hash};
 use anyhow::{ensure, Context, Result};
 use axum::{
@@ -70,7 +70,7 @@ impl Assets {
 
     pub fn new(height: u32, raw: Vec<u8>) -> Result<Self> {
         ensure!(
-            raw.len() <= MAX_BODY,
+            raw.len() <= body_limit(),
             "block exceeds the alpha Asset size limit"
         );
         let raw = Bytes::from(raw);
@@ -182,7 +182,7 @@ impl AssetService {
         let mut list = self.store.write().await;
         list.retain(|old| old.hash != asset.hash);
         list.push_back(asset);
-        while list.len() > 16 || list.iter().map(|a| a.raw.len()).sum::<usize>() > MAX_BODY {
+        while list.len() > 16 || list.iter().map(|a| a.raw.len()).sum::<usize>() > body_limit() {
             list.pop_front();
         }
     }

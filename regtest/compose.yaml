@@ -60,7 +60,7 @@ services:
     volumes: [tn2-data:/app/data]
   scary-node:
     build: ..
-    image: scary-node:local
+    image: ${SCARY_NODE_IMAGE:-scary-node:local}
     networks: [regtest]
     volumes: [scary-data:/data]
     depends_on: [tn1, tn2]

@@ -2,3 +2,5 @@
 target
 .scary-node
 .regtest
+
+.native

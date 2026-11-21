@@ -1,5 +1,5 @@
 //! Bounded block retrieval on a separate task so Asset I/O cannot stop GossipSub.
-use super::{Event, MAX_BODY};
+use super::{body_limit, Event};
 use crate::mining::wire::display_hash;
 use anyhow::{ensure, Context, Result};
 use bsv::primitives::hash::hash256;
@@ -171,7 +171,7 @@ async fn fetch(network: &str, r: &Request) -> Result<Vec<u8>> {
     url.set_query(Some("wire=1"));
     let res = client.get(url).send().await?.error_for_status()?;
     ensure!(
-        res.content_length().unwrap_or(0) <= MAX_BODY as u64,
+        res.content_length().unwrap_or(0) <= body_limit() as u64,
         "block exceeds the alpha download limit"
     );
     let mut bytes = Vec::new();
@@ -179,7 +179,7 @@ async fn fetch(network: &str, r: &Request) -> Result<Vec<u8>> {
     while let Some(chunk) = chunks.next().await {
         let chunk = chunk?;
         ensure!(
-            chunk.len() <= MAX_BODY - bytes.len(),
+            chunk.len() <= body_limit() - bytes.len(),
             "block exceeds the alpha download limit"
         );
         bytes.extend_from_slice(&chunk);
@@ -218,6 +218,7 @@ async fn worker(
                     let (validated, result) = tokio::sync::oneshot::channel();
                     if events
                         .send(Event::Block {
+                            source: r.base.clone(),
                             height: r.height,
                             raw,
                             validated,

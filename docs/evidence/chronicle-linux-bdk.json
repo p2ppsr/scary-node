@@ -1,0 +1,12 @@
+{
+  "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+  "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+  "platform": "linux_aarch64",
+  "dependencies_sha256": "ba52bbaea6b8c31f44679dad53ca57d3021654779d9e4d9d71da25c3dece8578",
+  "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+  "type": "Release",
+  "cxx_flags": "-O3 -g0 -DNDEBUG",
+  "cxx_standard": 20,
+  "compiler": "c++ (Debian 12.2.0-14+deb12u1) 12.2.0",
+  "cmake": "cmake version 3.25.1"
+}

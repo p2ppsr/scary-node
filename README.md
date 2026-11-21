@@ -2,15 +2,16 @@
 
 Scary Node is an alpha Rust implementation of a BSV mining node. Its default command listens to the native Teranode peer network on BSV mainnet. An operator can enable block observation, submit signed spends of recently witnessed outputs and give a locally assembled block candidate to an ASIC over Stratum V1.
 
-The node starts with an empty working set. It sees an output created, observes other miners build on its block, and tracks subsequent spends on that branch. A spend becomes eligible only after the creating block has a successor and the node has processed the complete bodies covering the intervening interval. Continued proof of work is the entrant’s basis for recognizing accepted history. This alpha concentrates on ordinary P2PKH payments and places no claim on outputs it has never observed. [Validation model](docs/validation.md)
+The node starts with an empty working set. It sees an output created, observes other miners build on its block, and tracks subsequent spends on that branch. A spend becomes eligible only after the creating block has a successor and the node has processed the complete bodies covering the intervening interval. Continued proof of work is the entrant’s basis for recognizing accepted history. Scary Node checks Chronicle-era ordinary spends with the shared BDK interpreter. Signed directives govern frozen outputs and authorized confiscations. [Validation model](docs/validation.md)
 
 ## Listen on mainnet
 
-Install a current stable Rust toolchain, then build the checked-in revision and dependency lock.
+Install Rust 1.98.1 and the native build prerequisites. The build fetches the pinned upstream interpreter and links it into the node. [Build and qualification](docs/chronicle-qualification.md)
 
 ```sh
 git clone https://github.com/p2ppsr/scary-node.git
 cd scary-node
+./scripts/build-bdk.sh
 cargo build --release --locked
 ./target/release/scary-node
 ```
@@ -22,7 +23,7 @@ curl -fsS http://127.0.0.1:8080/status
 ./target/release/scary-node --help
 ```
 
-Use repeated `--peer <multiaddr>` options to select specific peers. A peer identity is stored under `--data-dir`. The alpha rebuilds its witnessed transaction set after restart. Use `--observe-bodies` to fetch and verify block bodies while listening. Network, API and asset configuration are documented in the [operator guide](docs/operations.md).
+Use repeated `--peer <multiaddr>` options to select specific peers. A peer identity is stored under `--data-dir`. The node checkpoints its witnessed branch, undo data, directive sequence and solved-block state. Use `--observe-bodies` to fetch and verify block bodies while listening. Network, API and asset configuration are documented in the [operator guide](docs/operations.md).
 
 ## Demonstrate mining locally
 
@@ -65,22 +66,29 @@ The reliability proof submits an older Stratum job after a same-parent update, c
 
 [Run the reliability proof and cohort](docs/reliability.md) · [Reliability results](docs/reliability-results.md)
 
+## Verify Chronicle validation and asset recovery
+
+Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. [Reproduction](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md)
+
 ## Point an ASIC at your node
 
-Set the payout locking script to an address you control. Run the node with a reachable advertised Asset URL so that peers can retrieve the block you announce. Enable the Stratum listener on a trusted mining LAN. The example expects the operator to supply the two environment variables.
+Set the payout locking script to an address you control. Run the node with a reachable advertised Asset URL so that peers can retrieve the block you announce. Enable the Stratum listener on a trusted mining LAN. Supply the payout script, public asset URL and credential-file paths. Configure the alert receiver and authenticated gateway first. [Receiver and operator procedure](docs/chronicle-qualification.md)
 
 ```sh
 ./target/release/scary-node \
+  --operator-token-file "$OPERATOR_TOKEN_FILE" --worker-password-file "$WORKER_PASSWORD_FILE" \
+  --alert-service-url http://127.0.0.1:19366 --alert-token-file "$ALERT_TOKEN_FILE" \
   --stratum-bind 0.0.0.0:3333 \
   --asset-bind 0.0.0.0:9090 \
   --asset-url "$PUBLIC_ASSET_BASE" \
   --payout-script "$PAYOUT_SCRIPT_HEX"
 ```
 
-Configure the ASIC’s pool URL as `stratum+tcp://YOUR_NODE:3333`, enter a worker name and use `x` as the password. Check `GET /status` for the observed tip. After entry, use a wallet you control to fund a P2PKH output and wait for the node to observe its block and a successor. In the wallet, sign a fee-paying child of that exact output with `SIGHASH_ALL | FORKID`, save its raw bytes to `child.tx`, and submit it to your node before broadcasting it elsewhere. See the [operator guide](docs/operations.md) for the admitted transaction format.
+Configure the ASIC’s pool URL as `stratum+tcp://YOUR_NODE:3333`, enter a worker name and use the password from the worker credential file. Check `GET /status` for the observed tip. After entry, use a wallet you control to fund a P2PKH output and wait for the node to observe its block and a successor. In the wallet, sign a fee-paying child of that exact output with `SIGHASH_ALL | FORKID`, save its raw bytes to `child.tx`, and submit it to your node before broadcasting it elsewhere. See the [operator guide](docs/operations.md) for the admitted transaction format.
 
 ```sh
 curl --fail-with-body --data-binary @child.tx \
+  -H "Authorization: Bearer $(cat "$OPERATOR_TOKEN_FILE")" \
   -H 'Content-Type: application/octet-stream' http://127.0.0.1:8080/transactions
 ```
 

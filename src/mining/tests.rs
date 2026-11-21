@@ -1,6 +1,6 @@
 use super::*;
 use bsv::primitives::private_key::PrivateKey;
-use bsv::script::{templates::p2pkh::P2PKH, ScriptTemplateLock};
+use bsv::script::{templates::p2pkh::P2PKH, LockingScript, ScriptTemplateLock};
 use bsv::transaction::{TransactionInput, TransactionOutput};
 
 fn make_block(previous: Hash, height: u32, more: &[Vec<u8>]) -> Vec<u8> {
@@ -550,4 +550,205 @@ fn branch_replay_across_depth_and_delivery_orders() {
         assert!(miner.observation_window_ready());
         assert_eq!(miner.headers.len(), depth as usize + 2);
     }
+}
+
+#[test]
+fn checkpoint_restores_branch_and_refuses_corrupt_state() {
+    let dir = std::env::temp_dir().join(format!("scary-state-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let mut s = Mining::new(true, vec![]).unwrap();
+    s.open_store(&dir).unwrap();
+    let first = make_block([4; 32], 151, &[]);
+    let second = make_block(hash256(&first[..80]), 152, &[]);
+    s.observe(151, &first).unwrap();
+    s.observe(152, &second).unwrap();
+    s.save().unwrap();
+    let mut recovered = Mining::new(true, vec![0x51]).unwrap();
+    recovered.open_store(&dir).unwrap();
+    assert_eq!(recovered.tip(), s.tip());
+    assert_eq!(
+        recovered.status()["validation_window"],
+        s.status()["validation_window"]
+    );
+    assert_eq!(recovered.chain.applied.len(), 2);
+    assert_eq!(recovered.payout, [0x51]);
+    let f = dir.join("witness.state");
+    let mut bytes = std::fs::read(&f).unwrap();
+    bytes[12] ^= 1;
+    std::fs::write(&f, bytes).unwrap();
+    assert!(Mining::new(true, vec![]).unwrap().open_store(&dir).is_err());
+    std::fs::remove_dir_all(&dir).unwrap();
+}
+
+#[tokio::test]
+async fn packages_use_candidate_height_and_survive_restart() {
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abc101").unwrap());
+    let lock = signer.lock().unwrap();
+    let funding = tx(&"a1".repeat(32), 100000, lock.clone());
+    let mut m = Mining::new(true, lock.to_binary()).unwrap();
+    let block = make_block([3; 32], 250, &[funding.to_bytes().unwrap()]);
+    m.observe(250, &block).unwrap();
+    let next = make_block(m.tip().unwrap(), 251, &[]);
+    m.observe(251, &next).unwrap();
+    let mut p = tx(&funding.id().unwrap(), 90000, lock.clone());
+    p.sign(0, &signer, 0x41, 100000, &lock).await.unwrap();
+    let mut child = tx(&p.id().unwrap(), 80000, lock.clone());
+    child.sign(0, &signer, 0x41, 90000, &lock).await.unwrap();
+    let raws = [p.to_bytes().unwrap(), child.to_bytes().unwrap()];
+    assert!(m.submit_tx(&raws[1]).is_err());
+    m.submit_tx(&raws[0]).unwrap();
+    m.submit_tx(&raws[1]).unwrap();
+    let dir = std::env::temp_dir().join(format!("scary-package-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    m.open_store(&dir).unwrap();
+    m.save().unwrap();
+    let mut recovered = Mining::new(true, lock.to_binary()).unwrap();
+    recovered.open_store(&dir).unwrap();
+    assert_eq!(recovered.pending.len(), 2);
+    let body = make_block(recovered.tip().unwrap(), 252, &raws);
+    recovered.verify_own_block(252, &body, true).unwrap();
+    let reversed = make_block(
+        recovered.tip().unwrap(),
+        252,
+        &[raws[1].clone(), raws[0].clone()],
+    );
+    assert!(recovered.verify_own_block(252, &reversed, true).is_err());
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[tokio::test]
+#[ignore = "release throughput measurement"]
+async fn measure_signed_body_commit() {
+    let n = 4096;
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcd29").unwrap());
+    let lock = signer.lock().unwrap();
+    let mut m = Mining::new(true, lock.to_binary()).unwrap();
+    let dir = std::env::temp_dir().join(format!("scary-bench-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    m.open_store(&dir).unwrap();
+    let mut blocks = vec![];
+    let mut prev = [7; 32];
+    let mut parents = (0..n)
+        .map(|i| tx(&format!("{:064x}", i + 1), 100000, lock.clone()))
+        .collect::<Vec<_>>();
+    for round in 0..5u32 {
+        let mut txs = vec![];
+        for parent in &mut parents {
+            if round > 0 {
+                let mut child = tx(
+                    &parent.id().unwrap(),
+                    100000 - u64::from(round) * 1000,
+                    lock.clone(),
+                );
+                child
+                    .sign(0, &signer, 0x41, 101000 - u64::from(round) * 1000, &lock)
+                    .await
+                    .unwrap();
+                *parent = child;
+            }
+            txs.push(parent.to_bytes().unwrap());
+        }
+        let body = make_block(prev, 250 + round, &txs);
+        prev = hash256(&body[..80]);
+        blocks.push(body);
+    }
+    for (round, b) in blocks.iter().enumerate() {
+        let start = std::time::Instant::now();
+        m.observe(250 + round as u32, b).unwrap();
+        let observed = start.elapsed();
+        m.save().unwrap();
+        let total = start.elapsed();
+        let checks = m.validation_window.back().unwrap().checks;
+        if round > 0 {
+            assert_eq!(checks.script_checks_passed, n as u64);
+            assert_eq!(checks.transactions_determinate, n as u64);
+        }
+        println!(
+            "{}",
+            json!({"cohort":"signed_body_commit","round":round,"transactions":n,"wire_bytes":b.len(),
+            "known_signatures":checks.script_checks_passed,"observe_us":observed.as_micros(),"commit_inclusive_us":total.as_micros(),
+            "commit_inclusive_tps":n as f64/total.as_secs_f64(),
+            "checkpoint_bytes":std::fs::metadata(dir.join("witness.state")).unwrap().len()})
+        );
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[tokio::test]
+async fn soft_freeze_releases_on_fourth_successor_and_explicit_invalidation_rolls_back() {
+    use crate::alerts::tests::{keys, public, signed};
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcd1004").unwrap());
+    let lock = signer.lock().unwrap();
+    let source = tx(&"45".repeat(32), 100000, lock.clone());
+    let mut child = tx(&source.id().unwrap(), 90000, lock.clone());
+    child.sign(0, &signer, 0x41, 100000, &lock).await.unwrap();
+    let mut m = Mining::new(true, lock.to_binary()).unwrap();
+    let signing = keys(12);
+    m.directives = crate::alerts::Book::new(&public(&signing), false).unwrap();
+    let parent = make_block([7; 32], 250, &[source.to_bytes().unwrap()]);
+    m.observe(250, &parent).unwrap();
+    let mut freeze = hex::decode(source.id().unwrap()).unwrap();
+    freeze.extend(0u64.to_le_bytes());
+    freeze.extend(251u64.to_le_bytes());
+    freeze.extend(300u64.to_le_bytes());
+    freeze.push(1);
+    let envelope = signed(1, 2, &freeze, &signing);
+    m.directives.receive(&envelope, None).unwrap();
+    m.directives_changed(&envelope).unwrap();
+    let first = make_block(m.tip().unwrap(), 251, &[child.to_bytes().unwrap()]);
+    m.observe(251, &first).unwrap();
+    let mut prev = hash256(&first[..80]);
+    for height in 252..=255 {
+        let block = make_block(prev, height, &[]);
+        prev = hash256(&block[..80]);
+        m.observe(height, &block).unwrap();
+        assert_eq!(m.height, Some(if height == 255 { 255 } else { 250 }));
+        assert!(m.awaiting_height.is_none());
+    }
+    let mut payload = hash256(&first[..80]).to_vec();
+    payload.extend(b"\x03lab");
+    let invalid = signed(2, 7, &payload, &signing);
+    m.directives.receive(&invalid, None).unwrap();
+    m.directives_changed(&invalid).unwrap();
+    assert_eq!(m.tip(), Some(hash256(&parent[..80])));
+    let extension = make_block(prev, 256, &[]);
+    assert!(m.observe(256, &extension).is_err());
+    assert!(m.outpoint(&source.id().unwrap(), 0).unwrap()["known"] == true);
+}
+
+#[test]
+fn checkpoint_interruption_preserves_previous_boundary_and_burns_extranonce_lease() {
+    let dir = std::env::temp_dir().join(format!("scary-interrupt-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let mut m = Mining::new(true, vec![]).unwrap();
+    m.open_store(&dir).unwrap();
+    let parent = make_block([71; 32], 240, &[]);
+    m.observe(240, &parent).unwrap();
+    m.save().unwrap();
+    assert_eq!(m.extranonce_lease().unwrap(), (0, 1024));
+    let child = make_block(m.tip().unwrap(), 241, &[]);
+    m.observe(241, &child).unwrap();
+    std::fs::create_dir(dir.join("witness.next")).unwrap();
+    assert!(m.save().is_err());
+    let mut restored = Mining::new(true, vec![]).unwrap();
+    restored.open_store(&dir).unwrap();
+    assert_eq!(restored.tip(), Some(hash256(&parent[..80])));
+    assert_eq!(restored.extranonce_lease().unwrap(), (1024, 2048));
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn distant_gap_needs_two_linked_bodies_and_restarts_with_empty_old_evidence() {
+    let mut m = Mining::new(true, vec![]).unwrap();
+    let old = make_block([10; 32], 100, &[]);
+    m.observe(100, &old).unwrap();
+    let new = make_block([52; 32], 150, &[]);
+    m.observe(150, &new).unwrap();
+    assert!(!m.observation_window_ready());
+    assert_eq!(m.height, Some(100));
+    let child = make_block(hash256(&new[..80]), 151, &[]);
+    m.observe(151, &child).unwrap();
+    assert_eq!(m.tip(), Some(hash256(&child[..80])));
+    assert_eq!(m.headers.len(), 2);
+    assert_eq!(m.chain.applied.len(), 2);
 }

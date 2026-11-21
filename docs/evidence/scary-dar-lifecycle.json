@@ -1,0 +1,239 @@
+{
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "alternate_hashes": [
+    "6f5c4c17e7376da91d00c23ad84ae9d4dda8d4a9a082fb37f30783f153fb5dd8",
+    "595c49eb8eeb6baf87b1b8d36a853c966ac4727848bdb4bcb8fffa6984d4b2b1",
+    "621e936e5c4e172f70389192704feafbe03ffad6916f613f03b6b62e74eeba34",
+    "316dd6e0a6e29399d4723f3f50cb770da092d2fc2ab38ea154288851cbd25aaf"
+  ],
+  "settlement_before_reorg": [
+    {
+      "chain_state": "settled",
+      "deliveries": {
+        "sv:127.0.0.1:52814": {
+          "received_body": 1795227939982,
+          "sent_body": 1795227939586
+        }
+      },
+      "first_inclusion_at_ms": 1795227939972,
+      "first_settlement_at_ms": 1795227940708,
+      "hash": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
+      "height": 108,
+      "job": "5",
+      "parent": "75e09271cbd7c089146483317c831581a140c8444a2c9a7461515d11b40fe22d",
+      "peer_tip_reporters": [],
+      "publication_error": "NoPeersSubscribedToTopic",
+      "published_at_ms": null,
+      "queued_at_ms": 1795227938834,
+      "transitions": [
+        {
+          "at_ms": 1795227939972,
+          "height": 109,
+          "state": "observed_active"
+        },
+        {
+          "at_ms": 1795227940708,
+          "height": 116,
+          "state": "settled"
+        }
+      ]
+    },
+    {
+      "chain_state": "settled",
+      "deliveries": {
+        "sv:127.0.0.1:52814": {
+          "received_body": 1795228006573,
+          "sent_body": 1795228006141
+        }
+      },
+      "first_inclusion_at_ms": 1795228006547,
+      "first_settlement_at_ms": 1795228006547,
+      "hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
+      "height": 1108,
+      "job": "13e",
+      "parent": "72337dea017838d6dc7d2259e9f104378456959a77b0d1891bfb58bc5777a6a5",
+      "peer_tip_reporters": [],
+      "publication_error": "NoPeersSubscribedToTopic",
+      "published_at_ms": null,
+      "queued_at_ms": 1795228006022,
+      "transitions": [
+        {
+          "at_ms": 1795228006547,
+          "height": 1110,
+          "state": "settled"
+        }
+      ]
+    }
+  ],
+  "reorg_solutions": [
+    {
+      "chain_state": "settled",
+      "deliveries": {
+        "sv:127.0.0.1:52814": {
+          "received_body": 1795227939982,
+          "sent_body": 1795227939586
+        }
+      },
+      "first_inclusion_at_ms": 1795227939972,
+      "first_settlement_at_ms": 1795227940708,
+      "hash": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
+      "height": 108,
+      "job": "5",
+      "parent": "75e09271cbd7c089146483317c831581a140c8444a2c9a7461515d11b40fe22d",
+      "peer_tip_reporters": [],
+      "publication_error": "NoPeersSubscribedToTopic",
+      "published_at_ms": null,
+      "queued_at_ms": 1795227938834,
+      "transitions": [
+        {
+          "at_ms": 1795227939972,
+          "height": 109,
+          "state": "observed_active"
+        },
+        {
+          "at_ms": 1795227940708,
+          "height": 116,
+          "state": "settled"
+        }
+      ]
+    },
+    {
+      "chain_state": "stale_at_depth",
+      "deliveries": {
+        "sv:127.0.0.1:52814": {
+          "received_body": 1795228006573,
+          "sent_body": 1795228006141
+        }
+      },
+      "first_inclusion_at_ms": 1795228006547,
+      "first_settlement_at_ms": 1795228006547,
+      "hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
+      "height": 1108,
+      "job": "13e",
+      "parent": "72337dea017838d6dc7d2259e9f104378456959a77b0d1891bfb58bc5777a6a5",
+      "peer_tip_reporters": [],
+      "publication_error": "NoPeersSubscribedToTopic",
+      "published_at_ms": null,
+      "queued_at_ms": 1795228006022,
+      "transitions": [
+        {
+          "at_ms": 1795228006547,
+          "height": 1110,
+          "state": "settled"
+        },
+        {
+          "at_ms": 1795228008624,
+          "height": 1111,
+          "state": "stale_at_depth"
+        }
+      ]
+    }
+  ],
+  "alert_source": "isolated authenticated delivery fixture, three distinct SV Node wallet signers",
+  "genesis_keys": [
+    "025bdba12a86a8648c4715ce339b042b61a7ff2d7925dc2aeea52b6636b9e0affa",
+    "03d34c3ec0502dc5067c748fd553c3671bc47463c03521ce47c6e2bfd9675a55ce",
+    "03d2373360e2fed9e8adf72302e41f341554c0d97b823ca93dfc83e0e4309f480e",
+    "037259e3b8f166e0f5c6a18ac2a81ab969a253e1fcc2ad36dc1d0b6e619c538ff1",
+    "02430e83f599fbd78be4009ca055818d57e7dbc26804a8b8fef930cc97877444d0"
+  ],
+  "signed_records": [
+    {
+      "sequence_number": 1,
+      "raw": "01000000010000001e01016b0000000002000000b9dedcb93837d7b9a9dc7f86bcc1138548847e5cd562182fc2aca0f67b8ffee801000000000000006c00000000000000ffffff7f00000000001f059d60bf3c0edb88b3bbe2e2f7bdc00f611ae6cb1916498d415f69d5dccd3472358607eb0616409b59c0b460856356d3cec329f4714a0ed5af890b2c47cafcc21fa61be82333c2ee7a003d1f4175fb19cb9dc75949b97353dec36f2f729e2239bc7f654c81521ae7d2cfa1ebf1d023ca9d102eee5c1fbac3a2e87ca2a38db72fab20dae7366533523677102350d6976d355810ad86c23853e2e5b2b694b55377b36f7f96f8c7a436c187f0e63316516d1b7015b8cec943aea85667c79c66144979d2"
+    },
+    {
+      "sequence_number": 2,
+      "raw": "01000000020000002101016b00000000040000006c000000000000007b0100000001e8fe8f7bf6a0acc22f1862d55c7e84488513c1bc867fdca9b9d73738b9dcdeb90100000000ffffffff0200000000000000001d006a04636674781501b8531bc1ef21eee37a66a0cfa29df6f39a59691cf0b9f505000000001976a9143bc890d7ac219bb0c5645b36d6cd9618212ae32588ac000000002067e045ff5bf39b703cc7c4ae978e1ba2bab9f17885c6bd6491f0e74d592b25f30d9bba481442db55842d3a27b3f0fc38e4b50b18d5d7ad8f4ab0602382191b861fad3de4286d4f48ec633f0764ff7427209e7e46baf2e3754f1875e4212c5bce8f54db262a8409617be5fb69cb8540e6cca4523a0640cac475320f5d073fbecdcc208cff795f3e71b3b632377661df602825c0b6a86b49189dfc80482e5591d1daa3680ebe698b64a47923762dcbec9ea210558c5bcbe461ea12fb618552e740e259"
+    }
+  ],
+  "confiscation_block": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
+  "confiscation_txid": "a04a4791f48d8b99dedbcc926c80ec86e78dbf28f4386827dcd336e3e48e1501",
+  "maturity_minus_one": {
+    "amount_checks_deferred": 0,
+    "amount_checks_failed": 0,
+    "amount_checks_passed": 1,
+    "consumed_inputs": 0,
+    "known_inputs": 1,
+    "noncoinbase_transactions": 1,
+    "outcome": "invalid",
+    "reason": "immature confiscation output",
+    "same_block_inputs": 0,
+    "script_checks_deferred": 0,
+    "script_checks_failed": 0,
+    "script_checks_passed": 1,
+    "transactions_deferred": 0,
+    "transactions_determinate": 0,
+    "unknown_inputs": 0
+  },
+  "maturity_height": 1108,
+  "recipient_spend": "16264aeee2264d9bbf70fbdc95ff1c02af0333ee8c21166e2eff4b2cce3c279f",
+  "confiscation_and_recipient_spend_origin": "Scary Node Stratum worker",
+  "confirmed_hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
+  "remined_spend_hash": "3928a450242828c01a810f04e8e3ae75a6d8cee2cb1b1677fa1a8b1234c40c39",
+  "solutions": [
+    {
+      "chain_state": "settled",
+      "deliveries": {
+        "sv:127.0.0.1:52814": {
+          "received_body": 1795227939982,
+          "sent_body": 1795227939586
+        }
+      },
+      "first_inclusion_at_ms": 1795227939972,
+      "first_settlement_at_ms": 1795227940708,
+      "hash": "295d9ab53dd3f82305c44e168532258bfd18e63b0a17bbec7f02cd70e24ae0c3",
+      "height": 108,
+      "job": "5",
+      "parent": "75e09271cbd7c089146483317c831581a140c8444a2c9a7461515d11b40fe22d",
+      "peer_tip_reporters": [],
+      "publication_error": "NoPeersSubscribedToTopic",
+      "published_at_ms": null,
+      "queued_at_ms": 1795227938834,
+      "transitions": [
+        {
+          "at_ms": 1795227939972,
+          "height": 109,
+          "state": "observed_active"
+        },
+        {
+          "at_ms": 1795227940708,
+          "height": 116,
+          "state": "settled"
+        }
+      ]
+    },
+    {
+      "chain_state": "stale_at_depth",
+      "deliveries": {
+        "sv:127.0.0.1:52814": {
+          "received_body": 1795228006573,
+          "sent_body": 1795228006141
+        }
+      },
+      "first_inclusion_at_ms": 1795228006547,
+      "first_settlement_at_ms": 1795228006547,
+      "hash": "336e78277796511b48948e47b5249f91b9e49f8f10fa054f0384f7745b9f4dc4",
+      "height": 1108,
+      "job": "13e",
+      "parent": "72337dea017838d6dc7d2259e9f104378456959a77b0d1891bfb58bc5777a6a5",
+      "peer_tip_reporters": [],
+      "publication_error": "NoPeersSubscribedToTopic",
+      "published_at_ms": null,
+      "queued_at_ms": 1795228006022,
+      "transitions": [
+        {
+          "at_ms": 1795228006547,
+          "height": 1110,
+          "state": "settled"
+        },
+        {
+          "at_ms": 1795228008624,
+          "height": 1111,
+          "state": "stale_at_depth"
+        }
+      ]
+    }
+  ],
+  "scary_active_tip": "3928a450242828c01a810f04e8e3ae75a6d8cee2cb1b1677fa1a8b1234c40c39"
+}

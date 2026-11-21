@@ -1,0 +1,340 @@
+{
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "corpus": "SV Node v1.2.3 post-Chronicle opcode fixtures plus false result",
+  "funding_block": "488e7decb649edd589ad48d02a7348de3616128470be04e4ab3b245e04e337cf",
+  "funding_tx": "01000000012c7b6be29c2c149db954a6ef2e9c3d3643916dcf58048de50d5f6ba5a4145dcc0000000048473044022059480c991b63f0e1ad7fb6fc3ba6238f33a8c00ffcf8a27a38c5a1866386b95402203e4182007f9dbdfd1313412df418402738dad00020c5f989645e5663751761e041ffffffff0c50c30000000000000362755150c30000000000000a0401000000655167006850c30000000000000a0401ff0000665167006850c3000000000000150a48656c6c6f576f726c645455b3056f576f726c8750c3000000000000140a48656c6c6f576f726c6455b40548656c6c6f8750c3000000000000140a48656c6c6f576f726c6455b505576f726c648750c300000000000004518d528750c300000000000004528e518750c3000000000000055152b6548750c3000000000000056052b7548750c300000000000001008066fd29010000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+  "rows": [
+    {
+      "case": "70",
+      "txid": "d364e15ebd4d38745be53db763f3dd552e5993f03b5aa319e814f4604d1bbc2f",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100000000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100000000000ffffffff50c3000000000000036275510180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 106,
+      "block_hash": "4c7fec72a2863dc4fb90a77858bee0afcf97afcef6c3ed1421b634994d809ff6",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "71",
+      "txid": "e55e6e434f5741c965db7efe79b18611a62385f55a6a0b7c0f5975ed5fbed795",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100100000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100100000000ffffffff50c30000000000000a040100000065516700680180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 107,
+      "block_hash": "4940ac22a9d47c800bf3164d9c6e28b1744cc3a248ac2b1ec14f12b18a9e546a",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "72",
+      "txid": "706ca7277df7ee23fd5bf080e90d74036508477bd6a7491195e9fd8688732488",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100200000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100200000000ffffffff50c30000000000000a0401ff000066516700680180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 108,
+      "block_hash": "3b0a9ab07a3010e69c933b3ab476e4b828812b4b8f2664e24052792cca1835f6",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "73",
+      "txid": "40b6b44936a6312332c9f456d3387812cf3c884717de81864ceb02a18d81c786",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100300000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100300000000ffffffff50c3000000000000150a48656c6c6f576f726c645455b3056f576f726c870180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 109,
+      "block_hash": "22c1b1c5af276c6d30c6a9bde8e8841c99646a4616c2972b4c92dd1b65619827",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "74",
+      "txid": "648deac2e8169e566c65772206e5346e8beab4b6a87f2df0dd031eaf5feb04f3",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100400000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100400000000ffffffff50c3000000000000140a48656c6c6f576f726c6455b40548656c6c6f870180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 110,
+      "block_hash": "46070fc6fca4c2bbdc63c2abda8c31553abb4fe37ea3f5f10c08f50464a9bf75",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "75",
+      "txid": "1fa5736d58f90d75f375189af45e13a8ffd13521809832220b2cdb3aa674ffea",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100500000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100500000000ffffffff50c3000000000000140a48656c6c6f576f726c6455b505576f726c64870180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 111,
+      "block_hash": "3488906283e55386a138f0f48f091a11e634a5460e8b62b544c03cbcd3f36a59",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "76",
+      "txid": "368d9c408b48e67ed2ef1f769bbbbffbc60e8b216a86609be171e2370c474c09",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100600000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100600000000ffffffff50c300000000000004518d52870180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 112,
+      "block_hash": "14c96757601254094328bd804a01429be97ce6eb69af6911f0b90b6c9306cb10",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "77",
+      "txid": "e3c3c1364d2d99b33b0635b1c387be8b6db2e06f3df85b3fba8f57923b9bc0fa",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100700000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100700000000ffffffff50c300000000000004528e51870180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 113,
+      "block_hash": "74c046c3f82454e6530c0049e8d4f453938a05869f30d788f4dfb76b05cfd874",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "78",
+      "txid": "67d359ebb19cf59f5577e4eadde07d4a5d8d38a145dbaf29c80d9c85b1ebc98f",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100800000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100800000000ffffffff50c3000000000000055152b654870180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 114,
+      "block_hash": "2c360c1af8c94b6d5c5154ef10b0674b68d0292b18b15cb8e909863b5eca1dfd",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "79",
+      "txid": "3ef013817c2af52963b7f67aafa510aa3ce0faa504a8cc0788512c0c407813ac",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100900000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100900000000ffffffff50c3000000000000056052b754870180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 115,
+      "block_hash": "1b16e4016e99b3fd03ddc67445db21055560b79af3f382a97423f7241696b083",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "consensus_error": null,
+          "policy": true,
+          "policy_error": null,
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": true,
+          "policy": true,
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": true,
+          "consensus": true,
+          "reason": null
+        }
+      }
+    },
+    {
+      "case": "false-result",
+      "txid": "575bb032115504e7ebef94329a55e43555e5a04e74d1aeaf399e10aa28158735",
+      "raw_tx": "0100000001b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100a00000000ffffffff0180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "extended_hex": "010000000000000000ef01b3bc6c095ee58d8c4f0d3af3832c459419a08013324fa08238f4db60846e02100a00000000ffffffff50c300000000000001000180bb0000000000001976a9147c348e933100ff85cae3439fd6cf19fdcddad63688ac00000000",
+      "utxo_height": 106,
+      "parent_height": 116,
+      "block_hash": "6c9f63a059aa190d68d969908e966130b1f9cd987a5e7e256d16d01e4995d692",
+      "observations": {
+        "rust": {
+          "bdk_version": "1.4.0",
+          "consensus": false,
+          "consensus_error": "script error 2: Script evaluated without error but finished with a false/empty top stack element",
+          "policy": false,
+          "policy_error": "script error 2: Script evaluated without error but finished with a false/empty top stack element",
+          "sv_source": "6504a3a"
+        },
+        "go": {
+          "bdk_version": "1.4.0",
+          "consensus": false,
+          "consensus_error": "Script evaluated without error but finished with a false/empty top stack element",
+          "policy": false,
+          "policy_error": "Script evaluated without error but finished with a false/empty top stack element",
+          "sv_source": "6504a3aff"
+        },
+        "sv": {
+          "policy": false,
+          "consensus": false,
+          "reason": "blk-bad-inputs"
+        }
+      }
+    }
+  ]
+}

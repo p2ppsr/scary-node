@@ -1,0 +1,57 @@
+[
+  {
+    "checkpoint_bytes": 1565222,
+    "cohort": "signed_body_commit",
+    "commit_inclusive_tps": 190714.1663516422,
+    "commit_inclusive_us": 21477,
+    "known_signatures": 0,
+    "observe_us": 7639,
+    "round": 0,
+    "transactions": 4096,
+    "wire_bytes": 348308
+  },
+  {
+    "checkpoint_bytes": 3697328,
+    "cohort": "signed_body_commit",
+    "commit_inclusive_tps": 28226.975786140745,
+    "commit_inclusive_us": 145109,
+    "known_signatures": 4096,
+    "observe_us": 114456,
+    "round": 1,
+    "transactions": 4096,
+    "wire_bytes": 784509
+  },
+  {
+    "checkpoint_bytes": 5829536,
+    "cohort": "signed_body_commit",
+    "commit_inclusive_tps": 24518.40005060751,
+    "commit_inclusive_us": 167058,
+    "known_signatures": 4096,
+    "observe_us": 119185,
+    "round": 2,
+    "transactions": 4096,
+    "wire_bytes": 784471
+  },
+  {
+    "checkpoint_bytes": 7962524,
+    "cohort": "signed_body_commit",
+    "commit_inclusive_tps": 22332.27117649436,
+    "commit_inclusive_us": 183411,
+    "known_signatures": 4096,
+    "observe_us": 119726,
+    "round": 3,
+    "transactions": 4096,
+    "wire_bytes": 784515
+  },
+  {
+    "checkpoint_bytes": 10094990,
+    "cohort": "signed_body_commit",
+    "commit_inclusive_tps": 20518.27941503367,
+    "commit_inclusive_us": 199626,
+    "known_signatures": 4096,
+    "observe_us": 119068,
+    "round": 4,
+    "transactions": 4096,
+    "wire_bytes": 784497
+  }
+]

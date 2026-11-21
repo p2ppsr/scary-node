@@ -298,8 +298,8 @@ def prove():
     a, b = NODES
     with tempfile.TemporaryDirectory() as temp:
         wallet = DisposableWallet(Path(temp) / "key.pem")
-        # The restarted entrant keeps its transport identity; every chain observation
-        # lives in memory, so it starts with no UTXO set or prior block observations.
+        # A fresh lab volume has no contemporary observation before the entrant stops.
+        # Keep the node offline while the references build the pre-entry chain.
         compose("stop", "scary-node")
         try:
             funding_coin = rpc(a, "generatetoaddress", 1, wallet.address)[0]

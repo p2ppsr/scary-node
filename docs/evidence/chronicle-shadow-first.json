@@ -1,0 +1,26 @@
+{
+  "bits": 404771607,
+  "coverage": 1,
+  "directives": {
+    "authorized_confiscations": 0,
+    "banned_peers": 0,
+    "connected": false,
+    "frozen_records": 0,
+    "invalidated_blocks": 0,
+    "last_applied": 0,
+    "last_notice": null,
+    "last_verified": 0,
+    "outstanding_action": null,
+    "ready": false,
+    "reported_sequence": null,
+    "supervised": true
+  },
+  "expected_next_bits": null,
+  "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+  "height": 976422,
+  "observed_at": 1795227814,
+  "pending": 0,
+  "previous": "00000000000000001076543ba0f684404e1b03b04a38403e531db3f381dced9a",
+  "ready": false,
+  "unsigned_candidate": null
+}

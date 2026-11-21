@@ -90,6 +90,39 @@ pub fn transaction<'a>(
     Ok(&start[..start.len() - reader.len()])
 }
 
+/// Contextual locktime can be read without copying every script into SDK objects.
+pub fn final_under(raw: &[u8], height: u32, median: Option<u32>) -> Result<Option<bool>> {
+    let lock = u32::from_le_bytes(
+        raw.get(raw.len().checked_sub(4).context("missing locktime")?..)
+            .context("missing locktime")?
+            .try_into()?,
+    );
+    if lock == 0 {
+        return Ok(Some(true));
+    }
+    let mut r = raw;
+    take(&mut r, 4)?;
+    let n = varint(&mut r)?;
+    let mut final_inputs = true;
+    for _ in 0..n {
+        take(&mut r, 36)?;
+        let len = varint(&mut r)?;
+        take(&mut r, len)?;
+        final_inputs &= take(&mut r, 4)? == [255; 4];
+    }
+    if final_inputs {
+        return Ok(Some(true));
+    }
+    Ok(if lock < 500_000_000 {
+        Some(lock < height)
+    } else {
+        median.map(|t| lock < t)
+    })
+}
+pub fn p2sh(script: &[u8]) -> bool {
+    script.len() == 23 && script[0] == 0xa9 && script[1] == 20 && script[22] == 0x87
+}
+
 pub fn joined(left: Hash, right: Hash) -> Hash {
     let mut both = [0; 64];
     both[..32].copy_from_slice(&left);
@@ -169,8 +202,4 @@ pub fn height_push(height: u32) -> Vec<u8> {
     let mut script = vec![data.len() as u8];
     script.extend(data);
     script
-}
-
-pub fn p2pkh(script: &[u8]) -> bool {
-    script.len() == 25 && script[..3] == [0x76, 0xa9, 20] && script[23..] == [0x88, 0xac]
 }

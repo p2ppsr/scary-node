@@ -1,11 +1,17 @@
 //! Local checks against the current contiguous witnessed output set.
 use super::*;
-use bsv::primitives::transaction_signature::TransactionSignature;
 use serde::Serialize;
 
-pub(super) const SCRIPT_BUDGET: usize = 4096;
+#[derive(Debug)]
+pub(super) struct InvalidBody(pub &'static str);
+impl std::fmt::Display for InvalidBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0)
+    }
+}
+impl std::error::Error for InvalidBody {}
 
-#[derive(Default, Copy, Clone, Serialize)]
+#[derive(Default, Copy, Clone, Serialize, serde::Deserialize)]
 pub(super) struct Checks {
     pub noncoinbase_transactions: u64,
     pub known_inputs: u64,
@@ -22,7 +28,7 @@ pub(super) struct Checks {
     pub transactions_deferred: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, serde::Deserialize)]
 pub(super) struct Observation {
     pub height: u32,
     pub hash: String,
@@ -40,13 +46,14 @@ pub(super) struct Assessment {
 
 // An entry survives for at most MAX_WATCHED later consumptions. Removing an
 // entry before its FIFO turn (a recreated output) must not evict its new entry.
-#[derive(Default)]
+#[derive(Default, Serialize, serde::Deserialize)]
 pub(super) struct Spent {
     ids: HashMap<Outpoint, u64>,
     order: VecDeque<(Outpoint, u64)>,
     serial: u64,
 }
 
+#[derive(Serialize, serde::Deserialize)]
 pub(super) enum SpendUndo {
     Record {
         previous: Option<u64>,
@@ -55,6 +62,7 @@ pub(super) enum SpendUndo {
     Forget(Outpoint, Option<u64>),
 }
 
+#[derive(Serialize, serde::Deserialize)]
 pub(super) struct Applied {
     pub coins: Vec<(Outpoint, Option<Coin>)>,
     pub spends: Vec<SpendUndo>,
@@ -137,44 +145,8 @@ impl Checks {
     }
 }
 
-pub(super) fn check_script(tx: &Transaction, i: usize, coin: &Coin) -> Result<bool> {
-    let input = &tx.inputs[i];
-    let mut spend = Spend::new(SpendParams {
-        locking_script: LockingScript::from_binary(&coin.script),
-        unlocking_script: input
-            .unlocking_script
-            .clone()
-            .context("missing unlocking script")?,
-        source_txid: input
-            .source_txid
-            .clone()
-            .context("missing source transaction ID")?,
-        source_output_index: input.source_output_index as usize,
-        source_satoshis: coin.value,
-        transaction_version: tx.version,
-        transaction_lock_time: tx.lock_time,
-        transaction_sequence: input.sequence,
-        other_inputs: tx
-            .inputs
-            .iter()
-            .enumerate()
-            .filter(|(j, _)| *j != i)
-            .map(|(_, item)| item.clone())
-            .collect(),
-        other_outputs: tx.outputs.clone(),
-        input_index: i,
-    });
-    Ok(spend.validate()?)
-}
-
 fn checked_sum(sum: Option<u64>, value: u64) -> Option<u64> {
     sum?.checked_add(value).filter(|v| *v <= MAX_MONEY)
-}
-
-fn supported_signature(unlock: &[u8]) -> bool {
-    standard_unlock(unlock)
-        && TransactionSignature::from_checksig_format(&unlock[1..=unlock[0] as usize], false)
-            .is_ok_and(|s| s.has_low_s())
 }
 
 impl Mining {
@@ -184,17 +156,31 @@ impl Mining {
         height: u32,
         seen: &mut HashSet<Outpoint>,
         budget: &mut usize,
+        block_observation: bool,
+        created: Option<&HashMap<Outpoint, Coin>>,
     ) -> Result<Assessment> {
+        let is_confiscation = crate::alerts::confiscation(raw)?.is_some();
+        let is_authorized = is_confiscation && self.directives.authorized(&hash256(raw), height);
         let mut tx_inputs = 0;
-        let mut tx_outputs = 0;
         let mut total_in = Some(0);
         let mut total_out = Some(0);
         let mut supported = Vec::new();
         let mut a = Assessment::default();
         a.checks.noncoinbase_transactions = 1;
+        let finality = wire::final_under(
+            raw,
+            height,
+            (self.headers.len() >= 11).then(|| self.median_time()),
+        )?;
+        if finality == Some(false) {
+            a.violation = Some("non-final transaction");
+        }
+        if is_confiscation && self.directives.ready() && !is_authorized {
+            a.violation = Some("unauthorized confiscation");
+        }
         let mut bytes = raw;
         wire::transaction(&mut bytes, |event| match event {
-            Event::Input(id, index, unlock) => {
+            Event::Input(id, index, _) => {
                 let p = (id, index);
                 if p == ([0; 32], u32::MAX) {
                     a.violation.get_or_insert("unexpected coinbase prevout");
@@ -203,18 +189,27 @@ impl Mining {
                     a.violation
                         .get_or_insert("duplicate input in transaction or block");
                 }
-                if let Some(coin) = self.coins.get(&p) {
+                if !block_observation
+                    && !is_confiscation
+                    && self.directives.frozen(&p, height, false)
+                {
+                    a.violation.get_or_insert("consensus frozen input");
+                }
+                if let Some(coin) = self
+                    .coins
+                    .get(&p)
+                    .or_else(|| created.and_then(|outputs| outputs.get(&p)))
+                {
+                    if coin.confiscation && height.saturating_sub(coin.height) < 1000 {
+                        a.violation.get_or_insert("immature confiscation output");
+                    }
                     a.checks.known_inputs += 1;
                     a.checks.same_block_inputs += u64::from(coin.height == height);
                     total_in = checked_sum(total_in, coin.value);
                     if coin.coinbase && height.saturating_sub(coin.height) < 100 {
                         a.violation.get_or_insert("immature witnessed coinbase");
                     }
-                    if raw.len() <= 100_000
-                        && tx_inputs < 64
-                        && *budget > 0
-                        && supported_signature(unlock)
-                    {
+                    if coin.height >= interpreter::activation(self.regtest) {
                         supported.push((tx_inputs, coin));
                     }
                 } else if self.spent.has(&p) {
@@ -226,9 +221,11 @@ impl Mining {
                 }
                 tx_inputs += 1;
             }
-            Event::Output(_, value, _) => {
+            Event::Output(_, value, script) => {
+                if wire::p2sh(script) {
+                    a.violation.get_or_insert("post-Genesis P2SH output");
+                }
                 total_out = checked_sum(total_out, value);
-                tx_outputs += 1;
             }
         })?;
         ensure!(bytes.is_empty(), "trailing transaction data");
@@ -247,53 +244,77 @@ impl Mining {
         } else {
             a.checks.amount_checks_deferred = 1;
         }
-        // The SDK is used only for bounded, byte-preserving supported transactions.
-        // Unknown prevout values are not part of other inputs' FORKID preimages.
-        let mut supported_context = false;
-        if !supported.is_empty() && tx_inputs <= 64 && tx_outputs <= 128 {
-            if let Ok(tx) = Transaction::from_binary(&mut &raw[..]) {
-                if tx.to_bytes().is_ok_and(|encoded| encoded == raw) {
-                    supported_context = tx.version == 1
-                        && tx.lock_time == 0
-                        && tx.inputs.iter().all(|input| input.sequence == u32::MAX);
-                    for (i, coin) in supported.into_iter().take(*budget) {
-                        *budget -= 1;
-                        match check_script(&tx, i, coin) {
-                            Ok(true) => a.checks.script_checks_passed += 1,
-                            Ok(false) => {
-                                a.checks.script_checks_failed += 1;
-                                a.violation
-                                    .get_or_insert("witnessed P2PKH signature rejected");
-                            }
-                            Err(_) => {
-                                // For the supported two-push/P2PKH form OP_EQUALVERIFY
-                                // can fail on a key hash mismatch. Other errors may be
-                                // interpreter limitations, so classify them as deferred.
-                                let key =
-                                    tx.inputs[i].unlocking_script.as_ref().unwrap().to_binary();
-                                if bsv::primitives::hash::hash160(&key[key.len() - 33..])
-                                    != coin.script[3..23]
-                                {
-                                    a.checks.script_checks_failed += 1;
-                                    a.violation
-                                        .get_or_insert("witnessed P2PKH key hash mismatch");
-                                }
-                            }
-                        }
-                    }
+        let supported_context = supported.len() == tx_inputs && tx_inputs <= *budget;
+        // Try the full reference validator once on complete transactions. On a
+        // rejected or partial transaction, evaluate only evidenced inputs for
+        // the diagnostic record without inventing values or creation heights.
+        let mut full_passed = false;
+        if supported_context && !is_confiscation {
+            let coins: Vec<_> = supported.iter().map(|(_, coin)| *coin).collect();
+            let (ef, heights) = interpreter::extended(raw, &coins)?;
+            match interpreter::transaction(self.regtest, &ef, &heights, height, true)? {
+                Ok(()) => {
+                    full_passed = true;
+                    a.checks.script_checks_passed += tx_inputs as u64;
+                    *budget -= tx_inputs;
+                }
+                Err(_) => {
+                    a.violation
+                        .get_or_insert("BDK rejected witnessed transaction");
+                }
+            }
+        }
+        if !full_passed && !is_confiscation {
+            for (index, coin) in supported.into_iter().take(*budget) {
+                *budget -= 1;
+                if interpreter::spend(self.regtest, raw, index, coin, height)? {
+                    a.checks.script_checks_passed += 1;
+                } else {
+                    a.checks.script_checks_failed += 1;
+                    a.violation.get_or_insert("witnessed script rejected");
                 }
             }
         }
         a.checks.script_checks_deferred =
             a.checks.known_inputs - a.checks.script_checks_passed - a.checks.script_checks_failed;
         if a.violation.is_none() {
-            if supported_context && a.fee.is_some() && a.checks.script_checks_deferred == 0 {
+            if supported_context
+                && finality == Some(true)
+                && a.fee.is_some()
+                && (a.checks.script_checks_deferred == 0 || is_authorized)
+            {
                 a.checks.transactions_determinate = 1;
             } else {
                 a.checks.transactions_deferred = 1;
             }
         }
         Ok(a)
+    }
+
+    pub(super) fn assess_candidate(
+        &self,
+        raw: &[u8],
+        height: u32,
+        seen: &mut HashSet<Outpoint>,
+        created: &HashMap<Outpoint, Coin>,
+    ) -> Result<u64> {
+        let mut budget = usize::MAX;
+        let a = self.assess(raw, height, seen, &mut budget, false, Some(created))?;
+        ensure!(
+            a.violation.is_none() && a.checks.unknown_inputs == 0 && a.checks.consumed_inputs == 0,
+            "ineligible candidate inputs"
+        );
+        let ctx = crate::alerts::confiscation(raw)?.is_some();
+        ensure!(
+            (ctx && self.directives.authorized(&hash256(raw), height))
+                || a.checks.script_checks_deferred == 0,
+            "incomplete candidate validation"
+        );
+        ensure!(
+            self.final_at(&Transaction::from_binary(&mut &raw[..])?, height),
+            "non-final candidate"
+        );
+        a.fee.context("candidate fee unresolved")
     }
 
     pub fn check_transaction(&self, raw: &[u8]) -> Result<Value> {
@@ -307,8 +328,8 @@ impl Mining {
         if self.blocked || self.awaiting_height.is_some() {
             return Ok(json!({"outcome":"deferred","reason":"awaiting complete peer body"}));
         }
-        let mut budget = SCRIPT_BUDGET;
-        let a = self.assess(raw, height, &mut HashSet::new(), &mut budget)?;
+        let mut budget = usize::MAX;
+        let a = self.assess(raw, height, &mut HashSet::new(), &mut budget, false, None)?;
         let mut value = serde_json::to_value(a.checks)?;
         value["outcome"] = json!(if a.violation.is_some() {
             "invalid"
@@ -332,9 +353,15 @@ impl Mining {
         let Some(coin) = self.coins.get(&p) else {
             return Ok(json!({"known":false,"eligible":false,"consumed":self.spent.has(&p)}));
         };
-        let eligible = self
-            .height
-            .is_some_and(|h| h > coin.height && (!coin.coinbase || h - coin.height >= 99))
+        let eligible = self.directives.ready()
+            && !self
+                .directives
+                .frozen(&p, self.height.unwrap_or(0).saturating_add(1), true)
+            && self.height.is_some_and(|h| {
+                h > coin.height
+                    && (!coin.coinbase || h - coin.height >= 99)
+                    && (!coin.confiscation || h - coin.height >= 999)
+            })
             && !self.blocked
             && self.awaiting_height.is_none()
             && !self.pending.values().any(|e| e.inputs.contains(&p));
@@ -359,13 +386,14 @@ impl Mining {
             let mut fees = Some(0u64);
             let mut reward = Some(0u64);
             let mut seen = HashSet::new();
-            let mut budget = SCRIPT_BUDGET;
+            let mut budget = usize::MAX;
             let mut omitted = 0;
             for (pos, (id, raw)) in txs.into_iter().enumerate() {
+                let is_confiscation = pos != 0 && crate::alerts::confiscation(raw)?.is_some();
                 if pos != 0 {
-                    let a = self.assess(raw, height, &mut seen, &mut budget)?;
+                    let a = self.assess(raw, height, &mut seen, &mut budget, true, None)?;
                     if let Some(violation) = a.violation {
-                        anyhow::bail!("{violation}");
+                        return Err(InvalidBody(violation).into());
                     }
                     fees = fees.zip(a.fee).and_then(|(sum, fee)| sum.checked_add(fee));
                     checks.merge(a.checks);
@@ -386,7 +414,9 @@ impl Mining {
                         if self.spent.has(&(id, i)) {
                             spent_changes.push(((id, i), false));
                         }
-                        if wire::p2pkh(script) {
+                        if height >= interpreter::activation(self.regtest)
+                            && !script.starts_with(&[0, 0x6a])
+                        {
                             if seen.contains(&(id, i)) {
                                 // A body-order forward reference was already counted as unknown.
                                 // Avoid resurrecting its output when the producer appears later.
@@ -395,10 +425,11 @@ impl Mining {
                                 let previous = self.coins.insert(
                                     (id, i),
                                     Coin {
-                                        script: script.try_into().unwrap(),
+                                        script: Arc::from(script),
                                         value,
                                         height,
                                         coinbase: pos == 0,
+                                        confiscation: is_confiscation,
                                     },
                                 );
                                 undo.push(((id, i), previous));
@@ -409,12 +440,11 @@ impl Mining {
                     }
                 })?;
             }
-            let reward = reward.context("coinbase value exceeds money range")?;
+            let reward = reward.ok_or(InvalidBody("coinbase value exceeds money range"))?;
             if let Some(fees) = fees {
-                ensure!(
-                    reward <= subsidy(height, self.regtest).saturating_add(fees),
-                    "coinbase exceeds subsidy and known fees"
-                );
+                if reward > subsidy(height, self.regtest).saturating_add(fees) {
+                    return Err(InvalidBody("coinbase exceeds subsidy and known fees").into());
+                }
             }
             Ok((checks, fees.is_some(), omitted))
         })();

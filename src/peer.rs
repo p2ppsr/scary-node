@@ -21,7 +21,7 @@ use libp2p::{
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     fs::{self, OpenOptions},
     io::Write,
     net::SocketAddr,
@@ -31,10 +31,11 @@ use std::{
 };
 use tokio::sync::mpsc;
 
-const MAX_BODY: usize = 64 * 1024 * 1024;
+use crate::mining::body_limit;
 const CLIENT: &str = "scary-node-alpha";
 
 pub struct Config {
+    pub allow_sv_only: bool,
     pub network: String,
     pub peers: Vec<String>,
     pub listen: String,
@@ -47,12 +48,18 @@ pub struct Config {
 #[derive(Debug)]
 pub enum Event {
     Connected(String),
+    Delivery {
+        peer: String,
+        hash: String,
+        direction: &'static str,
+    },
     Status {
         peer: String,
         height: u32,
         hash: String,
     },
     Block {
+        source: String,
         height: u32,
         raw: Vec<u8>,
         validated: tokio::sync::oneshot::Sender<bool>,
@@ -336,9 +343,18 @@ async fn bootstrap() -> Result<Vec<Multiaddr>> {
     Ok(addresses)
 }
 
+fn endpoint_ip(addr: &Multiaddr) -> Option<std::net::IpAddr> {
+    addr.iter().find_map(|p| match p {
+        Protocol::Ip4(ip) => Some(ip.into()),
+        Protocol::Ip6(ip) => Some(ip.into()),
+        _ => None,
+    })
+}
+
 pub async fn run(
     config: Config,
     events: mpsc::Sender<Event>,
+    state: Arc<tokio::sync::Mutex<crate::mining::Mining>>,
     mut solved: mpsc::Receiver<(u32, Vec<u8>)>,
 ) -> Result<()> {
     ensure!(
@@ -346,7 +362,7 @@ pub async fn run(
         "unknown peer network"
     );
     ensure!(
-        config.network != "regtest" || !config.peers.is_empty(),
+        config.network != "regtest" || !config.peers.is_empty() || config.allow_sv_only,
         "regtest needs an explicit peer"
     );
     let key = load_key(&config.key_file)?;
@@ -386,7 +402,7 @@ pub async fn run(
         .iter()
         .map(|s| s.parse::<Multiaddr>())
         .collect::<Result<Vec<_>, _>>()?;
-    let use_dns = addresses.is_empty();
+    let use_dns = addresses.is_empty() && config.network == "mainnet";
     ensure!(
         config.asset_bind.is_some() == config.asset_url.is_some(),
         "Asset bind and advertised URL must be supplied together"
@@ -405,8 +421,31 @@ pub async fn run(
     retry.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
     let mut last_discovery = None::<Instant>;
     let mut last_gossip_error = None::<Instant>;
+    let mut endpoints = HashMap::new();
+    let mut enforce = tokio::time::interval(Duration::from_secs(1));
+    let mut last_attempt = None::<(String, Instant)>;
     loop {
         tokio::select! {
+            _ = enforce.tick() => {
+                let s = state.lock().await;
+                for (id, ip) in &endpoints {
+                    if s.directives.peer_banned(ip) { let _ = swarm.disconnect_peer_id(*id); }
+                }
+                if let (Some(base),Some(id)) = (config.asset_url.as_deref(), s.relayable_solution()) {
+                    let hash = display_hash(id);
+                    if last_attempt.as_ref().is_none_or(|(h,t)| *h != hash || t.elapsed() >= Duration::from_secs(15)) {
+                        let raw = s.solution_bytes(&id).expect("matched stored solution").to_vec();
+                        let height = s.height_hint()+1;
+                        last_attempt = Some((hash.clone(),Instant::now()));
+                        let event = match announce(&mut swarm,&topics,&assets,base,height,raw).await {
+                            Ok(hash) => Event::Published{hash},
+                            Err(e) => Event::PublicationFailed{hash,error:e.to_string()},
+                        };
+                        drop(s);
+                        events.send(event).await?;
+                    }
+                }
+            }
             _ = events.closed() => return Ok(()),
             _ = retry.tick() => {
                 if use_dns && last_discovery.is_none_or(|t| t.elapsed() > Duration::from_secs(300)) {
@@ -418,7 +457,9 @@ pub async fn run(
                         Err(error) => eprintln!("mainnet bootstrap lookup: {error}"),
                     }
                 }
+                let blocked = state.lock().await.directives.banned.clone();
                 for address in &addresses {
+                    if endpoint_ip(address).is_some_and(|ip| blocked.iter().any(|net|net.contains(&ip))) {continue;}
                     if matches!(address.iter().last(), Some(Protocol::P2p(id)) if swarm.is_connected(&id)) {
                         continue;
                     }
@@ -431,13 +472,24 @@ pub async fn run(
                 let Some((height, raw)) = work else { return Ok(()) };
                 let base = config.asset_url.as_deref().context("solved block requires an advertised Asset URL")?;
                 let hash = display_hash(hash256(&raw[..80]));
+                let guard = state.lock().await;
+                if guard.relayable_solution() != Some(hash256(&raw[..80])) {continue;}
+                if last_attempt.as_ref().is_some_and(|(h,_)| h==&hash) {continue;}
+                last_attempt=Some((hash.clone(),Instant::now()));
                 let event = match announce(&mut swarm, &topics, &assets, base, height, raw).await {
                     Ok(hash) => Event::Published { hash },
                     Err(error) => Event::PublicationFailed { hash, error: error.to_string() },
                 };
+                drop(guard);
                 events.send(event).await?;
             }
             event = swarm.select_next_some() => match event {
+                SwarmEvent::ConnectionEstablished { peer_id,endpoint,.. } => {
+                    if let Some(ip)=endpoint_ip(endpoint.get_remote_address()) {
+                        endpoints.insert(peer_id,ip);
+                        if state.lock().await.directives.peer_banned(&ip){let _=swarm.disconnect_peer_id(peer_id);}
+                    }
+                }
                 SwarmEvent::Behaviour(BehaviourEvent::Identify(identify::Event::Received { peer_id, info, .. })) => {
                     if info.protocol_version != protocol {
                         let _ = swarm.disconnect_peer_id(peer_id);
@@ -454,6 +506,7 @@ pub async fn run(
                     }
                 }
                 SwarmEvent::ConnectionClosed { peer_id, num_established: 0, .. } => {
+                    endpoints.remove(&peer_id);
                     identified.remove(&peer_id);
                 }
                 SwarmEvent::NewListenAddr { address, .. } => {
