@@ -1,0 +1,151 @@
+{
+  "phase": "pilot",
+  "study": "immediate",
+  "availability_by_parent": {
+    "first_four_parents": {
+      "witnessed/full": {
+        "witnessed": {
+          "scheduled": 26,
+          "ready": 15,
+          "no eligible common-payment job": 8,
+          "missing newer announced bodies": 3
+        },
+        "full-right": {
+          "scheduled": 26,
+          "ready": 26
+        }
+      },
+      "full/full": {
+        "full-left": {
+          "scheduled": 38,
+          "ready": 38
+        },
+        "full-right": {
+          "scheduled": 38,
+          "ready": 38
+        }
+      }
+    },
+    "remaining_parents": {
+      "full/full": {
+        "full-left": {
+          "scheduled": 218,
+          "ready": 218
+        },
+        "full-right": {
+          "scheduled": 218,
+          "ready": 218
+        }
+      },
+      "witnessed/full": {
+        "witnessed": {
+          "scheduled": 230,
+          "ready": 212,
+          "no eligible common-payment job": 7,
+          "missing newer announced bodies": 11
+        },
+        "full-right": {
+          "scheduled": 230,
+          "ready": 230
+        }
+      }
+    }
+  },
+  "sessions": 16,
+  "binary_sha256": "2d3a2d351ad55ce203a2c50d7394e9d6353e9136b0f4cf9179f9b961274b80b7",
+  "arms": {
+    "witnessed/full": {
+      "roles": [
+        {
+          "scheduled": 256,
+          "ready": 227,
+          "hashes": 294,
+          "discovered": 154,
+          "settled": 151,
+          "stale": 3
+        },
+        {
+          "scheduled": 256,
+          "ready": 256,
+          "hashes": 346,
+          "discovered": 185,
+          "stale": 80,
+          "settled": 105
+        }
+      ],
+      "stale_rates": [
+        0.01948051948051948,
+        0.43243243243243246
+      ],
+      "stale_difference": -0.41295191295191297,
+      "session_influence_sd": 0.1437407586864682,
+      "confidence_interval_95": [
+        -0.48954595664708556,
+        -0.3363578692567404
+      ],
+      "half_width": 0.07659404369517261,
+      "achieved_one_point_precision": false,
+      "per_scheduled_opportunity": {
+        "ready": [
+          0.88671875,
+          1.0
+        ],
+        "discovered": [
+          0.6015625,
+          0.72265625
+        ],
+        "settled": [
+          0.58984375,
+          0.41015625
+        ]
+      }
+    },
+    "full/full": {
+      "roles": [
+        {
+          "scheduled": 256,
+          "ready": 256,
+          "hashes": 347,
+          "discovered": 161,
+          "stale": 40,
+          "settled": 121
+        },
+        {
+          "scheduled": 256,
+          "ready": 256,
+          "hashes": 347,
+          "discovered": 169,
+          "stale": 34,
+          "settled": 135
+        }
+      ],
+      "stale_rates": [
+        0.2484472049689441,
+        0.20118343195266272
+      ],
+      "stale_difference": 0.047263773016281374,
+      "session_influence_sd": 0.18901398751196932,
+      "confidence_interval_95": [
+        -0.0534546714304258,
+        0.14798221746298856
+      ],
+      "half_width": 0.10071844444670718,
+      "achieved_one_point_precision": false,
+      "per_scheduled_opportunity": {
+        "ready": [
+          1.0,
+          1.0
+        ],
+        "discovered": [
+          0.62890625,
+          0.66015625
+        ],
+        "settled": [
+          0.47265625,
+          0.52734375
+        ]
+      }
+    }
+  },
+  "fresh_evaluation_sessions": 939
+}

@@ -79,6 +79,17 @@ python3 qualification/cohort_estimate.py .native/immediate-cohort/evaluation --s
 
 The combined command writes a timestamped registration before the first session, verifies saved receipt identities on resume, and publishes the evaluation summary once the last planned session closes. The published [registration](evidence/chronicle-immediate-registration.json) identifies the executable measured on this workstation.
 
+### Closed immediate-wake sizing pilot
+
+All 16 registered sessions closed with 512 scheduled parents and zero setup retries. The witnessed lane was ready on 227 of its 256 parents. Fourteen misses occurred while newer bodies were outstanding and fifteen while a common-payment job was unavailable. Both full-state control lanes were ready on all 256 control parents. The table reports depth-two stales divided by discoveries, with paired 95% intervals across the 16 fresh sessions. [Lossless session archive and calculations](evidence/chronicle-immediate-pilot/manifest.json) · [Counts for each session and lane](evidence/chronicle-immediate-pilot/sessions.csv)
+
+| Sizing arm, left / right | Left stale / discovered | Right stale / discovered | Left minus right (percentage points) |
+| --- | ---: | ---: | ---: |
+| Witnessed / full | 3 / 154 | 80 / 185 | −41.30 (−48.95 to −33.64) |
+| Full / full | 40 / 161 | 34 / 169 | +4.73 (−5.35 to +14.80) |
+
+The primary session influence standard deviation was 0.143741. The preregistered sizing formula fixes the separate immediate-wake evaluation at **939 fresh sessions**, or **30,048 scheduled parents**, starting at seed 81001. The strong difference in this sizing sample applies to the measured native publication paths on this workstation. Matching receiver ingress and qualifying a new release each require their own experiment. [Frozen sizing output](evidence/chronicle-immediate-sizing.json) · [Study registration](evidence/chronicle-immediate-registration.json)
+
 ## Closing and auditing a fixed-size phase
 
 The archive exporter checks the exact registered session filenames before reading race outcomes. It preserves every complete raw receipt in deterministic gzip shards of up to 128 sessions. The accompanying CSV gives the scheduled opportunities, readiness, hashes, discoveries, settlements, stales and later detachments for each lane in each independent session. A measured partial or an unclassified attempt holds the export open. The manifest includes every retained setup retry and its original zero-row receipt.
