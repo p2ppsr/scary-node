@@ -19,7 +19,8 @@ def docker(*args):
     return subprocess.check_output(["docker", *args], text=True).strip()
 
 
-def capture(corpus, warmup, release, manifest, folder, image):
+@contextlib.contextmanager
+def isolated_oracles(release, manifest, folder, image):
     image_id = docker("image", "inspect", image, "--format", "{{.Id}}")
     require(
         image_id == release["image_id"],
@@ -83,6 +84,11 @@ def capture(corpus, warmup, release, manifest, folder, image):
         def command(binary):
             return ["docker", "exec", "-i", container, "/oracles/" + binary.name]
 
+        yield runtime, command
+
+
+def capture(corpus, warmup, release, manifest, folder, image):
+    with isolated_oracles(release, manifest, folder, image) as (runtime, command):
         rows = collect(corpus, manifest, folder, command)
         payment = {}
         for role in ROLES:

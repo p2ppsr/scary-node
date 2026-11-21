@@ -107,3 +107,19 @@ python3 -m unittest discover -s qualification -p 'test_shadow*.py'
 ```
 
 On November 21, the passive observer upgraded to the same successor-aware release that had passed the complete live Chronicle corpus and DAR replay. The protected restart restored the same 110-header range, 32,668 witnessed outputs, cumulative work and applied directive sequence at height 976531. Five data peers reconfirmed the tip within three seconds. The receiver had two synchronized peers and no outstanding actions. The restored snapshot contained 125 eligible pending transactions, down from 335 in memory just before the stop. The last disk snapshot predates some peer admissions. The independently reconciled chain boundary survived. [Restart receipt](evidence/chronicle-waiting-mainnet-restart.json) · [Release validation](chronicle-results.md)
+
+### Cross-check the first candidate on macOS and Linux ARM64
+
+Wait for the native reader to report a complete receipt for the first candidate, its observed successor and its funding proofs. The macOS command below runs the distributed and exact-source GoBDK oracles on that same capture. On a Linux ARM64 Docker host, place the identical private receipt and paired macOS result in the private evidence directory. Supply the four Linux binaries and corresponding manifest built for the selected release image. The Linux oracles receive transactions over standard input inside a read-only container with external networking disabled. The container sees only the mounted oracle directory. [Building the two native variants](chronicle-qualification.md#compare-distributed-and-freshly-compiled-gobdk)
+
+```sh
+umask 077
+python3 qualification/shadow_bdk.py "$PRIVATE_EVIDENCE/first.json.gz" \
+  --go-oracles .native/go-oracles > "$PRIVATE_EVIDENCE/first-go-result.json"
+python3 qualification/linux_shadow_candidate.py \
+  "$PRIVATE_EVIDENCE/first.json.gz" "$PRIVATE_EVIDENCE/first-go-result.json" \
+  .native/linux-arm64-go-oracles "$PRIVATE_EVIDENCE/linux-summary.json" \
+  --journal "$SHADOW_LOG"
+```
+
+The summary contains the committed receipt digest, confirmed parent and successor, fees, transaction counts, interpreter identities, agreement and ordinary validation outcomes. The journal identifies the originating station executable separately from the Linux image used for the independent replay. The driver compares policy and consensus outcomes and individual script-rejection details between platforms, then counts confiscations separately. The optional `--private-decisions` path retains detailed results locally if investigation is required. An incomplete candidate, mismatched receipt or unrecognized executable fails verification.

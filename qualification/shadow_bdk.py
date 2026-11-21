@@ -2,13 +2,14 @@
 
 import argparse
 import contextlib
+import gzip
 import hashlib
 import json
 import struct
 import subprocess
 from pathlib import Path
 
-from shadow_first_candidate import assess, load
+from shadow_first_candidate import assess
 from shadow_native import inputs, require, txid, verify_funding
 from shadow_native_warmup import verify as verify_warmup
 from verify_entrant_chronicle import compact, extend
@@ -159,15 +160,47 @@ def replay(record, executable, native="source", command=None):
     return summary
 
 
+def accepted(result):
+    return result["ordinary_consensus_complete"] and result["ordinary_policy_complete"]
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("evidence", type=Path)
-    p.add_argument("--go-oracle", required=True, type=Path)
+    mode = p.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--go-oracle", type=Path)
+    mode.add_argument(
+        "--go-oracles",
+        type=Path,
+        help="a frozen pair of mainnet binaries and their manifest",
+    )
     p.add_argument("--native", choices=("source", "distributed"), default="source")
     args = p.parse_args()
-    result = replay(load(args.evidence), args.go_oracle.resolve(), args.native)
-    print(json.dumps(result, indent=2))
-    ok = result["ordinary_consensus_complete"] and (
-        result["kind"] == "confirmed-warmup-spend" or result["ordinary_policy_complete"]
-    )
+    packed = args.evidence.read_bytes()
+    evidence_sha = hashlib.sha256(packed).hexdigest()
+    record = json.loads(gzip.decompress(packed))
+    del packed
+    if args.go_oracles:
+        manifest = json.loads((args.go_oracles / "manifest.json").read_text())
+        results = {}
+        for native in ("distributed", "source"):
+            check = replay(
+                record, (args.go_oracles / (native + "-mainnet")).resolve(), native
+            )
+            require(
+                manifest["variants"][native]["mainnet_oracle_sha256"]
+                == check["go_oracle_sha256"]
+                and manifest["variants"][native]["linked"] == check["build"],
+                "mainnet oracle differs from its archive manifest",
+            )
+            results[native] = {"exit": 0 if accepted(check) else 1, "report": check}
+        payload = {
+            "evidence_sha256": evidence_sha,
+            "variants": results,
+        }
+        ok = all(check["exit"] == 0 for check in results.values())
+    else:
+        payload = replay(record, args.go_oracle.resolve(), args.native)
+        ok = accepted(payload)
+    print(json.dumps(payload, indent=2))
     raise SystemExit(0 if ok else 1)
