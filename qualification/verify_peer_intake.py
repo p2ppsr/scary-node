@@ -21,6 +21,108 @@ def header(hex_bytes, block_hash, parent):
     )
 
 
+def verify_p2pk_signature(funding, payment):
+    from ecdsa import SECP256k1, VerifyingKey, util
+    from verify_receipt import single_input
+
+    previous, index, unlock = single_input(payment)
+    _, outputs, end = parse_tx(funding, 0)
+    assert end == len(funding) and previous == txid(funding)
+    value, script = outputs[index]
+    assert script[0] in (33, 65) and len(script) == script[0] + 2 and script[-1] == 0xAC
+    assert unlock[0] == len(unlock) - 1 and unlock[-1] == 0x41
+    sequence_pos = 42 + len(unlock)
+    sequence = payment[sequence_pos : sequence_pos + 4]
+    count, outputs_pos = read_varint(payment, sequence_pos + 4)
+    assert count == 1
+    outpoint = payment[5:41]
+    preimage = (
+        payment[:4]
+        + dsha(outpoint)
+        + dsha(sequence)
+        + outpoint
+        + bytes([len(script)])
+        + script
+        + value.to_bytes(8, "little")
+        + sequence
+        + dsha(payment[outputs_pos:-4])
+        + payment[-4:]
+        + bytes([0x41, 0, 0, 0])
+    )
+    assert VerifyingKey.from_string(script[1:-1], curve=SECP256k1).verify_digest(
+        unlock[1:-1], dsha(preimage), sigdecode=util.sigdecode_der
+    )
+
+
+def verify_early_offer(row, funding, payment, creating):
+    early = row["early_offer"]
+    parent_raw, body, _ = decode_block(
+        bytes.fromhex(early["empty_successor_wire"]), row["parent"]
+    )
+    assert parent_raw[:80].hex() == row["parent_header"] and len(body) == 1
+    before, seen, successor = [
+        early[k] for k in ("before_offer", "after_first_offer", "after_successor")
+    ]
+    assert before["tip_hash"] == seen["tip_hash"] == creating
+    assert (
+        successor["tip_hash"] == row["parent"]
+        and successor["height"] == seen["height"] + 1
+    )
+    assert all(s["observation_window_ready"] for s in (before, seen, successor))
+    assert not before["job_preconditions_met"] and not seen["job_preconditions_met"]
+    assert before["pending_transactions"] == seen["pending_transactions"] == 0
+    assert (
+        early["before_successor_worker"]["authorized"]
+        and early["before_successor_worker"]["notifications"] == 0
+    )
+    assert early["stock_mempool_after_successor"] == [row["payment_txid"]]
+    assert (
+        early["stock_tx_bytes_after_successor"]
+        == early["stock_tx_bytes_after_offer"]
+        == early["stock_tx_bytes_before"] + 24 + len(payment)
+    )
+    assert row["funding_txid"] == txid(funding)
+    verify_p2pk_signature(funding, payment)
+    stats = [s["peer_transaction_intake"]["sv"] for s in (before, seen, successor)]
+    assert all(
+        s["peer_transaction_intake"]["teranode_subtree"]
+        == before["peer_transaction_intake"]["teranode_subtree"]
+        for s in (seen, successor)
+    )
+    if row["result"] == "withheld":
+        assert (
+            stats[1]["ineligible"] == stats[0]["ineligible"] + 1
+            and stats[2] == stats[1]
+        )
+        assert (
+            not successor["job_preconditions_met"]
+            and successor["pending_transactions"] == 0
+        )
+        assert (
+            early["after_successor_worker"]["authorized"]
+            and early["after_successor_worker"]["notifications"] == 0
+        )
+        return
+    assert row["result"] == "selected"
+    assert seen["waiting_for_successor"] == 1 and seen[
+        "waiting_for_successor_bytes"
+    ] == len(payment)
+    assert stats[1]["awaiting_successor"] == stats[0]["awaiting_successor"] + 1
+    assert (
+        stats[2]["promoted_after_successor"] == stats[0]["promoted_after_successor"] + 1
+    )
+    assert stats[2]["admitted"] == stats[0]["admitted"] + 1
+    assert successor["pending_transactions"] == 1 and successor["job_preconditions_met"]
+    assert (
+        successor["waiting_for_successor"]
+        == successor["waiting_for_successor_bytes"]
+        == 0
+    )
+    assert (
+        early["stock_tx_bytes_after_selection"] == early["stock_tx_bytes_after_offer"]
+    )
+
+
 def verify(row):
     assert row["network"] == "regtest"
     source = "teranode_subtree" if "subtree_hash" in row else "sv"
@@ -36,6 +138,15 @@ def verify(row):
     header(creating_raw[:80].hex(), creating, creating_raw[4:36][::-1].hex())
     assert row["parent"] != creating
     header(row["parent_header"], row["parent"], creating)
+    if "early_offer" in row:
+        verify_early_offer(row, funding, payment, creating)
+        if row["result"] == "withheld":
+            return {
+                "source": source,
+                "parent": row["parent"],
+                "result": "withheld",
+                "payment_txid": row["payment_txid"],
+            }
     raw, txs, outputs = decode_block(
         bytes.fromhex(row["solved_block"]), row["block_hash"]
     )

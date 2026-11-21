@@ -152,7 +152,7 @@ class LabFeed:
                 self.send_response(200)
                 self.send_header("content-length", str(len(raw)))
                 self.end_headers()
-                self.wfile.write(raw)
+                feed.write_response(self.path, raw, self.wfile)
 
             def log_message(self, *args):
                 pass
@@ -163,15 +163,22 @@ class LabFeed:
     def endpoint(self, operator_port):
         return self.server.server_port
 
-    def add(self, kind, payload):
+    def write_response(self, _path, raw, stream):
+        stream.write(raw)
+
+    def prepare(self, kind, payload):
         seq = len(self.records) + 1
         signed = struct.pack("<IIQI", 1, seq, int(time.time()), kind) + payload
         frame = signed + b"".join(
             base64.b64decode(self.node.rpc("signmessage", key, signed.hex()))
             for key in self.wallet[:3]
         )
-        self.records.append({"sequence_number": seq, "raw": frame.hex()})
-        return seq
+        return {"sequence_number": seq, "raw": frame.hex()}
+
+    def add(self, kind, payload):
+        record = self.prepare(kind, payload)
+        self.records.append(record)
+        return record["sequence_number"]
 
 
 @contextlib.contextmanager

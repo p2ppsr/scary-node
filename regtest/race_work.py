@@ -88,7 +88,7 @@ def teranode_job(parent, payment, node, label="full"):
 
 
 @contextmanager
-def stratum_job(parent, payment, port, status_port, label="witnessed"):
+def stratum_job(parent, payment, port, status_port, label="witnessed", *, submit_wire=None):
     """Keep the subscribed worker connection alive through optional producer alignment."""
     status = json.loads(request(f"http://127.0.0.1:{status_port}/status"))
     require(status["network"] == "regtest" and status["mining"]["tip_hash"] == parent
@@ -132,7 +132,12 @@ def stratum_job(parent, payment, port, status_port, label="witnessed"):
         coinbase = bytes.fromhex(prefix + extra1 + extra2 + suffix)
 
         def submit(nonce):
-            send(3, "mining.submit", [worker, job_id, extra2, ntime, f"{nonce:08x}"])
+            params = [worker, job_id, extra2, ntime, f"{nonce:08x}"]
+            if submit_wire is None:
+                send(3, "mining.submit", params)
+            else:
+                request = json.dumps({"id": 3, "method": "mining.submit", "params": params}).encode() + b"\n"
+                submit_wire(stream, request)
             for _ in range(64):
                 response = receive()
                 if response.get("id") == 3:

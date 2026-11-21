@@ -27,6 +27,8 @@ A separate fresh-volume run put two Teranode v0.16.1 peers on an isolated Docker
 
 The directive race used two fresh isolated SV Node processes and actual network-target Stratum submissions. With the signed freeze durably applied first, the worker lost the job, the solution queue stayed empty and SV Node stayed on its original parent. With delivery completed first, SV Node adopted the exact candidate before the freeze arrived. These are forced orderings at the two boundaries. [Directive receipts and peer dispositions](evidence/chronicle-directive-race.json)
 
+A later test records the worker request overlapping the first sequence report and the signed freeze frame on separate sockets. Both valid proposals yielded stale-job responses and the stock node extended the original parent. [Concurrent directive and Stratum trials](directive-overlap.md)
+
 A separate SV Node comparison mined an ordinary payment and then applied a signed freeze whose start height matched that payment's inclusion. Both processes retained the accepted height-107 tip. The next signed batch repeated the original outpoint and added a second one. Both RPC results listed exactly one unchanged item. A third signed action named an output outside the freeze and both implementations returned the same confiscation transaction ID and reason. Scary Node durably retained the failure and reported verified sequence 3, applied sequence 2 and mining paused before and after restart. [Item-level results and restart receipt](evidence/chronicle-alert-items.json) · [Reproduction](chronicle-qualification.md)
 
 ## Validation and durable storage throughput

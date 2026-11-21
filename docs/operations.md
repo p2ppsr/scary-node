@@ -39,6 +39,8 @@ A competing branch beyond the retained undo data can establish a fresh witnessed
 
 `--min-observed-blocks N` sets the minimum number of contiguous observed bodies before Stratum issues work. It accepts 1 through 147 and defaults to 1. The realistic regtest sets it to 13. Mainnet still requires the complete difficulty window. A ready observation window by itself supplies neither a payout script nor eligible transactions.
 
+An eligible signed native payment whose witnessed funding lacks a successor can wait outside the template. The status reports `waiting_for_successor` and `waiting_for_successor_bytes`. The per-source `promoted_after_successor` counter records later admission. [Signed stock-peer comparison and receipt](early-peer-intake.md)
+
 `GET /status` exposes the recent `mining.validation_window`. Each row binds its counters to a height and hash. Look at `known_inputs`, `unknown_inputs`, `script_checks_passed`, `amount_checks_passed`, `transactions_determinate`, `transactions_deferred` and `coinbase_reward_checked`. A row with deferred inputs can still have successful checks for the inputs the node knows.
 
 Use `GET /outpoints/<display-txid>/<vout>` to inspect a single outpoint in the local working set. Use `POST /check-transaction` with raw transaction bytes to assess a payment against that state. The response explains the determinate, deferred or invalid result. This read-only call leaves the candidate pool untouched. Submit work through `POST /transactions` when you want the miner to include it. All three endpoints belong on the operator’s trusted interface. [Lab and metric definitions](scenario.md)

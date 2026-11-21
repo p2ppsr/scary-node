@@ -1,0 +1,50 @@
+{
+  "source_commit": "c2a36d5c6a83f2262dffd596f5eecb421db6b132",
+  "source_tree": "f96d25c2a129ca882f1cbdfd373a91a75a450486",
+  "build_inputs": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "examples",
+    "native",
+    "scripts/build-bdk.sh",
+    "src"
+  ],
+  "source_archive_sha256": "1233e9889af869272e5ad84b0b3771e1df43296e257551e4252fee92c9a50748",
+  "cargo_lock_sha256": "49d8e303e370c713576a774237ae828e874cb85f7e2826e6564047618c9265fa",
+  "cargo_command": "cargo build --offline --locked --release",
+  "rustc_verbose": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: aarch64-apple-darwin",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "platform": "darwin_arm64",
+  "native_build": {
+    "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+    "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+    "platform": "darwin_arm64",
+    "dependencies_sha256": "50696015ff6b77d452bbd5098969e80ed562fe82eb5f8826651f3075d3538ce8",
+    "native_archive_sha256": "4f675dfe7df29b03de46b92a60ec10cb42f05580a2232476a40a4604cdbd398c",
+    "type": "Release",
+    "cxx_flags": "-O3 -g0 -DNDEBUG",
+    "cxx_standard": 20,
+    "compiler": "Apple clang version 17.0.0 (clang-1700.6.4.2)",
+    "cmake": "cmake version 3.29.5"
+  },
+  "executable_sha256": "da0703697a1974574fddcbf54d5c1dfcec74f53bb93313a90b352a3ad764e882",
+  "operator_probe": {
+    "release_sha256": "da0703697a1974574fddcbf54d5c1dfcec74f53bb93313a90b352a3ad764e882",
+    "operator_status_authenticated": 200,
+    "operator_status_anonymous": 401,
+    "operator_status_worker_credential": 401,
+    "asset_status_route": 404,
+    "asset_block_write": 405,
+    "worker_operator_credential_error": 24,
+    "worker_authorized": true,
+    "mainnet_miner_missing_operator_credential_refused": true
+  }
+}

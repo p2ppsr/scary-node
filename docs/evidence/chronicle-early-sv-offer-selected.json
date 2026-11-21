@@ -1,0 +1,162 @@
+{
+  "early_offer": {
+    "before_offer": {
+      "tip_hash": "296b13c38c804c46a726cd3541dd5abfa3d4d6ee7031439f70d6d881a014da75",
+      "height": 106,
+      "observation_window_ready": true,
+      "job_preconditions_met": false,
+      "pending_transactions": 0,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "waiting_for_successor": 0,
+      "waiting_for_successor_bytes": 0
+    },
+    "after_first_offer": {
+      "tip_hash": "296b13c38c804c46a726cd3541dd5abfa3d4d6ee7031439f70d6d881a014da75",
+      "height": 106,
+      "observation_window_ready": true,
+      "job_preconditions_met": false,
+      "pending_transactions": 0,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 1,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "waiting_for_successor": 1,
+      "waiting_for_successor_bytes": 200
+    },
+    "before_successor_worker": {
+      "authorized": true,
+      "notifications": 0,
+      "observed_methods": [
+        "mining.set_difficulty"
+      ],
+      "quiet_interval_ms": 800
+    },
+    "stock_tx_bytes_before": 0,
+    "stock_tx_bytes_after_offer": 224,
+    "stock_mempool_after_successor": [
+      "a480d4acf0fc25c0ae736e847cfc2b0faa700ca21b1c1bbfad93ea9127823c37"
+    ],
+    "empty_successor_wire": "0000002075da14a081d8d6709f433170eed6d4a3bf5add4135cd26a7464c808cc3136b298a418c8564a514893acf5733dbf0098bed54dd575199b084344ac172cb2e41b7300f026bffff7f20010000000101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0f016b73636172792d72656774657374ffffffff010000000000000000015100000000",
+    "after_successor": {
+      "tip_hash": "08ef9936858ed4c6979298910c0a2f8ce3f2b4ffb62b3e88ee0973785e8dc129",
+      "height": 107,
+      "observation_window_ready": true,
+      "job_preconditions_met": true,
+      "pending_transactions": 1,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 1,
+          "awaiting_successor": 1,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 1
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "waiting_for_successor": 0,
+      "waiting_for_successor_bytes": 0
+    },
+    "stock_tx_bytes_after_successor": 224,
+    "stock_tx_bytes_after_selection": 224
+  },
+  "result": "selected",
+  "network": "regtest",
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "binary_sha256": "da0703697a1974574fddcbf54d5c1dfcec74f53bb93313a90b352a3ad764e882",
+  "source": "Stock SV Node received sendrawtransaction and delivered the payment over the entrant\u2019s only SV connection.",
+  "peer_intake_before": {
+    "sv": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    },
+    "teranode_subtree": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    }
+  },
+  "peer_intake_after": {
+    "sv": {
+      "admitted": 1,
+      "awaiting_successor": 1,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 1
+    },
+    "teranode_subtree": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    }
+  },
+  "funding_txid": "07e637b40436b34733ad2a82a28085dd5ea73c80e195ddfe2ab990059064d9b1",
+  "funding_hex": "010000000108c4f70aaaf42a00c7920ccd603a6faeb18413e9829f7055905ed20870c1d8e5000000004948304502210091467d9587be9de786e52135ffa190d15f8d2b6482585ac4866810a3d7f24b58022060f39c169ea42dff8027f3c38d5485ad74b350f332bbcf167a8e0485391ba7d541ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a914ee1fae2b0990f68bbd6b9645a8093a07a205af2f88ac00000000",
+  "witnessed_funding_block": "296b13c38c804c46a726cd3541dd5abfa3d4d6ee7031439f70d6d881a014da75",
+  "creating_block_wire": "00000020d84d13dde9d9a1d229226cd6a6477d7f20dc3e2d32e58665175c20ddb083206574861b1c495dfbfea298334b54ecd9162a21e00aa6596c37559eac6a3e7ead102f0f026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016a0101ffffffff011019062a01000000232102e335181e02ba015d628e2ec942eb690b3305942c95b93a8bccdfcdfdea83c421ac00000000010000000108c4f70aaaf42a00c7920ccd603a6faeb18413e9829f7055905ed20870c1d8e5000000004948304502210091467d9587be9de786e52135ffa190d15f8d2b6482585ac4866810a3d7f24b58022060f39c169ea42dff8027f3c38d5485ad74b350f332bbcf167a8e0485391ba7d541ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a914ee1fae2b0990f68bbd6b9645a8093a07a205af2f88ac00000000",
+  "parent_header": "0000002075da14a081d8d6709f433170eed6d4a3bf5add4135cd26a7464c808cc3136b298a418c8564a514893acf5733dbf0098bed54dd575199b084344ac172cb2e41b7300f026bffff7f2001000000",
+  "parent": "08ef9936858ed4c6979298910c0a2f8ce3f2b4ffb62b3e88ee0973785e8dc129",
+  "payment_hex": "0100000001b1d964900590b92afedd95e1803ca75edd8580a2822aad3347b33604b437e6070000000049483045022100acab0f0d6cca233773dc9ca8afb1f78fe01d265787a9aba2774952b3c1530c8202205cf8aef32e025c6baf41ed2223a0d04429ba517f7f2d48b37ce151d7f6d53e2d4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+  "payment_txid": "a480d4acf0fc25c0ae736e847cfc2b0faa700ca21b1c1bbfad93ea9127823c37",
+  "fee_satoshis": 1100,
+  "subsidy_satoshis": 5000000000,
+  "payout_satoshis": 5000001100,
+  "block_hash": "64277630ec55c4f7912d55551b96838d0a32d1dfa6ec158de39372ad2a8d4883",
+  "solved_block": "0000002029c18d5e787309ee883e2bb6ffb4f2e38c2f0a0c91989297c6d48e853699ef082e39c3aa05d020d64f43a061884bede06043f178539d31c0b3c585cca51246b9310f026bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff39016c0800000002000000000c2f73636172792d6e6f64652f207899b4f86c832e718a4e8993dd17866e5cd060f92efba8aa08dd2e5088541b1cffffffff014cf6052a010000000151000000000100000001b1d964900590b92afedd95e1803ca75edd8580a2822aad3347b33604b437e6070000000049483045022100acab0f0d6cca233773dc9ca8afb1f78fe01d265787a9aba2774952b3c1530c8202205cf8aef32e025c6baf41ed2223a0d04429ba517f7f2d48b37ce151d7f6d53e2d4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+  "header_hex": "0000002029c18d5e787309ee883e2bb6ffb4f2e38c2f0a0c91989297c6d48e853699ef082e39c3aa05d020d64f43a061884bede06043f178539d31c0b3c585cca51246b9310f026bffff7f2000000000",
+  "block_transaction_ids": [
+    "fbda5b5b1643160721b3ee646a5cd24831c239bfcb973a66cdc619efa39f65f5",
+    "a480d4acf0fc25c0ae736e847cfc2b0faa700ca21b1c1bbfad93ea9127823c37"
+  ],
+  "sv_successor": "2877325eac980982df76b351f301f20f6398d8bb1b8b6f148305d77823869698",
+  "sv_successor_header": "0000002083488d2aad7293e38d15eca6dfd1320a8d83961b55552d91f7c455ec307627648fc9a84241dbdf1c19f1b2e58920bdfb16028cd8f5597dd36fdc7015547322192f0f026bffff7f2000000000"
+}
