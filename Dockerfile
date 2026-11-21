@@ -11,7 +11,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
-    --mount=type=cache,target=/build/target \
+    --mount=type=tmpfs,target=/build/target \
     cargo build --locked --release && install -m 755 target/release/scary-node /usr/local/bin/scary-node
 
 FROM debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
