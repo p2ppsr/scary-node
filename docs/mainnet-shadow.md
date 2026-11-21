@@ -159,3 +159,21 @@ The independently reconciled journal through that restart contains **114 consecu
 python3 qualification/shadow_checkpoint.py replay docs/evidence/chronicle-mainnet-h976535.json.gz
 python3 qualification/shadow_checkpoint.py qualify docs/evidence/chronicle-mainnet-h976535.json.gz
 ```
+
+## Recover a live journal reader at the append boundary
+
+At height 976536 the separate first-candidate reader exited with a JSON decoding error while the observer continued recording. A reader can encounter the old end of a file between the writer's JSON payload and its newline. If it advances beyond that fragment and the writer finishes before its next read, it can receive a newline by itself. The readers now stop that scan at the first unterminated byte sequence. The next scan reads the complete row from its start. A malformed newline-terminated record raises an error. The binary read also handles a pause in the middle of a UTF-8 character.
+
+The independently reconciled prefix through height 976538 contains **117 consecutive prospective tips** and **zero unsigned transaction-bearing candidates**. The external receipt confirms the accumulated work against the active tip and observation anchor. The native bodies at heights 976536, 976537 and 976538 contain 12, 506 and 3 transactions. Each complete body matched its confirmed header and Merkle root. The reader obtained a five-group clock sample at every one of those heights. Both the 1,008-block span and the first unsigned candidate remained open. [Recovered observations and external work](evidence/chronicle-mainnet-h976538.json.gz) · [Original diagnostic and the three independently rehashed bodies](evidence/chronicle-shadow-tail-recovery.json)
+
+```sh
+python3 qualification/shadow_checkpoint.py replay docs/evidence/chronicle-mainnet-h976538.json.gz
+python3 -m unittest discover -s qualification -p test_shadow_journal.py
+```
+
+For a finite supervised reader, place the argument array for the documented `shadow_first_candidate.py follow` command in a private JSON file and run the following command. The supervisor keeps the original output directory and appends each recovery to `reader-recoveries.jsonl`. It retries a failed child after checking every complete journal record. A malformed complete record produces a durable hold with its line number. Completion requires a fresh verification of the saved candidate against the native reader's terminal summary.
+
+```sh
+python3 qualification/shadow_reader_supervisor.py \
+  "$SHADOW_LOG" "$PRIVATE_EVIDENCE" "$PRIVATE_EVIDENCE/reader-argv.json"
+```

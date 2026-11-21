@@ -8,6 +8,7 @@ from pathlib import Path
 
 from go_native_parity import ROLES
 from linux_go_parity import EVIDENCE, isolated_oracles, verify_runtime
+from shadow import complete_lines
 from shadow_bdk import replay
 from shadow_first_candidate import assess, atomic_write
 from shadow_native import inputs, require
@@ -85,10 +86,8 @@ def checked_summary(candidate, macos, macos_manifest, linux, release, manifest, 
 
 def origin_in_journal(journal, decision):
     current = None
-    with journal.open() as stream:
-        for line in stream:
-            if not line.endswith("\n"):
-                break
+    with journal.open("rb") as stream:
+        for line in complete_lines(stream):
             event = json.loads(line)
             if event.get("event") == "start":
                 current = event["executable_sha256"]

@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "incident": "first-candidate sidecar read an isolated newline after observing an unfinished append",
+  "observed_process_exit": 1,
+  "first_error_class": "json.decoder.JSONDecodeError",
+  "first_error": "Expecting value: line 2 column 1 (char 1)",
+  "station_journal_retained": true,
+  "prefix_sha256": "b3716e8478c2bd8cd8a17b0a1e6082421183b64356e71275353e9b2f48f1654e",
+  "prefix_first": 976422,
+  "prefix_last": 976538,
+  "prospective_tips": 117,
+  "transaction_bearing_candidates": 0,
+  "affected_and_following": [
+    {
+      "height": 976536,
+      "block_hash": "00000000000000001645853964ffb27de07c8ca66c223c8757eb1b04e33dd18a",
+      "block_bytes": 174048,
+      "sha256_native_body": "8adccae6fc34fc9cbe37e0a8c5cb19c915feec08ce4e82518fb3f1f0aae9e45c",
+      "transactions": 12,
+      "merkle_root_verified": true,
+      "clock_groups": 5,
+      "clock_observed_at": 1795304815,
+      "contemporaneous_header_observed_at": 1795304815,
+      "signed_prefix": 1,
+      "pending_in_decision": 181,
+      "unsigned_candidate": false
+    },
+    {
+      "height": 976537,
+      "block_hash": "00000000000000001d42b1d59813ea04828468c310f71ad9b615a28fe64fd5de",
+      "block_bytes": 14235505,
+      "sha256_native_body": "ef13d70cf5aef5862b2b15c7702d84755adfc1628792dbf1f89af00319feb4f2",
+      "transactions": 506,
+      "merkle_root_verified": true,
+      "clock_groups": 5,
+      "clock_observed_at": 1795304872,
+      "contemporaneous_header_observed_at": 1795304872,
+      "signed_prefix": 1,
+      "pending_in_decision": 1,
+      "unsigned_candidate": false
+    },
+    {
+      "height": 976538,
+      "block_hash": "0000000000000000167e2734cfea3e0351896d3147be24aa30b28a16221e6c9a",
+      "block_bytes": 17495,
+      "sha256_native_body": "5c2425117d2361c470851ec2154fed6f67e8dfa6bd6fbe0e41e6962d66078c62",
+      "transactions": 3,
+      "merkle_root_verified": true,
+      "clock_groups": 5,
+      "clock_observed_at": 1795304873,
+      "contemporaneous_header_observed_at": 1795304872,
+      "signed_prefix": 1,
+      "pending_in_decision": 0,
+      "unsigned_candidate": false
+    }
+  ]
+}

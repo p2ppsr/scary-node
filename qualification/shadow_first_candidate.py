@@ -13,7 +13,7 @@ from urllib.error import URLError
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-from shadow import check_template
+from shadow import check_template, complete_lines
 from shadow_checkpoint import SCALE, atomic_write, check_coinbase, next_bits, target
 from shadow_native import (
     checked_header,
@@ -40,12 +40,11 @@ def load(path):
 
 
 def journal_rows(path):
-    with path.open() as f:
+    with path.open("rb") as stream:
         return [
             r
-            for line in f
-            if line.endswith("\n")
-            and (r := json.loads(line)).get("event", "tip") == "tip"
+            for line in complete_lines(stream)
+            if (r := json.loads(line)).get("event", "tip") == "tip"
         ]
 
 

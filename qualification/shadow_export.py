@@ -5,7 +5,7 @@ import io
 import json
 from pathlib import Path
 
-from shadow import audit
+from shadow import audit, complete_lines
 
 
 def export(journal, failover):
@@ -20,10 +20,8 @@ def export(journal, failover):
         return "asset:" + alias(assets, raw, "endpoint")
 
     records = []
-    with journal.open() as file:
-        for line in file:
-            if not line.endswith("\n"):
-                break
+    with journal.open("rb") as file:
+        for line in complete_lines(file):
             row = json.loads(line)
             if row.get("event") == "start":
                 interpreter = row.pop("interpreter")
@@ -67,8 +65,8 @@ def export(journal, failover):
                 }
             records.append(row)
     summary = audit(io.StringIO("\n".join(json.dumps(row) for row in records)))
-    with failover.open() as source:
-        actions = [json.loads(line) for line in source if line.endswith("\n")]
+    with failover.open("rb") as source:
+        actions = [json.loads(line) for line in complete_lines(source)]
     return {"records": records, "failover": actions, "audit": summary}
 
 

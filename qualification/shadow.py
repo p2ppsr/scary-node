@@ -1,9 +1,9 @@
 """Audit the passive mainnet journal, unsigned commitments and contemporaneous tip reports."""
 
 import argparse
-from collections import defaultdict
 import hashlib
 import json
+from collections import defaultdict
 from pathlib import Path
 
 
@@ -57,6 +57,16 @@ def check_template(row):
         raise ValueError(
             "unsigned template differs from selected parent, commitments or effective rules"
         )
+
+
+def complete_lines(stream):
+    """Read committed binary JSONL records without advancing past a live, partial tail."""
+    for line in stream:
+        if not line.endswith(b"\n"):
+            # The writer can append the suffix between two iterator reads. A
+            # later scan starts over and sees the entire completed record.
+            break
+        yield line
 
 
 def audit(lines):
@@ -158,5 +168,5 @@ def audit(lines):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("journal", type=Path)
-    with parser.parse_args().journal.open() as journal:
-        print(json.dumps(audit(journal), indent=2))
+    with parser.parse_args().journal.open("rb") as journal:
+        print(json.dumps(audit(complete_lines(journal)), indent=2))

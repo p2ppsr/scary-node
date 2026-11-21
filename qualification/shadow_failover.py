@@ -9,6 +9,8 @@ import subprocess
 import time
 from pathlib import Path
 
+from shadow import complete_lines
+
 
 def direct(row):
     return row.get("event") == "tip" and row.get("receipt_trigger_hash") == row.get(
@@ -18,8 +20,8 @@ def direct(row):
 
 def read_tips(path):
     if path.exists():
-        with path.open() as file:
-            for line in file:
+        with path.open("rb") as file:
+            for line in complete_lines(file):
                 row = json.loads(line)
                 if direct(row):
                     yield row
@@ -82,7 +84,7 @@ def run(binary, journal, output, options):
                 )
             position = file.tell()
             line = file.readline()
-            if line.endswith("\n"):
+            if line.endswith(b"\n"):
                 return json.loads(line)
             file.seek(position)
             if deadline is not None and time.monotonic() >= deadline:
@@ -94,7 +96,7 @@ def run(binary, journal, output, options):
 
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, terminate)
-    with journal.open() as source:
+    with journal.open("rb") as source:
         source.seek(0, 2)
         if before is None:
             with observer(False) as process:
