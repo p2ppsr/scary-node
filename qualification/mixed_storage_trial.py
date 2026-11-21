@@ -54,14 +54,16 @@ def start_references():
     compose(
         "up", "-d", "--no-build", "--pull", "never", "svref", "tn1", "tn2", "ingress"
     )
-    wait(
-        "SV source and native Teranode link",
-        lambda: (
-            sv("getblockchaininfo")["chain"] == "regtest"
-            and any("teranode" in p["subver"].lower() for p in sv("getpeerinfo"))
-        ),
-        seconds=180,
-    )
+
+    def source_connected():
+        try:
+            return sv("getblockchaininfo")["chain"] == "regtest" and any(
+                "teranode" in p["subver"].lower() for p in sv("getpeerinfo")
+            )
+        except subprocess.CalledProcessError:
+            return False
+
+    wait("SV source and native Teranode link", source_connected, seconds=180)
 
 
 def seed(directory, receipt, last, entrant=False, on_redial=None):

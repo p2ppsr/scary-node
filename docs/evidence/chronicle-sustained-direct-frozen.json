@@ -1,0 +1,88 @@
+{
+  "registration": "11e60074fbdde9587e1652d4de272a24bd4ac68b",
+  "recorded_wall_ns": 1795293803903425000,
+  "direct_wallet_receipt_sha256": "8401cd63c378d31d16a8c99720af4e994144afd5e5a01bdd0a3ab172304362d1",
+  "original_quiescence_sha256": "9ba9fe884fe79d50e07887a3b2eef287ee08a2a3c6daa93b90777ce87533db37",
+  "original_post_window_query_ports": {
+    "tn1": 19441,
+    "tn2": 19442,
+    "scary": 19480
+  },
+  "excluded_optional_fields": [
+    "post_window_selected_tips.tn1",
+    "post_window_selected_tips.tn2",
+    "post_window_selected_tips.scary",
+    "post_window_entrant_observed_above_audited_prefix"
+  ],
+  "enrolled_project": "scary-node-throughput",
+  "enrolled_ingress_ports": {
+    "19433/tcp": [
+      "21433"
+    ],
+    "19441/tcp": [
+      "21441"
+    ],
+    "19442/tcp": [
+      "21442"
+    ],
+    "19451/tcp": [
+      "21451"
+    ],
+    "19452/tcp": [
+      "21452"
+    ],
+    "19480/tcp": [
+      "21480"
+    ]
+  },
+  "sampler_last_clock_ns": 2100001778208,
+  "last_scheduled_sample": {
+    "sv": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "read_ns": 2100140917916
+    },
+    "tn1": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "read_ns": 2100143055083
+    },
+    "tn2": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "read_ns": 2100144644083
+    },
+    "scary": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "read_ns": 2100148348791
+    }
+  },
+  "stock_post_window_tip": {
+    "height": 618,
+    "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+    "wall_ns": 1795293618906470000
+  },
+  "frozen_stores": {
+    "tn1": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "invalid": false,
+      "volume": "scary-node-throughput_tn1-data"
+    },
+    "tn2": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "invalid": false,
+      "volume": "scary-node-throughput_tn2-data"
+    },
+    "scary": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "header_hex": "00000020ca7b8c27fe81b01300bb089489455bd7f56f45f899f60e0c402ceab842e60465f0d0cb6cef4f2c9d8726e1aec841182afe381b3e89924cf8ea88bafaedaffe76a601026bffff7f2000000000",
+      "volume": "scary-node-throughput_scary-data",
+      "checkpoint_bytes": 265582535,
+      "verified_checkpoint_payload_sha256": "ff64f90265b0d90c37e2764f57ccb2aba0cc629fdc24ae15fd5d3f86b9837d5a"
+    }
+  }
+}

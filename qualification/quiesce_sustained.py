@@ -24,7 +24,8 @@ SERVICES = {
 
 
 def quiesce(directory):
-    from mixed_storage_trial import docker, sv
+    from mixed_storage_trial import docker, rpc, sv
+    from prove import request
 
     output = directory / "quiesced.json"
     if output.exists():
@@ -57,6 +58,39 @@ def quiesce(directory):
             "expected precisely the eight independent direct-wallet containers"
         )
     final = snapshot(sv)
+    tips = {}
+    for name, observe in [
+        ("sv", lambda: sv("getblockchaininfo")),
+        ("tn1", lambda: rpc((21441, 21451), "getblockchaininfo")),
+        ("tn2", lambda: rpc((21442, 21452), "getblockchaininfo")),
+    ]:
+        info = observe()
+        tips[name] = {
+            "height": info["blocks"],
+            "hash": info["bestblockhash"],
+            "wall_ns": time.time_ns(),
+        }
+    mining = json.loads(request("http://127.0.0.1:21480/status"))["mining"]
+    tips["scary"] = {
+        "height": mining["height"],
+        "hash": mining["tip_hash"],
+        "wall_ns": time.time_ns(),
+    }
+    suffix = [
+        {
+            k: obs[k]
+            for k in (
+                "height",
+                "hash",
+                "noncoinbase_transactions",
+                "known_inputs",
+                "unknown_inputs",
+                "script_checks_passed",
+            )
+        }
+        for obs in mining["validation_window"]
+        if obs["height"] > result["completion"]["final_height"]
+    ]
     started = time.time_ns()
     subprocess.run(
         ["docker", "pause", *enrolled.values()], check=True, stdout=subprocess.DEVNULL
@@ -76,6 +110,8 @@ def quiesce(directory):
         "audited_blocks": len(result["blocks"]),
         "confirmed_payments": summary["distinct_confirmed"],
         "post_window_stock_observation": final,
+        "post_window_selected_tips": tips,
+        "post_window_entrant_observed_above_audited_prefix": suffix,
         "pause_started_wall_ns": started,
         "pause_verified_wall_ns": time.time_ns(),
         "paused_services": paused,

@@ -31,7 +31,9 @@ SOURCE = "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2"
 PROJECT = "scary-node-sustained-production"
 
 
-def setup(corpus, payments, directory, image=IMAGE, image_id=IMAGE_ID):
+def setup(
+    corpus, payments, directory, image=IMAGE, image_id=IMAGE_ID, resume_genesis=False
+):
     record = {"registration": REGISTRATION, "project": PROJECT, "events": []}
     logfile = directory / "setup.json"
 
@@ -47,15 +49,26 @@ def setup(corpus, payments, directory, image=IMAGE, image_id=IMAGE_ID):
     existing = docker(
         "volume", "ls", "-q", "--filter", f"label=com.docker.compose.project={PROJECT}"
     ).splitlines()
-    if existing:
+    if existing and not resume_genesis:
         raise ValueError(
             "replication project already owns volumes; enrollment requires fresh stores"
         )
     existing = docker(
         "ps", "-a", "-q", "--filter", f"label=com.docker.compose.project={PROJECT}"
     )
-    if existing:
+    if existing and not resume_genesis:
         raise ValueError("replication project already owns containers")
+    if resume_genesis:
+        previous = json.loads(logfile.read_text())
+        if (
+            previous["registration"] != REGISTRATION
+            or previous["project"] != PROJECT
+            or [e["event"] for e in previous["events"]] != ["fresh_project_verified"]
+            or int(sv("getblockcount")) != 0
+            or any(rpc(n, "getblockchaininfo")["blocks"] != 0 for n in NODES)
+        ):
+            raise ValueError("resume requires the original new stores still at genesis")
+        record = previous
     source = json.loads((payments / "manifest.json").read_text())
     receipt = json.loads((corpus / "sqlite-receipt.json").read_text())
     history = inspect(corpus, receipt)
@@ -72,7 +85,9 @@ def setup(corpus, payments, directory, image=IMAGE, image_id=IMAGE_ID):
         raise ValueError("immutable release image differs")
     os.environ["SCARY_NODE_IMAGE"] = image
     event(
-        "fresh_project_verified",
+        "resumed_fresh_genesis_setup_after_stock_rpc_warmup"
+        if resume_genesis
+        else "fresh_project_verified",
         funding_history=history["sha256_of_ordered_wire_digests"],
         source_ids=SOURCE,
         host_free_bytes=shutil.disk_usage(directory).free,
@@ -153,14 +168,25 @@ if __name__ == "__main__":
         default=IMAGE_ID,
         help="full immutable local image ID; the release ELF must match independently",
     )
+    parser.add_argument(
+        "--resume-genesis-setup",
+        action="store_true",
+        help="resume an enrolled but untimed setup only while all reference histories are still at genesis",
+    )
     args = parser.parse_args()
     print(
         json.dumps(
             run(
                 args.payments,
                 args.output,
+                resume_genesis=args.resume_genesis_setup,
                 setup=lambda d: setup(
-                    args.history, args.payments, d, args.image, args.image_id
+                    args.history,
+                    args.payments,
+                    d,
+                    args.image,
+                    args.image_id,
+                    args.resume_genesis_setup,
                 ),
             ),
             indent=2,

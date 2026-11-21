@@ -437,13 +437,17 @@ def load_ids(corpus, source):
     return ids
 
 
-def run(corpus, directory, *, setup=None):
+def run(corpus, directory, *, setup=None, resume_genesis=False):
     from sustained_resources import sample_resources
 
     src = json.loads((corpus / "manifest.json").read_text())
-    directory.mkdir(parents=True, exist_ok=False)
+    directory.mkdir(parents=True, exist_ok=resume_genesis)
     start_ns = 0
     with session_lock():
+        if resume_genesis and (
+            not setup or {item.name for item in directory.iterdir()} != {"setup.json"}
+        ):
+            raise ValueError("cannot repeat or resume a timed sustained workload")
         if setup:
             setup(directory)
         base = prepare_funding(corpus)

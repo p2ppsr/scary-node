@@ -1,0 +1,93 @@
+{
+  "registration": "11e60074fbdde9587e1652d4de272a24bd4ac68b",
+  "project": "scary-node-throughput",
+  "receipt_seen_wall_ns": 1795293618011620000,
+  "first_scheduled_offer_wall_ns": 1795291517498496334,
+  "observation_duration_ns": 2100006528125,
+  "audited_blocks": 134,
+  "confirmed_payments": 1143159,
+  "post_window_stock_observation": {
+    "wall_ns": 1795293618135102000,
+    "finished_wall_ns": 1795293618758545000,
+    "getmempoolinfo": {
+      "size": 0,
+      "journalsize": 0,
+      "nonfinalsize": 0,
+      "bytes": 0,
+      "usage": 5701600,
+      "usagedisk": 0,
+      "usagecpfp": 0,
+      "nonfinalusage": 256,
+      "maxmempool": 1000000000,
+      "maxmempoolsizedisk": 0,
+      "maxmempoolsizecpfp": 100000000,
+      "mempoolminfee": 1.987e-05
+    },
+    "getblockchainactivity": {
+      "blocks": 0,
+      "transactions": 2589147
+    },
+    "getorphaninfo": {
+      "size": 0
+    },
+    "peers": {
+      "teranode": {
+        "connections": 1,
+        "recv_inv_bytes": 195858,
+        "recv_getdata_bytes": 4491454,
+        "recv_tx_bytes": 0,
+        "recv_reject_bytes": 0,
+        "sent_inv_bytes": 4580908,
+        "sent_getdata_bytes": 1403,
+        "sent_tx_bytes": 27643837,
+        "sent_reject_bytes": 0
+      },
+      "scary-node": {
+        "connections": 1,
+        "recv_inv_bytes": 0,
+        "recv_getdata_bytes": 152277,
+        "recv_tx_bytes": 0,
+        "recv_reject_bytes": 0,
+        "sent_inv_bytes": 152277,
+        "sent_getdata_bytes": 122,
+        "sent_tx_bytes": 938695,
+        "sent_reject_bytes": 0
+      }
+    }
+  },
+  "post_window_selected_tips": {
+    "sv": {
+      "height": 618,
+      "hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+      "wall_ns": 1795293618906470000
+    },
+    "tn1": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "wall_ns": 1795293618924952000
+    },
+    "tn2": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "wall_ns": 1795293618929192000
+    },
+    "scary": {
+      "height": 483,
+      "hash": "707cdde2b681d5f7e14b941cf91e81d4258443349fbaaf595638583a69eec945",
+      "wall_ns": 1795293618931767000
+    }
+  },
+  "post_window_entrant_observed_above_audited_prefix": [],
+  "pause_started_wall_ns": 1795293618931780000,
+  "pause_verified_wall_ns": 1795293619097097000,
+  "paused_services": {
+    "wallet-ingress": true,
+    "scary-node": true,
+    "ingress": true,
+    "tn2": true,
+    "tn1": true,
+    "svref": true,
+    "as1": true,
+    "as2": true
+  }
+}

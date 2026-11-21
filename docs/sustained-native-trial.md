@@ -50,3 +50,72 @@ python3 qualification/sustained_dataset.py unpack .native/offer-assets .native/r
 ```
 
 A new funding run creates fresh ECDSA signatures. Reusing the exact archived funding and transfer wires makes the transaction IDs comparable across the two registered relay configurations.
+
+## Direct-wallet result on November 21, 2026
+
+All four nodes selected the same block at height 618. **1,143,159 of 5,529,600 distinct signed payments met the independent body-read requirement in 2,100.007 seconds, or 544.36/s.** The registered 3,000/s target and full inclusion both failed. All 134 selected bodies from h485 through h618 matched byte-for-byte at SV Node and both Teranodes, covering 228,078,164 bytes. Scary Node recorded 1,143,159 successful input-script checks. The measured branch contained zero foreign payments and zero duplicate confirmations. Of the original population, 4,386,441 were outside the selected bodies at closure. [Compact receipt](evidence/chronicle-sustained-direct.json.gz)
+
+| Measurement | Observed |
+|---|---:|
+| Scheduled wallet offers | 10,800 batches, 5,529,600 distinct signed payments |
+| Original complete socket writes | 10,800 batches across four connections |
+| Reported wallet disconnects / explicit peer rejects | 0 / 0 |
+| Batch-start lateness, median / 95th percentile | 1.98 / 6.48 ms |
+| Independent payments read by offer end at 1,800 s | 228,197 |
+| Additional distinct confirmations read during drain | 914,962 |
+| Reoffered during drain | 839,959 already-scheduled payments across 1,862 batches |
+| Largest independently verified block | 100,248 ordinary payments, maximum observed wire size 19,998,174 bytes |
+| Last included payment block / final selected height | 615 / 618 |
+| Lowest sampled free space, workstation / Docker | 59.34 / 69.24 GiB |
+
+The included subset gained three successors. The completion condition required successors after **every** registered payment had appeared, so the driver never entered its settlement phase. The last scheduled status sample and durable frozen records agree on `58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf` at height 618. The source offered payments in dependency order across 65,536 chains. The first five-minute source cohort contributed 921,060 confirmed payments. The final four source cohorts contributed none by the deadline.
+
+| Five-minute period | Offered | Distinct members of this source cohort confirmed by closure | Cumulative independent reads by end of this period |
+|---|---:|---:|---:|
+| 0–5 min | 921,600 | 921,060 | 35,841 |
+| 5–10 min | 921,600 | 222,099 | 74,585 |
+| 10–15 min | 921,600 | 0 | 116,578 |
+| 15–20 min | 921,600 | 0 | 160,078 |
+| 20–25 min | 921,600 | 0 | 191,030 |
+| 25–30 min | 921,600 | 0 | 228,197 |
+| 30–35 min drain | 0 new | — | 1,143,159 |
+
+| Primary six-second opportunities | Scary Node | Full SV miner |
+|---|---:|---:|
+| Scheduled | 225 | 75 |
+| Solved | 74 | 75 |
+| Unready | 67 | 0 |
+| Missed while previous work was outstanding | 83 | 0 |
+| Worker timeout | 1 | 0 |
+| Returned solution selected on the final audited branch | 68 | 54 |
+| Returned solution absent from that branch | 6 | 21 |
+| Payments in final-branch blocks from these primary slots | 64,475 | 224,214 |
+
+Every primary opportunity is counted. During drain there were 12 more full SV solutions, 27 unready Scary slots and 10 missed Scary slots. Final-branch totals across both phases were 64,475 payments in Scary solutions and 1,078,684 in SV solutions. A successful primary SV call took a median 9.70 seconds and a maximum 19.01 seconds. Successful Scary Stratum calls took a median 0.36 seconds and a maximum 0.83 seconds. Only one mining operation could occupy the shared worker at a time. Long SV calls therefore affected subsequent scheduled Scary opportunities. This workload did not match both miners' hashpower or provide a stale-rate control.
+
+The sampler obtained 2,065 status readings from each of the four nodes. Scary had an unready observation window in 14 readings. It lacked an issuable job in 1,264 readings, including 1,139 with no eligible pending payment, 111 awaiting independent observation after its own solution, and the 14 unready-window readings. All initial funding rails were created on h484. Scary's candidate rule requires a successor for a newly witnessed confirmed output, so immediately spending those rails could not supply a first job while h484 remained the tip. The receipt also records admissions from both the stock SV and Teranode subtree routes. [Candidate admission rule](https://github.com/p2ppsr/scary-node/blob/af9b605ad8da96d041a540111d46a7c0105209f7/src/mining.rs#L790-L798)
+
+### Where the backlog formed
+
+![Payment offers, confirmed payments, the stock validation queue and mempool through 30 minutes of offers and five minutes of drain](evidence/chronicle-sustained-direct.png)
+
+The plot uses actual send completion times, independent body-read completion times and stock RPC sample timestamps. [Figure reproduction](../qualification/plot_sustained.py)
+
+A supplementary read-only SV sampler began 290.43 seconds after the first offer. It took 62 readings through the end of drain. At t=1,800s SV reported 5,228,885 transactions processing or awaiting validation and 3,242 in its mempool. At t=1,830s those values were 4,884,498 and 255,770. At t=1,890s the sampled mempool reached 553,741. The sampled orphan-pool count was zero throughout. Immediately before the original containers were paused, the stock reference still reported 2,589,147 transactions in or awaiting validation and zero in its mempool. A queue entry is an item of work. It does not establish unique inclusion. [Read-only stock gauges](evidence/chronicle-sustained-direct-stock.jsonl.gz) · [SV stock gauge definition](https://github.com/bitcoin-sv/bitcoin-sv/blob/6504a3aff65ba97c0f6c80962b033e35ecbfed4b/src/rpc/blockchain.cpp#L3649-L3683)
+
+Two stock settings help interpret this result. The enrolled 20 MB SV block-size limit also restricted a stock transaction inventory retrieval to 700 entries. SV’s regtest defaults enabled a full mempool consistency check for each accepted transaction, an operation SV documents as quadratic as the pool grows. The four direct-wallet sessions closed after the offer interval. The stock code uses the source peer handle during normal post-validation diagnostics and relay. The queue then fell and several full-node blocks approached the measured 20 MB limit. The time series identifies the stock-side validation backlog and a change in processing during drain. It does not isolate how much throughput each setting, wallet lifetime or miner schedule contributed. The 15,140/s result from the earlier preassembled-block burst had a different entry path and denominator. [Stock regtest defaults](https://github.com/bitcoin-sv/bitcoin-sv/blob/6504a3aff65ba97c0f6c80962b033e35ecbfed4b/src/init.cpp#L2339-L2351) · [Stock mempool cost](https://github.com/bitcoin-sv/bitcoin-sv/blob/6504a3aff65ba97c0f6c80962b033e35ecbfed4b/src/txmempool.h#L425-L429) · [Peer-aware post-validation processing](https://github.com/bitcoin-sv/bitcoin-sv/blob/6504a3aff65ba97c0f6c80962b033e35ecbfed4b/src/validation.cpp#L2096-L2116) · [Paired block-input burst](mixed-storage-trial.md)
+
+### Closed evidence and reproduction
+
+The final handoff paused all eight containers in the enrolled project and retained their volumes. An optional supplemental query used the default 194xx loopback ports for TN1, TN2 and Scary and returned the paired fixture's h483. Those three rows and the associated suffix field in the original handoff are superseded. Its stock SV query and project pause were correctly addressed. The measured workload used the enrolled 214xx ports. All four final scheduled samples reported h618. A subsequent read-only inspection independently recovered h618 directly from each paused Teranode's SQLite main-chain row and the Scary checkpoint's last header, including verification of the checkpoint's internal SHA-256 checksum. The original handoff remains available beside the correction. [Original handoff](evidence/chronicle-sustained-direct-handoff.json) · [Frozen-store correction](evidence/chronicle-sustained-direct-frozen.json)
+
+```sh
+python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustained-direct.json.gz
+python3 qualification/quiesce_sustained.py docs/evidence/chronicle-sustained-direct.json.gz \
+  --stock-log docs/evidence/chronicle-sustained-direct-stock.jsonl.gz \
+  --handoff docs/evidence/chronicle-sustained-direct-handoff.json
+python3 qualification/verify_sustained_native.py docs/evidence/chronicle-sustained-direct.json.gz \
+  --corpus .native/sustained-signed --blocks .native/sustained-run/blocks
+```
+
+On the original frozen Docker project, `uv run --with msgpack==1.1.2 python qualification/sustained_frozen.py .native/sustained-run/receipt.json.gz .native/sustained-run/quiesced.json` reads copies of the project-specific volumes. The dedicated [production-settings replication](sustained-native-replication.md) uses the same signed population, a distinct stock configuration and inventory/request-based wallet delivery. Both studies use one physical workstation and accelerated regtest work.
