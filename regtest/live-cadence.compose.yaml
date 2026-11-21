@@ -1,0 +1,26 @@
+x-cadence-store: &cadence-store
+  entrypoint:
+    - /bin/sh
+    - -ec
+    - |
+      sed 's/filesize 9G/filesize 5G/' /etc/aerospike/qualification.conf > /tmp/cadence.conf
+      grep -q 'filesize 5G' /tmp/cadence.conf
+      exec asd --foreground --config-file /tmp/cadence.conf
+services:
+  as1: *cadence-store
+  as2: *cadence-store
+  scary-node:
+    environment:
+      SCARY_MAX_BLOCK_BYTES: "536870912"
+      SCARY_MAX_JOURNAL_BYTES: "1073741824"
+      SCARY_MAX_UNDO_ITEMS: "8000000"
+  ingress:
+    ports: !override
+      - 127.0.0.1:23441:19441
+      - 127.0.0.1:23442:19442
+      - 127.0.0.1:23451:19451
+      - 127.0.0.1:23452:19452
+      - 127.0.0.1:23480:19480
+      - 127.0.0.1:23433:19433
+  wallet-ingress:
+    ports: !override ["127.0.0.1:23444:21444"]

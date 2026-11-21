@@ -10,12 +10,16 @@ import time
 
 # Use only the dedicated loopback ports and named Docker project.
 PRODUCTION_REPLICATION = os.getenv("SCARY_SUSTAINED_PROFILE") == "production"
+LIVE_CADENCE = os.getenv("SCARY_SUSTAINED_PROFILE") == "live-cadence"
 os.environ["COMPOSE_PROJECT_NAME"] = (
     "scary-node-sustained-production"
     if PRODUCTION_REPLICATION
     else "scary-node-throughput"
 )
 os.environ["SCARY_LAB_PORT_SHIFT"] = "3000" if PRODUCTION_REPLICATION else "2000"
+if LIVE_CADENCE:
+    os.environ["COMPOSE_PROJECT_NAME"] = "scary-node-live-cadence"
+    os.environ["SCARY_LAB_PORT_SHIFT"] = "4000"
 from mixed_corpus import inspect, path_at
 from mixed_native_load import NODES, measure, rpc, status, sv, wait
 from run_cohort import ROOT, session_lock
@@ -34,8 +38,10 @@ def compose(*args):
         "mixed-native.compose.yaml",
         "mixed-aerospike.compose.yaml",
     ]
-    if PRODUCTION_REPLICATION:
+    if PRODUCTION_REPLICATION or LIVE_CADENCE:
         layers += ["sustained-wallet.compose.yaml", "sustained-production.compose.yaml"]
+    if LIVE_CADENCE:
+        layers.append("live-cadence.compose.yaml")
     for name in layers:
         command += ["-f", str(ROOT / "regtest" / name)]
     return docker(*command, *args)

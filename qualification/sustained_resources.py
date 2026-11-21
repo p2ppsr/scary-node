@@ -45,7 +45,11 @@ done
 
 def service_ids():
     project = os.getenv("COMPOSE_PROJECT_NAME", "scary-node-throughput")
-    if project not in ("scary-node-throughput", "scary-node-sustained-production"):
+    if project not in (
+        "scary-node-throughput",
+        "scary-node-sustained-production",
+        "scary-node-live-cadence",
+    ):
         raise ValueError("unexpected sustained regtest project")
     lines = subprocess.check_output(
         [

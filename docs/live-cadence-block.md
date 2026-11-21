@@ -1,0 +1,27 @@
+# A four-node trial at a ten-minute block cadence
+
+## Prospective registration
+
+This isolated regtest trial asks whether stock SV Node, two independent stock Teranodes and the witnessed entrant can select one fully signed body representing 600 seconds of arrivals at 3,000 payments per second. The separately registered wallet trials measure continuous ingress over 1,800 seconds and use six-second work opportunities. A network can perform differently on those two workloads. [Sustained wallet design](sustained-native-trial.md) · [Production-settings replication](sustained-native-replication.md)
+
+Use the first **1,800,000** ordinary transactions, in their published order, from the 5,529,600-payment signed source. Their raw transaction bodies occupy **359,090,161 bytes**. The first 65,536 spend witnessed funding outputs in height 484. The other 1,734,464 spend earlier outputs in the same block. The lab advances the header timestamp by 600 seconds. The new coinbase claims the height-485 subsidy and the exact fees. Before network delivery the offline verifier checks the header, Merkle root, distinct transaction IDs, funding, transfer values, fees and ordered source commitment. The full signed population has a separate signature verification. [Fixture builder and verifier](../qualification/live_cadence_body.py) · [Signed source](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1) · [Stock-format signature check](evidence/chronicle-sustained-source-signatures.json)
+
+Use the Linux ARM64 recovery release at source `8c41f89850ea906fb4ae43bd39a17a884bd0eb62`, ELF SHA-256 `063f28035d8a6e3f7f69d858aafdd448b6c4bba9ebee2f350423bdf53bb4bafe`, alongside stock SV Node 1.2.3 and Teranode 0.16.1. A fresh named Docker project gets two independent disk-backed Aerospike namespaces, each with a 5 GiB UTXO data file. SV uses mainnet diagnostic settings on regtest and advertises a four-billion-byte block allowance. Configure Scary Node for a 512 MiB block, a 1 GiB recent-body journal, and eight million undo items. This profile tests full native receipt and validation of a large block. Stratum origination is measured separately. [Build identity](evidence/chronicle-recovery-linux-build.json) · [Isolated Compose settings](../regtest/live-cadence.compose.yaml)
+
+The three stock nodes replay their common history. Scary joins empty at height 449 and witnesses the two funding stages before the block under test. A loopback Bitcoin P2P publisher announces the block hash to stock SV Node, and streams the body when SV requests it. The two Teranodes and the entrant receive the block through their ordinary native connections. The workstation measures each selected tip independently, using the same monotonic clock. Stock SV Node must return the full body on a separate P2P connection. Both Teranodes must return their own complete legacy wire bodies through their Asset services. All three lengths and SHA-256 digests must agree with the original. The entrant must record every expected script and value check, the exact same-block dependency count and a determinate fee-based coinbase check. Finally all four nodes must select two actual stock-mined successors.
+
+The rate denominator starts immediately before stock inventory announcement and ends when the last of the four nodes is observed on the fixture. Report the individual observations, readback times and settlement separately. The cadence target requires at least 3,000 signed payments per second over that denominator, all three independent reads, complete entrant checks and two successors. An absent read, wrong digest, unobserved tip, resource stop or lower rate remains in the outcome. Retain every measured attempt, including an interruption after announcement. Resource sampling includes per-service memory and CPU, and free bytes on the workstation and Docker backing filesystem. The reserve is 20 GiB on the host and 12 GiB on the backing filesystem. Preflight also budgets for the new data files and setup. A smaller positive stock P2P transfer exercises the transport before the measured opportunity. [Native trial](../qualification/live_cadence_run.py) · [Stock transport](../qualification/cadence_transport.py)
+
+## Reproduction
+
+Unpack the two public source archives into `workload/` using the [dataset instructions](sustained-native-trial.md). Use the lab Python environment, Docker Compose and the exact release binary specified above. The local Docker image name can vary. The driver checks the running executable against the release digest. Run from the repository root with space for the file-backed fixture, witness journal and independent reference stores. The commands below leave the run directory and named stores available for inspection.
+
+```sh
+python3 qualification/live_cadence_body.py build workload/sustained-signed cadence.block
+python3 qualification/live_cadence_body.py verify workload/sustained-signed cadence.block --manifest cadence.json
+.native/py/bin/python qualification/cadence_peer_smoke.py cadence-small.json
+.native/py/bin/python qualification/live_cadence_run.py prepare workload/paired-corpus workload/sustained-signed cadence-run --image "$CADENCE_IMAGE"
+.native/py/bin/python qualification/live_cadence_run.py run cadence.block cadence.json cadence-run --image "$CADENCE_IMAGE"
+```
+
+The raw body is deterministic. The driver stores its digest, the chosen parent, per-peer observations and the resource trace. The local study files and valid block can be reconstructed from the signed release.
