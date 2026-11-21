@@ -70,3 +70,30 @@ The published 90-block entry checkpoint yields zero candidate-bearing pairs. It 
 The November 21 passive upgrade at height **976520** recovered the same selected hash, 99 contiguous headers from 976422, 30,553 witnessed outputs and durable directive sequence 1. Two data peers were connected when tip reconfirmation was recorded. The signed receiver reported two alert peers and zero outstanding actions. These 99 observations remain a prefix of the 1,008-block acceptance interval. [Restart and reconfirmation](evidence/chronicle-shadow-recovery-upgrade.json) · [macOS release provenance](evidence/chronicle-recovery-macos-build.json) · [Linux build from the same source](evidence/chronicle-recovery-linux-build.json)
 
 At height **976525**, the entrant had 104 consecutive local headers, 31,339 witnessed outputs and 111 pending transactions. Since the height-976520 restart, native admission counted 314 accepted SV-peer offers and 33 accepted Teranode subtree offers. Both paths also delivered repeats and ineligible transactions. Five SV network groups corroborated local time within one second. The signed directive prefix was current. The 147-header difficulty window was still incomplete, and the node recorded no unsigned candidate or local solution at that parent. An independent readback matched the local header, parent and increment in chainwork. Admission counters measure events received through each transport. A transaction can appear more than once. [Mainnet observation and reference headers](evidence/chronicle-mainnet-native-offers.json)
+
+## Independently replay the first unsigned candidate's fees
+
+The native evidence reader selects the **first transaction-bearing unsigned decision** in the prospectively written station journal. It verifies the 147 linked proof-of-work headers, computes the next CW-144 target, checks the candidate's parent, median time, coinbase height and Merkle root, then compares the very next observed header with the selected parent, height and target. It also checks the signed-prefix status at the decision and samples the running station's clock report for the same parent. The time check requires a corroborated offset from at least three SV network groups and a sample within 120 seconds of the decision.
+
+For each ordinary input the reader retains the exact funding outpoint, value and locking script. It checks funding transaction bytes and their Merkle branches against the selected chain, and resolves outputs from earlier transactions in the same template in order. It compares every independently calculated fee with the node's admitted fee and reconciles the sum plus subsidy with the coinbase payout. Coinbase and confiscation outputs have independent age checks. The source proofs establish creation and value. The station’s witnessed spend journal and shared BDK supply spend and script validation. The signed-prefix check reads the node’s receipt. Full signed-message verification is exercised in the [receiver and DAR qualification](chronicle-results.md).
+
+Start the reader before the first eligible decision, using a private directory on the same filesystem as the node state. The live decoder requires Python and MessagePack. The verifier for an existing receipt uses the Python standard library.
+
+```sh
+python3 -m venv .native/shadow-reader
+.native/shadow-reader/bin/pip install 'msgpack==1.1.2'
+.native/shadow-reader/bin/python qualification/shadow_first_candidate.py follow \
+  "$SHADOW_LOG" "$DATA_DIR/mainnet/witness.state" "$PRIVATE_EVIDENCE" \
+  --status-url "$LOCAL_API" --token-file "$OPERATOR_TOKEN_FILE" \
+  --asset-list "$APPROVED_ASSET_URL_FILE"
+python3 qualification/shadow_first_candidate.py verify "$PRIVATE_EVIDENCE/first.json.gz"
+```
+
+Each line of the optional Asset file is an operator-selected native Asset base URL, including the API prefix. The reader requests a previously witnessed, confirmed block by hash when its body has left the local evidence cache. The node receives no chain data from the reader. The reader retains up to four immutable checkpoint links, the first candidate's exact bytes and funding proofs. Its compressed body cache defaults to 2 GiB. The `--cache-bytes` and `--max-block-bytes` options set archive and remote read limits. A missing source or clock sample leaves the public count incomplete. A conflicting immediate successor is reported against the original decision. Keep the candidate receipt private while its signed payments are unconfirmed. The summary contains counts, fees, difficulty and the confirmed parent hash.
+
+At height **976529**, the station had observed 108 consecutive contemporary tips, zero unsigned candidates and 68 pending payments in that tip decision. A separate preflight used a confirmed transaction at height **976522**. Its single input came from **976521**, and the difference between that funding output and the spending outputs was **64 satoshis**. Both raw transactions have Merkle paths under their respective proof-of-work headers. A subsequent native Asset read of the funding block reproduced the same proof. The first passive candidate and the 1,008-block qualification remain open at this checkpoint. [Confirmed fee and inclusion evidence](evidence/chronicle-shadow-native-fee-warmup.json.gz)
+
+```sh
+python3 qualification/shadow_native_warmup.py docs/evidence/chronicle-shadow-native-fee-warmup.json.gz
+python3 -m unittest discover -s qualification -p 'test_shadow*.py'
+```
