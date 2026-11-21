@@ -46,6 +46,19 @@ def extend(raw, coins):
 
 def verify(record):
     require(record["schema"] == 1, "unexpected release corpus schema")
+    build = record["interpreter"]
+    require(
+        build["bdk_commit"] == "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9"
+        and build["sv_node_commit"] == "6504a3aff65ba97c0f6c80962b033e35ecbfed4b"
+        and build["linked_bdk_version"] == "1.4.0"
+        and build["linked_sv_version"] == "1.2.3",
+        "running interpreter does not match the registered source",
+    )
+    require(
+        record["reference"]
+        == "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+        "unexpected stock SV image",
+    )
     coins = outputs(record)
     rows = record["opcodes"]["rows"] + record["signatures"]
     require(
