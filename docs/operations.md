@@ -35,6 +35,10 @@ Use `--sv-peer IP:PORT` to add an independent current-tip Bitcoin SV path. Mainn
 
 A competing branch beyond the retained undo data can establish a fresh witnessed boundary from a common eligible ancestor and greater verified work. Inspect the signed exclusion, recovery locator, body budget and rebuilt coverage when a deep fork interrupts work. [Deep recovery procedure and stock-node evidence](deep-recovery.md)
 
+## Stop and restore the miner
+
+Send SIGINT or, on Unix, SIGTERM for a controlled stop. The node closes new transaction admission and work issuance and writes an atomic checkpoint when its eligible transaction pool has gained payments since the last durable boundary. Allow enough time for a large outstanding snapshot to sync before a service manager escalates to a forced kill. On startup, inspect the restored parent and wait for a connected data peer to reconfirm it. An abrupt process or storage failure restores the last durable checkpoint. A native offer awaiting its funding block's first successor lives in the bounded in-memory waiting queue.
+
 ## Inspect what the entrant knows
 
 `--min-observed-blocks N` sets the minimum number of contiguous observed bodies before Stratum issues work. It accepts 1 through 147 and defaults to 1. The realistic regtest sets it to 13. Mainnet still requires the complete difficulty window. A ready observation window by itself supplies neither a payout script nor eligible transactions.

@@ -460,6 +460,19 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
     bail!("peer event stream closed")
 }
 
+async fn shutdown_signal() -> std::io::Result<()> {
+    #[cfg(unix)]
+    {
+        let mut term = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())?;
+        tokio::select! {
+            outcome = tokio::signal::ctrl_c() => outcome,
+            _ = term.recv() => Ok(()),
+        }
+    }
+    #[cfg(not(unix))]
+    tokio::signal::ctrl_c().await
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
@@ -666,7 +679,7 @@ async fn main() -> Result<()> {
     if let (Some(bind), Some(lease)) = (args.stratum_bind, lease) {
         tasks.spawn(mining::run_stratum(
             bind,
-            app.mining,
+            app.mining.clone(),
             solutions.clone(),
             worker_password,
             lease,
@@ -678,13 +691,16 @@ async fn main() -> Result<()> {
                "api":args.api_bind,"stratum":args.stratum_bind}),
     );
     tokio::select! {
-        _ = tokio::signal::ctrl_c() => {},
+        signal = shutdown_signal() => {
+            signal.context("install shutdown signal handler")?;
+            app.mining.lock().await.flush_on_shutdown().context("final witnessed checkpoint")?;
+        },
         result = tasks.join_next() => {
             result.context("no services running")?.context("service task terminated")??;
             bail!("service stopped unexpectedly");
         }
     }
-    tasks.abort_all();
+    tasks.shutdown().await;
     Ok(())
 }
 

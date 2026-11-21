@@ -92,6 +92,39 @@ async fn witness_requires_successor_signature_and_unspent_coverage() {
 }
 
 #[tokio::test]
+async fn clean_stop_saves_recent_eligible_payments_and_fences_late_offers() {
+    let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcdef07").unwrap());
+    let lock = signer.lock().unwrap();
+    let source = tx(&"73".repeat(32), 100_000, lock.clone());
+    let funding = make_block([8; 32], 150, &[source.to_bytes().unwrap()]);
+    let child = make_block(hash256(&funding[..80]), 151, &[]);
+    let mut payment = tx(&source.id().unwrap(), 90_000, lock.clone());
+    payment
+        .sign(0, &signer, 0x41, 100_000, &lock)
+        .await
+        .unwrap();
+    let raw = payment.to_bytes().unwrap();
+    let directory = tempfile::tempdir().unwrap();
+    let mut state = Mining::new(true, vec![0x51]).unwrap();
+    state.open_store(directory.path()).unwrap();
+    state.observe(150, &funding).unwrap();
+    state.observe(151, &child).unwrap();
+    state.save().unwrap();
+    state.peer_tx(TxSource::Sv, &raw);
+    assert!(state.pending_dirty);
+    state.flush_on_shutdown().unwrap();
+    assert!(!state.observation_window_ready());
+    assert!(state.submit_tx(&raw).is_err());
+    assert!(!state.pending_dirty);
+
+    let mut restored = Mining::new(true, vec![0x51]).unwrap();
+    restored.open_store(directory.path()).unwrap();
+    assert_eq!(restored.tip(), state.tip());
+    assert!(restored.pending.contains_key(&hash256(&raw)));
+    assert!(!restored.shutting_down);
+}
+
+#[tokio::test]
 async fn native_payment_waits_for_endorsed_funding_and_rechecks_the_selected_spend() {
     let signer = P2PKH::from_private_key(PrivateKey::from_hex("abcdef07").unwrap());
     let lock = signer.lock().unwrap();

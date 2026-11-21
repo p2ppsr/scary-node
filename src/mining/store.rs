@@ -140,6 +140,19 @@ impl Mining {
         }
         Ok(())
     }
+    /// Fence workers and retain payments admitted since the last complete snapshot.
+    pub(crate) fn flush_on_shutdown(&mut self) -> Result<()> {
+        self.shutting_down = true;
+        ensure!(
+            self.storage_failure.is_none(),
+            "cannot finalize a failed durable boundary"
+        );
+        if self.pending_dirty {
+            self.save()?;
+        }
+        Ok(())
+    }
+
     pub(crate) fn save(&mut self) -> Result<()> {
         let Some(dir) = self.path.as_ref() else {
             return Ok(());
@@ -172,6 +185,8 @@ impl Mining {
             self.storage_failure = Some(error.to_string());
             self.parent_epoch += 1;
             self.revision += 1;
+        } else {
+            self.pending_dirty = false;
         }
         result
     }

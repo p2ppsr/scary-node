@@ -183,6 +183,10 @@ pub struct Mining {
     coins: HashMap<Outpoint, Coin>,
     pending: BTreeMap<Hash, Entry>,
     #[serde(skip)]
+    pending_dirty: bool,
+    #[serde(skip)]
+    shutting_down: bool,
+    #[serde(skip)]
     waiting: waiting::WaitingOffers,
     #[serde(skip)]
     pending_inputs: HashSet<Outpoint>,
@@ -291,6 +295,8 @@ impl Mining {
             headers: VecDeque::new(),
             coins: HashMap::new(),
             pending: BTreeMap::new(),
+            pending_dirty: false,
+            shutting_down: false,
             waiting: waiting::WaitingOffers::default(),
             pending_inputs: HashSet::new(),
             pending_outputs: HashMap::new(),
@@ -324,7 +330,8 @@ impl Mining {
     }
 
     pub(crate) fn observation_window_ready(&self) -> bool {
-        self.peer_ready()
+        !self.shutting_down
+            && self.peer_ready()
             && self.storage_failure.is_none()
             && clock_ready()
             && self.peer_clocks.ready()
@@ -719,13 +726,17 @@ impl Mining {
         }
     }
     pub fn submit_tx(&mut self, raw: &[u8]) -> Result<String> {
+        ensure!(!self.shutting_down, "node is shutting down");
         ensure!(self.storage_failure.is_none(), "durable state write failed");
         ensure!(self.directives.ready(), "directive state is not ready");
         ensure!(
             !self.blocked && self.awaiting_height.is_none(),
             "incomplete active branch coverage"
         );
-        self.admit(raw)
+        let previous_count = self.pending.len();
+        let id = self.admit(raw)?;
+        self.pending_dirty |= previous_count != self.pending.len();
+        Ok(id)
     }
 
     fn admit(&mut self, raw: &[u8]) -> Result<String> {
@@ -931,6 +942,7 @@ impl Mining {
     }
     pub fn status(&self) -> Value {
         let readiness: Vec<&str> = [
+            (self.shutting_down, "node is shutting down"),
             (
                 !self.peer_ready(),
                 "awaiting current tip from a connected data peer",

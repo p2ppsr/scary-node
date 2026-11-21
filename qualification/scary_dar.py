@@ -184,7 +184,7 @@ class LabFeed:
 @contextlib.contextmanager
 def entrant(
     binary, node, feed, dir, port, stratum, *, extra_args=(), require_directives=True,
-    asset_port=None,
+    asset_port=None, stop_signal=signal.SIGINT, exit_receipt=None,
 ):
     peer = node.docker("port", node.container, "18444/tcp")
     log = (dir / "node.log").open("ab")
@@ -235,8 +235,10 @@ def entrant(
         yield api
     finally:
         if p.poll() is None:
-            p.send_signal(signal.SIGINT)
-        p.wait(timeout=10)
+            p.send_signal(stop_signal)
+        exit_code = p.wait(timeout=10)
+        if exit_receipt is not None:
+            exit_receipt.update(signal=stop_signal.name, exit_code=exit_code)
         log.close()
 
 
