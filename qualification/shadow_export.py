@@ -4,6 +4,7 @@ import argparse
 import io
 import json
 from pathlib import Path
+
 from shadow import audit
 
 
@@ -66,7 +67,8 @@ def export(journal, failover):
                 }
             records.append(row)
     summary = audit(io.StringIO("\n".join(json.dumps(row) for row in records)))
-    actions = [json.loads(l) for l in failover.read_text().splitlines()]
+    with failover.open() as source:
+        actions = [json.loads(line) for line in source if line.endswith("\n")]
     return {"records": records, "failover": actions, "audit": summary}
 
 

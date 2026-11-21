@@ -3,7 +3,6 @@
 import argparse
 import gzip
 import hashlib
-import io
 import json
 import os
 import tempfile
@@ -21,6 +20,7 @@ SCALE = 1 << 256
 LIMIT = 0xFFFF << 208
 TARGET_BLOCKS = 1008
 MAX_PEER_AGE = 1200
+FINAL_CONTRACT = "chronicle-mainnet-shadow-v1"
 
 
 def target(bits):
@@ -87,16 +87,53 @@ def current_run(records):
     return tips
 
 
-def public_reference(records):
-    # The reference is a prospective tip check and retrospective readbacks by hash.
+def timed_reports(records):
+    reports = defaultdict(list)
+    for row in records:
+        if row.get("event") == "reference_tip":
+            reports[(row["height"], row["hash"])].append(
+                (row["peer"], row["observed_at"])
+            )
+    return reports
+
+
+def separate_report(row, reports):
+    peers = {
+        peer
+        for peer, at in reports[(row["height"], row["hash"])]
+        if abs(at - row["observed_at"]) <= 7200
+    }
+    delivery = row.get("delivery_source", "")
+    # SV delivery and status use the same run-local peer aliases. An Asset URL
+    # has a separate alias namespace; one reporter might own that URL as well.
+    if delivery.startswith("sv:"):
+        return bool(peers - {delivery.removeprefix("sv:")})
+    return len(peers) >= 2
+
+
+class InactiveReference(Exception):
+    """An independently queried hash is currently outside the provider's active chain."""
+
+
+def reference_hashes(records):
     tips = current_run(records)
+    reports = timed_reports(records)
     wanted = (
         [tips[0]["previous"]]
-        + [r["hash"] for r in tips if not r.get("header_hex")]
+        + [
+            r["hash"]
+            for r in tips
+            if not r.get("header_hex") or not separate_report(r, reports)
+        ]
         + [tips[-1]["hash"]]
     )
+    return dict.fromkeys(wanted)
+
+
+def public_reference(records):
+    # The API supplies retrospective readbacks. Timed P2P reports are kept separately.
     rows = {}
-    for block_hash in dict.fromkeys(wanted):
+    for block_hash in reference_hashes(records):
         if len(block_hash) != 64 or bytes.fromhex(block_hash).hex() != block_hash:
             raise ValueError("invalid journal block hash")
         time.sleep(1)
@@ -121,8 +158,12 @@ def public_reference(records):
             + int(row["bits"], 16).to_bytes(4, "little")
             + row["nonce"].to_bytes(4, "little")
         )
-        if row["hash"] != block_hash or row["confirmations"] < 1:
-            raise ValueError("reference served a different or inactive header")
+        if row["hash"] != block_hash:
+            raise ValueError("reference served a different header")
+        if row["confirmations"] < 1:
+            raise InactiveReference(
+                "queried hash is outside the reference active chain"
+            )
         rows[block_hash] = {
             "height": row["height"],
             "hash": block_hash,
@@ -139,7 +180,9 @@ def public_reference(records):
 def check_reference(records, reference, work):
     tips = current_run(records)
     refs = reference["by_hash"]
-    for ref in refs.values():
+    for block_hash, ref in refs.items():
+        if ref["hash"] != block_hash or ref["confirmations"] < 1:
+            raise ValueError("reference readback is for a different or inactive block")
         check_header(ref)
     anchor = refs[tips[0]["previous"]]
     if (
@@ -206,6 +249,20 @@ def check_coinbase(job, previous_headers, observed_at):
 
 
 def verified_failover(records, receipt):
+    # A new attempt starts at its restriction. Preserve unsuccessful and
+    # partial attempts in the archive without joining stages across attempts.
+    starts = [
+        i
+        for i, row in enumerate(receipt)
+        if row.get("event") == "restrict_body_transport"
+    ]
+    ends = starts[1:] + [len(receipt)]
+    return any(
+        verified_attempt(records, receipt[i:end]) for i, end in zip(starts, ends)
+    )
+
+
+def verified_attempt(records, receipt):
     # The restricted and restored starts must surround the specific direct successor.
     if [r.get("event") for r in receipt] != [
         "restrict_body_transport",
@@ -226,12 +283,14 @@ def verified_failover(records, receipt):
             r.get("event", "tip") == "tip"
             and r["hash"] == restricted["hash"]
             and r["height"] == restricted["height"]
+            and r["observed_at"] <= restricted["unix_s"]
             and r.get("receipt_trigger_hash") == r["hash"]
             and r.get("delivery_source", "").startswith("asset:")
         ),
         lambda r: (
             r.get("event") == "start"
             and r.get("body_transport") == "sv_only"
+            and restricted["unix_s"] <= r["at"] <= received["unix_s"]
             and r.get("restored_tip") == restricted["hash"]
         ),
         lambda r: (
@@ -239,19 +298,27 @@ def verified_failover(records, receipt):
             and r["previous"] == restricted["hash"]
             and r["hash"] == received["hash"]
             and r["height"] == received["height"]
+            and restricted["unix_s"] <= r["observed_at"] <= received["unix_s"]
             and r.get("receipt_trigger_hash") == r["hash"]
             and r.get("delivery_source", "").startswith("sv:")
         ),
         lambda r: (
             r.get("event") == "start"
             and r.get("body_transport") == "all"
+            and r["at"] >= restored["unix_s"]
             and r.get("restored_tip") == received["hash"]
         ),
     ]
-    staged = iter(r for r in records if r.get("event", "tip") in ("start", "tip"))
-    if not any(stages[0](r) for r in staged):
-        return False
-    return all(stage(next(staged, {"event": "end"})) for stage in stages[1:])
+    transitions = deque(maxlen=len(stages))
+    for row in records:
+        if row.get("event", "tip") not in ("start", "tip"):
+            continue
+        transitions.append(row)
+        if len(transitions) == len(stages) and all(
+            check(event) for check, event in zip(stages, transitions)
+        ):
+            return True
+    return False
 
 
 def reconcile(snapshot):
@@ -260,12 +327,7 @@ def reconcile(snapshot):
     if baseline != snapshot["audit"]:
         raise ValueError("embedded commitment audit differs from replay")
 
-    reports = defaultdict(list)
-    for row in records:
-        if row.get("event") == "reference_tip":
-            reports[(row["height"], row["hash"])].append(
-                (row["peer"], row["observed_at"])
-            )
+    reports = timed_reports(records)
     recent = deque(maxlen=147)
     reasons, match_histogram = Counter(), Counter()
     previous = forecast = first = None
@@ -353,6 +415,16 @@ def reconcile(snapshot):
                 )
             signed_ready += 1
             latest_signed = sequence
+        if not 1 <= row["coverage"] <= 147:
+            raise ValueError(f"height {row['height']}: invalid body coverage window")
+        if row["ready"] and (
+            not directive["ready"]
+            or row["coverage"] < 147
+            or row["expected_next_bits"] is None
+        ):
+            raise ValueError(
+                f"height {row['height']}: readiness contradicts observed state"
+            )
         present = row.get("unsigned_candidate") is not None
         if present:
             if (
@@ -365,7 +437,14 @@ def reconcile(snapshot):
                 )
             job = row["unsigned_candidate"]
             check_coinbase(job, recent, row["observed_at"])
-            if len(set(job["transactions"])) != len(job["transactions"]):
+            ids = job["transactions"]
+            if len(ids) != row["pending"] or any(
+                len(bytes.fromhex(txid)) != 32 for txid in ids
+            ):
+                raise ValueError(
+                    f"height {row['height']}: candidate commitments differ from pending count or txid width"
+                )
+            if len(set(ids)) != len(ids):
                 raise ValueError(
                     f"height {row['height']}: duplicate transaction commitment"
                 )
@@ -435,6 +514,120 @@ def reconcile(snapshot):
     }
 
 
+def qualification(snapshot, summary):
+    """Assess the current linked run after reconcile has replayed its commitments."""
+    records = snapshot["records"]
+    run = current_run(records)
+    start = next(i for i, row in enumerate(records) if row is run[0])
+    positions = [
+        i for i in range(start, len(records)) if records[i].get("event", "tip") == "tip"
+    ]
+    # A missing prospective decision or a lost boundary requires a new clean
+    # observation period. Keep the entire prefix and its failures in the audit.
+    disqualified = [i for i in summary["restore_mismatch_records"] if i > start]
+    disqualified.extend(
+        e["record"]
+        for e in summary["continuity_or_node_prediction_exceptions"]
+        if e["kind"] == "unexpected_bits" and e["record"] > start
+    )
+    incomplete_coverage = []
+    missing_decisions = []
+    for i, row in enumerate(run):
+        if row["coverage"] < min(147, i + 1):
+            incomplete_coverage.append(row["height"])
+            disqualified.append(positions[i] + 1)
+        if row["ready"] and row["pending"] and row.get("unsigned_candidate") is None:
+            missing_decisions.append(row["height"])
+            disqualified.append(positions[i] + 1)
+    # Exceptions use one-based journal record numbers. Slicing at that number
+    # excludes the affected record and includes only later prospective events.
+    boundary = max([start, *disqualified])
+    suffix = records[boundary:]
+    window = [row for row in suffix if row.get("event", "tip") == "tip"]
+    reports = timed_reports(records)
+    readbacks = snapshot.get("reference", {}).get("by_hash", {})
+    missing_corroboration = [
+        r["height"]
+        for r in window
+        if not separate_report(r, reports) and r["hash"] not in readbacks
+    ]
+    # An unsigned template on the last observed tip still awaits a successor.
+    # Retrospective header readbacks never advance this on-wire window.
+    wire_run = templates = 0
+    for i, row in enumerate(window):
+        wire_run = wire_run + 1 if row.get("header_hex") else 0
+        job = row.get("unsigned_candidate")
+        if (
+            wire_run >= 147
+            and job
+            and job["transactions"]
+            and i + 1 < len(window)
+            and window[i + 1].get("header_hex")
+            and window[i + 1]["bits"] == job["bits"]
+        ):
+            templates += 1
+    failover = verified_failover(suffix, snapshot["failover"])
+    reference = summary["external_reference"]
+    endpoint_matched = bool(
+        reference
+        and reference["absolute_chainwork_delta_matched"]
+        and reference["tip_hash"] == run[-1]["hash"]
+        and reference["anchor_hash"] == run[0]["previous"]
+    )
+    pending = []
+    for passed, reason in (
+        (
+            len(window) >= TARGET_BLOCKS,
+            "current clean linked window is shorter than the target",
+        ),
+        (
+            failover,
+            "current run lacks a verified failover and matching restored tips",
+        ),
+        (
+            templates > 0,
+            "no transaction-bearing unsigned template with an independently verified successor in the current run",
+        ),
+        (
+            not summary["coverage_failures_awaiting_successor"],
+            "a coverage failure still awaits a successor",
+        ),
+        (
+            bool(window and window[-1]["directives"]["ready"]),
+            "latest signed directive state is unready",
+        ),
+    ):
+        if not passed:
+            pending.append(reason)
+    local_complete = not pending
+    if not endpoint_matched:
+        pending.append(
+            "independent readbacks of the active tip and chainwork anchor are required"
+        )
+    if missing_corroboration:
+        pending.append(
+            "tip observations lack a separate timed report or independent readback"
+        )
+    return {
+        "contract": FINAL_CONTRACT,
+        "qualified": not pending,
+        "local_evidence_complete": local_complete,
+        "current_linked_blocks": len(run),
+        "qualifying_window_blocks": len(window),
+        "qualifying_window_first_height": window[0]["height"] if window else None,
+        "excluded_prefix_blocks": len(run) - len(window),
+        "disqualifying_records_in_linked_run": sorted(set(disqualified)),
+        "required_linked_blocks": TARGET_BLOCKS,
+        "templates_with_verified_successor": templates,
+        "unexplained_missing_templates": missing_decisions,
+        "incomplete_coverage_heights": incomplete_coverage,
+        "uncorroborated_heights": missing_corroboration,
+        "active_tip_and_anchor_matched": endpoint_matched,
+        "failover_and_restores_in_current_run": failover,
+        "pending": pending,
+    }
+
+
 def atomic_write(path, payload):
     with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as tmp:
         name = Path(tmp.name)
@@ -444,72 +637,81 @@ def atomic_write(path, payload):
             os.fsync(tmp.fileno())
             tmp.close()
             name.replace(path)
+            directory_fd = os.open(path.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
         finally:
             name.unlink(missing_ok=True)
 
 
-def checkpoint(snapshot, output, with_reference):
+def checkpoint(snapshot, output, with_reference, *, final=False):
+    snapshot = dict(snapshot)
     if with_reference:
         snapshot["reference"] = public_reference(snapshot["records"])
+    summary = reconcile(snapshot)
+    if final:
+        result = qualification(snapshot, summary)
+        if not result["qualified"]:
+            raise ValueError(
+                "shadow qualification pending: " + "; ".join(result["pending"])
+            )
+        snapshot["qualification_contract"] = FINAL_CONTRACT
+        summary["qualification"] = result
     # Stable gzip bytes also support a public digest of the exact redacted observations.
     packed = gzip.compress(
         json.dumps(snapshot, sort_keys=True, separators=(",", ":")).encode(),
         compresslevel=9,
         mtime=0,
     )
-    summary = reconcile(snapshot)
     summary["observations_sha256"] = hashlib.sha256(packed).hexdigest()
     atomic_write(output, packed)
     return summary
 
 
-def replay(path):
+def replay(path, *, assess=False):
     packed = path.read_bytes()
-    summary = reconcile(json.load(io.BytesIO(gzip.decompress(packed))))
+    snapshot = json.loads(gzip.decompress(packed))
+    summary = reconcile(snapshot)
+    contract = snapshot.get("qualification_contract")
+    if contract is not None and contract != FINAL_CONTRACT:
+        raise ValueError("unknown mainnet shadow qualification contract")
+    if assess or contract is not None:
+        result = qualification(snapshot, summary)
+        if contract is not None and not result["qualified"]:
+            raise ValueError("checkpoint claims an unmet shadow qualification")
+        summary["qualification"] = result
     summary["observations_sha256"] = hashlib.sha256(packed).hexdigest()
     return summary
 
 
-def follow(journal, failover, output, with_reference):
-    # This is a finite collection process. Journal records come from the live observer.
-    last_size = None
+def follow(journal, failover, output):
+    last_revision = None
     while True:
-        size = journal.stat().st_size
-        if size != last_size:
+        try:
+            revision = (journal.stat().st_mtime_ns, failover.stat().st_mtime_ns)
+        except FileNotFoundError:
+            time.sleep(60)
+            continue
+        if revision != last_revision:
             snapshot = export(journal, failover)
-            result = reconcile(snapshot)
-            if (
-                result["current_contiguous_blocks"] >= TARGET_BLOCKS
-                and result["unsigned_templates_with_independent_cw144"]
-            ):
-                run = current_run(snapshot["records"])
-                hashes = {row["hash"] for row in run}
-                in_run = any(
-                    r.get("event") == "sv_body_received"
-                    and r.get("hash") in hashes
-                    and r.get("restored")
-                    and r.get("contiguous_failover")
-                    for r in snapshot["failover"]
-                )
-                with_work = any(row.get("unsigned_candidate") for row in run[146:])
-                if not (
-                    in_run
-                    and result["receipt_confirmed_sv_only_failover"]
-                    and with_work
-                ):
-                    raise ValueError(
-                        "new 1,008-block window requires an evidenced failover and unsigned work in that run"
-                    )
-                while True:
-                    try:
-                        return checkpoint(snapshot, output, with_reference)
-                    except HTTPError as exc:
-                        if exc.code not in {408, 425, 429, 500, 502, 503, 504}:
-                            raise
-                    except (TimeoutError, ConnectionError, URLError):
-                        pass
-                    time.sleep(60)
-            last_size = size
+            if not snapshot["audit"]["observed_transitions"]:
+                time.sleep(60)
+                continue
+            result = qualification(snapshot, reconcile(snapshot))
+            last_revision = revision
+            if result["local_evidence_complete"]:
+                try:
+                    return checkpoint(snapshot, output, with_reference=True, final=True)
+                except HTTPError as exc:
+                    if exc.code not in {404, 408, 425, 429, 500, 502, 503, 504}:
+                        raise
+                except (TimeoutError, ConnectionError, URLError, InactiveReference):
+                    pass
+                # Refresh the journal too. A fork may have changed the
+                # selected run while the public readback was unavailable.
+                last_revision = None
         time.sleep(60)
 
 
@@ -526,15 +728,18 @@ if __name__ == "__main__":
             action="store_true",
             help="reconcile against public mainnet header and chainwork readbacks",
         )
-    check = sub.add_parser("replay")
-    check.add_argument("snapshot", type=Path)
+    for command in ("replay", "qualify"):
+        check = sub.add_parser(command)
+        check.add_argument("snapshot", type=Path)
     args = parser.parse_args()
     if args.mode == "follow":
-        report = follow(args.journal, args.failover, args.output, args.reference)
+        report = follow(args.journal, args.failover, args.output)
     elif args.mode == "capture":
         report = checkpoint(
             export(args.journal, args.failover), args.output, args.reference
         )
     else:
-        report = replay(args.snapshot)
+        report = replay(args.snapshot, assess=args.mode == "qualify")
     print(json.dumps(report, indent=2))
+    if args.mode == "qualify" and not report["qualification"]["qualified"]:
+        raise SystemExit(1)
