@@ -116,6 +116,16 @@ python3 qualification/verify_mixed_native_load.py .native/mixed-native-large.jso
 
 Pass `--rollback-binary PATH` to the large-body driver to restore the new checkpoint with an older executable and verify its next active tip against SV Node. Pin the older build and retain its digest. The measured rollback uses a body below the MessagePack single-binary limit.
 
+### Exercise the running entrant on the reference vectors
+
+The following driver gives the entrant the actual funding block and one descendant before comparing the same transaction at its admission and read-only consensus interfaces. For policy-eligible cases a real Stratum worker submits the entrant’s solved bytes. The stock SV node reads back the selected block. Consensus-valid cases outside policy use an independently assembled reference block. Each result retains the parent, signed transaction, witnessed checks, independent outcomes and full selected bytes. The verifier reconstructs each extended input from its funded output and replays the block commitments.
+
+```sh
+.native/py/bin/python qualification/entrant_chronicle.py .native/entrant-chronicle.json.gz \
+  --binary target/release/scary-node
+python3 qualification/verify_entrant_chronicle.py .native/entrant-chronicle.json.gz
+```
+
 ## Native receiver integration on regtest
 
 Build the v0.3.5 synchronization harness from its pinned source. Its Go overlay supplies loopback peers and a lab publisher, while the receiver uses the upstream StreamThread, signature verifier, SQLite models, processing retry, HTTP handlers and node RPC client. All lab streams bind to loopback with a separate regtest protocol identifier. The Python driver creates the lab trust keys and signs genuine alerts, starts the bearer-authenticated gateway and submits Stratum solves to stock SV Node v1.2.3. The receipt records independently queried active hashes, signed records and receiver application state.

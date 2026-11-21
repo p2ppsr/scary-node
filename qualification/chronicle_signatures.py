@@ -31,7 +31,7 @@ FAMILIES = {
 }
 
 
-def evaluate(node, family, klass):
+def evaluate(node, family, klass, *, entrant=None, rust=None, go=None):
     case = klass()
     size = case._NUMBER_OF_UTXOS_PER_HEIGHT
     coin = node.rpc("listunspent")[0]
@@ -54,7 +54,10 @@ def evaluate(node, family, klass):
     for out in parent.vout:
         out.scriptPubKey = CScript(out.scriptPubKey)
     node.rpc("sendrawtransaction", ToHex(parent))
-    source = node.rpc("getblock", node.rpc("generate", 1)[0])["height"]
+    funding_block = node.rpc("generate", 1)[0]
+    source = node.rpc("getblock", funding_block)["height"]
+    if entrant:
+        entrant.confirm_funding(node, funding_block)
     case.utxos["POST_CHRONICLE"] = ([(i, parent) for i in range(size)], None)
     vectors = TxCollection(source + 1, "POST_CHRONICLE")
     case.get_transactions_for_test(vectors, None)
@@ -83,10 +86,12 @@ def evaluate(node, family, klass):
             outcomes = {
                 name: binding(binary, ef, contexts, tip)
                 for name, binary in [
-                    ("rust", ROOT / "target/debug/examples/chronicle"),
-                    ("go", ROOT / ".native/go-oracle"),
+                    ("rust", rust or ROOT / "target/debug/examples/chronicle"),
+                    ("go", go or ROOT / ".native/go-oracle"),
                 ]
             }
+            if entrant:
+                outcomes["scary"] = entrant.check(node, tx)
             why = None
             try:
                 accepted = node.rpc("sendrawtransaction", ToHex(tx)) == tx.hash
@@ -95,7 +100,9 @@ def evaluate(node, family, klass):
                 if "-26" not in why:
                     raise
                 accepted = False
-            active, block_id, reason = block(node, tx)
+            active, block_id, reason = (
+                entrant.block(node, tx, accepted, outcomes) if entrant else block(node, tx)
+            )
             outcomes["sv"] = {
                 "policy": accepted,
                 "consensus": active,

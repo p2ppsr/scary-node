@@ -49,8 +49,10 @@ def block(node, tx):
     return active, candidate.hash, result
 
 
-def compare(node, rust, go):
-    node.rpc("generate", 105)
+def compare(node, rust, go, *, entrant=None):
+    remaining = 105 - node.rpc("getblockcount")
+    if remaining > 0:
+        node.rpc("generate", remaining)
     vectors = [
         (str(i), bytes(v.locking_script), bytes(v.unlocking_script))
         for i, v in enumerate(OpcodesTestCase.TESTS)
@@ -80,6 +82,8 @@ def compare(node, rust, go):
     node.rpc("sendrawtransaction", ToHex(funding))
     funding_block = node.rpc("generate", 1)[0]
     source_height = node.rpc("getblock", funding_block)["height"]
+    if entrant:
+        entrant.confirm_funding(node, funding_block)
     results = []
     for index, (name, locking, unlocking) in enumerate(vectors):
         tip = node.rpc("getblockcount")
@@ -95,13 +99,17 @@ def compare(node, rust, go):
             k: binding(v, extended, source_height, tip)
             for k, v in [("rust", rust), ("go", go)]
         }
+        if entrant:
+            observations["scary"] = entrant.check(node, tx)
         try:
             accepted = node.rpc("sendrawtransaction", ToHex(tx)) == tx.hash
         except RpcError as error:
             if "error code: -26" not in str(error):
                 raise
             accepted = False
-        active, block_hash, reason = block(node, tx)
+        active, block_hash, reason = (
+            entrant.block(node, tx, accepted, observations) if entrant else block(node, tx)
+        )
         observations["sv"] = {"policy": accepted, "consensus": active, "reason": reason}
         results.append(
             {
