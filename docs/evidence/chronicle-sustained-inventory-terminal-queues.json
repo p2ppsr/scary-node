@@ -1,0 +1,124 @@
+{
+  "network": "regtest",
+  "project": "scary-node-sustained-production",
+  "timing": "untimed post-settlement inspection of the original eight paused services",
+  "resumed_at": "2026-11-21T23:31:51.125504+00:00",
+  "repaused_at": "2026-11-21T23:31:56.825372+00:00",
+  "all_eight_returned_to_pause": true,
+  "observations": [
+    {
+      "utc": "2026-11-21T23:31:53.324980+00:00",
+      "stock_sv": {
+        "selected_hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+        "selected_tips": [
+          {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "branchlen": 0,
+            "status": "active"
+          }
+        ],
+        "mempool_transactions": 0,
+        "validation_transactions": 0
+      },
+      "scary": {
+        "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+        "pending_transactions": 0,
+        "witnessed_outputs": 69745
+      },
+      "teranodes": {
+        "tn1": {
+          "selected_hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+          "candidate": {
+            "prevhash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "height": 562,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        },
+        "tn2": {
+          "selected_hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+          "candidate": {
+            "prevhash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "height": 562,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-11-21T23:31:56.246278+00:00",
+      "stock_sv": {
+        "selected_hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+        "selected_tips": [
+          {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "branchlen": 0,
+            "status": "active"
+          }
+        ],
+        "mempool_transactions": 0,
+        "validation_transactions": 0
+      },
+      "scary": {
+        "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+        "pending_transactions": 0,
+        "witnessed_outputs": 69745
+      },
+      "teranodes": {
+        "tn1": {
+          "selected_hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+          "candidate": {
+            "prevhash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "height": 562,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        },
+        "tn2": {
+          "selected_hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+          "candidate": {
+            "prevhash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "height": 562,
+            "num_tx": 0,
+            "sizeWithoutCoinbase": 80
+          },
+          "stock_gauges": {
+            "teranode_blockassembly_conflict_intents_pending": 0.0,
+            "teranode_blockassembly_queued_transactions": 0.0,
+            "teranode_blockassembly_subtrees": 1.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"chain_extending\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"deep_fork\"}": 0.0,
+            "teranode_blockvalidation_priority_queue_size{priority=\"near_fork\"}": 0.0
+          }
+        }
+      }
+    }
+  ]
+}

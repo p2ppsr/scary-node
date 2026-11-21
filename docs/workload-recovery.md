@@ -53,6 +53,8 @@ The fresh cadence Teranode also selected the 1,800,000-payment block and its two
 
 Two untimed samples taken after the original cadence run recorded zero SV mempool entries, zero SV transactions awaiting validation and zero Scary Node pending transactions. Both original Teranodes selected the same h487 tip, reported zero transactions in their next work candidates and returned zero for the block-assembly transaction queue and each instrumented block-priority queue. The eight original services returned to pause after 5.52 seconds. [Original terminal queue observations](evidence/chronicle-cadence-terminal-queues.json)
 
+The original inventory project also exposed both stock Teranode queue gauges and next work candidates. Two samples at the settled h561 tip recorded zero for the candidate transaction counts, assembly queues, block-priority queues, SV mempool, SV validation queue and Scary pending count. All eight services returned to pause after 5.70 seconds. [Original inventory queue observations](evidence/chronicle-sustained-inventory-terminal-queues.json)
+
 ## Restore an entrant from archived volumes
 
 Freeze the enrolled Compose project after its settlement and final queue observations. Keep the two private entrant archives with its release image. The restore command launches that image on a fresh private RAM filesystem, reads both archives, hashes the checkpoint before startup, and queries the actual running node in a network namespace with no data peers. It compares its selected tip, witnessed coverage and measured script-check counts with the recorded observations. The complete original cadence window also permits a row-for-row restart comparison.
