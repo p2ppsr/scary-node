@@ -379,14 +379,23 @@ def compare_membership(record, corpus, blocks):
     amounts = array("Q", [0]) * PAYMENTS
     claimed = Counter()
     fees = Counter()
+    fees_per_payment = Counter()
     miners = {s["hash"]: s["miner"] for s in record["slots"] if "hash" in s}
     block_miners = {}
+    suffix = summary["observed_empty_pool_suffix"]
+    empty_height = suffix["first_empty_status"]["height"] if suffix else None
+    funding_height = record["setup"]["funding"]["height"]
+    after_empty = Counter()
+    later_blocks = 0
     for b in record["blocks"]:
         ident = b["hash"]
         raw = (blocks / (ident + ".block")).read_bytes()
-        verify_block_membership(raw, b, ordinals, seen, PAYMENTS // 6, heights=heights)
-        _, txs, outputs = decode_block(raw, ident)
+        txs, outputs = verify_block_membership(
+            raw, b, ordinals, seen, PAYMENTS // 6, heights=heights
+        )
         total_fee = 0
+        after_first_empty = empty_height is not None and b["height"] > empty_height
+        later_blocks += after_first_empty
         for tx, out in zip(txs[1:], outputs[1:], strict=True):
             n = ordinals[dsha(tx)]
             require(
@@ -395,11 +404,19 @@ def compare_membership(record, corpus, blocks):
             )
             input_value = initial[n] if n < len(initial) else amounts[n - len(initial)]
             amounts[n] = out[0][0]
+            if after_first_empty:
+                origin_height = (
+                    funding_height if n < len(initial) else heights[n - len(initial)]
+                )
+                require(0 < origin_height <= b["height"], "unavailable source parent")
+                after_empty[b["height"] - origin_height] += 1
             require(
                 input_value >= amounts[n] and input_value > 0,
                 "input has no earlier evidenced value",
             )
-            total_fee += input_value - amounts[n]
+            paid = input_value - amounts[n]
+            total_fee += paid
+            fees_per_payment[paid] += 1
         miner = miners.get(ident, "unattributed")
         subsidy = 5_000_000_000 >> (b["height"] // 150)
         payout = sum(value for value, _ in outputs[0])
@@ -414,9 +431,13 @@ def compare_membership(record, corpus, blocks):
     )
     with (corpus / "ids.bin").open("rb") as f:
         ids = f.read(submitted * 32)
-    pending = b"".join(
-        sorted(ids[i * 32 : (i + 1) * 32] for i in range(submitted) if not seen[i])
+    pending_ordinals = [i for i in range(submitted) if not seen[i]]
+    pending = b"".join(sorted(ids[i * 32 : (i + 1) * 32] for i in pending_ordinals))
+    terminal_parent_heights = Counter(
+        funding_height if i < len(initial) else heights[i - len(initial)]
+        for i in pending_ordinals
     )
+    pending_parents = terminal_parent_heights.pop(0, 0)
     require(
         len(pending) // 32 == summary["final_stock_mempool_after_interruption"]
         and hashlib.sha256(pending).hexdigest()
@@ -428,11 +449,25 @@ def compare_membership(record, corpus, blocks):
         "merkle_verified_bodies": len(block_miners),
         "confirmed_distinct_memberships": sum(seen),
         "advertised_unmined_matched_stock_mempool": len(pending) // 32,
+        "stock_pending_source_inputs": {
+            "selected_tip_height": summary["final_audited_height"],
+            "confirmed_parent_creation_heights": dict(
+                sorted(terminal_parent_heights.items())
+            ),
+            "unconfirmed_source_parents": pending_parents,
+        },
+        "selected_bodies_above_first_empty_status_height": {
+            "first_empty_status_height": empty_height,
+            "selected_bodies": later_blocks,
+            "confirmed_payments": sum(after_empty.values()),
+            "inclusion_height_minus_parent_creation_height": dict(
+                sorted(after_empty.items())
+            ),
+        },
+        "payment_counts_by_fee_satoshis": dict(sorted(fees_per_payment.items())),
         "transaction_fees_satoshis_by_origin": dict(fees),
         "claimed_above_subsidy_satoshis_by_origin": dict(claimed),
-        "source_parent_ages": parent_ages(
-            heights, record["setup"]["funding"]["height"], block_miners
-        ),
+        "source_parent_ages": parent_ages(heights, funding_height, block_miners),
     }
 
 

@@ -771,7 +771,7 @@ def verify_block_membership(
         and hashlib.sha256(raw).hexdigest() == block["wire_sha256"],
         "archived body differs from readback",
     )
-    _, txs, _ = decode_block(raw, block["hash"])
+    _, txs, outputs = decode_block(raw, block["hash"])
     counts = [0] * COHORTS
     duplicates = foreign = 0
     for tx in txs[1:]:
@@ -798,6 +798,7 @@ def verify_block_membership(
         and duplicates == block["duplicate_scheduled"],
         "archived body membership differs from its compact observation",
     )
+    return txs, outputs
 
 
 def parent_ages(heights, funding_height, miners, rails=65_536):
