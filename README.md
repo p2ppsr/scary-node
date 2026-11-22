@@ -15,7 +15,7 @@ Clone the repository. To see what a solved block contains, replay a saved run wi
 ```sh
 git clone https://github.com/p2ppsr/scary-node.git
 cd scary-node
-python3 regtest/verify_receipt.py docs/evidence/regtest-release.json
+python3 regtest/verify_receipt.py docs/evidence/chronicle-two-teranode-quickstart.json
 ```
 
 To produce your own receipt, start Docker with Compose v2 and install Python 3 and an OpenSSL executable with secp256k1 support. The first build downloads the pinned native interpreter, Rust dependencies and reference images. Start from fresh lab volumes.

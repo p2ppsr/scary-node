@@ -2,6 +2,8 @@
 
 Start with the [two-Teranode lab](regtest.md) to watch an empty entrant receive a payment, issue work, publish a block and see it extended. A **witnessed output** is one whose creation the node observed on its selected branch. An **eligible payment** has the evidence and approvals needed for the next template. **Settlement** in a lab report means reaching its stated depth on the observed branch. The reports identify the release, network and depth used.
 
+The [November 22 alpha review](alpha-review.md) collects the current runtime fixes and their funded, signed and multi-node regression results.
+
 | Question | Where to look | What was observed |
 | --- | --- | --- |
 | How much can an entrant learn? | [Validation model](validation.md) · [Active-chain experiment](scenario-results.md) | After entering at height 143, the entrant followed 12 reference blocks. Its next three solved blocks carried 3, 8 and 12 payments. At the final shared tip it knew 97 of 452 live outputs. |

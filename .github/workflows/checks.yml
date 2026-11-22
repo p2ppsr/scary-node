@@ -21,7 +21,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Replay the two-Teranode receipt
-        run: python3 regtest/verify_receipt.py docs/evidence/regtest-release.json
+        run: |
+          python3 regtest/verify_receipt.py docs/evidence/chronicle-two-teranode-quickstart.json
+          python3 regtest/verify_receipt.py docs/evidence/regtest-release.json
       - name: Build the pinned native interpreter
         run: ./scripts/build-bdk.sh
       - name: Check the Rust node

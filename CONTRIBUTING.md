@@ -27,7 +27,7 @@ rustup component add --toolchain 1.98.1 clippy rustfmt
 rustup run 1.98.1 cargo fmt --all -- --check
 rustup run 1.98.1 cargo test --release --locked
 rustup run 1.98.1 cargo clippy --release --locked --all-targets -- -D warnings
-python3 regtest/verify_receipt.py docs/evidence/regtest-release.json
+python3 regtest/verify_receipt.py docs/evidence/chronicle-two-teranode-quickstart.json
 python3 -m venv .native/py
 .native/py/bin/pip install ecdsa==0.19.1 msgpack==1.1.2
 .native/py/bin/python -m unittest discover -s qualification
