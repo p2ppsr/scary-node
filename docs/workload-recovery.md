@@ -95,6 +95,8 @@ python3 qualification/restore_teranode_archive.py boot "$measured" private-servi
 python3 qualification/restore_teranode_archive.py verify "$measured" new-tn1.json
 ```
 
+When the original node had pending payments, pass `--original-candidate path/to/original-candidate.block` to the boot command. The proof records the restored candidate’s membership and ordered ordinary transaction bytes alongside the independently saved original. The coinbase and mining time can change at restart. A changed payment set is visible in `pending_recovery`.
+
 Use the second pair's three archives and `tn2` for its independent run. Both original inventory pairs reopened at h561, produced an empty candidate on the original hash and served all 77 original Asset bodies. Each returned exactly 1,103,139,534 bytes matching the timed study. Recovery and reads took 86.07 seconds for TN1 and 84.20 seconds for TN2. Each native peer gauge read zero before and after the full readback. [Archived TN1 and AS1](evidence/chronicle-sustained-inventory-archived-tn1.json) · [Archived TN2 and AS2](evidence/chronicle-sustained-inventory-archived-tn2.json)
 
 ## Restore an entrant from archived volumes

@@ -1,4 +1,4 @@
-"""Boot an archived, settled regtest Teranode and its Aerospike store on an isolated bridge."""
+"""Boot an archived regtest Teranode and its Aerospike store on an isolated bridge."""
 
 import argparse
 import contextlib
@@ -10,7 +10,7 @@ import time
 import uuid
 from pathlib import Path
 
-from recover_sustained_chain import GIB, read
+from recover_sustained_chain import GIB, confirmed_boundary, read
 from recover_teranode_chain import AEROSPIKE_IMAGE, TERANODE_IMAGE
 from restore_witness_archive import HELPER, canonical, docker, extract
 from run_cohort import ROOT, session_lock
@@ -111,7 +111,7 @@ def wait_ready(cid, query, timeout):
     raise TimeoutError("archived reference service did not recover: " + str(last))
 
 
-def native_rpc(cid, method):
+def native_rpc(cid, method, *params):
     # This credential is the public literal from the isolated regtest Compose file.
     raw = docker(
         "exec",
@@ -127,7 +127,7 @@ def native_rpc(cid, method):
         "-H",
         "Content-Type: application/json",
         "--data-binary",
-        json.dumps({"id": 1, "method": method, "params": []}),
+        json.dumps({"id": 1, "method": method, "params": list(params)}),
         "http://127.0.0.1:9292/",
         stderr=subprocess.DEVNULL,
     )
@@ -182,7 +182,65 @@ def readback(cid, row):
     }
 
 
-def boot(measured_path, configuration, role, node_data, store_data, store_smd):
+def compare_pending(tnid, candidate, original_wire):
+    from prove import decode_block, dsha, txid
+
+    original = original_wire.read_bytes()
+    url = (
+        "http://127.0.0.1:8090/api/v1/block_legacy/"
+        + candidate["id"]
+        + "?type=miningcandidate&wire=1"
+    )
+    current = subprocess.check_output(
+        ["docker", "exec", tnid, "curl", "-fsS", "--max-time", "180", url]
+    )
+    require(
+        original[4:36] == current[4:36]
+        and current[4:36][::-1].hex() == candidate["prevhash"],
+        "unpublished candidate parent differs",
+    )
+
+    def membership(raw):
+        _, txs, _ = decode_block(raw, txid(raw[:80]))
+        ordinary = txs[1:]
+        ids = [dsha(tx) for tx in ordinary]
+        require(len(set(ids)) == len(ids), "duplicate candidate payment")
+        return {
+            "payments": len(ids),
+            "candidate_wire_sha256": hashlib.sha256(raw).hexdigest(),
+            "ordinary_wire_sha256": hashlib.sha256(b"".join(ordinary)).hexdigest(),
+            "ordered_internal_txids_sha256": hashlib.sha256(b"".join(ids)).hexdigest(),
+            "sorted_internal_txids_sha256": hashlib.sha256(
+                b"".join(sorted(ids))
+            ).hexdigest(),
+        }
+
+    before = membership(original)
+    after = membership(current)
+    require(
+        after["payments"] == candidate["num_tx"],
+        "native RPC and candidate asset differ",
+    )
+    return {
+        "original": before,
+        "after_isolated_restart": after,
+        "same_payment_membership": before["sorted_internal_txids_sha256"]
+        == after["sorted_internal_txids_sha256"],
+        "same_ordered_payment_bytes": before["ordinary_wire_sha256"]
+        == after["ordinary_wire_sha256"],
+    }
+
+
+def boot(
+    measured_path,
+    configuration,
+    role,
+    node_data,
+    store_data,
+    store_smd,
+    *,
+    original_candidate=None,
+):
     receipt = read(measured_path)
     original = {
         c["Config"]["Labels"]["com.docker.compose.service"]: c for c in configuration
@@ -269,7 +327,7 @@ def boot(measured_path, configuration, role, node_data, store_data, store_smd):
             240,
         )
         docker("exec", tnid, "touch", "/run/archive/start")
-        target = receipt["completion"]
+        target = confirmed_boundary(receipt)
 
         def ready():
             msg = native_rpc(tnid, "getblockchaininfo")
@@ -281,7 +339,11 @@ def boot(measured_path, configuration, role, node_data, store_data, store_smd):
             )
 
         info = wait_ready(tnid, ready, 240)
-        candidate = native_rpc(tnid, "getminingcandidate")
+        candidate = (
+            native_rpc(tnid, "getminingcandidate", True)
+            if original_candidate is not None
+            else native_rpc(tnid, "getminingcandidate")
+        )
         require(
             candidate["prevhash"] == info["bestblockhash"],
             "recovered native candidate has different parent",
@@ -303,12 +365,18 @@ def boot(measured_path, configuration, role, node_data, store_data, store_smd):
             return connected_peers(tnid)
 
         before = isolation()
+        pending = (
+            {"pending_recovery": compare_pending(tnid, candidate, original_candidate)}
+            if original_candidate is not None
+            else {}
+        )
         rows = [readback(tnid, row) for row in receipt["blocks"]]
         after = isolation()
         return {
             "network": "isolated regtest",
             "role": role,
             "database_role": db,
+            **pending,
             "teranode_image": EXPECTED[role],
             "aerospike_image": EXPECTED[db],
             "teranode_image_id": original[role]["Image"],
@@ -356,14 +424,27 @@ def verify(proof, receipt):
         }
         for r in receipt["blocks"]
     ]
+    target = confirmed_boundary(receipt)
     require(
         expected == proof["restored_readbacks"]
-        and proof["selected_hash"]
-        == proof["candidate_parent"]
-        == receipt["completion"]["final_hash"]
-        and proof["height"] == receipt["completion"]["final_height"],
+        and proof["selected_hash"] == proof["candidate_parent"] == target["final_hash"]
+        and proof["height"] == target["final_height"],
         "retained blocks or boundary differ",
     )
+    if "pending_recovery" in proof:
+        original = proof["pending_recovery"]["original"]
+        restored = proof["pending_recovery"]["after_isolated_restart"]
+        require(
+            restored["payments"] == proof["candidate_transactions"]
+            and proof["pending_recovery"]["same_payment_membership"]
+            == (
+                restored["sorted_internal_txids_sha256"]
+                == original["sorted_internal_txids_sha256"]
+            )
+            and proof["pending_recovery"]["same_ordered_payment_bytes"]
+            == (restored["ordinary_wire_sha256"] == original["ordinary_wire_sha256"]),
+            "pending candidate comparison differs",
+        )
     return {
         "role": role,
         "height": proof["height"],
@@ -380,6 +461,7 @@ if __name__ == "__main__":
     b.add_argument("measured", type=Path)
     b.add_argument("private_inspect", type=Path)
     b.add_argument("role", choices=("tn1", "tn2"))
+    b.add_argument("--original-candidate", type=Path)
     for k in ("node_data", "store_data", "store_smd", "proof"):
         b.add_argument(k, type=Path)
     v = a.add_parser("verify")
@@ -397,6 +479,7 @@ if __name__ == "__main__":
                 args.node_data,
                 args.store_data,
                 args.store_smd,
+                original_candidate=args.original_candidate,
             )
             verify(result, read(args.measured))
             with args.proof.open("x") as f:
