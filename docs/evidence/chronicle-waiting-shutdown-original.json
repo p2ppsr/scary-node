@@ -1,0 +1,118 @@
+[
+  {
+    "release": "0aab15b07c706b9cbf49d26b68b4ce3675eb0ee308fb92fc8d294675157b0b36",
+    "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+    "exit": {
+      "signal": "SIGINT",
+      "exit_code": 0
+    },
+    "before_waiting": 1,
+    "restored_waiting": 0,
+    "restored_before_endorsement_pending": 0,
+    "pre_endorsement_worker": {
+      "authorized": true,
+      "notifications": 0,
+      "observed_methods": [
+        "mining.set_difficulty"
+      ],
+      "quiet_interval_ms": 800
+    },
+    "sender_waiting_events": 1,
+    "after_endorsement_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "height": 107,
+    "parent": "45e0972a125974e4df9420ca55be8364fdf62338d32e3ad89eda278fdf28b0fd",
+    "funding_hex": "0100000001051329bc60eeb97f03d3c1029cbf0c6c67e3cc74d9b5d1ae5dcfb27a714f8b9500000000484730440220206ef87ae22e1c1079b7114d3c5598cbb3d9b1f0d16478415d3ac0e74900857e022047c037aaa6776dafa2ae183d50a383978c7fb11174c29b8761577820ceeba52a41ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a9141617a521fa5ea7a77ef0405beeaa94e0cb345e7788ac00000000",
+    "funding_block_hex": "00000020432116fd85550f20796f4dc518af3fb3800deb76c9bed13c5a41f8f28d59751b0ef987c00fd24be1f01a28f4c2c0e8ea391e74d7d621d9c599a7cc61777c682cb02c026bffff7f20020000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016a0101ffffffff011019062a01000000232102f56a24e4528477ebb989dff2e76d0becfd9361298d48a2f773b64937ae888a93ac000000000100000001051329bc60eeb97f03d3c1029cbf0c6c67e3cc74d9b5d1ae5dcfb27a714f8b9500000000484730440220206ef87ae22e1c1079b7114d3c5598cbb3d9b1f0d16478415d3ac0e74900857e022047c037aaa6776dafa2ae183d50a383978c7fb11174c29b8761577820ceeba52a41ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a9141617a521fa5ea7a77ef0405beeaa94e0cb345e7788ac00000000",
+    "funding_block_header": "00000020432116fd85550f20796f4dc518af3fb3800deb76c9bed13c5a41f8f28d59751b0ef987c00fd24be1f01a28f4c2c0e8ea391e74d7d621d9c599a7cc61777c682cb02c026bffff7f2002000000",
+    "parent_header": "00000020b31c6d0f2a4c37d94c05904c520281ebbf19173d00a1d5dee9c52649eb5d1e2cab3afc4b356f74fccf6e4765d75e8c7d92c83cc17261dd2f8ba9186b0071ee5eb02c026bffff7f2000000000",
+    "payment_hex": "010000000159783508e78798cd06f2dc7034a0ad90c3c0300f9f750a020c203ace9567454000000000484730440220397d92f4e69f8728b877a2ac6dec967ca0a6312e94bb64c0a41e91cce6d75bd702202bbdf0dea272c1d1be328991d9f31e060e8234f96c327ea6cc2f43a1e434fb624100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+    "payment_id": "ab69370e741823a64fdbc7d4bf7dff15742f312b571157995a8d2fbcb58221dc",
+    "before_pending": 0,
+    "restored_pending": 0,
+    "sender_native_admissions": 0,
+    "new_peer_tx_bytes": 0,
+    "worker": {
+      "authorized": true,
+      "notifications": 0,
+      "observed_methods": [
+        "mining.set_difficulty"
+      ],
+      "quiet_interval_ms": 800
+    }
+  },
+  {
+    "release": "0aab15b07c706b9cbf49d26b68b4ce3675eb0ee308fb92fc8d294675157b0b36",
+    "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+    "exit": {
+      "signal": "SIGTERM",
+      "exit_code": 0
+    },
+    "before_waiting": 1,
+    "restored_waiting": 0,
+    "restored_before_endorsement_pending": 0,
+    "pre_endorsement_worker": {
+      "authorized": true,
+      "notifications": 0,
+      "observed_methods": [
+        "mining.set_difficulty"
+      ],
+      "quiet_interval_ms": 800
+    },
+    "sender_waiting_events": 1,
+    "after_endorsement_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "height": 107,
+    "parent": "4bba854b6d1b8e335f0456a00b2866341eeb24a751ed41378723e806356f3c7f",
+    "funding_hex": "01000000011cbb02e81c457376d4a9070fe36a651fd983fa49f2ed415c7f99e8854269c3130000000049483045022100d6d6446ccb44752d76ce095ac79404798b6c03c3b0bd40705ae836dadd7ac15c02205ca1d0afeb97fb70e30de636f89cb9d389bd2ecb5dda40f91f127d31a82d33f341ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a91466f2d1be28aad6d2b2105411f09ca4e8152f545488ac00000000",
+    "funding_block_hex": "0000002067c23ace0c1b1ba1f0f1174ae5179a437a786f47c66d3321a0aed7558ca84a461a54348ad9b662944ac0ed07a5e8af530a485355e4a4982eaa5689cbf04f1d526f2e026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016a0101ffffffff011019062a01000000232102f4061c78d5e62ef6eac4d1f1955d5f81080129f6e98616ece872ff7fb16fb935ac0000000001000000011cbb02e81c457376d4a9070fe36a651fd983fa49f2ed415c7f99e8854269c3130000000049483045022100d6d6446ccb44752d76ce095ac79404798b6c03c3b0bd40705ae836dadd7ac15c02205ca1d0afeb97fb70e30de636f89cb9d389bd2ecb5dda40f91f127d31a82d33f341ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a91466f2d1be28aad6d2b2105411f09ca4e8152f545488ac00000000",
+    "funding_block_header": "0000002067c23ace0c1b1ba1f0f1174ae5179a437a786f47c66d3321a0aed7558ca84a461a54348ad9b662944ac0ed07a5e8af530a485355e4a4982eaa5689cbf04f1d526f2e026bffff7f2000000000",
+    "parent_header": "00000020c1a7166cb72866bb27c868f9de342bd19e23bd6bb70a6220f3f5e2ab4f0c3f540fe1ae86ed8231b4b976140b9c9eb7eb2aa581d39a56e0e8908532ed5d03fa216f2e026bffff7f2000000000",
+    "payment_hex": "0100000001c6ade703855ce785690f05d6d03fed61c3661559c4ee8d675ff5220ecfa2666f000000004847304402206b3ba26fceb6ed0970da3cf76ae304c600504850c84f46cd4c111a39766ffdf802206300e371e574905226fd7b45702f034ce88dbb2d2de2e471d11b2c56d03e877d4100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+    "payment_id": "90f0987641b56934a9ea74458638df342b0c0170ab0855ccb3841a91b43af753",
+    "before_pending": 0,
+    "restored_pending": 0,
+    "sender_native_admissions": 0,
+    "new_peer_tx_bytes": 0,
+    "worker": {
+      "authorized": true,
+      "notifications": 0,
+      "observed_methods": [
+        "mining.set_difficulty"
+      ],
+      "quiet_interval_ms": 800
+    }
+  }
+]

@@ -18,6 +18,32 @@ The archive-built macOS executable from [c2a36d5](https://github.com/p2ppsr/scar
 
 Both archive-built release manifests record the native BDK provenance, compiler and executable SHA-256. [macOS build](evidence/chronicle-waiting-macos-build.json) · [Linux build](evidence/chronicle-waiting-linux-build.json)
 
+## Restart before the funding block has a successor
+
+Each run starts two independent stock SV Node v1.2.3 instances. Only the first receives the signed wallet payment. After stopping the entrant with SIGINT or SIGTERM, the driver reconnects it exclusively to the second stock node. Both stock nodes validated the funding block. The second has an empty mempool and sends zero transaction bytes during the measurement. It mines the first successor to the funding block. This isolates the payment the entrant saved before shutdown.
+
+| Payment at shutdown | Source | Runs | Waiting after restart | Selected and extended by stock | Fee per selected block |
+|---|---|---:|---:|---:|---:|
+| Waiting for a successor | `10b93b4` | 2 | 0 of 2 | 0 of 2 | — |
+| Waiting for a successor | `5148c31` | 2 | 2 of 2 | 2 of 2 | 1,100 sat |
+| Already eligible | `5148c31` | 2 | — | 2 of 2 | 1,100 sat |
+
+On both release runs with a waiting payment, the worker received zero jobs before the successor. Scary then promoted precisely one payment, and stock accepted the worker’s block and mined directly on top of it. Each signal used a fresh chain and wallet. These six experiments cover graceful stops and a payment offered once. [Original waiting runs](evidence/chronicle-waiting-shutdown-original.json) · [Restored waiting runs](evidence/chronicle-waiting-shutdown-fixed.json) · [Eligible controls](evidence/chronicle-waiting-shutdown-eligible.json) · [Release build](evidence/chronicle-waiting-shutdown-macos-build.json)
+
+Replay all six observations offline. To repeat them live, set `OLD_BINARY` and `SCARY_BINARY` to the respective archive-built executables and use fresh output paths.
+
+~~~sh
+p=.native/py/bin/python
+receipts=docs/evidence/chronicle-waiting-shutdown
+"$p" qualification/verify_pending_shutdown.py "$receipts-original.json" --baseline
+"$p" qualification/verify_pending_shutdown.py "$receipts-fixed.json"
+"$p" qualification/verify_pending_shutdown.py "$receipts-eligible.json"
+
+"$p" qualification/pending_shutdown.py "$OLD_BINARY" .native/old-waiting.json --baseline --awaiting-successor
+"$p" qualification/pending_shutdown.py "$SCARY_BINARY" .native/restored-waiting.json --awaiting-successor
+"$p" qualification/pending_shutdown.py "$SCARY_BINARY" .native/restored-eligible.json
+~~~
+
 ## Apply a freeze issued during a controlled stop
 
 The regression uses two isolated stock SV Node v1.2.3 instances and one Scary data directory. The first stock peer sends a signed ordinary payment after its funding block reaches the entrant. Scary receives SIGTERM before any successor arrives. While Scary is down, three distinct disposable signers authorize a freeze of that funding outpoint. The fixture applies the corresponding consensus blacklist interval to the second stock node. That node has validated the same 106 blocks and has an empty mempool when Scary reconnects.
