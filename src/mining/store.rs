@@ -57,6 +57,24 @@ impl<W: Write> Write for Hashed<W> {
         self.io.flush()
     }
 }
+fn write_checkpoint(out: &mut impl Write, state: &impl Serialize) -> Result<()> {
+    out.write_all(MAGIC)?;
+    let mut payload = Hashed {
+        io: out,
+        digest: Sha256::new(),
+    };
+    {
+        // Buffer the encoder's small writes before updating the payload checksum.
+        let mut buffered = BufWriter::with_capacity(8192, &mut payload);
+        rmp_serde::encode::write_named(&mut buffered, state)?;
+        buffered.flush()?;
+    }
+    let Hashed { io, digest } = payload;
+    io.write_all(&digest.finalize())?;
+    io.flush()?;
+    Ok(())
+}
+
 impl Mining {
     pub fn open_store(&mut self, dir: &Path) -> Result<()> {
         let file = dir.join("witness.state");
@@ -172,17 +190,9 @@ impl Mining {
         );
         let result = (|| -> Result<()> {
             let tmp = dir.join("witness.next");
-            let mut io = BufWriter::new(File::create(&tmp)?);
-            io.write_all(MAGIC)?;
-            let mut hashed = Hashed {
-                io,
-                digest: Sha256::new(),
-            };
-            rmp_serde::encode::write_named(&mut hashed, self)?;
-            let Hashed { mut io, digest } = hashed;
-            io.write_all(&digest.finalize())?;
-            io.flush()?;
-            io.get_ref().sync_all()?;
+            let mut file = File::create(&tmp)?;
+            write_checkpoint(&mut file, self)?;
+            file.sync_all()?;
             fs::rename(tmp, dir.join("witness.state"))?;
             File::open(dir)?.sync_all()?;
             Ok(())
@@ -253,5 +263,103 @@ impl Mining {
             self.lifecycle.restore_subtree(solution.hash, &txs)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod writer_tests {
+    use super::*;
+    use std::io;
+
+    struct ShortWriter {
+        bytes: Vec<u8>,
+        limit: usize,
+    }
+    impl Write for ShortWriter {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            let room = self.limit.saturating_sub(self.bytes.len());
+            if room == 0 {
+                return Err(io::Error::other("injected write failure"));
+            }
+            let n = bytes.len().min(room).min(7);
+            self.bytes.extend_from_slice(&bytes[..n]);
+            Ok(n)
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn checkpoint_matches_original_wire_with_short_writes_and_reports_errors() {
+        let data = vec![0x51; 25_000];
+        let data = serde_bytes::Bytes::new(&data);
+        let payload = rmp_serde::to_vec_named(data).unwrap();
+        let expected = [
+            MAGIC.as_slice(),
+            &payload,
+            Sha256::digest(&payload).as_slice(),
+        ]
+        .concat();
+        let mut sink = ShortWriter {
+            bytes: vec![],
+            limit: expected.len(),
+        };
+        write_checkpoint(&mut sink, &data).unwrap();
+        assert_eq!(sink.bytes, expected);
+
+        for limit in [5, 8193, expected.len() - 1] {
+            let mut failed = ShortWriter {
+                bytes: vec![],
+                limit,
+            };
+            assert!(write_checkpoint(&mut failed, &data).is_err());
+            assert_eq!(failed.bytes, expected[..limit]);
+        }
+        struct Refused;
+        impl Serialize for Refused {
+            fn serialize<S: Serializer>(&self, _: S) -> Result<S::Ok, S::Error> {
+                Err(serde::ser::Error::custom("injected serialization failure"))
+            }
+        }
+        let mut failed = Vec::new();
+        assert!(write_checkpoint(&mut failed, &Refused).is_err());
+        assert_eq!(failed, MAGIC);
+    }
+
+    #[test]
+    fn opens_legacy_checkpoint_then_restores_current_writer() {
+        let scratch = tempfile::tempdir().unwrap();
+        let path = scratch.path().join("witness.state");
+        let mut previous = Mining::new(true, vec![0x51]).unwrap();
+        previous.accepted_shares = 31;
+        let mut previous_writer = BufWriter::new(File::create(&path).unwrap());
+        previous_writer.write_all(MAGIC).unwrap();
+        let mut legacy = Hashed {
+            io: previous_writer,
+            digest: Sha256::new(),
+        };
+        rmp_serde::encode::write_named(&mut legacy, &previous).unwrap();
+        let Hashed { mut io, digest } = legacy;
+        io.write_all(&digest.finalize()).unwrap();
+        io.flush().unwrap();
+        drop(io);
+
+        let mut upgraded = Mining::new(true, vec![0x51]).unwrap();
+        upgraded.open_store(scratch.path()).unwrap();
+        assert_eq!(upgraded.accepted_shares, 31);
+        upgraded.accepted_shares = 32;
+        upgraded.save().unwrap();
+        let bytes = fs::read(&path).unwrap();
+        let expected = rmp_serde::to_vec_named(&upgraded).unwrap();
+        assert_eq!(&bytes[8..bytes.len() - 32], &expected);
+        assert_eq!(
+            &bytes[bytes.len() - 32..],
+            Sha256::digest(&expected).as_slice()
+        );
+        let mut reopened = Mining::new(true, vec![0x51]).unwrap();
+        reopened.open_store(scratch.path()).unwrap();
+        assert_eq!(reopened.accepted_shares, 32);
     }
 }
