@@ -116,6 +116,18 @@ python3 qualification/cohort_archive.py export "$STUDY/evaluation" \
 python3 qualification/cohort_archive.py verify docs/evidence/chronicle-immediate-evaluation
 ```
 
+### Restart between fixed evaluation sessions
+
+On November 22, 2026 UTC, the three evaluation writers stopped while a separate sustained workload held the workstation. The original relay study had sealed 1,006 of 2,263 sessions, the immediate relay study 39 of 939, and the matched-ingress study 12 of 6,765. Each had a contiguous prefix and zero open evaluation ledgers. Together those prefixes contain 33,872 scheduled parents. The resumed writers verified the existing files and continued from each study’s next scheduled seed, with its original executable and fixture. The sample sizes and inclusion rules stayed fixed. [Outcome-blind commitments to the three prefixes](evidence/chronicle-cohort-resume.json)
+
+To verify a prefix, supply its original evaluation directory or the completed study’s public shard directory. The check authenticates every complete session object in seed order and reads only the specified prefix. The final phase analysis uses the full registered sample.
+
+~~~sh
+python3 qualification/cohort_prefix.py docs/evidence/chronicle-cohort-resume.json original "$ORIGINAL_EVALUATION"
+python3 qualification/cohort_prefix.py docs/evidence/chronicle-cohort-resume.json immediate "$IMMEDIATE_EVALUATION"
+python3 qualification/cohort_prefix.py docs/evidence/chronicle-cohort-resume.json matched "$MATCHED_EVALUATION"
+~~~
+
 ## Registering a different release
 
 Changes to publication or readback timing can alter the time until the next worker job. For example, commit `af9b605` adds active-header readback after sending a solution. Register each materially different executable as a new experiment before sampling. Keep the original and immediate-wake studies on their original binaries.

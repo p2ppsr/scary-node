@@ -1,0 +1,37 @@
+{
+  "scheduled_workload": "Exclusive sustained workload on the same workstation",
+  "workstation_cohorts": "All three evaluation writers were between independent sessions. There were no open evaluation ledgers or partially written result files when ownership changed.",
+  "commitment": "SHA-256 of complete session objects in ascending numeric seed order, serialized as UTF-8 sorted-key compact JSON with one LF per object.",
+  "studies": {
+    "original": {
+      "first_seed_decimal": "51001",
+      "last_seed_decimal": "52006",
+      "sealed_sessions": 1006,
+      "registered_sessions": 2263,
+      "unsealed_evaluation_ledgers_at_handoff": 0,
+      "opportunities_per_session": 32,
+      "binary_sha256": "c5b08e6fdec47e29ce03e36c3233f07e38f75c0fedfd229fe840a2d94d951127",
+      "canonical_receipts_sha256": "28607af6f73c4c857ffb3bcba1a63dc0c0f2d7313771a781a2bfed0d68db94af"
+    },
+    "immediate": {
+      "first_seed_decimal": "81001",
+      "last_seed_decimal": "81039",
+      "sealed_sessions": 39,
+      "registered_sessions": 939,
+      "unsealed_evaluation_ledgers_at_handoff": 0,
+      "opportunities_per_session": 32,
+      "binary_sha256": "2d3a2d351ad55ce203a2c50d7394e9d6353e9136b0f4cf9179f9b961274b80b7",
+      "canonical_receipts_sha256": "937c588d22240a7edae6286e48a9218faf6bef6998ac4afd5e2f7db80bfe4034"
+    },
+    "matched": {
+      "first_seed_decimal": "2370692480716161951269477119012177151836635004945",
+      "last_seed_decimal": "2370692480716161951269477119012177151836635004956",
+      "sealed_sessions": 12,
+      "registered_sessions": 6765,
+      "unsealed_evaluation_ledgers_at_handoff": 0,
+      "opportunities_per_session": 36,
+      "binary_sha256": "8f99871ba04a9f0c234d1b9520fc021396689ac7924c02a28666db9c9f3b52c9",
+      "canonical_receipts_sha256": "809a82c868cc81070110b1b876a36d7ddd2f7c1cac5349455a38c2f5cba76061"
+    }
+  }
+}
