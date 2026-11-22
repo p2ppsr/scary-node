@@ -512,7 +512,7 @@ async fn main() -> Result<()> {
     let regtest = matches!(args.network, Network::Regtest);
     ensure!(
         !regtest || !args.peer.is_empty() || !args.sv_peer.is_empty(),
-        "regtest requires an explicit --peer"
+        "regtest requires an explicit --peer or --sv-peer"
     );
     if let Some(ref url) = args.asset_url {
         let u = reqwest::Url::parse(url).context("invalid --asset-url")?;
@@ -535,8 +535,8 @@ async fn main() -> Result<()> {
         .context("invalid hex in --payout-script")?
         .unwrap_or_default();
     ensure!(
-        args.stratum_bind.is_none() || !payout.is_empty(),
-        "mining requires a payout script"
+        (args.stratum_bind.is_none() && args.shadow_log.is_none()) || !payout.is_empty(),
+        "candidate assembly requires a nonempty payout script"
     );
     let dir = args.data_dir.join(network);
     tokio::fs::create_dir_all(&dir).await?;
@@ -603,6 +603,13 @@ async fn main() -> Result<()> {
         "mainnet Stratum needs a worker password"
     );
     let worker_password = secret_file(args.worker_password_file.as_ref())?;
+    let operator_token = secret_file(args.operator_token_file.as_ref())?;
+    if let Some(value) = &operator_token {
+        ensure!(
+            value.is_ascii() && value.trim() == value.as_ref(),
+            "operator bearer token must be printable ASCII without surrounding whitespace"
+        );
+    }
     let shadow = args
         .shadow_log
         .as_ref()
@@ -627,7 +634,7 @@ async fn main() -> Result<()> {
             })
             .ok(),
         shadow,
-        operator_token: secret_file(args.operator_token_file.as_ref())?,
+        operator_token,
         network,
         mining: Arc::new(Mutex::new(mining)),
         peer: Arc::new(Mutex::new(PeerStats::default())),

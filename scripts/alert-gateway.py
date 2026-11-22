@@ -5,8 +5,10 @@ import base64
 import hmac
 import datetime
 import json
+import os
 import re
 import threading
+import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -30,7 +32,7 @@ class ReceiverSync:
         with self.lock:
             try:
                 with self.path.open("rb") as stream:
-                    stat = self.path.stat()
+                    stat = os.fstat(stream.fileno())
                     identity = (stat.st_dev, stat.st_ino)
                     if self.inode != identity or stat.st_size < self.position:
                         self.position = max(0, stat.st_size - (2 << 20))
@@ -43,11 +45,18 @@ class ReceiverSync:
                         self.position += len(line)
                         hit = self.event.search(line)
                         if hit:
-                            when = datetime.datetime.strptime(
-                                hit[1].decode(), "%Y/%m/%d %H:%M:%S"
-                            ).replace(tzinfo=datetime.timezone.utc)
+                            try:
+                                when = datetime.datetime.strptime(
+                                    hit[1].decode(), "%Y/%m/%d %H:%M:%S"
+                                ).replace(tzinfo=datetime.timezone.utc)
+                                sequence = int(hit[2])
+                                if sequence > 0xffffffff:
+                                    raise ValueError("sequence outside receiver range")
+                            except ValueError:
+                                self.latest = {}
+                                continue
                             self.latest = {
-                                "sequence": int(hit[2]),
+                                "sequence": sequence,
                                 "unix_s": int(when.timestamp()),
                                 "peer": hit[3].decode(),
                             }
@@ -56,9 +65,15 @@ class ReceiverSync:
             return dict(self.latest)
 
 
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 class Handler(BaseHTTPRequestHandler):
     def forward(self, expected, target, data=None, token=None):
-        if not hmac.compare_digest(self.headers.get("Authorization", ""), expected):
+        supplied = self.headers.get("Authorization", "")
+        if not supplied.isascii() or not hmac.compare_digest(supplied, expected):
             self.send_error(401)
             return
         headers = {"Content-Type": "application/json"}
@@ -66,13 +81,19 @@ class Handler(BaseHTTPRequestHandler):
             headers["Authorization"] = "Bearer " + token
         try:
             request = urllib.request.Request(target, data=data, headers=headers)
-            with urllib.request.urlopen(request, timeout=6) as reply:
+            with self.server.upstream.open(request, timeout=6) as reply:
                 result = reply.read()
                 if self.path == "/health" and self.server.sync:
                     payload = json.loads(result)
+                    if not isinstance(payload, dict):
+                        raise ValueError("invalid receiver health object")
                     payload["peer_sync"] = self.server.sync.read()
                     result = json.dumps(payload).encode()
-        except OSError:
+        except urllib.error.HTTPError as error:
+            error.close()
+            self.send_error(503, "local service unavailable")
+            return
+        except (OSError, ValueError):
             self.send_error(503, "local service unavailable")
             return
         self.send_response(200)
@@ -120,15 +141,17 @@ if __name__ == "__main__":
     p.add_argument("--port", type=int, default=19366)
     args = p.parse_args()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    server.upstream = urllib.request.build_opener(NoRedirect())
     server.sync = (
         ReceiverSync(args.receiver_sync_log) if args.receiver_sync_log else None
     )
     server.receiver = args.receiver.rstrip("/")
     server.node = args.node.rstrip("/")
-    server.operator_token = args.operator_token_file.read_text().strip()
+    server.operator_token = args.operator_token_file.read_text().rstrip("\r\n")
     password = args.token_file.read_text().strip()
-    if not password or not server.operator_token:
-        raise ValueError("empty credential")
+    if any(not value or not value.isascii() or not value.isprintable() or value.strip() != value
+           for value in (password, server.operator_token)):
+        raise ValueError("expected a printable ASCII credential")
     server.bearer = "Bearer " + password
     server.basic = "Basic " + base64.b64encode(("scary:" + password).encode()).decode()
     server.serve_forever()

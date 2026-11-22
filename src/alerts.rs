@@ -18,7 +18,7 @@ use std::{
     fs,
     io::Write,
     net::IpAddr,
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 pub const MAIN_KEYS: [&str; 5] = [
@@ -70,6 +70,7 @@ pub struct Book {
     failed_action: Option<(Hash, Value)>,
     sealed: Vec<Hash>, // envelope digests in contiguous sequence order, starting at one
     pub verified: u32,
+    journal_tip: u32,
     pub pending: Option<String>,
     pub connected: bool,
     pub reported_sequence: Option<u32>,
@@ -99,6 +100,7 @@ impl Book {
             failed_action: None,
             sealed: vec![],
             verified: 0,
+            journal_tip: 0,
             pending: None,
             connected: false,
             reported_sequence: None,
@@ -135,11 +137,12 @@ impl Book {
                         .as_secs(),
                 )
                 && self.pending.is_none()
+                && self.applied() >= self.journal_tip
                 && self.reported_sequence == Some(self.applied())
                 && self.verified == self.applied())
     }
     pub fn status(&self) -> Value {
-        json!({"last_verified":self.verified,"last_applied":self.applied(),
+        json!({"last_verified":self.verified,"last_applied":self.applied(),"highest_stored_sequence":self.journal_tip,
         "peer_sync_required":self.require_peer_sync,
         "last_peer_sync":self.peer_sync.map(|(sequence,unix_s)|json!({"sequence":sequence,"unix_s":unix_s})),
         "genesis_verified":self.genesis_verified,"reported_sequence":self.reported_sequence,"connected":self.connected,"supervised":self.supervised,
@@ -180,25 +183,15 @@ impl Book {
     }
     pub fn restore_through(&mut self, dir: &Path, through: u32) -> Result<()> {
         fs::create_dir_all(dir)?;
-        let mut sequences = Vec::new();
-        for ent in fs::read_dir(dir)? {
-            let path = ent?.path();
-            if path.extension().is_some_and(|e| e == "signed") {
-                let n = path
-                    .file_stem()
-                    .and_then(|s| s.to_str())
-                    .context("alert journal filename")?
-                    .parse::<u32>()?;
-                sequences.push((n, path));
-            }
-        }
-        sequences.sort_by_key(|(n, _)| *n);
-        for (seq, path) in sequences {
+        for (seq, path) in journal_entries(dir)? {
             if seq > through {
                 break;
             }
-            ensure!(seq == self.applied() + 1, "alert journal sequence gap");
-            let bytes = fs::read(path)?;
+            ensure!(
+                self.applied().checked_add(1) == Some(seq),
+                "alert journal sequence gap"
+            );
+            let bytes = read_stored(&path, seq)?;
             if let Err(e) = self.receive(&bytes, Some(dir)) {
                 if self.verified == seq && self.pending.is_some() {
                     break;
@@ -210,7 +203,7 @@ impl Book {
     }
     pub fn receive(&mut self, raw: &[u8], dir: Option<&Path>) -> Result<bool> {
         ensure!(raw.len() >= 20 + 2 + 3 * 65, "short signed alert");
-        let seq = u32::from_le_bytes(raw[4..8].try_into()?);
+        let seq = sequence(raw)?;
         ensure!(seq > 0, "genesis is fixed by network");
         let digest = hash256(raw);
         if seq <= self.applied() {
@@ -253,6 +246,7 @@ impl Book {
         self.verified = seq;
         if let Some(dir) = dir {
             persist(dir, seq, raw)?;
+            self.journal_tip = self.journal_tip.max(seq);
         }
         let mut next = self.clone();
         let kind = u32::from_le_bytes(raw[16..20].try_into()?);
@@ -480,20 +474,55 @@ fn local_ban_start(dir: &Path, seq: u32) -> Result<u64> {
     Ok(first)
 }
 
+fn sequence(raw: &[u8]) -> Result<u32> {
+    Ok(u32::from_le_bytes(
+        raw.get(4..8).context("short alert header")?.try_into()?,
+    ))
+}
+
+fn journal_entries(dir: &Path) -> Result<Vec<(u32, PathBuf)>> {
+    let mut entries = Vec::new();
+    for entry in fs::read_dir(dir)? {
+        let path = entry?.path();
+        if path.extension().is_some_and(|e| e == "signed") {
+            let stem = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .context("alert journal filename")?;
+            let number = stem.parse::<u32>()?;
+            ensure!(
+                number > 0 && stem == format!("{number:010}"),
+                "invalid alert journal filename"
+            );
+            entries.push((number, path));
+        }
+    }
+    entries.sort_by_key(|(n, _)| *n);
+    Ok(entries)
+}
+
+fn read_stored(path: &Path, expected: u32) -> Result<Vec<u8>> {
+    let raw = fs::read(path)?;
+    ensure!(
+        sequence(&raw)? == expected,
+        "signed sequence differs from journal filename at {expected}"
+    );
+    Ok(raw)
+}
+
 fn persist(dir: &Path, seq: u32, raw: &[u8]) -> Result<()> {
     durable_file(dir, &format!("{seq:010}.signed"), raw)
 }
 fn durable_file(dir: &Path, name: &str, raw: &[u8]) -> Result<()> {
     let dest = dir.join(name);
-    if dest.exists() {
+    if dest.try_exists()? {
         ensure!(fs::read(&dest)? == raw, "conflicting durable directive");
         return Ok(());
     }
-    let tmp = dir.join(format!("{name}.tmp"));
-    let mut f = fs::File::create(&tmp)?;
+    let mut f = tempfile::NamedTempFile::new_in(dir)?;
     f.write_all(raw)?;
-    f.sync_all()?;
-    fs::rename(tmp, dest)?;
+    f.as_file().sync_all()?;
+    f.persist_noclobber(dest)?;
     fs::File::open(dir)?.sync_all()?;
     Ok(())
 }
@@ -501,7 +530,7 @@ fn durable_file(dir: &Path, name: &str, raw: &[u8]) -> Result<()> {
 fn apply_signed(dir: &Path, state: &mut crate::mining::Mining, raw: &[u8]) -> Result<()> {
     use sha2::{Digest, Sha256};
     state.directives.receive(raw, Some(dir))?;
-    let seq = u32::from_le_bytes(raw[4..8].try_into()?);
+    let seq = sequence(raw)?;
     if seq <= state.durable_sequence() {
         return Ok(());
     }
@@ -540,12 +569,24 @@ fn apply_signed(dir: &Path, state: &mut crate::mining::Mining, raw: &[u8]) -> Re
 
 pub fn recover(dir: &Path, state: &mut crate::mining::Mining) -> Result<()> {
     fs::create_dir_all(dir)?;
-    while let Some(next) = state.durable_sequence().checked_add(1) {
-        let path = dir.join(format!("{next:010}.signed"));
-        if !path.exists() {
+    let entries = journal_entries(dir)?;
+    if let Some((last, _)) = entries.last() {
+        state.directives.journal_tip = *last;
+    }
+    for (seq, path) in entries {
+        if seq <= state.durable_sequence() {
+            continue;
+        }
+        let next = state
+            .durable_sequence()
+            .checked_add(1)
+            .context("alert sequence exhausted")?;
+        if seq != next {
+            state.directives.pending =
+                Some(format!("missing stored alert {next} before sequence {seq}"));
             break;
         }
-        let bytes = fs::read(path)?;
+        let bytes = read_stored(&path, seq)?;
         if let Err(e) = apply_signed(dir, state, &bytes) {
             if state.directives.pending.is_some() {
                 eprintln!("outstanding signed directive: {e}");
@@ -557,6 +598,25 @@ pub fn recover(dir: &Path, state: &mut crate::mining::Mining) -> Result<()> {
     Ok(())
 }
 
+fn gateway_url(value: &str) -> Result<reqwest::Url> {
+    let url = reqwest::Url::parse(value)?;
+    ensure!(
+        (url.scheme() == "https"
+            || (url.scheme() == "http"
+                && url
+                    .host_str()
+                    .and_then(|h| h.trim_matches(['[', ']']).parse::<IpAddr>().ok())
+                    .is_some_and(|ip| ip.is_loopback())))
+            && url.host().is_some()
+            && url.username().is_empty()
+            && url.password().is_none()
+            && url.query().is_none()
+            && url.fragment().is_none(),
+        "use HTTPS or a literal loopback address for the alert gateway"
+    );
+    Ok(url)
+}
+
 /// The upstream /health synced flag is advisory. Check the complete signed
 /// prefix, active peers and the advertised sequence before making work ready.
 pub async fn follow(
@@ -566,27 +626,18 @@ pub async fn follow(
     state: std::sync::Arc<tokio::sync::Mutex<crate::mining::Mining>>,
 ) -> Result<()> {
     use std::time::Duration;
-    let url = reqwest::Url::parse(&url)?;
+    let url = gateway_url(&url)?;
+    let token = token.trim();
     ensure!(
-        url.scheme() == "https"
-            || (url.scheme() == "http"
-                && url
-                    .host_str()
-                    .and_then(|h| h.parse::<IpAddr>().ok())
-                    .is_some_and(|ip| ip.is_loopback())),
-        "use HTTPS or a literal loopback address for the alert gateway"
+        !token.is_empty() && token.bytes().all(|b| (0x20..=0x7e).contains(&b)),
+        "invalid alert gateway token"
     );
-    ensure!(!token.trim().is_empty(), "empty alert gateway token");
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(4))
         .redirect(reqwest::redirect::Policy::none())
         .build()?;
     let base = url.as_str().trim_end_matches('/');
-    let get = |path: &str| {
-        client
-            .get(format!("{base}/{path}"))
-            .bearer_auth(token.trim())
-    };
+    let get = |path: &str| client.get(format!("{base}/{path}")).bearer_auth(token);
     loop {
         let res: Result<()> = async {
             let health: Value = get("health")
@@ -617,6 +668,7 @@ pub async fn follow(
             if s.directives.genesis_verified
                 && s.directives.applied() == seq
                 && s.durable_sequence() == seq
+                && s.directives.journal_tip <= seq
                 && s.directives.pending.is_none()
             {
                 return Ok(());
@@ -652,15 +704,18 @@ pub async fn follow(
                 s.directives.genesis_verified = true;
                 s.refresh_work();
             }
-            for record in records {
-                if record["sequence_number"].as_u64() == Some(0) {
-                    continue;
-                }
+            for record in records.iter().skip(1) {
                 let raw = hex::decode(record["raw"].as_str().context("missing signed record")?)?;
+                let signed_seq = sequence(&raw)?;
+                ensure!(
+                    signed_seq > 0
+                        && record["sequence_number"].as_u64() == Some(u64::from(signed_seq)),
+                    "receiver sequence differs from signed record"
+                );
                 apply_signed(&dir, &mut s, &raw)?;
             }
             ensure!(
-                s.directives.applied() >= seq,
+                s.directives.applied() >= seq.max(s.directives.journal_tip),
                 "receiver returned an incomplete history"
             );
             Ok(())
@@ -708,6 +763,65 @@ pub(crate) mod tests {
         }
         data
     }
+    #[test]
+    fn gateway_accepts_loopback_literals_and_https_bases() {
+        for base in [
+            "http://127.0.0.1:19366",
+            "http://[::1]:19366",
+            "https://gateway.example/api",
+        ] {
+            assert!(gateway_url(base).is_ok());
+        }
+        for base in [
+            "http://192.0.2.1",
+            "https://host/?override=1",
+            "https://host/#endpoint",
+            "https://user@host/",
+        ] {
+            assert!(gateway_url(base).is_err());
+        }
+    }
+
+    #[test]
+    fn recovery_rejects_a_signed_record_in_the_wrong_slot() {
+        let keys = keys(0);
+        let dir = tempfile::tempdir().unwrap();
+        let first = signed(1, 1, b"\x02hi", &keys);
+        let mut state = crate::mining::Mining::new(true, vec![0x51]).unwrap();
+        state.directives = Book::new(&public(&keys), true).unwrap();
+        apply_signed(dir.path(), &mut state, &first).unwrap();
+        fs::write(dir.path().join("0000000002.signed"), &first).unwrap();
+        assert!(recover(dir.path(), &mut state).is_err());
+        assert_eq!(state.durable_sequence(), 1);
+        let mut restored = Book::new(&public(&keys), true).unwrap();
+        assert!(restored.restore_through(dir.path(), 2).is_err());
+        assert_eq!(restored.applied(), 1);
+    }
+
+    #[test]
+    fn a_stored_suffix_with_a_gap_withholds_work_until_replayed() {
+        let keys = keys(0);
+        let dir = tempfile::tempdir().unwrap();
+        let first = signed(1, 1, b"\x02hi", &keys);
+        let second = signed(2, 1, b"\x03bye", &keys);
+        fs::write(dir.path().join("0000000002.signed"), &second).unwrap();
+        let mut state = crate::mining::Mining::new(true, vec![0x51]).unwrap();
+        state.directives = Book::new(&public(&keys), true).unwrap();
+        state.directives.connected = true;
+        state.directives.genesis_verified = true;
+        state.directives.reported_sequence = Some(0);
+        recover(dir.path(), &mut state).unwrap();
+        assert!(!state.directives.ready());
+        assert_eq!(state.directives.status()["highest_stored_sequence"], 2);
+        apply_signed(dir.path(), &mut state, &first).unwrap();
+        state.directives.reported_sequence = Some(1);
+        assert!(!state.directives.ready());
+        apply_signed(dir.path(), &mut state, &second).unwrap();
+        state.directives.reported_sequence = Some(2);
+        assert!(state.directives.ready());
+        assert_eq!(state.durable_sequence(), 2);
+    }
+
     #[test]
     fn peer_sync_requires_the_signed_tip_and_a_recent_clock() {
         let mut book = unconfigured();

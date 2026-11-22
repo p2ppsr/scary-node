@@ -8,7 +8,17 @@ sv=6504a3aff65ba97c0f6c80962b033e35ecbfed4b
 checkout() {
     local name=$1 pin=$2
     if [[ ! -d "$stage/$name/.git" ]]; then
+        if [[ -e "$stage/$name" ]]; then
+            echo "Expected a pinned Git checkout at $stage/$name" >&2
+            return 1
+        fi
         git init -q "$stage/$name"
+    fi
+    if ! git -C "$stage/$name" rev-parse --verify HEAD >/dev/null 2>&1; then
+        if [[ -n "$(git -C "$stage/$name" status --porcelain --untracked-files=normal --ignored)" ]]; then
+            echo "Uninitialized checkout has local files: $stage/$name" >&2
+            return 1
+        fi
         git -C "$stage/$name" fetch -q --depth=1 "https://github.com/bitcoin-sv/$name" "$pin"
         git -C "$stage/$name" checkout -q --detach "$pin"
     fi
@@ -24,11 +34,18 @@ case "$(uname -s)-$(uname -m)" in
     *) echo "Unsupported upstream build platform" >&2; exit 1 ;;
 esac
 bundle=dependancies_$platform
-if [[ ! -f "$stage/$bundle.tar.gz" ]]; then
-    curl --fail --silent --show-error --location --retry 3 "https://github.com/bitcoin-sv/bdk/releases/download/depcy/$bundle.tar.gz" -o "$stage/$bundle.part"
-    mv "$stage/$bundle.part" "$stage/$bundle.tar.gz"
+archive_ok() {
+    echo "$digest  $1" | shasum -a 256 -c -
+}
+if [[ ! -f "$stage/$bundle.tar.gz" ]] || ! archive_ok "$stage/$bundle.tar.gz"; then
+    download=$(mktemp "$stage/$bundle.XXXXXXXX")
+    trap 'rm -f "$download"' EXIT
+    curl --fail --silent --show-error --location --retry 3 "https://github.com/bitcoin-sv/bdk/releases/download/depcy/$bundle.tar.gz" -o "$download"
+    archive_ok "$download"
+    mv "$download" "$stage/$bundle.tar.gz"
+    trap - EXIT
 fi
-(cd "$stage" && echo "$digest  $bundle.tar.gz" | shasum -a 256 -c - && tar -xzf "$bundle.tar.gz")
+tar -C "$stage" -xzf "$stage/$bundle.tar.gz"
 export SOURCE_DATE_EPOCH
 SOURCE_DATE_EPOCH=$(git -C "$stage/bdk" show -s --format=%ct HEAD)
 cmake -S "$stage/bdk" -B "$stage/release" -DCMAKE_BUILD_TYPE=Release \
