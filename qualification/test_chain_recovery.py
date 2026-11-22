@@ -1,11 +1,38 @@
 import copy
+import hashlib
+import io
+import struct
 import unittest
 
+from cadence_transport import MAGIC
+from recover_stock_archive import identity, inspect_block_file
 from recover_sustained_chain import selected_order
 from restore_witness_archive import canonical, verify_boot
 
 
 class RecoveryTests(unittest.TestCase):
+    def test_durable_block_file_framing_and_padding(self):
+        raw = b"b" * 80 + b"payment"
+        ident = identity(raw)
+        expected = {
+            ident: {
+                "wire_sha256": hashlib.sha256(raw).hexdigest(),
+                "wire_bytes": len(raw),
+            }
+        }
+        wire = MAGIC[::-1] + struct.pack("<I", len(raw)) + raw
+        found = set()
+        self.assertEqual(
+            inspect_block_file(
+                io.BytesIO(wire + bytes(15)), expected, found, set(), set()
+            ),
+            (1, 15),
+        )
+        self.assertEqual(found, {ident})
+        for bad in (wire[:-1], wire[:-1] + b"X", wire + bytes(8) + b"nonzero"):
+            with self.assertRaises(ValueError):
+                inspect_block_file(io.BytesIO(bad), expected, set(), set(), set())
+
     def test_selected_after_detach_keeps_terminal_order(self):
         parent = {"hash": "first"}
         old_tip = {"hash": "previously-detached"}

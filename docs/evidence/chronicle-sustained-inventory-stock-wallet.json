@@ -1,0 +1,1235 @@
+{
+  "network": "isolated regtest",
+  "image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "measured_record_sha256": "6389f959daf7308287e7a1cab416d161f03ebdc23c3a15cdc79c9c689be4212f",
+  "archived_wallet_bytes": 1425408,
+  "verified_data_roots": {
+    "normal": {
+      "network_root": "/data/regtest",
+      "root_entries": [
+        "regtest"
+      ],
+      "byte_equal_probe_files": {
+        "wallet.dat": 1425408,
+        "blocks/blk00000.dat": 133667912,
+        "blocks/index/CURRENT": 16,
+        "chainstate/CURRENT": 16
+      },
+      "observed_process_flags": [
+        "-regtest",
+        "-datadir=/data",
+        "-listen=0",
+        "-connect=0",
+        "-txindex=1",
+        "-genesisactivationheight=1",
+        "-chronicleactivationheight=2",
+        "-keypool=1"
+      ]
+    },
+    "reindex": {
+      "network_root": "/data/regtest",
+      "root_entries": [
+        "regtest"
+      ],
+      "byte_equal_probe_files": {
+        "wallet.dat": 1425408,
+        "blocks/blk00000.dat": 133667912,
+        "blocks/index/CURRENT": 16,
+        "chainstate/CURRENT": 16
+      },
+      "observed_process_flags": [
+        "-regtest",
+        "-datadir=/data",
+        "-listen=0",
+        "-connect=0",
+        "-txindex=1",
+        "-genesisactivationheight=1",
+        "-chronicleactivationheight=2",
+        "-keypool=1",
+        "-reindex=1"
+      ]
+    }
+  },
+  "wallet_loaded": true,
+  "original_wallet_comparison": {
+    "private_keys_and_master_rows": 2078,
+    "key_metadata_rows": 2077,
+    "spendable_outpoints": 0,
+    "all_three_private_commitments_equal": true,
+    "wallet_transaction_records": 77,
+    "wallet_transaction_wires": 77,
+    "complete_wallet_transaction_records_equal": true
+  },
+  "wallet_transaction_count": 77,
+  "wallet_version": 160300,
+  "first_tips_and_progress": {
+    "normal": [
+      {
+        "elapsed_s": 2.218141500139609,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 0,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 12.886568458983675,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 0,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 23.529363250127062,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 0,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 34.15382875013165,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 0,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 44.776468249969184,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 0,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 55.379767584148794,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 0,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 65.97983400011435,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 0,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      }
+    ],
+    "reindex": [
+      {
+        "elapsed_s": 1.0948264580219984,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 428,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 2.5172377079725266,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 484,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 3.8276454580482095,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 492,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 5.1546145000029355,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 500,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 6.457345000002533,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 508,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 7.770449333125725,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 516,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 9.099146666005254,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 524,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 10.408170999959111,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 532,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 11.730285333003849,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 540,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 13.039089291123673,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 548,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 14.34754491597414,
+        "boundary": {
+          "height": 0,
+          "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+          "headers": 556,
+          "work": "0000000000000000000000000000000000000000000000000000000000000002",
+          "getblockheader": null,
+          "getblock": null
+        }
+      },
+      {
+        "elapsed_s": 15.657587999943644,
+        "boundary": {
+          "height": 264,
+          "hash": "17e0a37e12ef05ca5692dc9c7a7e9d2161b07534850528f22e5a623b4125ad31",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000212",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 16.99111941596493,
+        "boundary": {
+          "height": 408,
+          "hash": "38b26c52bc38b26495231f8162d084e1b42440cc3e7c0380364980f74421c42d",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000332",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 18.361077750101686,
+        "boundary": {
+          "height": 439,
+          "hash": "63241df2cbf66966f5f38f268b00c9ce63345192d2e3461cf1bf574f430a181e",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000370",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 19.713886416051537,
+        "boundary": {
+          "height": 456,
+          "hash": "09bcf53f1a39359cc5ad71cb06f66964c61db3e1d9aa213dc625819ddd1ada1b",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000392",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 21.039769374998286,
+        "boundary": {
+          "height": 463,
+          "hash": "0de011c474d1dff2ae49d0bcd1ed4cc28a5fcd74478a5ca0b3eba0c483f48ecc",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003a0",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 22.457764875143766,
+        "boundary": {
+          "height": 471,
+          "hash": "6e4ed49236dc9d090f0a4b6269e034274688b751cc2d72cf77cb51a45bf2cd68",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003b0",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 23.871238958090544,
+        "boundary": {
+          "height": 479,
+          "hash": "175f80b8a6166ac3b3d81ebfdeede8987d8d98a0b49c73edff5ac6601bf13aab",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003c0",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 25.35141508304514,
+        "boundary": {
+          "height": 484,
+          "hash": "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003ca",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 26.9108397080563,
+        "boundary": {
+          "height": 486,
+          "hash": "2f74326d3583c246487e56920acf393a8d9fb402894b21ab5464d33fc751ea87",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003ce",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 28.586390000069514,
+        "boundary": {
+          "height": 488,
+          "hash": "67b8f8d70705cdb2f67683f7ab825e364e66c170adaefd78aef5dcbb122400fd",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003d2",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 30.320179000031203,
+        "boundary": {
+          "height": 490,
+          "hash": "3054af96663e509d2c4bdceb388705f1429e3fd96d2a0dd19ce871045f2e44ce",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003d6",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 32.019789833109826,
+        "boundary": {
+          "height": 492,
+          "hash": "7ecd17ab8fec8aa90bce65fad5a1a399aabf3e6c00fd4f1fb17880c1b8ba77d4",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003da",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 33.74484358308837,
+        "boundary": {
+          "height": 494,
+          "hash": "1647e78a5e3bc8e2faa26d7bbebc2f5084e65825abeb76e8b4965a98f237f375",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003de",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 35.559718624921516,
+        "boundary": {
+          "height": 496,
+          "hash": "7c60548480bc2a5fecb28c3fabd3a60815375a9c7181a9f0a05bd666bdb0dc41",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003e2",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 37.296247499994934,
+        "boundary": {
+          "height": 498,
+          "hash": "574d81c45e67fe4f659359df1559b4463aef26f55cb7653957700ff6de144db9",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003e6",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 38.728775165975094,
+        "boundary": {
+          "height": 500,
+          "hash": "492cc2177cd0f57bc9fa65b6f662c1f51f294cb3faa2eecaf5dc536010bbee62",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003ea",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 40.21652704104781,
+        "boundary": {
+          "height": 502,
+          "hash": "526bacee1002dc77b97007dde37228d06891340b1e456de6f894a1c10db49263",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003ee",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 41.7531125000678,
+        "boundary": {
+          "height": 504,
+          "hash": "5d0ea232b090a3feeac74b05907de6516afd94f147eb30e460afc6be75d2b837",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003f2",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 43.343934749951586,
+        "boundary": {
+          "height": 506,
+          "hash": "4088143ce41aeed566f79821172a0c4c6592fd8653cb60a487b7c5d182eacc04",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003f6",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 44.95908716600388,
+        "boundary": {
+          "height": 508,
+          "hash": "0f86e62c4b902f09d80f972d8017374f5fef9156e23ada17b98a1ff2f2603782",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003fa",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 46.70909283310175,
+        "boundary": {
+          "height": 510,
+          "hash": "0eee1f2cfab7f5731d1d23cf7eef695632ff72beac11193d0d2b82e9305cbfa0",
+          "headers": 561,
+          "work": "00000000000000000000000000000000000000000000000000000000000003fe",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 48.29863154096529,
+        "boundary": {
+          "height": 512,
+          "hash": "7ed2437012af7134962d9b15eb63ea9b1158f58ab5930cda6e46a6b96b367e09",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000402",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 50.0046449159272,
+        "boundary": {
+          "height": 514,
+          "hash": "1e8f6b57e354bcf2ddd28be8ed49388830632d3e4802484e7d4e89efb7032da2",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000406",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 51.800360874971375,
+        "boundary": {
+          "height": 516,
+          "hash": "33db251449c0f8b48387efabfa869ff1d40d2284062078b6a73290204b63588c",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000040a",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 53.54609387507662,
+        "boundary": {
+          "height": 518,
+          "hash": "2916f2e6f5dfe136ce52f51aa3c1cb1e2c366cdfaa178561d0e6a8322bee3dc9",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000040e",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 55.12342429114506,
+        "boundary": {
+          "height": 520,
+          "hash": "20cba952f984848110118625883e23040c5e43bd8cf7420efa6df16a402beb69",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000412",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 56.85865758312866,
+        "boundary": {
+          "height": 522,
+          "hash": "29f26deb14f790e3fa3fec1f5db4c78756c00e590b745e13a6dff0cd7a91138a",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000416",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 58.36651524994522,
+        "boundary": {
+          "height": 524,
+          "hash": "35771c6140781ac58af81365cddcb912c2c116654681a5c7afbba74c544ce440",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000041a",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 60.081261875107884,
+        "boundary": {
+          "height": 526,
+          "hash": "44963953aa644cf9254f630924fc2b7d1e191e669d6604f0545b712565292899",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000041e",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 61.49829325010069,
+        "boundary": {
+          "height": 528,
+          "hash": "258b0e2626805563fbe0ed8acd1ccfdd02f0bf75613844ea63706a00ac61bf26",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000422",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 63.11885012499988,
+        "boundary": {
+          "height": 530,
+          "hash": "016e6b464313ae5502e61eb17e9262063d2b84a69b13db259c5d6575cd1bcd6d",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000426",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 64.74625708302483,
+        "boundary": {
+          "height": 532,
+          "hash": "5315d1176cf2306e5f01697432d545f226e9837f54cb1f91c7320fd81ebb7e24",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000042a",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 66.49575812509283,
+        "boundary": {
+          "height": 534,
+          "hash": "38123f36b54d65c0e3a5c23a0b4ce2b75abfa095d171ecd0ee80ec52ee869b9a",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000042e",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 68.17154237511568,
+        "boundary": {
+          "height": 536,
+          "hash": "03fc01341dcc5e7650e645bc3e04f6a91d378f11c57de4301ba912c2ba052458",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000432",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 69.75450537493452,
+        "boundary": {
+          "height": 538,
+          "hash": "1f61decb84d218bb48beb0f75883908ed495b02bf0b106efbc5a4443ed137fd9",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000436",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 71.53904066607356,
+        "boundary": {
+          "height": 540,
+          "hash": "7ffd75852731e9eeb1fae090c8f6642ca5127c6e2b0eb1aff4b558eef19792de",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000043a",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 73.27825600001961,
+        "boundary": {
+          "height": 542,
+          "hash": "67314c58812e3fb49c79c0904e6ce5a73dd0b6463aa9888a185c3a917d8838fb",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000043e",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 74.99057487514801,
+        "boundary": {
+          "height": 544,
+          "hash": "081856ec47e7923d83ef3c409843ae58fb3d3a19e8dd87a3d7f6303db0200884",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000442",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 76.63714479096234,
+        "boundary": {
+          "height": 546,
+          "hash": "69b0d1bd7a828b690faeaac50a145f2e6d46dd41b3b53bab7fe258bba1131563",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000446",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 78.28719116607681,
+        "boundary": {
+          "height": 548,
+          "hash": "5b352850146fe139483a13ad0688705012050305c8c36f747e0a2ec0c9a774c7",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000044a",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 79.94611508306116,
+        "boundary": {
+          "height": 550,
+          "hash": "04c33e8b3aed67a49246fae2da6243f0376802459bd59e5a527d8e5802ed9bdf",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000044e",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 81.49739458295517,
+        "boundary": {
+          "height": 552,
+          "hash": "39e77bf798abb9dbf07b151e9164b170c8916441542d972c32510fd87cf09701",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000452",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 83.0288555000443,
+        "boundary": {
+          "height": 554,
+          "hash": "2869ee0e240889bb40452b1cd5c14810bea220fe95cac1f3354a52fd9e346e07",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000456",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 84.5216309579555,
+        "boundary": {
+          "height": 556,
+          "hash": "3e592f3a609bab341d155f7497ad2cf468ad4ad9aa34e8d6ef175bb128442f7c",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000045a",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          }
+        }
+      },
+      {
+        "elapsed_s": 86.1744687911123,
+        "boundary": {
+          "height": 558,
+          "hash": "2061f50b1422dd5589c57205bca55e6f6184853b9480335200556bfc0457f8be",
+          "headers": 561,
+          "work": "000000000000000000000000000000000000000000000000000000000000045e",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": -1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": 1
+          }
+        }
+      },
+      {
+        "elapsed_s": 87.82882637507282,
+        "boundary": {
+          "height": 561,
+          "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+          "headers": 561,
+          "work": "0000000000000000000000000000000000000000000000000000000000000464",
+          "getblockheader": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": 1
+          },
+          "getblock": {
+            "height": 561,
+            "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+            "confirmations": 1
+          }
+        }
+      }
+    ]
+  },
+  "durable_block_files": {
+    "files": [
+      {
+        "file": "blk00000.dat",
+        "blocks": 456,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00001.dat",
+        "blocks": 31,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00002.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00003.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00004.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00005.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00006.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00007.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00008.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00009.dat",
+        "blocks": 9,
+        "zero_padding_bytes": 0
+      },
+      {
+        "file": "blk00010.dat",
+        "blocks": 3,
+        "zero_padding_bytes": 2272418
+      }
+    ],
+    "framing": [
+      "fabfb5da"
+    ],
+    "exact_selected_blocks_on_disk": 561,
+    "missing_selected_heights": [],
+    "other_recorded_hashes": [
+      "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"
+    ],
+    "selected_wire_sha256_commitment": "449cf4676486bf80cca851d5e630f989098884faec004b937cd852692fa3dd02"
+  },
+  "reoffered_blocks": [],
+  "recovery_method": "native reindex of archived block files",
+  "terminal": {
+    "height": 561,
+    "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+    "headers": 561,
+    "work": "0000000000000000000000000000000000000000000000000000000000000464",
+    "getblockheader": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "confirmations": 1
+    },
+    "getblock": {
+      "height": 561,
+      "hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+      "confirmations": 1
+    }
+  },
+  "mempool": 0,
+  "validation_activity": {
+    "blocks": 0,
+    "transactions": 0
+  },
+  "peers": 0
+}

@@ -55,6 +55,48 @@ Two untimed samples taken after the original cadence run recorded zero SV mempoo
 
 The original inventory project also exposed both stock Teranode queue gauges and next work candidates. Two samples at the settled h561 tip recorded zero for the candidate transaction counts, assembly queues, block-priority queues, SV mempool, SV validation queue and Scary pending count. All eight services returned to pause after 5.70 seconds. [Original inventory queue observations](evidence/chronicle-sustained-inventory-terminal-queues.json)
 
+### Restart stock SV Node from its archived database
+
+The original inventory SV process was paused at h561. A fresh, isolated process started from a copy of that exact data volume. Ordinary startup selected regtest genesis, reported zero indexed headers and could not serve the h561 header or block. It stayed there for 65.93 seconds. The eleven archived `blk*.dat` files nevertheless contained genesis and all 561 selected blocks. Every selected block matched the retained wire digest. The normal-start and reindex processes both used `-regtest -datadir=/data`; their `/data/regtest` wallet, first block file and two LevelDB `CURRENT` files matched the original byte-for-byte immediately before startup.
+
+Starting again from a clean copy with stock `-reindex=1` selected the original h561 in 88.03 seconds. The process had zero connected peers, received zero re-offered block wires and loaded a wallet containing 77 transactions. A paused copy preserved all block bodies for this workload. Recovering its selected chain required rebuilding the native stock index. [Original stock archive recovery receipt](evidence/chronicle-sustained-inventory-stock-reindex.json)
+
+To repeat this check with a privately archived SV regtest data volume, give the driver the enrolled volume's tar rooted at its `regtest` directory parent. Run `verify` to inspect the shipped result without an operator archive. The driver scans the persisted block files, compares them with the selected body digests and records the first responding RPC and subsequent progress for each native start. It reports any exact block suffix it re-offers if native reindex cannot complete the original chain.
+
+```sh
+python3 qualification/recover_stock_archive.py boot "$measured" workload/paired-corpus workload/sustained-signed \
+  private-sv-data.tar.gz new-stock-restart.json --archive inventory.zip
+python3 qualification/recover_stock_archive.py verify "$measured" \
+  docs/evidence/chronicle-sustained-inventory-stock-reindex.json
+```
+
+### Compare the original wallet and the recovered wallet
+
+Before archiving the operator's settled regtest volume, capture a private fingerprint from the enrolled stock process at its measured terminal tip. The comparison records key and metadata counts, checks the full spendable outpoint set and covers every wallet transaction returned by `getwalletinfo`. Stock `gettransaction` supplies its serialized transaction and complete wallet record. The key dump stays in the container's temporary memory filesystem. Store the private fingerprint alongside the archive.
+
+```sh
+python3 qualification/stock_wallet_archive.py "$measured" "$enrolled_sv_container" private-wallet.json
+python3 qualification/recover_stock_archive.py boot "$measured" workload/paired-corpus workload/sustained-signed \
+  private-sv-data.tar.gz new-wallet-restart.json --archive inventory.zip \
+  --private-wallet-summary private-wallet.json
+```
+
+SV Node refills reserve keys each time it opens a wallet. The exact-comparison path supplies `-keypool=1` to preserve a populated reserve while reading the recovered wallet. The stock archive driver records the flags of both running processes. [SV Node wallet startup](https://github.com/bitcoin-sv/bitcoin-sv/blob/6504a3aff65ba97c0f6c80962b033e35ecbfed4b/src/wallet/wallet.cpp#L4154)
+
+The first restore with SV Node’s default keypool returned 2,079 key and master rows against 2,078 in the original. A separate restore with the bounded keypool reopened the original 2,077 key metadata records and master key exactly. All 77 full wallet transaction responses, their signed bytes and the complete set of zero spendable wallet outputs matched. On that copy, normal startup remained at genesis for 65.98 seconds. Reindex selected the original h561 in 87.83 seconds, with zero connected peers and zero block re-offers. [Stock wallet and reindex receipt](evidence/chronicle-sustained-inventory-stock-wallet.json)
+
+### Reopen an archived Teranode and Aerospike pair
+
+Keep each reference's private Compose inspection record, Teranode data volume, Aerospike namespace volume and Aerospike system metadata. The inspection record carries the enrolled images, peer identity and database settings. The driver restores each pair on its own internal Docker bridge and reads every measured block through its Asset API. It checks the native connected-peer gauge and both services' network memberships before and after those reads. Each pair needs 30 GiB of available guest RAM before startup.
+
+```sh
+python3 qualification/restore_teranode_archive.py boot "$measured" private-services.json tn1 \
+  private-tn1-data.tar.gz private-as1-data.tar.gz private-as1-meta.tar.gz new-tn1.json
+python3 qualification/restore_teranode_archive.py verify "$measured" new-tn1.json
+```
+
+Use the second pair's three archives and `tn2` for its independent run. Both original inventory pairs reopened at h561, produced an empty candidate on the original hash and served all 77 original Asset bodies. Each returned exactly 1,103,139,534 bytes matching the timed study. Recovery and reads took 86.07 seconds for TN1 and 84.20 seconds for TN2. Each native peer gauge read zero before and after the full readback. [Archived TN1 and AS1](evidence/chronicle-sustained-inventory-archived-tn1.json) · [Archived TN2 and AS2](evidence/chronicle-sustained-inventory-archived-tn2.json)
+
 ## Restore an entrant from archived volumes
 
 Freeze the enrolled Compose project after its settlement and final queue observations. Keep the two private entrant archives with its release image. The restore command launches that image on a fresh private RAM filesystem, reads both archives, hashes the checkpoint before startup, and queries the actual running node in a network namespace with no data peers. It compares its selected tip, witnessed coverage and measured script-check counts with the recorded observations. The complete original cadence window also permits a row-for-row restart comparison.
