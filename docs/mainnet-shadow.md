@@ -177,3 +177,22 @@ For a finite supervised reader, place the argument array for the documented `sha
 python3 qualification/shadow_reader_supervisor.py \
   "$SHADOW_LOG" "$PRIVATE_EVIDENCE" "$PRIVATE_EVIDENCE/reader-argv.json"
 ```
+
+To check the three body commitments, obtain the confirmed native blocks by hash from a stock peer or Teranode Asset service. Save each block's complete wire bytes under its displayed hash in `$CONFIRMED_BLOCK_DIR`, then run the following from the repository root.
+
+```sh
+python3 - "$CONFIRMED_BLOCK_DIR" <<'PY'
+import hashlib, json, sys
+from pathlib import Path
+sys.path.insert(0, "qualification")
+from shadow_native import proofs, read_varint
+receipt = json.loads(Path("docs/evidence/chronicle-shadow-tail-recovery.json").read_text())
+for row in receipt["affected_and_following"]:
+    block = (Path(sys.argv[1]) / row["block_hash"]).read_bytes()
+    assert len(block) == row["block_bytes"]
+    assert hashlib.sha256(block).hexdigest() == row["sha256_native_body"]
+    assert read_varint(block, 80)[0] == row["transactions"]
+    proofs(block, row["height"], row["block_hash"], set())
+    print(row["height"], row["transactions"], "transactions verified")
+PY
+```
