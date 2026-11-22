@@ -27,6 +27,15 @@ class InterruptedWorkloadTests(unittest.TestCase):
             [50, 50, 50, 50, 46, 0],
         )
         self.assertTrue(result["per_window_criterion_already_missed"])
+        tail = result["observed_empty_pool_suffix"]
+        self.assertEqual(tail["empty_status_replies"], 1149)
+        self.assertEqual(tail["unavailable_status_replies"], 0)
+        self.assertEqual(tail["minimum_connected_peers"], 3)
+        self.assertEqual(tail["last_populated_status"]["pending"], 19168)
+        self.assertEqual(tail["first_empty_status"]["height"], 494)
+        self.assertEqual(
+            tail["intake_change_since_last_populated"]["sv"]["admitted"], 0
+        )
         self.assertEqual(
             confirmed_boundary(self.record)["final_hash"],
             self.record["blocks"][-1]["hash"],

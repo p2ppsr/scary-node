@@ -3,6 +3,7 @@
 import argparse
 import gzip
 import hashlib
+import itertools
 import json
 import subprocess
 import time
@@ -23,6 +24,14 @@ SERVICES = {
     "ingress",
     "wallet-ingress",
 }
+
+
+def ingress_ports(arm):
+    shift = PROJECTS[arm][1]
+    return {
+        role: port + shift
+        for role, port in (("tn1", 19441), ("tn2", 19442), ("scary", 19480))
+    }
 
 
 def quiesce(directory):
@@ -68,10 +77,7 @@ def quiesce(directory):
     bindings = json.loads(docker("inspect", enrolled["ingress"]))[0]["NetworkSettings"][
         "Ports"
     ]
-    query_ports = {
-        role: port + shift
-        for role, port in (("tn1", 19441), ("tn2", 19442), ("scary", 19480))
-    }
+    query_ports = ingress_ports(arm)
     for internal, external in (
         (19441, query_ports["tn1"]),
         (19442, query_ports["tn2"]),
@@ -231,6 +237,37 @@ def verify_frozen(path, record, receipt, handoff, marker):
     }
 
 
+def compare_terminal_tips(arm, result, marker):
+    roles = ("sv", "tn1", "tn2", "scary")
+    last = {
+        role: {
+            k: result["samples"][-1][role].get(k) for k in ("height", "hash", "read_ns")
+        }
+        for role in roles
+    }
+    if marker["final_measured_sample"] != last or marker[
+        "query_ports_verified_against_enrolled_ingress"
+    ] != ingress_ports(arm):
+        raise ValueError("handoff does not match its measured sample or enrolled ports")
+    expected = (
+        result["completion"]["final_height"],
+        result["completion"]["final_hash"],
+    )
+    tips = marker["post_window_selected_tips"]
+    if any(
+        not (
+            marker["post_window_stock_observation"]["finished_wall_ns"]
+            <= tips[role]["wall_ns"]
+            <= marker["pause_started_wall_ns"]
+        )
+        for role in roles
+    ):
+        raise ValueError("final receiver read outside the post-window handoff")
+    return {
+        role: (tips[role]["height"], tips[role]["hash"]) == expected for role in roles
+    }
+
+
 def verify_handoff(receipt, stock_log, handoff, frozen=None):
     def read(path):
         return gzip.open(path, "rt") if path.suffix == ".gz" else path.open()
@@ -270,7 +307,9 @@ def verify_handoff(receipt, stock_log, handoff, frozen=None):
         and marker["first_scheduled_offer_wall_ns"] == start
     ):
         raise ValueError("queued stock work or closed primary identity differs")
-    if not rows or any(b["wall_ns"] < a["wall_ns"] for a, b in zip(rows, rows[1:])):
+    if not rows or any(
+        b["wall_ns"] < a["wall_ns"] for a, b in itertools.pairwise(rows)
+    ):
         raise ValueError("stock gauges missing or out of order")
     evidence = {
         "stock_samples": len(rows),
@@ -283,39 +322,10 @@ def verify_handoff(receipt, stock_log, handoff, frozen=None):
         "paused_services": sorted(SERVICES),
     }
 
-    if result["registration"] == REPLICATION:
-        roles = ("sv", "tn1", "tn2", "scary")
-        last = {
-            role: {
-                k: result["samples"][-1][role].get(k)
-                for k in ("height", "hash", "read_ns")
-            }
-            for role in roles
-        }
-        if marker["final_measured_sample"] != last or marker[
-            "query_ports_verified_against_enrolled_ingress"
-        ] != {"tn1": 22441, "tn2": 22442, "scary": 22480}:
-            raise ValueError(
-                "inventory handoff does not match its measured sample or enrolled ports"
-            )
-        expected = (
-            result["completion"]["final_height"],
-            result["completion"]["final_hash"],
+    if arm != "direct":
+        evidence["post_window_matches_audited_tip"] = compare_terminal_tips(
+            arm, result, marker
         )
-        tips = marker["post_window_selected_tips"]
-        if any(
-            not (
-                final["finished_wall_ns"]
-                <= tips[role]["wall_ns"]
-                <= marker["pause_started_wall_ns"]
-            )
-            for role in roles
-        ):
-            raise ValueError("final receiver read outside the post-window handoff")
-        evidence["post_window_matches_audited_tip"] = {
-            role: (tips[role]["height"], tips[role]["hash"]) == expected
-            for role in roles
-        }
     if frozen:
         evidence["supplement"] = verify_frozen(frozen, result, receipt, handoff, marker)
     return evidence

@@ -16,6 +16,7 @@ from verify_sustained_native import (
     SLOTS,
     batch_order,
     check_header,
+    intake_delta,
     pinned_build,
     replication_setup,
     require,
@@ -106,6 +107,38 @@ def capture(directory, output):
         stream.write(
             gzip.compress(json.dumps(result, separators=(",", ":")).encode(), mtime=0)
         )
+
+
+def observed_empty_pool_suffix(samples):
+    """Describe the observed empty-pool tail using timestamped status replies."""
+    last_populated = next(
+        (
+            i
+            for i in reversed(range(len(samples)))
+            if samples[i]["scary"].get("pending", 0) > 0
+        ),
+        None,
+    )
+    if last_populated is None:
+        return None
+    earlier = samples[last_populated]["scary"]
+    tail = samples[last_populated + 1 :]
+    observed = [row["scary"] for row in tail if "pending" in row.get("scary", {})]
+    if not observed:
+        return None
+    return {
+        "last_populated_status": {
+            k: earlier[k] for k in ("height", "read_ns", "pending")
+        },
+        "first_empty_status": {k: observed[0][k] for k in ("height", "read_ns")},
+        "last_status": {k: observed[-1][k] for k in ("height", "read_ns")},
+        "empty_status_replies": len(observed),
+        "unavailable_status_replies": len(tail) - len(observed),
+        "minimum_connected_peers": min(row["connected_peers"] for row in observed),
+        "ready_replies": sum(row["ready"] for row in observed),
+        "storage_failure_replies": sum(row["storage_failed"] for row in observed),
+        "intake_change_since_last_populated": intake_delta(samples[last_populated:]),
+    }
 
 
 def verify(record):
@@ -297,6 +330,7 @@ def verify(record):
         ],
         "minimum_host_free_bytes": host["lowest_host_free_bytes"],
         "minimum_docker_free_bytes": host["lowest_docker_free_bytes"],
+        "observed_empty_pool_suffix": observed_empty_pool_suffix(record["samples"]),
         "scary_unready_reasons": dict(
             Counter(
                 r.get("job_wait_reason") or "receiver preconditions"

@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import quiesce_sustained
 import verify_sustained_native as audit
 from sustained_block_archive import assemble, checked
 from sustained_resources import DOCKER_MIN, HOST_MIN, fields
@@ -36,6 +37,37 @@ class SustainedVerifierTests(unittest.TestCase):
             assemble(
                 prefix, (2).to_bytes(4, "little"), frames, positions, len(self.body)
             )
+
+    def test_reordered_handoff_checks_the_enrolled_ports_and_each_receiver(self):
+        roles = ("sv", "tn1", "tn2", "scary")
+        sample = {r: {"height": 1, "hash": "a", "read_ns": 8} for r in roles}
+        marker = {
+            "final_measured_sample": sample,
+            "query_ports_verified_against_enrolled_ingress": {
+                "tn1": 25441,
+                "tn2": 25442,
+                "scary": 25480,
+            },
+            "post_window_stock_observation": {"finished_wall_ns": 10},
+            "pause_started_wall_ns": 12,
+            "post_window_selected_tips": {
+                r: {"height": 1, "hash": "a", "wall_ns": 11} for r in roles
+            },
+        }
+        result = {
+            "samples": [sample],
+            "completion": {"final_height": 1, "final_hash": "a"},
+        }
+        marker["post_window_selected_tips"]["tn1"]["hash"] = "b"
+        self.assertEqual(
+            quiesce_sustained.compare_terminal_tips("reordered", result, marker),
+            {r: r != "tn1" for r in roles},
+        )
+        with self.assertRaisesRegex(ValueError, "enrolled ports"):
+            quiesce_sustained.compare_terminal_tips("cold", result, marker)
+        marker["post_window_selected_tips"]["scary"]["wall_ns"] = 13
+        with self.assertRaisesRegex(ValueError, "outside the post-window"):
+            quiesce_sustained.compare_terminal_tips("reordered", result, marker)
 
     def setUp(self):
         receipt = (
