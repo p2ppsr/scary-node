@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from matched_subgroups import GROUPS, analyze, group_counts, record
+from matched_subgroups import GROUPS, analyze, group_counts, record, tip_disposition
 
 
 class MatchedSubgroups(unittest.TestCase):
@@ -72,6 +72,37 @@ class MatchedSubgroups(unittest.TestCase):
             counts["both_receivers_certified_ties"]["selected_at_depth_two"]["right"], 1
         )
         self.assertEqual(counts["other_ties"]["selected_at_depth_two"]["left"], 1)
+
+    def test_receiver_selection_distinguishes_split_tips_and_bounded_order(self):
+        row = self.row([True, True], ["certified"] * 2, "right")
+        row["gate_complete_ns"] = 100
+        row["plan"] = {"successor_receiver": 1}
+        row["settlement"].update(
+            precontinuation_tips=["left", "right"], generation_started_ns=125
+        )
+        for i, choice in enumerate(("left", "right")):
+            row["postdeadline_readbacks"][i].update(
+                active_hash=choice, active_query_ns=[105, 110]
+            )
+        row["ingress_alignment"][1]["left_minus_right_ingress_bounds_ns"] = [1, 6]
+        self.assertEqual(
+            tip_disposition(row), (("split", "right", "right"), True, True, True)
+        )
+        row["ingress_alignment"][1]["left_minus_right_ingress_bounds_ns"] = [-3, 0]
+        self.assertEqual(
+            tip_disposition(row)[0], ("split", "interval_contains_zero", "right")
+        )
+        row["settlement"]["precontinuation_tips"] = ["parent", "parent"]
+        del row["ingress_alignment"][1]["left_minus_right_ingress_bounds_ns"]
+        self.assertEqual(
+            tip_disposition(row),
+            (("outside_candidate_pair", "unavailable", "right"), False, False, True),
+        )
+        row["settlement"]["precontinuation_tips"][1] = None
+        self.assertEqual(tip_disposition(row)[0][0], "unavailable")
+        row["postdeadline_readbacks"][1]["active_query_ns"][1] = 126
+        with self.assertRaisesRegex(ValueError, "crosses continuation"):
+            tip_disposition(row)
 
     def test_incomplete_phase_cannot_be_read_or_reported(self):
         with (

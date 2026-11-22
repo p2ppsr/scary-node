@@ -1,4 +1,4 @@
-"""Replay the prespecified descriptive receiver-certified subgroups only after an entire phase closes."""
+"""Replay receiver observations and settlement only after an entire matched phase closes."""
 
 import argparse
 import hashlib
@@ -106,7 +106,100 @@ def combine(grouped):
     return out
 
 
-def analyze(directory, registration, pilot=None):
+def tip_disposition(row):
+    hashes = [lane["discovery"]["hash"] for lane in row["lanes"]]
+    picks = dict(zip(hashes, ("left", "right"), strict=True))
+    chosen = row["plan"]["successor_receiver"]
+    settlement = row["settlement"]
+    before = settlement["precontinuation_tips"]
+    pre = [r["active_hash"] for r in row["predeadline_readbacks"]]
+    post = [r["active_hash"] for r in row["postdeadline_readbacks"]]
+    for readback in row["postdeadline_readbacks"]:
+        begin, end = readback["active_query_ns"]
+        check(
+            row["gate_complete_ns"]
+            <= begin
+            <= end
+            <= settlement["generation_started_ns"],
+            "active-tip readback crosses continuation or precedes gate closure",
+        )
+    if any(h is None for h in before):
+        agreement = "unavailable"
+    elif any(h not in picks for h in before):
+        agreement = "outside_candidate_pair"
+    elif before[0] == before[1]:
+        agreement = "both_" + picks[before[0]]
+    else:
+        agreement = "split"
+    bounds = row["ingress_alignment"][chosen].get("left_minus_right_ingress_bounds_ns")
+    if bounds is None:
+        order = "unavailable"
+    elif bounds[1] < 0:
+        order = "left"
+    elif bounds[0] > 0:
+        order = "right"
+    else:
+        order = "interval_contains_zero"
+    winner = settlement["depth_two_ancestry"][0]
+    return (
+        (agreement, order, picks.get(winner, "outside_candidate_pair")),
+        before[chosen] in picks and before[chosen] == winner,
+        None not in pre + post and pre == post == before,
+        row["session_final_ancestry"][0] == winner,
+    )
+
+
+def receiver_tips(receipts, labels, primary):
+    groups = {
+        key: {
+            "scheduled_parents": 0,
+            "two_discoveries": 0,
+            "settled_on_chosen_receivers_candidate": 0,
+            "same_tip_at_all_three_reads_on_each_receiver": 0,
+            "depth_two_winner_in_final_ancestry": 0,
+            "joint_counts": Counter(),
+        }
+        for key in labels
+    }
+    for _, receipt, _ in receipts:
+        for row in receipt["rows"]:
+            key = (
+                f"{row['plan']['arm']}:{row['offsets_ns'][0] - row['offsets_ns'][1]}ns"
+            )
+            g = groups[key]
+            g["scheduled_parents"] += 1
+            if not all(lane["discovery"] for lane in row["lanes"]):
+                continue
+            joint, chosen, stable, final = tip_disposition(row)
+            g["two_discoveries"] += 1
+            g["joint_counts"][joint] += 1
+            g["settled_on_chosen_receivers_candidate"] += int(chosen)
+            g["same_tip_at_all_three_reads_on_each_receiver"] += int(stable)
+            g["depth_two_winner_in_final_ancestry"] += int(final)
+    for key, g in groups.items():
+        check(
+            g["scheduled_parents"] == primary["pooled"][key]["parents"],
+            "missing assigned parents",
+        )
+        g["joint_counts"] = [
+            {
+                "active_tips_before_continuation": tips,
+                "earlier_at_chosen_receiver": order,
+                "settled_at_depth_two": won,
+                "parents": count,
+            }
+            for (tips, order, won), count in sorted(g["joint_counts"].items())
+        ]
+    return {
+        "phase": primary["phase"],
+        "complete_sessions": primary["sessions"],
+        "scheduled_parents": primary["parents"],
+        "primary_summary_sha256": hashlib.sha256(canonical(primary)).hexdigest(),
+        "by_role_and_assigned_offset": groups,
+    }
+
+
+def analyze(directory, registration, pilot=None, *, compare_tips=False):
     # Verify complete fixed-N enrollment and replay the primary analysis before reading subgroups.
     check((directory / "summary.json").is_file(), "the registered phase has not closed")
     reg = read(registration)
@@ -122,8 +215,11 @@ def analyze(directory, registration, pilot=None):
     start, n = phase_bounds(d, phase, size)
     offsets = (-d["signed_delay_ns"], 0, d["signed_delay_ns"])
     labels = [f"{arm}:{ns}ns" for arm in ARMS for ns in offsets]
+    receipts = sessions(directory, [f"{start + i}.json.gz" for i in range(n)])
+    if compare_tips:
+        return receiver_tips(receipts, labels, primary)
     data = []
-    for _, rec, _ in sessions(directory, [f"{start + i}.json.gz" for i in range(n)]):
+    for _, rec, _ in receipts:
         session = {k: {g: group_counts() for g in GROUPS} for k in labels}
         for row in rec["rows"]:
             key = (
@@ -174,9 +270,20 @@ if __name__ == "__main__":
     p.add_argument("archive", type=Path)
     p.add_argument("registration", type=Path)
     p.add_argument("--pilot-summary", type=Path)
+    p.add_argument(
+        "--receiver-tips",
+        action="store_true",
+        help="compare both native active tips with the preassigned continuation",
+    )
     args = p.parse_args()
     print(
         json.dumps(
-            analyze(args.archive, args.registration, args.pilot_summary), indent=2
+            analyze(
+                args.archive,
+                args.registration,
+                args.pilot_summary,
+                compare_tips=args.receiver_tips,
+            ),
+            indent=2,
         )
     )

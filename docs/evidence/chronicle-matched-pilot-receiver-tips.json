@@ -1,0 +1,176 @@
+{
+  "phase": "pilot",
+  "complete_sessions": 16,
+  "scheduled_parents": 576,
+  "primary_summary_sha256": "1458f7f6daa693278c6e6402048763cc8208b2648297924e3124a9c53c3d8b02",
+  "by_role_and_assigned_offset": {
+    "witnessed/full:-184000000ns": {
+      "scheduled_parents": 96,
+      "two_discoveries": 34,
+      "settled_on_chosen_receivers_candidate": 34,
+      "same_tip_at_all_three_reads_on_each_receiver": 34,
+      "depth_two_winner_in_final_ancestry": 34,
+      "joint_counts": [
+        {
+          "active_tips_before_continuation": "both_left",
+          "earlier_at_chosen_receiver": "left",
+          "settled_at_depth_two": "left",
+          "parents": 34
+        }
+      ]
+    },
+    "witnessed/full:0ns": {
+      "scheduled_parents": 96,
+      "two_discoveries": 35,
+      "settled_on_chosen_receivers_candidate": 35,
+      "same_tip_at_all_three_reads_on_each_receiver": 35,
+      "depth_two_winner_in_final_ancestry": 35,
+      "joint_counts": [
+        {
+          "active_tips_before_continuation": "both_left",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "left",
+          "parents": 15
+        },
+        {
+          "active_tips_before_continuation": "both_left",
+          "earlier_at_chosen_receiver": "left",
+          "settled_at_depth_two": "left",
+          "parents": 3
+        },
+        {
+          "active_tips_before_continuation": "both_right",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "right",
+          "parents": 2
+        },
+        {
+          "active_tips_before_continuation": "both_right",
+          "earlier_at_chosen_receiver": "right",
+          "settled_at_depth_two": "right",
+          "parents": 2
+        },
+        {
+          "active_tips_before_continuation": "split",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "left",
+          "parents": 6
+        },
+        {
+          "active_tips_before_continuation": "split",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "right",
+          "parents": 2
+        },
+        {
+          "active_tips_before_continuation": "split",
+          "earlier_at_chosen_receiver": "left",
+          "settled_at_depth_two": "left",
+          "parents": 3
+        },
+        {
+          "active_tips_before_continuation": "split",
+          "earlier_at_chosen_receiver": "right",
+          "settled_at_depth_two": "right",
+          "parents": 2
+        }
+      ]
+    },
+    "witnessed/full:184000000ns": {
+      "scheduled_parents": 96,
+      "two_discoveries": 24,
+      "settled_on_chosen_receivers_candidate": 24,
+      "same_tip_at_all_three_reads_on_each_receiver": 24,
+      "depth_two_winner_in_final_ancestry": 24,
+      "joint_counts": [
+        {
+          "active_tips_before_continuation": "both_right",
+          "earlier_at_chosen_receiver": "right",
+          "settled_at_depth_two": "right",
+          "parents": 24
+        }
+      ]
+    },
+    "full/full:-184000000ns": {
+      "scheduled_parents": 96,
+      "two_discoveries": 30,
+      "settled_on_chosen_receivers_candidate": 30,
+      "same_tip_at_all_three_reads_on_each_receiver": 30,
+      "depth_two_winner_in_final_ancestry": 30,
+      "joint_counts": [
+        {
+          "active_tips_before_continuation": "both_left",
+          "earlier_at_chosen_receiver": "left",
+          "settled_at_depth_two": "left",
+          "parents": 30
+        }
+      ]
+    },
+    "full/full:0ns": {
+      "scheduled_parents": 96,
+      "two_discoveries": 31,
+      "settled_on_chosen_receivers_candidate": 31,
+      "same_tip_at_all_three_reads_on_each_receiver": 31,
+      "depth_two_winner_in_final_ancestry": 31,
+      "joint_counts": [
+        {
+          "active_tips_before_continuation": "both_left",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "left",
+          "parents": 12
+        },
+        {
+          "active_tips_before_continuation": "both_left",
+          "earlier_at_chosen_receiver": "left",
+          "settled_at_depth_two": "left",
+          "parents": 3
+        },
+        {
+          "active_tips_before_continuation": "both_right",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "right",
+          "parents": 7
+        },
+        {
+          "active_tips_before_continuation": "both_right",
+          "earlier_at_chosen_receiver": "right",
+          "settled_at_depth_two": "right",
+          "parents": 1
+        },
+        {
+          "active_tips_before_continuation": "split",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "left",
+          "parents": 3
+        },
+        {
+          "active_tips_before_continuation": "split",
+          "earlier_at_chosen_receiver": "interval_contains_zero",
+          "settled_at_depth_two": "right",
+          "parents": 3
+        },
+        {
+          "active_tips_before_continuation": "split",
+          "earlier_at_chosen_receiver": "right",
+          "settled_at_depth_two": "right",
+          "parents": 2
+        }
+      ]
+    },
+    "full/full:184000000ns": {
+      "scheduled_parents": 96,
+      "two_discoveries": 35,
+      "settled_on_chosen_receivers_candidate": 35,
+      "same_tip_at_all_three_reads_on_each_receiver": 35,
+      "depth_two_winner_in_final_ancestry": 35,
+      "joint_counts": [
+        {
+          "active_tips_before_continuation": "both_right",
+          "earlier_at_chosen_receiver": "right",
+          "settled_at_depth_two": "right",
+          "parents": 35
+        }
+      ]
+    }
+  }
+}
