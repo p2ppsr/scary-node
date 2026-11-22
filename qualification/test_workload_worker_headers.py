@@ -4,6 +4,7 @@ import copy
 import gzip
 import json
 import socket
+import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -128,11 +129,14 @@ class WorkerHeaderAttribution(unittest.TestCase):
 
         with ThreadPoolExecutor(max_workers=1) as thread:
             received = thread.submit(serve)
+            start = time.monotonic_ns()
+            slot["started_ns"] = 0
             with (
                 patch("sustained_native.socket.create_connection", return_value=client),
                 self.assertRaisesRegex(EOFError, "session closed"),
             ):
-                stratum(self.original["parent"], slot)
+                stratum(self.original["parent"], slot, start=start)
+            slot["finished_ns"] = time.monotonic_ns() - start
             submission = received.result()
         self.assertEqual(submission["method"], "mining.submit")
         proof = slot["worker_candidate"]
@@ -142,6 +146,13 @@ class WorkerHeaderAttribution(unittest.TestCase):
         )
         self.record["slots"] = [slot]
         self.record["blocks"] = []
+        from verify_sustained_native import phase_timings
+
+        self.record["phase_timing_format"] = 1
+        result = phase_timings(self.record)
+        self.assertEqual(
+            result["worker_submit_through_return_or_error_ms"]["error"]["count"], 1
+        )
         self.assertEqual(
             audit(self.record)["prepared_headers_outside_active_prefix"], 1
         )

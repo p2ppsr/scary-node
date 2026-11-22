@@ -130,6 +130,56 @@ def distribution(values):
     }
 
 
+def phase_timings(record):
+    require(record.get("phase_timing_format") == 1, "unknown phase timing format")
+    setup_ms = []
+    submit_ms = {}
+    keys = (
+        "worker_connect_started_ns",
+        "worker_setup_ended_ns",
+        "worker_submit_started_ns",
+        "worker_submit_ended_ns",
+    )
+    for slot in record["slots"]:
+        present = [key for key in keys if key in slot]
+        require(present == list(keys[: len(present)]), "missing earlier worker phase")
+        require(
+            bool(present) == (slot["miner"] == "scary" and slot["ready"]),
+            "worker connection and readiness disagree",
+        )
+        stamps = [slot["started_ns"], *(slot[k] for k in present), slot["finished_ns"]]
+        require(stamps == sorted(stamps), "worker phase clock moved backwards")
+        require(
+            ("worker_candidate" in slot) == (len(present) == 4),
+            "prepared work and submission timing disagree",
+        )
+        if len(present) >= 2:
+            setup_ms.append((stamps[2] - stamps[1]) / 1e6)
+        if len(present) == 4:
+            submit_ms.setdefault(slot["outcome"], []).append(
+                (stamps[4] - stamps[3]) / 1e6
+            )
+    reads_ms = {role: [] for role in ("sv", "tn1", "tn2")}
+    for body in record["blocks"]:
+        reads = body["independent_wire_read"]
+        require(reads.keys() == reads_ms.keys(), "missing independent read clock")
+        for role, times in reads.items():
+            begin, end = times["start_ns"], times["end_ns"]
+            require(
+                0 <= begin <= end <= body["readback_ns"], "invalid peer read interval"
+            )
+            reads_ms[role].append((end - begin) / 1e6)
+    return {
+        "worker_connect_through_initial_job_ms": distribution(setup_ms),
+        "worker_submit_through_return_or_error_ms": {
+            k: distribution(v) for k, v in submit_ms.items()
+        },
+        "complete_stock_body_fetch_ms": {
+            k: distribution(v) for k, v in reads_ms.items()
+        },
+    }
+
+
 def intake_delta(samples):
     endpoints = [
         s["scary"]["peer_intake"]
@@ -634,6 +684,7 @@ def verify(record, executable=None):
         origin["worker_return_matched_primary_payments_by_miner"] = returned_payments
     return {
         **origin,
+        **({"phase_timings": phase_timings(record)} if "phase_timing_format" in record else {}),
         "registered_payments": PAYMENTS,
         "observed_offer_batches": len(offers),
         "registration": record["registration"],

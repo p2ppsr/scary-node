@@ -91,7 +91,9 @@ def prepare_funding(corpus):
     }
 
 
-def stratum(parent, slot=None, *, port=None):
+def stratum(parent, slot=None, *, port=None, start=None):
+    if slot is not None and start is not None:
+        slot["worker_connect_started_ns"] = time.monotonic_ns() - start
     with (
         socket.create_connection(
             ("127.0.0.1", 19433 + PORT_SHIFT if port is None else port), timeout=4
@@ -101,6 +103,8 @@ def stratum(parent, slot=None, *, port=None):
         conn.settimeout(4)
         worker = Worker(stream, "sustained-native")
         subscribed = worker.setup("")
+        if slot is not None and start is not None:
+            slot["worker_setup_ended_ns"] = time.monotonic_ns() - start
         j = subscribed["first_job"]
         if previous_hash(j)[::-1].hex() != parent:
             raise ValueError("worker received a different parent")
@@ -126,9 +130,13 @@ def stratum(parent, slot=None, *, port=None):
         hdr = prefix + struct.pack("<I", nonce)
         # The worker already has the exact PoW before waiting for the reply.
         # Preserve it on both return and failure without writing ahead of submission.
+        if slot is not None and start is not None:
+            slot["worker_submit_started_ns"] = time.monotonic_ns() - start
         try:
             result = worker.submit(4, j, x2, nonce)
         finally:
+            if slot is not None and start is not None:
+                slot["worker_submit_ended_ns"] = time.monotonic_ns() - start
             header = hdr.hex()
             ident = txid(hdr)
             if slot is not None:
@@ -167,7 +175,7 @@ def mine(kind, phase, index, due, start):
             if not r["ready"]:
                 r["outcome"] = "unready"
             else:
-                h, header, result = stratum(r["parent"], r)
+                h, header, result = stratum(r["parent"], r, start=start)
                 r["outcome"] = "solved" if result["result"] is True else "rejected"
                 r["solution_header"] = header
                 if r["outcome"] == "solved":
@@ -274,6 +282,11 @@ def audit_loop(ids, seen, directory, live, start, stop, abort):
     base = live.base
     source_cohorts = cohort_by_batch(ARM)
     next_height = base["height"] + 1
+    def timed_read(fn, *args):
+        before = time.monotonic_ns() - start
+        body = fn(*args)
+        return body, {"start_ns": before, "end_ns": time.monotonic_ns() - start}
+
     try:
         with (
             (directory / "body-events.jsonl").open("x", buffering=1) as log,
@@ -301,17 +314,17 @@ def audit_loop(ids, seen, directory, live, start, stop, abort):
                 if not observed:
                     stop.wait(0.15)
                     continue
-                reads = [fetch.submit(read_block, n, h) for n in NODES]
-                sv_body = bytes.fromhex(sv("getblock", h, 0))
+                reads = [fetch.submit(timed_read, read_block, n, h) for n in NODES]
+                wire_hex, sv_read = timed_read(sv, "getblock", h, 0)
+                sv_body = bytes.fromhex(wire_hex)
+                del wire_hex
                 _, txs, _ = decode_block(sv_body, h)
                 wire = hashlib.sha256(sv_body).hexdigest()
-                hashes = {
-                    "sv": wire,
-                    **{
-                        name: hashlib.sha256(f.result()).hexdigest()
-                        for name, f in zip(("tn1", "tn2"), reads)
-                    },
-                }
+                hashes = {"sv": wire}
+                timings = {"sv": sv_read}
+                for role, future in zip(("tn1", "tn2"), reads):
+                    hashes[role] = hashlib.sha256(future.result()[0]).hexdigest()
+                    timings[role] = future.result()[1]
                 if set(hashes.values()) != {wire}:
                     raise ValueError("native wire disagreement")
                 parent = sv_body[4:36][::-1].hex()
@@ -364,6 +377,7 @@ def audit_loop(ids, seen, directory, live, start, stop, abort):
                     "wire_sha256": wire,
                     "wire_bytes": len(sv_body),
                     "independent_wire_sha256": hashes,
+                    "independent_wire_read": timings,
                     "ordinary_transactions": len(txs) - 1,
                     "scheduled_payments": sum(counts),
                     "foreign_payments": unexpected,
@@ -520,6 +534,7 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
                 {
                     "registration": REGISTRATION,
                     "worker_header_format": 1,
+                    "phase_timing_format": 1,
                     **({"arm": ARM} if ARM in WITNESSED_ARMS else {}),
                     "start_wall_ns": start_wall,
                     "baseline": base,
@@ -650,6 +665,7 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
             "schema": 1,
             "registration": REGISTRATION,
             "worker_header_format": 1,
+            "phase_timing_format": 1,
             **({"arm": ARM} if ARM in WITNESSED_ARMS else {}),
             "network": "regtest",
             "release_sha256": RELEASE,

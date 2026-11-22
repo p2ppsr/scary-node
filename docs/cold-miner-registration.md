@@ -24,3 +24,5 @@ For this arm the worker records the job notification, both extranonces and the e
 ```sh
 python3 qualification/workload_worker_headers.py .native/cold-changed-run/receipt.json.gz
 ```
+
+The host monotonic clock also records the interval from a worker’s connection attempt through completion of Stratum setup, the interval from its submit call through a response or error, and the start and finish of each stock node’s complete body read. Each stock read includes any retries within that request. The driver retains the group audit completion after decoding, membership accounting and writes. These fields distinguish worker response time, sampled tip selection and body retrieval on a common clock. Earlier receipts preserve their original timestamp resolution.
