@@ -19,7 +19,7 @@ For an ongoing miner demonstration, preregister at least one Scary-originated, n
 
 ### Endorsed arm results
 
-The eight selected Scary blocks in the observed prefix contained 84,210 payments. They all came in the first 50 work opportunities. Three later complete windows contained zero Scary blocks. The original enrollment was interrupted with 246 of its 300 opportunities recorded. [Measured outcomes, evidence limits and replay](endorsed-workload-interruption.md)
+The eight selected Scary blocks in the observed prefix contained 84,210 payments. They all came in the first 50 work opportunities. Three later complete windows contained zero Scary blocks. The original enrollment was interrupted with 246 of its 300 opportunities recorded. [Measured outcomes, evidence limits and replay](endorsed-workload-interruption.md) The reordered arm completed all 300 opportunities and settled every signed payment. Scary produced selected blocks in all six windows. The system measured 2,974.15 confirmed payments/s. [Reordered workload and settlement readbacks](witnessed-workload-results.md)
 
 ## Separately measuring one large body
 

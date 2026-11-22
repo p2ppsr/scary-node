@@ -1,0 +1,23 @@
+{
+  "mining_identity": "4a6629b0f2dcbaaf66e6751f7afe24a9d286458084ef077767f85acb9fc3d4a2",
+  "public_peer_id": "12D3KooWHgTe6jCvnFkcbWLBYT8wbf6Qj4SELBGFjBE2MjismgUC",
+  "public_identity_protobuf_hex": "0801122074d70926576cafafaddcc5032b70326752c7091b93c97203f6a6eb5c5bd00cc5",
+  "receivers": {
+    "tn1": {
+      "log_sha256": "c254a7869777bc81731d0f755087e2f69479784f4fdec43db2b7666323396901",
+      "log_bytes": 16848334,
+      "distinct_inline_ed25519_peers": 3,
+      "matching_lines": 151,
+      "first_matching_log_time": "2026-11-22T02:17:05.741782257Z",
+      "last_matching_log_time": "2026-11-22T02:48:58.317924795Z"
+    },
+    "tn2": {
+      "log_sha256": "4bb855ca662dcfca545df6f0c6e6bfd30ef4f0363e7a9e40f69a490951a24db2",
+      "log_bytes": 13971584,
+      "distinct_inline_ed25519_peers": 3,
+      "matching_lines": 157,
+      "first_matching_log_time": "2026-11-22T02:17:05.741753341Z",
+      "last_matching_log_time": "2026-11-22T02:48:58.317872504Z"
+    }
+  }
+}
