@@ -10,6 +10,25 @@ Use the first 128 signed spends in their original order from the published 4,096
 
 Run six trials per treatment under the workstation measurement lock. Rotate treatment order through all six permutations to balance placement. Report all trials. The acceptance conditions for the four-fetch treatment are complete ordered admission of the 128 payments in every trial, peak concurrency between two and four, an unchanged selected tip, and median drain time lower than the 256-slot serial treatment. Report the old queue’s actual omissions and the larger serial queue’s effect separately. A second stock Teranode interoperability run must show a signed payment delivered over actual gossip, mined through Stratum, selected and extended by the stock reference. These measurements concern a bounded signed fixture under specified read delays. They cannot establish unique payment loss or throughput on mainnet. [Signed source blocks and payments](evidence/chronicle-mixed-workload.json.gz) · [Stock Teranode native intake fixture](early-peer-intake.md)
 
+## Results from the 18 registered trials
+
+With four concurrent reads, all 128 signed payments reached the template in announcement order in each of six trials. The median time from the first offer until the queue drained was 1.978 seconds. With one reader and the same 256-slot queue, the same work took 6.867 seconds, a 3.47-fold difference. The selected parent remained the same across all 18 trials. [Ordered offers, loopback requests, template IDs and per-trial timings](evidence/chronicle-subtree-scheduler-trials.json.gz)
+
+| Fetch workers / queue slots | Roots admitted per trial (of 64) | Queue-full offers per trial | Template payments per trial (of 128) | Peak concurrent reads | Median drain (range), seconds |
+|---|---:|---:|---:|---:|---:|
+| 1 / 16 (reference) | 26 | 38 | 52 | 1 | 2.971 (2.964–2.979) |
+| 1 / 256 | 64 | 0 | 128 | 1 | 6.867 (6.855–6.880) |
+| 4 / 256 | 64 | 0 | 128 | 4 | 1.978 (1.965–1.987) |
+
+The 16-slot reference finished after fetching just 26 roots. Increasing capacity alone kept every offer and gave the serial reader more work. With four workers, a later root’s response became ready before the delayed first root in all six trials. All six resulting templates still listed the signed payments in their original order. These results measure this loopback fixture’s burst and prescribed response delays. They do not measure production throughput, stale blocks or live payment loss.
+
+Verify the published bytes without starting any services:
+
+```sh
+.native/py/bin/python qualification/subtree_scheduler.py verify \
+  docs/evidence/chronicle-subtree-scheduler-trials.json.gz
+```
+
 ## Reproduce the scheduler trials
 
 Build the shared BDK and Python environment from the [qualification runbook](chronicle-qualification.md) and install the release Rust toolchain 1.98.1. The procedure exports the two source revisions into temporary directories, appends the same test-only probe, and builds an optimized test executable for each. It records the source revisions, injected module and executable digests. Each treatment starts a fresh mining state and an isolated loopback Asset service. The funding body and the 128 signed payment bytes come from the published mixed-network artifact. The deterministic empty successor selects parent `0c67f3ede46fb83e2381df38630735189b8dcf72be131a9bec9a264e4884f152`. [Archived-source harness and verifier](../qualification/subtree_scheduler.py) · [Rust timing probe](../qualification/subtree_scheduler_probe.rs)
