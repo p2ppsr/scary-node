@@ -471,7 +471,7 @@ def compare_membership(record, corpus, blocks):
     }
 
 
-def restore_stock_mempool(stock, record, corpus, private_ids):
+def restore_stock_mempool(stock, record, corpus, private_ids, *, allow_retained=False):
     """Reoffer the original pending set in dependency order on a fresh reference chain."""
     from sustained_block_archive import signed_frames
 
@@ -490,10 +490,16 @@ def restore_stock_mempool(stock, record, corpus, private_ids):
         == [original[i : i + 32] for i in range(0, len(original), 32)],
         "original mempool identifiers are duplicated or unordered",
     )
+    existing = {bytes.fromhex(txid)[::-1] for txid in stock.rpc("getrawmempool")}
     require(
-        stock.rpc("getrawmempool") == [],
+        existing <= wanted,
+        "restored stock contains transactions absent from the original pool",
+    )
+    require(
+        allow_retained or not existing,
         "fresh stock already has unconfirmed transactions",
     )
+    missing = wanted - existing
     accepted = 0
     with (
         signed_frames(corpus, record["source"]) as (frames, starts),
@@ -502,7 +508,7 @@ def restore_stock_mempool(stock, record, corpus, private_ids):
         batch = []
         for ordinal in range(summary["advertised_transactions"]):
             ident = ids.read(32)
-            if ident not in wanted:
+            if ident not in missing:
                 continue
             raw = frames[starts[ordinal] + 24 : starts[ordinal + 1]]
             batch.append({"hex": raw.hex()})
@@ -525,11 +531,15 @@ def restore_stock_mempool(stock, record, corpus, private_ids):
         sorted(bytes.fromhex(value)[::-1] for value in stock.rpc("getrawmempool"))
     )
     require(
-        accepted == count and reopened == original,
+        len(existing) + accepted == count and reopened == original,
         "restored stock mempool differs in membership",
     )
     return {
-        "fresh_initial_count": 0,
+        **(
+            {"retained_initial_count": len(existing)}
+            if allow_retained
+            else {"fresh_initial_count": 0}
+        ),
         "reoffered": accepted,
         "restored_count": len(reopened) // 32,
         "sorted_internal_txids_sha256": hashlib.sha256(reopened).hexdigest(),

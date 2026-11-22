@@ -209,6 +209,9 @@ def compare_pending(tnid, candidate, original_wire):
             "payments": len(ids),
             "candidate_wire_sha256": hashlib.sha256(raw).hexdigest(),
             "ordinary_wire_sha256": hashlib.sha256(b"".join(ordinary)).hexdigest(),
+            "sorted_ordinary_wire_sha256": hashlib.sha256(
+                b"".join(tx for _, tx in sorted(zip(ids, ordinary, strict=True)))
+            ).hexdigest(),
             "ordered_internal_txids_sha256": hashlib.sha256(b"".join(ids)).hexdigest(),
             "sorted_internal_txids_sha256": hashlib.sha256(
                 b"".join(sorted(ids))
@@ -228,6 +231,8 @@ def compare_pending(tnid, candidate, original_wire):
         == after["sorted_internal_txids_sha256"],
         "same_ordered_payment_bytes": before["ordinary_wire_sha256"]
         == after["ordinary_wire_sha256"],
+        "same_signed_payments": before["sorted_ordinary_wire_sha256"]
+        == after["sorted_ordinary_wire_sha256"],
     }
 
 
@@ -450,6 +455,15 @@ def verify(proof, receipt):
             == (restored["ordinary_wire_sha256"] == original["ordinary_wire_sha256"]),
             "pending candidate comparison differs",
         )
+        if "same_signed_payments" in proof["pending_recovery"]:
+            require(
+                proof["pending_recovery"]["same_signed_payments"]
+                == (
+                    restored["sorted_ordinary_wire_sha256"]
+                    == original["sorted_ordinary_wire_sha256"]
+                ),
+                "pending signed payment bytes differ from the reported comparison",
+            )
     return {
         "role": role,
         "height": proof["height"],

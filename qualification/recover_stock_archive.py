@@ -359,6 +359,7 @@ def boot(
     blocks=None,
     *,
     original_wallet=None,
+    original_pending_ids=None,
     retain_private_result=None,
 ):
     receipt = read(measured)
@@ -428,6 +429,16 @@ def boot(
             offers = reoffer(stock, receipt, measured, history, corpus, archive, blocks)
             method = "native reindex and reoffer of exact retained suffix"
         info = inspect_tip(stock, target)
+        pending = {}
+        expected_pool = 0
+        if original_pending_ids is not None:
+            from interrupted_workload import restore_stock_mempool
+
+            restored = restore_stock_mempool(
+                stock, receipt, corpus, original_pending_ids, allow_retained=True
+            )
+            pending["original_pending_recovery"] = restored
+            expected_pool = restored["restored_count"]
         pool = stock.rpc("getmempoolinfo")["size"]
         activity = stock.rpc("getblockchainactivity")
         wallet = stock.rpc("getwalletinfo")
@@ -440,10 +451,8 @@ def boot(
         require(
             info["hash"] == target
             and info["height"] == confirmed_boundary(receipt)["final_height"]
-            and stock.rpc("getconnectioncount")
-            == pool
-            == activity["transactions"]
-            == 0,
+            and pool == expected_pool
+            and stock.rpc("getconnectioncount") == activity["transactions"] == 0,
             "complete recovery or zero-peer boundary differs",
         )
         return {
@@ -454,6 +463,7 @@ def boot(
             "verified_data_roots": openings,
             "wallet_loaded": True,
             "original_wallet_comparison": comparison,
+            **pending,
             "wallet_transaction_count": wallet["txcount"],
             "wallet_version": wallet["walletversion"],
             "first_tips_and_progress": stages,
@@ -477,13 +487,27 @@ def verify(proof, receipt):
         and proof["network"] == "isolated regtest",
         "different original or stock image",
     )
+    expected_pool = 0
+    if "original_pending_recovery" in proof:
+        from interrupted_workload import verify as verify_interruption
+
+        interrupted = verify_interruption(receipt)
+        pool = proof["original_pending_recovery"]
+        expected_pool = interrupted["final_stock_mempool_after_interruption"]
+        require(
+            pool["restored_count"]
+            == expected_pool
+            == pool["retained_initial_count"] + pool["reoffered"]
+            and min(pool["retained_initial_count"], pool["reoffered"]) >= 0
+            and pool["sorted_internal_txids_sha256"]
+            == interrupted["sorted_internal_mempool_txids_sha256"],
+            "restored stock pending payments differ from original",
+        )
     require(
         proof["terminal"]["height"] == final["final_height"]
         and proof["terminal"]["hash"] == final["final_hash"]
-        and proof["peers"]
-        == proof["mempool"]
-        == proof["validation_activity"]["transactions"]
-        == 0,
+        and proof["mempool"] == expected_pool
+        and proof["peers"] == proof["validation_activity"]["transactions"] == 0,
         "final stock state differs",
     )
     require(
@@ -593,6 +617,7 @@ if __name__ == "__main__":
     b.add_argument("corpus", type=Path)
     b.add_argument("data_tar", type=Path)
     b.add_argument("proof", type=Path)
+    b.add_argument("--original-pending-ids", type=Path)
     b.add_argument(
         "--private-wallet-summary",
         type=Path,
@@ -624,6 +649,7 @@ if __name__ == "__main__":
                 a.archive,
                 a.blocks,
                 original_wallet=private["wallet"] if private else None,
+                original_pending_ids=a.original_pending_ids,
             )
             verify(evidence, read(a.measured))
             with a.proof.open("x") as f:
