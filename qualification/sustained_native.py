@@ -22,6 +22,7 @@ from run_cohort import session_lock
 from sustained_profiles import (
     pinned_build,
     REGISTRATIONS,
+    SUBTREE_COUNTERS,
     WITNESSED_ARMS,
     cohort_by_batch,
     profile,
@@ -235,6 +236,8 @@ class Live:
                         "peer_intake": m["peer_transaction_intake"],
                         "storage_failed": bool(m["storage_failure"]),
                     }
+                    if ARM == "buffered-reordered":
+                        st["subtree"] = {k: got["peer"][k] for k in SUBTREE_COUNTERS}
                     with self.lock:
                         for obs in m["validation_window"]:
                             self.observations[obs["hash"]] = (

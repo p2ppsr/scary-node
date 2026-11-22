@@ -22,13 +22,30 @@ FROZEN_RELEASE = "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a5
 CHANGED_RELEASE = "4c9ef032f2ebf4c806331fbbbc53464c517da04cc497209bb9cdb5e4cc572faf"
 RELEASE_REGISTRATION = "91444cdc0d304230b83d99138a07fda9b567d9f9"
 RELEASE_ELF = "5129b3dea8cecf04d369aa7a7d663024879291799af5424cb0158e8e337b643e"
-REORDERED_ARMS = ("reordered", "release-reordered")
-WITNESSED_ARMS = ("endorsed", "reordered", "cold", "release-reordered")
+BUFFERED_REGISTRATION = "50e437de0a9f9aae213cfbc43e55c92259463807"
+BUFFERED_ELF = "86f0f7caaa2188b19eed42fcfe47af04e5041d0bf34284a8c91ecdef529a25e2"
+REORDERED_ARMS = ("reordered", "release-reordered", "buffered-reordered")
+WITNESSED_ARMS = ("endorsed", "reordered", "cold", "release-reordered", "buffered-reordered")
+
+SUBTREE_COUNTERS = (
+    "subtree_notices",
+    "subtree_queue_full",
+    "subtree_processed",
+    "subtree_failed",
+    "subtree_processed_transactions",
+    "subtree_processed_bytes",
+)
+SUBTREE_SETTINGS = {
+    "subtree_retrieval_enabled": True,
+    "subtree_fetch_workers": 4,
+    "subtree_queue_capacity": 256,
+}
 
 BASELINE_BUILD = ("af9b605ad8da96d041a540111d46a7c0105209f7", FROZEN_RELEASE)
 CHANGED_BUILDS = {
     "cold": ("c2a36d5c6a83f2262dffd596f5eecb421db6b132", CHANGED_RELEASE),
     "release-reordered": ("5148c31ae620544c31a61b1710172c4bcc524c54", RELEASE_ELF),
+    "buffered-reordered": ("a69433bf4d43202b6155561ec4ec0b18aa4d6ce3", BUFFERED_ELF),
 }
 REGISTRATIONS = {
     "direct": DIRECT,
@@ -37,6 +54,7 @@ REGISTRATIONS = {
     "reordered": WITNESSED,
     "cold": COLD,
     "release-reordered": RELEASE_REGISTRATION,
+    "buffered-reordered": BUFFERED_REGISTRATION,
 }
 
 PROJECTS = {
@@ -47,6 +65,7 @@ PROJECTS = {
     "reordered": ("scary-node-sustained-reordered", 6000),
     "cold": ("scary-node-sustained-cold", 7000),
     "release-reordered": ("scary-node-sustained-release-reordered", 8000),
+    "buffered-reordered": ("scary-node-sustained-buffered-reordered", 9000),
 }
 
 

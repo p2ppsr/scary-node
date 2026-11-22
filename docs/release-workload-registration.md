@@ -43,3 +43,15 @@ Run one additional 5,529,600-payment workload on the first published Linux ARM64
 Use a new project named `scary-node-sustained-buffered-reordered` with port shift 9000, the registered R funding history and the same ordered payment IDs, wallets, worker, reference images, resource floors and common measurement lock. Keep the default four overlapping subtree reads, queue capacity 256 and ordinary checkpoint durability. Capture the exact running executable and settings before the timed run. Enroll after the `5148c31` run's terminal handoff on fresh independent stores. Preserve the single timed attempt, all 300 scheduled primary opportunities, the bounded drain, original solved journal, coinbase identities, prepared worker headers and the independently read stock bytes. A failed setup before the first timed offer records its reason and can resume from verified initial conditions.
 
 The primary operating target requires all 5,529,600 registered payments confirmed through two successors in at most 1,843.200 seconds, plus at least one independently selected, nonempty Scary block in each of the six primary windows. Account separately for the source payments originated by Scary and the other miner, unavailable work, solution attempts, stale blocks and readiness. Preserve any earlier throughput miss. The enrolled passive mainnet observer and the three registered stale-rate evaluations keep their existing executables.
+
+The combined release is pinned before enrollment to source `a69433bf4d43202b6155561ec4ec0b18aa4d6ce3` and ELF SHA-256 `86f0f7caaa2188b19eed42fcfe47af04e5041d0bf34284a8c91ecdef529a25e2`. Its isolated running process reported BDK 1.4.0 and SV Node 1.2.3. The setup checks the actual fetch configuration on the operator endpoint. The timed recorder retains subtree announcements, full offers, completion and failure counts, processed transactions and bytes from each successful status sample. These counts include overlapping roots and payments. The receipt reports counter regressions if a process restarts. [Linux build, compiler and archive hashes](evidence/chronicle-buffered-linux-build.json) · [Checkpoint measurements](checkpoint-encoding-results.md)
+
+~~~sh
+SCARY_SUSTAINED_PROFILE=buffered-reordered .native/py/bin/python qualification/sustained_replication.py \
+  .native/paired-corpus .native/sustained-signed .native/buffered-reordered-run
+.native/py/bin/python qualification/verify_sustained_native.py \
+  .native/buffered-reordered-run/receipt.json.gz --corpus .native/sustained-signed \
+  --blocks .native/buffered-reordered-run/blocks --parent-ages
+~~~
+
+To reproduce the Docker image independently, first run `python3 qualification/release_build.py a69433bf4d43202b6155561ec4ec0b18aa4d6ce3 .native/buffered-linux-build.json`. Supply its image ID via both `--image` and `--image-id` to the workload driver. Setup checks the executable digest inside the independently built image.

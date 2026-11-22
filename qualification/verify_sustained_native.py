@@ -22,6 +22,8 @@ from sustained_profiles import (
     ENDORSED_SHA,
     ENDORSEMENT,
     PROJECTS,
+    SUBTREE_SETTINGS,
+    SUBTREE_COUNTERS,
     REGISTRATIONS,
     WITNESSED_ARMS,
     REORDERED_IDS,
@@ -315,6 +317,8 @@ def replication_setup(record):
         setup["funding"]["height"] == 484 and setup["funding"]["hash"] == FUNDING,
         "replication funding differs",
     )
+    if arm == "buffered-reordered":
+        require(setup["subtree_settings"] == SUBTREE_SETTINGS, "subtree settings differ")
     if arm in WITNESSED_ARMS:
         expected_ids = REORDERED_IDS if arm in REORDERED_ARMS else ORDERED_SOURCE
         require(
@@ -664,6 +668,24 @@ def verify(record, executable=None):
             * NS
             / elapsed,
         }
+    if arm == "buffered-reordered":
+        reads = [r["scary"] for r in sampled if "error" not in r["scary"]]
+        require(
+            all(
+                set(r["subtree"]) == set(SUBTREE_COUNTERS)
+                and all(type(v) is int and v >= 0 for v in r["subtree"].values())
+                for r in reads
+            ),
+            "missing or invalid subtree counters on a successful operator read",
+        )
+        origin["subtree_samples"] = len(reads)
+        if reads:
+            origin["first_subtree_sample"] = reads[0]["subtree"]
+            origin["last_subtree_sample"] = reads[-1]["subtree"]
+            origin["subtree_counter_regressions"] = sum(
+                any(b["subtree"][k] < a["subtree"][k] for k in SUBTREE_COUNTERS)
+                for a, b in zip(reads, reads[1:])
+            )
     if origin:
         origin["witnessed_miner_target_met"] = bool(
             regular

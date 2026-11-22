@@ -2,6 +2,8 @@
 
 from collections import Counter
 import hashlib
+import json
+from pathlib import Path
 import unittest
 
 from sustained_profiles import (
@@ -85,6 +87,25 @@ class WitnessedWorkloadTests(unittest.TestCase):
         self.assertEqual(
             PROJECTS[profile], ("scary-node-sustained-release-reordered", 8000)
         )
+
+    def test_buffered_release_runs_the_same_workload_on_a_separate_pinned_build(self):
+        profile = "buffered-reordered"
+        self.assertEqual(batch_order(profile), batch_order("release-reordered"))
+        self.assertEqual(
+            PROJECTS[profile], ("scary-node-sustained-buffered-reordered", 9000)
+        )
+        manifest = (
+            Path(__file__).resolve().parents[1]
+            / "docs/evidence/chronicle-buffered-linux-build.json"
+        )
+        native = json.loads(manifest.read_bytes())
+        self.assertEqual(
+            pinned_build(profile),
+            (native["source_commit"], native["release"]["executable_sha256"]),
+        )
+        for previous in ("cold", "reordered", "release-reordered"):
+            self.assertNotEqual(REGISTRATIONS[profile], REGISTRATIONS[previous])
+            self.assertNotEqual(pinned_build(profile), pinned_build(previous))
 
     def test_endorsed_wire_parent_merkle_and_registered_builds(self):
         self.assertEqual(hashlib.sha256(ENDORSEMENT).hexdigest(), ENDORSED_SHA)

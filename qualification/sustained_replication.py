@@ -10,6 +10,7 @@ from pathlib import Path
 
 from sustained_profiles import (
     PROJECTS,
+    SUBTREE_SETTINGS,
     WITNESSED_ARMS,
     ENDORSEMENT,
     ENDORSED_HASH,
@@ -50,6 +51,10 @@ if ARM == "cold":
 elif ARM == "release-reordered":
     IMAGE = IMAGE_ID = (
         "sha256:0da9e6af62129fa7385f78ddf190780c3975598c49211b3fbb838837d9ca2d6f"
+    )
+elif ARM == "buffered-reordered":
+    IMAGE = IMAGE_ID = (
+        "sha256:0e61b92676c4b8b52065fc9e2b5e6bbbec0f8cc717c9ddde6bf6c641be6f0c55"
     )
 FUNDING = "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9"
 SOURCE = "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2"
@@ -167,8 +172,14 @@ def setup(
         lambda: status()["mining"]["connected_data_peers"] >= 3,
         seconds=180,
     )
-    if status()["release"]["executable_sha256"] != RELEASE:
+    entrant_status = status()
+    if entrant_status["release"]["executable_sha256"] != RELEASE:
         raise ValueError("running entrant executable differs")
+    if ARM == "buffered-reordered":
+        settings = {k: entrant_status["peer"][k] for k in SUBTREE_SETTINGS}
+        if settings != SUBTREE_SETTINGS:
+            raise ValueError("running subtree fetch settings differ from registration")
+        record["subtree_settings"] = settings
     for height in (450, 451, *range(455, 484, 4)):
         seed(corpus, receipt, height, entrant=True)
         if height == 451:
