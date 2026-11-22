@@ -569,8 +569,10 @@ pub async fn run(
                 let (blocked,missing)={let m=state.lock().await;(m.directives.active_bans(),m.missing_recent())};
                 if let Some(queue)=&fetch{
                     for (id,height) in missing {
+                        let hash = display_hash(id);
+                        queue.forget_delivery(&hash);
                         for base in asset_sources.values(){
-                            let _=queue.offer(Request{hash:display_hash(id),height,base:base.clone(),header:None});
+                            let _=queue.offer(Request{hash:hash.clone(),height,base:base.clone(),header:None});
                         }
                     }
                 }

@@ -141,27 +141,49 @@ impl std::fmt::Display for IncompleteBody {
 }
 impl std::error::Error for IncompleteBody {}
 
+const READ_PROGRESS: Duration = Duration::from_secs(30);
+
+async fn receive_header(
+    r: &mut (impl AsyncRead + Unpin),
+    regtest: bool,
+    budget: Duration,
+) -> Result<(String, u64, Option<[u8; 4]>)> {
+    // An established peer may stay quiet between frames. Once its first byte
+    // arrives, the entire 24- or 44-byte header shares a single deadline.
+    let mut h = [0u8; 24];
+    h[0] = r.read_u8().await?;
+    let deadline = tokio::time::Instant::now() + budget;
+    tokio::time::timeout_at(deadline, r.read_exact(&mut h[1..]))
+        .await
+        .context("SV frame header timed out")??;
+    ensure!(h[..4] == magic(regtest), "SV peer network mismatch");
+    let cmd = command(&h[4..16])?;
+    let size = u32::from_le_bytes(h[16..20].try_into()?);
+    let checksum = h[20..24].try_into()?;
+    if cmd != "extmsg" {
+        return Ok((cmd.to_owned(), u64::from(size), Some(checksum)));
+    }
+    ensure!(
+        size == u32::MAX && checksum == [0; 4],
+        "invalid extmsg header"
+    );
+    let mut more = [0u8; 20];
+    tokio::time::timeout_at(deadline, r.read_exact(&mut more))
+        .await
+        .context("SV extended frame header timed out")??;
+    Ok((
+        command(&more[..12])?.to_owned(),
+        u64::from_le_bytes(more[12..].try_into()?),
+        None,
+    ))
+}
+
 async fn receive(
     r: &mut (impl AsyncRead + Unpin),
     regtest: bool,
     limit: usize,
 ) -> Result<(String, crate::body::BlockBody)> {
-    let mut h = [0u8; 24];
-    r.read_exact(&mut h).await?;
-    ensure!(h[..4] == magic(regtest), "SV peer network mismatch");
-    let mut cmd = command(&h[4..16])?.to_owned();
-    let mut n = u32::from_le_bytes(h[16..20].try_into()?) as u64;
-    let ext = cmd == "extmsg";
-    if ext {
-        ensure!(
-            n == u32::MAX as u64 && h[20..24] == [0; 4],
-            "invalid extmsg header"
-        );
-        let mut more = [0u8; 20];
-        r.read_exact(&mut more).await?;
-        cmd = command(&more[..12])?.to_owned();
-        n = u64::from_le_bytes(more[12..].try_into()?);
-    }
+    let (cmd, n, checksum) = receive_header(r, regtest, READ_PROGRESS).await?;
     let cap = if cmd == "block" {
         limit
     } else if cmd == "tx" {
@@ -194,7 +216,7 @@ async fn receive(
     while left != 0 {
         // A quiet peer may legitimately send no new message for a long time.
         // Once a header promises a body, require its stream to make progress.
-        let received = tokio::time::timeout(Duration::from_secs(30), input.read(&mut chunk))
+        let received = tokio::time::timeout(READ_PROGRESS, input.read(&mut chunk))
             .await
             .map_err(|_| failure(&prefix, format!("SV {cmd} stopped mid-message")))?
             .map_err(|e| failure(&prefix, format!("SV {cmd} read failed: {e}")))?;
@@ -215,7 +237,7 @@ async fn receive(
     let body = spool
         .finish()
         .map_err(|e| failure(&prefix, format!("SV {cmd} spool failed: {e}")))?;
-    if !ext && hash256(&body)[..4] != h[20..24] {
+    if checksum.is_some_and(|expected| hash256(&body)[..4] != expected) {
         return Err(failure(
             &prefix,
             format!("SV {cmd} message checksum mismatch"),
@@ -239,6 +261,41 @@ fn version(height: u32) -> Vec<u8> {
     raw.push(1);
     raw
 }
+async fn send_headers_reply(
+    w: &mut (impl AsyncWrite + Unpin),
+    regtest: bool,
+    state: &Mutex<Mining>,
+    mut locator: &[u8],
+) -> Result<()> {
+    wire::take(&mut locator, 4)?;
+    let n = wire::varint(&mut locator)?;
+    ensure!(
+        n <= 101 && locator.len() == 32 * (n + 1),
+        "invalid header locator"
+    );
+    let (ancestors, stop) = locator.split_at(n * 32);
+    let mut reply = vec![0];
+    {
+        let mining = state.lock().await;
+        if let Some(id) = mining.relayable_solution() {
+            let block = mining
+                .solution_bytes(&id)
+                .expect("selected stored solution");
+            let has_parent = ancestors
+                .as_chunks::<32>()
+                .0
+                .iter()
+                .any(|h| h == &block[4..36]);
+            if (stop == id || stop == [0; 32]) && (has_parent || (n == 0 && stop == id)) {
+                reply[0] = 1;
+                reply.extend(&block[..80]);
+                reply.push(0);
+            }
+        }
+    }
+    send(w, regtest, "headers", &reply).await
+}
+
 fn header_locator(parent: Hash) -> Vec<u8> {
     let mut locator = VERSION.to_le_bytes().to_vec();
     locator.push(1);
@@ -415,13 +472,8 @@ async fn session(
 ) -> Result<()> {
     let stream = tokio::time::timeout(Duration::from_secs(6), TcpStream::connect(addr)).await??;
     let (mut r, mut w) = stream.into_split();
-    send(
-        &mut w,
-        regtest,
-        "version",
-        &version(state.lock().await.height_hint()),
-    )
-    .await?;
+    let height = state.lock().await.height_hint();
+    send(&mut w, regtest, "version", &version(height)).await?;
     let (tx, mut rx) = mpsc::channel(2);
     // The reader owns each entire frame. A timer firing between header and
     // payload cannot cancel a partial read and lose framing.
@@ -517,20 +569,7 @@ async fn session(
                             send(&mut w, regtest, "getheaders", &header_locator(parent)).await?;
                         }}
                     "sendheaders" if handshake && body.is_empty()=>{prefers_headers=true;}
-                    "getheaders" if handshake=>{
-                        let mut locator=&body[..];wire::take(&mut locator,4)?;
-                        let n=wire::varint(&mut locator)?;ensure!(n<=101 && locator.len()==32*(n+1),"invalid header locator");
-                        let s=state.lock().await;
-                        let mut reply=vec![0];
-                        if let Some(id)=s.relayable_solution(){
-                            let b=s.solution_bytes(&id).expect("selected stored solution");
-                            let stop=&locator[n*32..];
-                            if (stop==id || stop==[0;32]) && (locator[..n*32].as_chunks::<32>().0.iter().any(|h|h==&b[4..36]) || (n==0 && stop==id)){
-                                reply[0]=1;reply.extend(&b[..80]);reply.push(0);
-                            }
-                        }
-                        send(&mut w,regtest,"headers",&reply).await?;
-                    }
+                    "getheaders" if handshake=>send_headers_reply(&mut w,regtest,state,&body).await?,
                     "headers" if handshake=>{
                         let mut input=&body[..];let n=wire::varint(&mut input)?;ensure!(n<=2000,"too many peer headers");
                         let mut headers=Vec::with_capacity(n);
@@ -682,6 +721,61 @@ mod frame_tests {
         assert_eq!(&extended[20..24], &[0; 4]);
         assert_eq!(command(&extended[24..36]).unwrap(), "block");
         assert_eq!(&extended[36..44], &(max + 1).to_le_bytes());
+    }
+
+    #[tokio::test]
+    async fn quiet_peer_can_start_an_extended_frame_after_the_header_budget() {
+        let budget = Duration::from_millis(40);
+        let (mut r, mut w) = tokio::io::duplex(64);
+        let size = u64::from(u32::MAX) + 1;
+        let (header, ()) = tokio::join!(receive_header(&mut r, true, budget), async {
+            tokio::time::sleep(budget * 2).await;
+            w.write_all(&frame_header(true, "block", size, [0; 4]))
+                .await
+                .unwrap();
+        });
+        assert_eq!(header.unwrap(), ("block".into(), size, None));
+    }
+
+    #[tokio::test]
+    async fn incomplete_standard_and_extended_headers_expire() {
+        let header = frame_header(true, "block", u64::from(u32::MAX) + 1, [0; 4]);
+        for (length, message) in [
+            (1, "SV frame header timed out"),
+            (30, "SV extended frame header timed out"),
+        ] {
+            let (mut r, mut w) = tokio::io::duplex(64);
+            w.write_all(&header[..length]).await.unwrap();
+            let err = tokio::time::timeout(
+                Duration::from_secs(2),
+                receive_header(&mut r, true, Duration::from_millis(30)),
+            )
+            .await
+            .unwrap()
+            .unwrap_err();
+            assert_eq!(err.to_string(), message);
+        }
+    }
+
+    #[tokio::test]
+    async fn a_pending_header_reply_releases_the_mining_state() {
+        let state = Mutex::new(Mining::new(true, vec![0x51]).unwrap());
+        let (mut reader, mut writer) = tokio::io::duplex(1);
+        let locator = header_locator([7; 32]);
+        let (sent, ()) = tokio::join!(
+            send_headers_reply(&mut writer, true, &state, &locator),
+            async {
+                let mut reply = vec![reader.read_u8().await.unwrap()];
+                assert!(state.try_lock().is_ok());
+                let mut rest = [0; 24];
+                reader.read_exact(&mut rest).await.unwrap();
+                reply.extend(rest);
+                let (command, body) = receive(&mut reply.as_slice(), true, 128).await.unwrap();
+                assert_eq!(command, "headers");
+                assert_eq!(&*body, &[0]);
+            }
+        );
+        sent.unwrap();
     }
 
     #[tokio::test]

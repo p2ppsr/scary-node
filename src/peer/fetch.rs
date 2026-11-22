@@ -108,6 +108,16 @@ impl Queue {
         (Self { schedule, ready }, inbox)
     }
 
+    // The queue remembers deliveries independently of the mining state's
+    // shorter body buffer. A known missing ancestor must be fetchable again.
+    pub fn forget_delivery(&self, hash: &str) {
+        self.schedule
+            .lock()
+            .expect("download schedule lock")
+            .delivered
+            .retain(|delivered| delivered != hash);
+    }
+
     pub fn offer(&self, request: Request) -> Result<()> {
         let mut schedule = self.schedule.lock().expect("download schedule lock");
         if schedule.delivered.contains(&request.hash) {
@@ -353,6 +363,46 @@ async fn worker(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_missing_ancestor_can_be_fetched_again_without_duplicating_pending_work() {
+        let (queue, mut ready) = Queue::channel(1);
+        let first = Request {
+            base: "first".into(),
+            height: 8,
+            hash: "ancestor".into(),
+            header: None,
+        };
+        let other = Request {
+            base: "second".into(),
+            ..first.clone()
+        };
+        queue
+            .schedule
+            .lock()
+            .unwrap()
+            .mark_delivered(first.hash.clone());
+        queue.offer(first.clone()).unwrap();
+        assert!(matches!(
+            ready.try_recv(),
+            Err(mpsc::error::TryRecvError::Empty)
+        ));
+
+        queue.forget_delivery(&first.hash);
+        queue.offer(first.clone()).unwrap();
+        queue.offer(other.clone()).unwrap();
+        queue.forget_delivery(&first.hash);
+        queue.offer(other).unwrap();
+        assert_eq!(ready.try_recv().unwrap(), first.hash);
+        assert!(matches!(
+            ready.try_recv(),
+            Err(mpsc::error::TryRecvError::Empty)
+        ));
+        let mut schedule = queue.schedule.lock().unwrap();
+        assert_eq!(schedule.next_source(&first.hash).unwrap().base, "first");
+        assert_eq!(schedule.next_source(&first.hash).unwrap().base, "second");
+        assert!(schedule.next_source(&first.hash).is_none());
+    }
 
     #[tokio::test]
     async fn a_rejected_body_leaves_other_sources_eligible() {
