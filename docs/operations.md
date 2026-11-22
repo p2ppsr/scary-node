@@ -105,3 +105,20 @@ Query an independent full node for the active hash at that height and its succes
 `--subtree-fetch-workers` controls how many announced subtrees can be read and checked concurrently. `--subtree-queue-capacity` controls the number of distinct roots waiting for a slot. The defaults are four reads and 256 waiting roots. A queued item holds its hash and up to three advertised sources. At most one body per active slot waits for admission. Each body is subject to the existing wire limit and spills to temporary storage above 1 MiB. Allow room for concurrent bodies on the node volume. The block-body fetch queue and its capacity are independent.
 
 The node checks each subtree’s Merkle root before admission, then processes roots in their original queue order. Within each root it applies the normal witnessed-input, script and directive checks to each payment. Under authenticated `GET /status`, the `peer` object gives the effective retrieval mode and configuration, announcement and queue-full counts, successfully processed and failed root counts, and processed bytes and transactions. A repeated root can appear in more than one notice. A processed transaction can be a duplicate or have an unknown input. Use `mining.peer_transaction_intake.teranode_subtree` for the number actually admitted. The queue counters reset with the process. [Signed inventory workload and comparison protocol](subtree-scheduler-study.md)
+
+## Connect a Stratum worker
+
+Use the Docker regtest first to exercise the complete worker protocol with disposable coins. For a configured mainnet node, prepare the maintained signed alert receiver and its authenticated loopback gateway. Select the coinbase locking script with your wallet and verify that the wallet controls it. Keep the operator, worker and gateway secrets in separate files readable by the node account. The gateway and the node must read the same operator token. [Receiver setup](chronicle-qualification.md#operating-the-signed-alert-receiver) · [Regtest worker](regtest.md)
+
+Set `OPERATOR_TOKEN_FILE`, `WORKER_PASSWORD_FILE` and `ALERT_TOKEN_FILE` to the absolute paths of the configured files. Set `PAYOUT_SCRIPT_HEX` to the hexadecimal locking script and `PUBLIC_ASSET_BASE` to the peer-reachable HTTP(S) URL ending in `/api/v1`. Bind the worker listener to the mining LAN address in `MINER_LAN_IP`. The default operator API stays on loopback.
+
+```sh
+./target/release/scary-node \
+  --operator-token-file "${OPERATOR_TOKEN_FILE:?}" --worker-password-file "${WORKER_PASSWORD_FILE:?}" \
+  --alert-service-url http://127.0.0.1:19366 --alert-token-file "${ALERT_TOKEN_FILE:?}" \
+  --stratum-bind "${MINER_LAN_IP:?}:3333" \
+  --asset-bind 0.0.0.0:9090 --asset-url "${PUBLIC_ASSET_BASE:?}" \
+  --payout-script "${PAYOUT_SCRIPT_HEX:?}"
+```
+
+On the ASIC, use `stratum+tcp://<mining-LAN-IP>:3333`, a worker name and the contents of the worker password file. Keep plaintext Stratum within the trusted LAN or encrypted tunnel. Query the authenticated operator endpoint for `mining.readiness_reasons`. Building current difficulty history, waiting for eligible payments, or recovering a signed sequence can all withhold work. Compare `highest_stored_sequence`, `last_applied` and the receiver’s reported sequence if an alert journal was restored. Preserve the original files and reconcile missing records with the signed receiver history. [Validation](validation.md) · [Deferred peer payments](early-peer-intake.md)

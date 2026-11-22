@@ -1,0 +1,38 @@
+name: Alpha checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alpha-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Replay the two-Teranode receipt
+        run: python3 regtest/verify_receipt.py docs/evidence/regtest-release.json
+      - name: Build the pinned native interpreter
+        run: ./scripts/build-bdk.sh
+      - name: Check the Rust node
+        run: |
+          rustup toolchain install 1.98.1 --profile minimal --component rustfmt,clippy
+          cargo fmt --all -- --check
+          cargo test --release --locked
+          cargo clippy --release --locked --all-targets -- -D warnings
+      - name: Check regtest drivers and qualification readers
+        run: |
+          python3 -m venv .native/py
+          .native/py/bin/pip install ecdsa==0.19.1 msgpack==1.1.2
+          .native/py/bin/python -m unittest discover -s regtest
+          .native/py/bin/python -m unittest discover -s qualification

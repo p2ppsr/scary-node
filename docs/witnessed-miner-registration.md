@@ -1,5 +1,7 @@
 # Witnessed miner origin under continuous native inventory
 
+**Study disposition.** The endorsed-funding run ended after an interruption. The reordered run completed. [Interruption record](endorsed-workload-interruption.md) · [Completed reordered result](witnessed-workload-results.md)
+
 ## Prospective registration
 
 Run two single-session arms, E then R, against the frozen Scary Node source `af9b605ad8da96d041a540111d46a7c0105209f7`. The Linux executable SHA-256 is `833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528`. The historical cold, uniformly spaced [native inventory control](sustained-native-replication.md) supplies a comparison. The [design and observed input ages](witnessed-miner-workload.md) explain why initial funding endorsement and subsequent input reuse deserve separate comparisons. One session per condition provides descriptive evidence for this finite input and schedule. Preserve both outcomes.

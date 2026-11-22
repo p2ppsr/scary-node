@@ -1,107 +1,51 @@
 # Scary Node
 
-Scary Node is an alpha Rust implementation of a BSV mining node. Its default command listens to the native Teranode peer network on BSV mainnet. An operator can enable block observation, submit signed spends of recently witnessed outputs and give a locally assembled block candidate to an ASIC over Stratum V1.
+Scary Node is an alpha Rust mining node for Bitcoin SV (BSV). It joins the native Teranode network, follows contemporary blocks and can give an ASIC a candidate over Stratum V1. The default command listens on mainnet. The included Docker lab lets you mine a block locally and ask two independently stored Teranodes what they accepted.
 
-The node starts with an empty working set. It sees an output created, observes other miners build on its block, and tracks subsequent spends on that branch. A confirmed output can fund a template after its creating block has a successor and the node has processed every intervening body. An eligible transaction can also fund a child later in the same template. Continued proof of work is the entrant’s basis for recognizing accepted history. Scary Node checks Chronicle-era ordinary spends with the shared BDK interpreter. Signed directives govern frozen outputs and authorized confiscations. [Validation model](docs/validation.md)
+## How can a miner start empty?
 
-## Listen on mainnet
+Suppose Alice receives an output in a block Scary Node sees. Another miner extends that block. If Scary Node has processed every intervening body on the selected branch, it knows Alice’s locking script, amount, creation height and whether the output has since been spent. It can check a signed payment from Alice against the shared BDK interpreter, account for the fee, and include the payment in a candidate. It can also include a child of an earlier validated transaction in that candidate.
 
-Install Rust 1.98.1 and the native build prerequisites. Rustup reads the repository toolchain pin. If a system package manager also supplies Cargo, run the explicit rustup command below or put the 1.98.1 toolchain first on your build path. The build fetches the pinned upstream interpreter and links it into the node. [Build and qualification](docs/chronicle-qualification.md)
+For an input created before entry, those facts may be unavailable. Scary Node leaves that spend out of its own work and reports unavailable checks as deferred on incoming blocks. Accepting the selected parent rests on subsequent proof of work and the effective signed directives. A violation confined to unwitnessed history can escape detection. The size of the usable set depends on which outputs people spend and how continuously the node observes the chain. [Validation rules](docs/validation.md) · [Two measured entry runs](docs/scenario-results.md)
+
+## Try it on regtest
+
+Clone the repository. To see what a solved block contains, replay a saved run with Python 3. This first check works offline from the checkout.
 
 ```sh
 git clone https://github.com/p2ppsr/scary-node.git
 cd scary-node
+python3 regtest/verify_receipt.py docs/evidence/regtest-release.json
+```
+
+To produce your own receipt, start Docker with Compose v2 and install Python 3 and an OpenSSL executable with secp256k1 support. The first build downloads the pinned native interpreter, Rust dependencies and reference images. Start from fresh lab volumes.
+
+```sh
+mkdir -p .regtest
+./regtest/up.sh
+./regtest/prove.sh > .regtest/receipt.json
+python3 regtest/verify_receipt.py .regtest/receipt.json
+./regtest/down.sh
+```
+
+The references mine the initial history while the entrant is offline. A funding block and its successor then make a signed payment eligible. A CPU worker solves Scary’s job. The live driver asks both Teranodes for the winning block, compares the bytes and waits for a successor. The offline verifier prints the solved hash, height and fee after checking the recorded headers, Merkle commitments, coinbase and peer body digests. Teardown removes this lab’s containers, networks and volumes. The receipt stays in `.regtest/`. [Lab procedure](docs/regtest.md)
+
+## Listen on mainnet
+
+A native build needs Rust 1.98.1 with rustup, Git, curl, CMake, Make, a C++20 compiler, Python 3 and Perl with shasum. Supported native build targets are Linux x86-64, Linux ARM64 and Apple Silicon. Run these commands from the checkout.
+
+```sh
 ./scripts/build-bdk.sh
 rustup run 1.98.1 cargo build --release --locked
 ./target/release/scary-node
 ```
 
-The node discovers the published Teranode mainnet bootstrap peers, subscribes to native status, block and subtree gossip, and prints peer and block observations. Startup and a connected peer are distinct events. Block announcements depend on network activity. Use the status API to inspect the process, and Ctrl-C to stop it.
+From a second terminal, run `curl -fsS http://127.0.0.1:8080/status` to inspect peer connections and the selected tip. Discovery and the next block announcement can take time. Stop with Ctrl-C. Add `--observe-bodies` to retrieve blocks and build witnessed state. Give different identities their own `--data-dir`. Use `--help` for static peers and network options. [Operator guide](docs/operations.md) · [Native build and provenance](docs/chronicle-qualification.md#build-the-interpreter)
 
-```sh
-curl -fsS http://127.0.0.1:8080/status
-./target/release/scary-node --help
-```
+## Connect a worker or explore the evidence
 
-Use repeated `--peer <multiaddr>` options to select specific peers. A peer identity is stored under `--data-dir`. The node checkpoints its witnessed branch, undo data, directive sequence and solved-block state. Use `--observe-bodies` to fetch and verify block bodies while listening. Network, API and asset configuration are documented in the [operator guide](docs/operations.md).
-
-To check what the node would mine while keeping the workstation passive, configure the signed alert receiver and start the node with `--shadow-log` and a payout script. Its journal records the selected parent, evidence available at that height, readiness decision and any unsigned template. The replay checks the recorded decisions against header work, the directive sequence and independent observations. [Observer setup](docs/chronicle-qualification.md#operating-the-signed-alert-receiver) · [Mainnet results and replay](docs/mainnet-shadow.md)
-
-## Demonstrate mining locally
-
-Install Docker with Compose v2, Python 3, and OpenSSL with secp256k1 support. The isolated lab contains Scary Node and two Teranode reference nodes. Run these commands in order.
-
-```sh
-./regtest/up.sh
-./regtest/prove.sh
-./regtest/down.sh
-```
-
-The references establish a chain before the empty-state entrant joins. One reference mines a fresh funding output and the other builds on it. The driver sends its signed child to Scary Node and uses a CPU Stratum worker to return valid regtest proof of work. Both Teranodes must adopt the exact solved block, serve its bytes, and agree on a successor. The lab prints a JSON receipt you can verify offline. [Regtest procedure](docs/regtest.md) · [Recorded runs and verification](docs/verification.md)
-
-## Follow a newcomer on an active chain
-
-The longer lab starts two Teranodes, circulates hundreds of signed payments among four wallets, and then brings up Scary Node on a fresh volume. An independent replay measures how many live outputs Rust learns and how many reference-block inputs it can check. The same sixteen payment accounts submit work at each of three Stratum rounds. Compare which offers Rust can mine, the size of its solved blocks, and what the reference miners do with the remaining offers.
-
-```sh
-./regtest/scenario.sh --seed 7 > scenario-7.json
-python3 regtest/verify_scenario.py scenario-7.json
-./regtest/scenario.sh --down
-```
-
-[Workload and reproduction](docs/scenario.md) · [Measured results](docs/scenario-results.md)
-
-## Compare stale blocks under equal work
-
-The race lab gives a Scary Node Stratum job and a full-state Teranode job one SHA256d attempt each per tick. They mine on the same parent with the same signed payment. An independent SV Node receives every discovery through a shared relay. The run records both candidates in a simultaneous discovery and checks which branch still holds after two successors.
-
-```sh
-./regtest/races.sh --seed 1701 --trials 128 > races-1701.json
-./regtest/races.sh --down
-```
-
-[Experimental design and reproduction](docs/races.md) · [Stale rates and uncertainty](docs/race-results.md)
-
-The native-receiver study also measures opportunities when a miner has no ready job and includes a full-state versus full-state control. Four paired engineering trials found that immediate SV publication reduced median solo submit-to-active readback from 533 ms to 46 ms. The preregistered evaluations measure stale rates and their uncertainty. The matched-ingress study additionally times native delivery to independent receivers and includes all registered opportunities. [Native propagation study](docs/production-cohort.md) · [Matched-ingress design and enrollment](docs/propagation-control.md)
-
-## Verify job and branch recovery
-
-The reliability proof submits an older Stratum job after a same-parent update, checks settlement on two Teranodes, and follows a short reorg while preserving the witnessed state it can still use. The larger matched-work sample also checks each locally solved block against its settlement ancestry.
-
-[Run the reliability proof and cohort](docs/reliability.md) · [Reliability results](docs/reliability-results.md)
-
-## Verify Chronicle validation and asset recovery
-
-Run the pinned Rust, Go and SV Node comparison, followed by the signed DAR lifecycle. The latter includes two Scary Node Stratum solutions, a process restart, maturity checks and a reorg. Run `regtest/mixed.sh` for independent SV Node and Teranode adoption, or `regtest/mixed.sh --stream sustained` to reproduce 24 mixed-network Stratum rounds. The four-store block replay covers 524,288 signed spends. The separate 30-minute lab uses native wallet connections and 300 scheduled mining opportunities. [Reproduction and production acceptance](docs/chronicle-qualification.md) · [Measured results](docs/chronicle-results.md) · [Native wallet and Stratum lab](docs/sustained-native-trial.md)
-
-To audit the original direct-wallet trial and inventory replication without running Docker, download the common signed source, each study’s selected block bodies and the inventory wallets’ request and delivery records. Through the five-minute drain, the four-node lab confirmed 1,143,159 of 5,529,600 offered payments, or 544.36 per second. The production-settings inventory replication confirmed all 5,529,600 at 3,037.51 per second, with zero entrant-issued jobs in its 225 slots. Offline replay verified every offered transaction ID and all Merkle roots across the 134 direct-wallet and 77 inventory-trial blocks. [Download the regtest wires](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1) · [Offline verification](docs/sustained-native-trial.md) · [Inventory replication and work availability](docs/sustained-native-replication.md)
-
-In the mixed-age workload, all four nodes reached the same final tip. The system confirmed 5,529,600 signed payments through two successors at **2,974.15 payments/s**, 16.02 seconds over the registered time allowed for 3,000/s. Scary originated a selected fee-paying block in every five-minute window. Its 29 primary blocks and one drain block contained **235,937 payments**. Four selected solutions had timed-out worker connections. A fresh stock SV Node and Teranode independently reproduced the selected ledger. [Results, full blocks and reproduction](docs/witnessed-workload-results.md) · [Publication timing and worker replies](docs/workload-publication-timing.md)
-
-## Point an ASIC at your node
-
-Set the payout locking script to an address you control. Run the node with a reachable advertised Asset URL so that peers can retrieve the block you announce. Enable the Stratum listener on a trusted mining LAN. Supply the payout script, public asset URL and credential-file paths. Configure the alert receiver and authenticated gateway first. [Receiver and operator procedure](docs/chronicle-qualification.md)
-
-```sh
-./target/release/scary-node \
-  --operator-token-file "$OPERATOR_TOKEN_FILE" --worker-password-file "$WORKER_PASSWORD_FILE" \
-  --alert-service-url http://127.0.0.1:19366 --alert-token-file "$ALERT_TOKEN_FILE" \
-  --stratum-bind 0.0.0.0:3333 \
-  --asset-bind 0.0.0.0:9090 \
-  --asset-url "$PUBLIC_ASSET_BASE" \
-  --payout-script "$PAYOUT_SCRIPT_HEX"
-```
-
-Configure the ASIC’s pool URL as `stratum+tcp://YOUR_NODE:3333`, enter a worker name and use the password from the worker credential file. Check authenticated `GET /status` for the selected tip, pending transactions and readiness reasons. Stock SV peers and native Teranode subtrees can supply eligible wallet payments. Scary retains a valid peer payment awaiting its witnessed funding block’s first successor and checks it again when the successor arrives. [Stock-node demonstration](docs/early-peer-intake.md)
-
-To supply your own test payment after entry, use a wallet you control to fund a P2PKH output and wait for the node to observe its block and a successor. In the wallet, sign a fee-paying child of that exact output with `SIGHASH_ALL | FORKID`, save its raw bytes to `child.tx`, and submit it to your node before broadcasting it elsewhere. See the [operator guide](docs/operations.md) for the admitted transaction format.
-
-```sh
-curl --fail-with-body --data-binary @child.tx \
-  -H "Authorization: Bearer $(cat "$OPERATOR_TOKEN_FILE")" \
-  -H 'Content-Type: application/octet-stream' http://127.0.0.1:8080/transactions
-```
-
-Inspect readiness before assigning work. On mainnet the node first needs contiguous difficulty history and an eligible transaction. Winning the network target requires real hashpower and is probabilistic. The independently reproducible block proof supplied with this release runs on regtest. [Protocol and peer interoperability](docs/protocol.md) · [Open BSV License](LICENSE)
+- **ASIC or pool operator.** Configure the authenticated alert receiver, payout locking script, worker credential and reachable read-only Asset endpoint. The operator guide gives the node command, ASIC settings and readiness checks. [Connect a Stratum worker](docs/operations.md#connect-a-stratum-worker)
+- **Protocol or consensus engineer.** Follow a payment through admission, block assembly, a short reorg and settlement. Compare funded Chronicle transactions and recovered assets with the pinned reference implementations. [Guide to the evidence](docs/README.md)
+- **Contributor.** Report a reproducible discrepancy, improve a guide or submit a patch. The contributor guide lists the fast checks, source layout and information that helps others reproduce a result. [Contributing](CONTRIBUTING.md) · [Open BSV License](LICENSE)
 
 **This is alpha-quality proof-of-concept software.**

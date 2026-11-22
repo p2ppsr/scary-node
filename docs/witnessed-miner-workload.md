@@ -1,5 +1,7 @@
 # Measuring sustained witnessed-miner work
 
+The design below preceded the experiments. Read the [mixed-age results](witnessed-workload-results.md), [interrupted endorsed run](endorsed-workload-interruption.md) and [cold-funding result](cold-workload-results.md) for what actually happened.
+
 ## Two comparisons with the same signed payments
 
 The [production-settings replication](sustained-native-replication.md) supplied a baseline for four-node receipt and validation. Its 5,529,600 selected payments included 614,400 same-block spends, 4,915,200 spends of the immediately preceding block, and zero older confirmed parents. The [signed-input replay](evidence/chronicle-sustained-inventory-parent-ages.json) measured these counts. It raised a different question for a miner: can the entrant regularly issue nonempty work and settle its solutions under continuous native ingress? Two additional comparisons can separate the age of the initial funding from subsequent reuse. These are proposed experiments. Each needs a published registration covering its exact source order, software, setup, opportunity schedule, endpoints, acceptance and stopping rules before measurement.
