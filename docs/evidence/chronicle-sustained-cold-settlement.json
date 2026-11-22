@@ -1,0 +1,145 @@
+{
+  "arm": "cold",
+  "start_wall_ns": 1795324245852904708,
+  "last_offer": {
+    "phase": "offer",
+    "position": 10799,
+    "batch": 10799,
+    "count": 512,
+    "sender": 3,
+    "scheduled_ns": 1799833333333,
+    "started_ns": 1799879503167,
+    "finished_ns": 1799880006500,
+    "outcome": "sent"
+  },
+  "first_sample_with_all_wallet_transfers_served": {
+    "elapsed_ns": 1800085364167,
+    "requests": 5529600,
+    "served": 5529600,
+    "unknown_requests": 0,
+    "unique_requested": 5529600,
+    "unique_served": 5529600,
+    "served_wire_bytes": 1235835697
+  },
+  "readvertisement_batches": 0,
+  "readvertisement_entries": 0,
+  "first_readvertisement": null,
+  "last_readvertisement": null,
+  "final_wallet_counters": {
+    "requests": 5529600,
+    "served": 5529600,
+    "unknown_requests": 0,
+    "unique_requested": 5529600,
+    "unique_served": 5529600,
+    "served_wire_bytes": 1235835697,
+    "requested_bits_sha256": "d8fe867972d99f97a1a1501bc6092efc8971aed3e953fed4a17a6120eb5f2518",
+    "served_bits_sha256": "d8fe867972d99f97a1a1501bc6092efc8971aed3e953fed4a17a6120eb5f2518"
+  },
+  "last_payment_and_successors": [
+    {
+      "height": 559,
+      "hash": "6b883123f701f935d1cf62aec2bcb0aab0bcc270ac6b6109965d35b62341934a",
+      "payments": 71680,
+      "wire_bytes": 14300136,
+      "matching_wire_reads": {
+        "sv": "966aa28b022e97a293686b818c2ad15c663a11f1c5c699b127d700cf58521d32",
+        "tn1": "966aa28b022e97a293686b818c2ad15c663a11f1c5c699b127d700cf58521d32",
+        "tn2": "966aa28b022e97a293686b818c2ad15c663a11f1c5c699b127d700cf58521d32"
+      },
+      "first_sampled_tip_ns": {
+        "sv": 1802343822250,
+        "tn1": 1803355512542,
+        "tn2": 1803358070167,
+        "scary": 1807005868417
+      },
+      "completed_body_audit_ns": 1809824660500,
+      "scheduled_solution_slot": 299,
+      "independent_wire_read": {
+        "sv": {
+          "start_ns": 1807528314792,
+          "end_ns": 1809154820583
+        },
+        "tn1": {
+          "start_ns": 1807534327000,
+          "end_ns": 1807712263833
+        },
+        "tn2": {
+          "start_ns": 1807536554875,
+          "end_ns": 1807676126875
+        }
+      },
+      "prepared_worker_attempts": []
+    },
+    {
+      "height": 560,
+      "hash": "08ff4d4d143b8840fd0cfd91b0db8ae39658b573e605413ce4e76dc865ff773c",
+      "payments": 0,
+      "wire_bytes": 181,
+      "matching_wire_reads": {
+        "sv": "00ad2e145d086f4d773174822c32f43ee9367fc1189519d0b427e0d11a2c6ecb",
+        "tn1": "00ad2e145d086f4d773174822c32f43ee9367fc1189519d0b427e0d11a2c6ecb",
+        "tn2": "00ad2e145d086f4d773174822c32f43ee9367fc1189519d0b427e0d11a2c6ecb"
+      },
+      "first_sampled_tip_ns": {
+        "sv": 1813217843833,
+        "tn1": 1813221276417,
+        "tn2": 1813223617542,
+        "scary": 1814889561583
+      },
+      "completed_body_audit_ns": 1815569286042,
+      "scheduled_solution_slot": 301,
+      "independent_wire_read": {
+        "sv": {
+          "start_ns": 1815272412333,
+          "end_ns": 1815543135458
+        },
+        "tn1": {
+          "start_ns": 1815277358750,
+          "end_ns": 1815285742542
+        },
+        "tn2": {
+          "start_ns": 1815278192917,
+          "end_ns": 1815282713292
+        }
+      },
+      "prepared_worker_attempts": []
+    },
+    {
+      "height": 561,
+      "hash": "6a80d4b8af5ee05d6aeb1789622152371c557c1b3d330dbccbad8b10aea03ca7",
+      "payments": 0,
+      "wire_bytes": 181,
+      "matching_wire_reads": {
+        "sv": "67358c36b8bc093ce623e0506ce4498520aa3c1b9806e49426b0c7a0c604a2a0",
+        "tn1": "67358c36b8bc093ce623e0506ce4498520aa3c1b9806e49426b0c7a0c604a2a0",
+        "tn2": "67358c36b8bc093ce623e0506ce4498520aa3c1b9806e49426b0c7a0c604a2a0"
+      },
+      "first_sampled_tip_ns": {
+        "sv": 1819222048667,
+        "tn1": 1819226078458,
+        "tn2": 1819232177750,
+        "scary": 1820505274792
+      },
+      "completed_body_audit_ns": 1821163173583,
+      "scheduled_solution_slot": 302,
+      "independent_wire_read": {
+        "sv": {
+          "start_ns": 1820957292875,
+          "end_ns": 1821162297583
+        },
+        "tn1": {
+          "start_ns": 1820962175208,
+          "end_ns": 1820964463917
+        },
+        "tn2": {
+          "start_ns": 1820957518292,
+          "end_ns": 1820964751292
+        }
+      },
+      "prepared_worker_attempts": []
+    }
+  ],
+  "primary_close_ns": 1821309198375,
+  "full_denominator_seconds": 1821.309198375,
+  "confirmed_payments_per_second": 3036.0578011320613
+}

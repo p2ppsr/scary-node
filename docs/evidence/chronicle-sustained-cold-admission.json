@@ -1,0 +1,242 @@
+{
+  "arm": "cold",
+  "registration": "44e4d8eab6aab427453b23e1f7f098a9ba36d2fe",
+  "observations": 1478,
+  "intervals": [
+    {
+      "phase": "offer",
+      "nominal_start_ns": 0,
+      "nominal_end_ns": 300000000000,
+      "first_entrant_read_ns": 1063195000,
+      "last_entrant_read_ns": 299351553083,
+      "endpoint_heights": [
+        484,
+        496
+      ],
+      "new_observations": 249,
+      "counter_decreases": [],
+      "changes": {
+        "sv": {
+          "awaiting_successor": 801919,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 773317,
+          "admitted": 0,
+          "duplicate": 228,
+          "ineligible": 113306
+        },
+        "teranode_subtree": {
+          "awaiting_successor": 14446,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 13115,
+          "admitted": 0,
+          "duplicate": 1589920,
+          "ineligible": 169688
+        }
+      }
+    },
+    {
+      "phase": "offer",
+      "nominal_start_ns": 300000000000,
+      "nominal_end_ns": 600000000000,
+      "first_entrant_read_ns": 299351553083,
+      "last_entrant_read_ns": 599347708125,
+      "endpoint_heights": [
+        496,
+        508
+      ],
+      "new_observations": 247,
+      "counter_decreases": [],
+      "changes": {
+        "sv": {
+          "awaiting_successor": 808618,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 773760,
+          "admitted": 0,
+          "duplicate": 599,
+          "ineligible": 112658
+        },
+        "teranode_subtree": {
+          "awaiting_successor": 11369,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 12672,
+          "admitted": 0,
+          "duplicate": 1635929,
+          "ineligible": 64806
+        }
+      }
+    },
+    {
+      "phase": "offer",
+      "nominal_start_ns": 600000000000,
+      "nominal_end_ns": 900000000000,
+      "first_entrant_read_ns": 599347708125,
+      "last_entrant_read_ns": 899336273417,
+      "endpoint_heights": [
+        508,
+        521
+      ],
+      "new_observations": 237,
+      "counter_decreases": [],
+      "changes": {
+        "sv": {
+          "awaiting_successor": 803407,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 838195,
+          "admitted": 0,
+          "duplicate": 486,
+          "ineligible": 118219
+        },
+        "teranode_subtree": {
+          "awaiting_successor": 15793,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 13773,
+          "admitted": 0,
+          "duplicate": 1588499,
+          "ineligible": 1314
+        }
+      }
+    },
+    {
+      "phase": "offer",
+      "nominal_start_ns": 900000000000,
+      "nominal_end_ns": 1200000000000,
+      "first_entrant_read_ns": 899336273417,
+      "last_entrant_read_ns": 1199409944500,
+      "endpoint_heights": [
+        521,
+        533
+      ],
+      "new_observations": 247,
+      "counter_decreases": [],
+      "changes": {
+        "sv": {
+          "awaiting_successor": 805279,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 771999,
+          "admitted": 0,
+          "duplicate": 922,
+          "ineligible": 115399
+        },
+        "teranode_subtree": {
+          "awaiting_successor": 13921,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 14433,
+          "admitted": 0,
+          "duplicate": 1655555,
+          "ineligible": 1668
+        }
+      }
+    },
+    {
+      "phase": "offer",
+      "nominal_start_ns": 1200000000000,
+      "nominal_end_ns": 1500000000000,
+      "first_entrant_read_ns": 1199409944500,
+      "last_entrant_read_ns": 1499468572833,
+      "endpoint_heights": [
+        533,
+        546
+      ],
+      "new_observations": 241,
+      "counter_decreases": [],
+      "changes": {
+        "sv": {
+          "awaiting_successor": 808759,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 839144,
+          "admitted": 0,
+          "duplicate": 301,
+          "ineligible": 113052
+        },
+        "teranode_subtree": {
+          "awaiting_successor": 11465,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 12824,
+          "admitted": 0,
+          "duplicate": 1609746,
+          "ineligible": 9035
+        }
+      }
+    },
+    {
+      "phase": "offer",
+      "nominal_start_ns": 1500000000000,
+      "nominal_end_ns": 1800000000000,
+      "first_entrant_read_ns": 1499468572833,
+      "last_entrant_read_ns": 1799324126875,
+      "endpoint_heights": [
+        546,
+        558
+      ],
+      "new_observations": 240,
+      "counter_decreases": [],
+      "changes": {
+        "sv": {
+          "awaiting_successor": 800147,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 770274,
+          "admitted": 0,
+          "duplicate": 450,
+          "ineligible": 119576
+        },
+        "teranode_subtree": {
+          "awaiting_successor": 18029,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 16158,
+          "admitted": 0,
+          "duplicate": 1445041,
+          "ineligible": 208010
+        }
+      }
+    },
+    {
+      "phase": "drain",
+      "nominal_start_ns": 1800000000000,
+      "nominal_end_ns": null,
+      "first_entrant_read_ns": 1799324126875,
+      "last_entrant_read_ns": 1821344542625,
+      "endpoint_heights": [
+        558,
+        561
+      ],
+      "new_observations": 16,
+      "counter_decreases": [],
+      "changes": {
+        "sv": {
+          "awaiting_successor": 0,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 63488,
+          "admitted": 0,
+          "duplicate": 0,
+          "ineligible": 3072
+        },
+        "teranode_subtree": {
+          "awaiting_successor": 0,
+          "promoted_after_successor": 0,
+          "discarded_after_recheck": 2048,
+          "admitted": 0,
+          "duplicate": 0,
+          "ineligible": 6144
+        }
+      }
+    }
+  ],
+  "full_sampled_changes": {
+    "sv": {
+      "awaiting_successor": 4828129,
+      "promoted_after_successor": 0,
+      "discarded_after_recheck": 4830177,
+      "admitted": 0,
+      "duplicate": 2986,
+      "ineligible": 695282
+    },
+    "teranode_subtree": {
+      "awaiting_successor": 85023,
+      "promoted_after_successor": 0,
+      "discarded_after_recheck": 85023,
+      "admitted": 0,
+      "duplicate": 9524690,
+      "ineligible": 460665
+    }
+  }
+}
