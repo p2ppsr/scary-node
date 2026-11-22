@@ -1,0 +1,120 @@
+{
+  "arm": "reordered",
+  "start_wall_ns": 1795313891637075417,
+  "last_offer": {
+    "phase": "offer",
+    "position": 10799,
+    "batch": 10799,
+    "count": 512,
+    "sender": 3,
+    "scheduled_ns": 1799833333333,
+    "started_ns": 1799874515958,
+    "finished_ns": 1799875028708,
+    "outcome": "sent"
+  },
+  "first_sample_with_all_wallet_transfers_served": {
+    "elapsed_ns": 1800078750708,
+    "requests": 5529600,
+    "served": 5529600,
+    "unknown_requests": 0,
+    "unique_requested": 5529600,
+    "unique_served": 5529600,
+    "served_wire_bytes": 1235835697
+  },
+  "readvertisement_batches": 83,
+  "readvertisement_entries": 42496,
+  "first_readvertisement": {
+    "phase": "rebroadcast",
+    "position": null,
+    "batch": 10467,
+    "count": 512,
+    "sender": 3,
+    "scheduled_ns": 1818409180375,
+    "started_ns": 1818453844083,
+    "finished_ns": 1818461293833,
+    "outcome": "sent"
+  },
+  "last_readvertisement": {
+    "phase": "rebroadcast",
+    "position": null,
+    "batch": 10741,
+    "count": 512,
+    "sender": 1,
+    "scheduled_ns": 1850380836583,
+    "started_ns": 1850606508042,
+    "finished_ns": 1850607167917,
+    "outcome": "sent"
+  },
+  "final_wallet_counters": {
+    "requests": 5920110,
+    "served": 5917038,
+    "unknown_requests": 0,
+    "unique_requested": 5529600,
+    "unique_served": 5529600,
+    "served_wire_bytes": 1322425742,
+    "requested_bits_sha256": "d8fe867972d99f97a1a1501bc6092efc8971aed3e953fed4a17a6120eb5f2518",
+    "served_bits_sha256": "d8fe867972d99f97a1a1501bc6092efc8971aed3e953fed4a17a6120eb5f2518"
+  },
+  "last_payment_and_successors": [
+    {
+      "height": 578,
+      "hash": "0cb16457d2911b2b39ca981689307b045748de07a3f40c8465a0d8407d632d39",
+      "payments": 66432,
+      "wire_bytes": 13253054,
+      "matching_wire_reads": {
+        "sv": "845d79b86ea69917b8648fff822c97e3342773dbabba98ac745ab441dbd94d10",
+        "tn1": "845d79b86ea69917b8648fff822c97e3342773dbabba98ac745ab441dbd94d10",
+        "tn2": "845d79b86ea69917b8648fff822c97e3342773dbabba98ac745ab441dbd94d10"
+      },
+      "first_sampled_tip_ns": {
+        "sv": 1831811877750,
+        "tn1": 1831854125500,
+        "tn2": 1831878107792,
+        "scary": 1846679688292
+      },
+      "completed_body_audit_ns": 1850609520875,
+      "scheduled_solution_slot": 303
+    },
+    {
+      "height": 579,
+      "hash": "1562cc47e623b7e52d9d018a36ecd8f729cf3b63aec3972cdb84bad472cd7e9b",
+      "payments": 0,
+      "wire_bytes": 181,
+      "matching_wire_reads": {
+        "sv": "60c03289a6d241757be36372d6ebcee3fddc7b45a7472663b7cfbb70632909e5",
+        "tn1": "60c03289a6d241757be36372d6ebcee3fddc7b45a7472663b7cfbb70632909e5",
+        "tn2": "60c03289a6d241757be36372d6ebcee3fddc7b45a7472663b7cfbb70632909e5"
+      },
+      "first_sampled_tip_ns": {
+        "sv": 1850601062500,
+        "tn1": 1850607175000,
+        "tn2": 1850611173083,
+        "scary": 1855888874792
+      },
+      "completed_body_audit_ns": 1857701305708,
+      "scheduled_solution_slot": 307
+    },
+    {
+      "height": 580,
+      "hash": "5754c4a0292ba4c9ea34bb59f721b7b28e39d5806300681823f305890e8783b4",
+      "payments": 0,
+      "wire_bytes": 181,
+      "matching_wire_reads": {
+        "sv": "89cb7c3b7c75288044b1acb3d224f5be7417fbb3a5feab74ea7a91353c3f0115",
+        "tn1": "89cb7c3b7c75288044b1acb3d224f5be7417fbb3a5feab74ea7a91353c3f0115",
+        "tn2": "89cb7c3b7c75288044b1acb3d224f5be7417fbb3a5feab74ea7a91353c3f0115"
+      },
+      "first_sampled_tip_ns": {
+        "sv": 1856446116375,
+        "tn1": 1856450388125,
+        "tn2": 1856453719875,
+        "scary": 1857578576583
+      },
+      "completed_body_audit_ns": 1859155111583,
+      "scheduled_solution_slot": 308
+    }
+  ],
+  "primary_close_ns": 1859220269000,
+  "full_denominator_seconds": 1859.220269,
+  "confirmed_payments_per_second": 2974.150019875886
+}

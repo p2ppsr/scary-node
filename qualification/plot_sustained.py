@@ -112,7 +112,7 @@ def plot(receipt, stock_rows, output):
     )
     ax.text(
         30.3,
-        0.91,
+        0.78,
         "Drain",
         transform=ax.get_xaxis_transform(),
         fontsize=9,

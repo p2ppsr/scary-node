@@ -1,0 +1,24 @@
+{
+  "arm": "reordered",
+  "registration": "d2507fa8954f3da784316cd09e4ec2835ba806ea",
+  "release_sha256": "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528",
+  "start_wall_ns": 1795313891637075417,
+  "sampled_wall_ns": 1795313992085834000,
+  "host": {
+    "cpu": "Apple M3 Max",
+    "physical_cores": 16,
+    "logical_cores": 16,
+    "memory_bytes": 137438953472,
+    "os": "macOS",
+    "os_version": "27.2",
+    "architecture": "arm64"
+  },
+  "docker": {
+    "server_version": "27.3.1",
+    "vcpus": 16,
+    "memory_bytes": 102380195840,
+    "architecture": "aarch64",
+    "kernel": "6.10.14-linuxkit",
+    "storage_driver": "overlayfs"
+  }
+}
