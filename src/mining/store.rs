@@ -78,8 +78,19 @@ fn write_checkpoint(out: &mut impl Write, state: &impl Serialize) -> Result<()> 
 impl Mining {
     pub fn open_store(&mut self, dir: &Path) -> Result<()> {
         let file = dir.join("witness.state");
-        if file.exists() {
-            let mut reader = BufReader::new(File::open(&file)?);
+        let checkpoint = match fs::symlink_metadata(&file) {
+            Ok(entry) => {
+                ensure!(
+                    entry.is_file() || (entry.is_symlink() && fs::metadata(&file)?.is_file()),
+                    "witness checkpoint must be a regular file"
+                );
+                Some(File::open(&file)?)
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+            Err(e) => return Err(e.into()),
+        };
+        if let Some(checkpoint) = checkpoint {
+            let mut reader = BufReader::new(checkpoint);
             let size = reader.get_ref().metadata()?.len();
             ensure!(size >= 40, "short witness checkpoint");
             let mut magic = [0; 8];
@@ -95,7 +106,9 @@ impl Mining {
                 "witness checkpoint digest mismatch"
             );
             reader.seek(SeekFrom::Start(8))?;
-            let mut restored: Self = rmp_serde::from_read(reader.take(n))?;
+            let mut payload = reader.take(n);
+            let mut restored: Self = rmp_serde::from_read(&mut payload)?;
+            ensure!(payload.limit() == 0, "trailing data in witness checkpoint");
             ensure!(
                 restored.regtest == self.regtest,
                 "checkpoint is for a different network"
@@ -190,7 +203,15 @@ impl Mining {
         );
         let result = (|| -> Result<()> {
             let tmp = dir.join("witness.next");
-            let mut file = File::create(&tmp)?;
+            let mut file = match File::create_new(&tmp) {
+                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                    // After an interrupted save, replace the directory entry without
+                    // truncating the inode it happens to reference.
+                    fs::remove_file(&tmp)?;
+                    File::create_new(&tmp)?
+                }
+                result => result?,
+            };
             write_checkpoint(&mut file, self)?;
             file.sync_all()?;
             fs::rename(tmp, dir.join("witness.state"))?;
@@ -361,5 +382,43 @@ mod writer_tests {
         let mut reopened = Mining::new(true, vec![0x51]).unwrap();
         reopened.open_store(scratch.path()).unwrap();
         assert_eq!(reopened.accepted_shares, 32);
+    }
+
+    #[test]
+    fn refuses_an_authenticated_payload_with_trailing_data() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut state = Mining::new(true, vec![]).unwrap();
+        let mut payload = rmp_serde::to_vec_named(&state).unwrap();
+        payload.push(0xc0); // A complete second MessagePack value.
+        let file = [MAGIC.as_slice(), &payload, &Sha256::digest(&payload)].concat();
+        fs::write(dir.path().join("witness.state"), file).unwrap();
+        let err = state.open_store(dir.path()).unwrap_err();
+        assert!(err.to_string().contains("trailing data"));
+        assert!(state.path.is_none());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn refuses_unreadable_boundaries_and_replaces_stale_temporary_entries() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("witness.state");
+        let mut state = Mining::new(true, vec![]).unwrap();
+        std::os::unix::fs::symlink(dir.path().join("missing"), &path).unwrap();
+        assert!(state.open_store(dir.path()).is_err());
+        assert!(state.path.is_none());
+        fs::remove_file(&path).unwrap();
+        state.open_store(dir.path()).unwrap();
+        state.accepted_shares = 17;
+        state.save().unwrap();
+        let preserved = dir.path().join("archived.state");
+        fs::hard_link(&path, &preserved).unwrap();
+        fs::hard_link(&path, dir.path().join("witness.next")).unwrap();
+        let before = fs::read(&preserved).unwrap();
+        state.accepted_shares = 18;
+        state.save().unwrap();
+        assert_eq!(fs::read(&preserved).unwrap(), before);
+        let mut restored = Mining::new(true, vec![]).unwrap();
+        restored.open_store(dir.path()).unwrap();
+        assert_eq!(restored.accepted_shares, 18);
     }
 }
