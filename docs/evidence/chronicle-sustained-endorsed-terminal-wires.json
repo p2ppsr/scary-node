@@ -1,0 +1,24 @@
+{
+  "stock_sibling_heights": [
+    486,
+    487,
+    491
+  ],
+  "stock_sibling_bytes": 63671832,
+  "exact_sibling_reads": 9,
+  "candidate_bytes": {
+    "tn1": 9805475,
+    "tn2": 9805475
+  },
+  "ordinary_per_candidate": {
+    "tn1": 49151,
+    "tn2": 49151
+  },
+  "candidate_membership_intersection": 49151,
+  "same_order": false,
+  "payments_at_the_same_position": 20,
+  "in_original_stock_mempool": {
+    "tn1": 49151,
+    "tn2": 49151
+  }
+}
