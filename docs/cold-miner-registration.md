@@ -26,3 +26,15 @@ python3 qualification/workload_worker_headers.py .native/cold-changed-run/receip
 ```
 
 The host monotonic clock also records the interval from a worker’s connection attempt through completion of Stratum setup, the interval from its submit call through a response or error, and the start and finish of each stock node’s complete body read. Each stock read includes any retries within that request. The driver retains the group audit completion after decoding, membership accounting and writes. These fields distinguish worker response time, sampled tip selection and body retrieval on a common clock. Earlier receipts preserve their original timestamp resolution.
+
+### A selected block after the worker loses its connection
+
+In a separate live regtest on release `5148c31`, stock SV Node v1.2.3 relayed one signed payment. A loopback relay forwarded the worker’s real `mining.submit` to Scary Node and closed the response path to the worker. The worker reported `Stratum session closed`. The node returned a positive response to the relay. Stock SV Node selected the resulting 399-byte block, served its two transactions, and mined a successor on that exact hash. The coinbase included the payment’s 1,100-satoshi fee. Both the worker error and the active-chain inclusion belong in the result. This test exercises one response-path failure on regtest. [Worker job, forwarded submission, stock block and successor](evidence/chronicle-stratum-lost-reply.json)
+
+Replay the public receipt with the qualification Python environment. The verifier rebuilds the header from the recorded job, matches the forwarded nonce, checks the payment signature and fee, and verifies the selected block and successor. The second command recreates the live test with Docker and the archive-built macOS or Linux executable.
+
+```sh
+.native/py/bin/python qualification/verify_peer_intake.py docs/evidence/chronicle-stratum-lost-reply.json
+.native/py/bin/python qualification/sv_transaction_intake.py .native/stratum-lost-reply.json \
+  --binary target/release/scary-node --lose-worker-reply
+```

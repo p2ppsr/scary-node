@@ -61,7 +61,7 @@ def worker_without_job(port):
         }
 
 
-def run(binary, directory, early=None):
+def run(binary, directory, early=None, *, lose_worker_reply=False):
     with (
         Reference().running(peer=True, fast_rpc=True) as full,
         contextlib.ExitStack() as life,
@@ -218,11 +218,22 @@ def run(binary, directory, early=None):
         else:
             assert after["sv"]["admitted"] == before["sv"]["admitted"] + 1
         assert after["teranode_subtree"] == before["teranode_subtree"]
-        with stratum_job(parent, payment, worker, port, "sv-relayed-payment") as job:
-            solution = nonce(job)
-            header = job.header(solution)
-            solved_hash = dsha(header)[::-1].hex()
-            assert job.submit_native(solution)
+        reply_loss = {}
+        if lose_worker_reply:
+            from workload_reply_loss import submit_without_reply
+
+            reply_loss = submit_without_reply(parent, worker)
+            candidate = reply_loss["slot"]["worker_candidate"]
+            header = bytes.fromhex(candidate["header"])
+            solved_hash = candidate["hash"]
+        else:
+            with stratum_job(
+                parent, payment, worker, port, "sv-relayed-payment"
+            ) as job:
+                solution = nonce(job)
+                header = job.header(solution)
+                solved_hash = dsha(header)[::-1].hex()
+                assert job.submit_native(solution)
         until(
             lambda: full.rpc("getbestblockhash") == solved_hash,
             "SV selected Stratum block",
@@ -256,6 +267,7 @@ def run(binary, directory, early=None):
         assert full.rpc("getblock", successor)["previousblockhash"] == solved_hash
         return {
             **({"early_offer": early_record, "result": "selected"} if early else {}),
+            **({"reply_loss": reply_loss} if reply_loss else {}),
             "network": "regtest",
             "reference": IMAGE,
             "binary_sha256": binary_sha256,
@@ -291,7 +303,19 @@ if __name__ == "__main__":
         choices=["baseline", "reconsidered"],
         help="offer the payment before its parent gains a successor",
     )
+    p.add_argument(
+        "--lose-worker-reply",
+        action="store_true",
+        help="close the worker response path after forwarding mining.submit",
+    )
     args = p.parse_args()
+    if args.lose_worker_reply and args.early == "baseline":
+        p.error("the withheld early-offer control has no eligible job to submit")
     with session_lock(), tempfile.TemporaryDirectory() as directory:
-        receipt = run(args.binary, Path(directory), args.early)
+        receipt = run(
+            args.binary,
+            Path(directory),
+            args.early,
+            lose_worker_reply=args.lose_worker_reply,
+        )
     args.receipt.write_text(json.dumps(receipt, indent=2) + "\n")

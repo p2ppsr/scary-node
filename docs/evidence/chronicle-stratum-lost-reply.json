@@ -1,0 +1,108 @@
+{
+  "reply_loss": {
+    "slot": {
+      "index": 0,
+      "phase": "offer",
+      "miner": "scary",
+      "ready": true,
+      "parent": "5114f5dbb9b8d6cd499e7bb3900c76dab802b0ccc1aa6cbd1fe0ef2dbb4e62e6",
+      "worker_candidate": {
+        "notify": [
+          "5",
+          "bb4e62e61fe0ef2dc1aa6cbdb802b0cc900c76da499e7bb3b9b8d6cd5114f5db",
+          "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff39016c08",
+          "0c2f73636172792d6e6f64652f202a963de3f94f558ba9d89cb0755fd6a1a39e62cdb06f82171571a9bd7261535affffffff014cf6052a01000000015100000000",
+          [
+            "db0649dad77b0b14e87ea16fc98e1b53bfee729592209f48875f3833f23ba2e2"
+          ],
+          "20000000",
+          "207fffff",
+          "6b025e1b",
+          true
+        ],
+        "extranonce1": "00000001",
+        "extranonce2": "00000000",
+        "header": "00000020e6624ebb2defe01fbd6caac1ccb002b8da760c90b37b9e49cdd6b8b9dbf514514b0d5e15ba949d2a0b717f1713ec966ffbc248ef42a7f848ae24d0383703d7711b5e026bffff7f2000000000",
+        "hash": "601cf30a2bb6ad52fe31e817a7320100376f576674ea4383bbd0fd6009edd61f"
+      },
+      "outcome": "error",
+      "error": "Stratum session closed"
+    },
+    "forwarded_submit": {
+      "id": 4,
+      "method": "mining.submit",
+      "params": [
+        "sustained-native",
+        "5",
+        "00000000",
+        "6b025e1b",
+        "00000000"
+      ]
+    },
+    "upstream_reply": {
+      "error": null,
+      "id": 4,
+      "result": true
+    }
+  },
+  "network": "regtest",
+  "reference": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "binary_sha256": "1c653db328c8c5af9b49dc9b1939fb320611097c507be7bac35449f668ced1ef",
+  "source": "Stock SV Node received sendrawtransaction and delivered the payment over the entrant\u2019s only SV connection.",
+  "peer_intake_before": {
+    "sv": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    },
+    "teranode_subtree": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    }
+  },
+  "peer_intake_after": {
+    "sv": {
+      "admitted": 1,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    },
+    "teranode_subtree": {
+      "admitted": 0,
+      "awaiting_successor": 0,
+      "discarded_after_recheck": 0,
+      "duplicate": 0,
+      "ineligible": 0,
+      "promoted_after_successor": 0
+    }
+  },
+  "funding_txid": "5d73774ef12c1a5cd429d08634becdf0ce57bc6ed664e621d7723cb84940b4f1",
+  "funding_hex": "0100000001379b34e160316499f0be39df3509e44b96e9912195c71ec38a8683da5bd7a4e10000000049483045022100a4998ab640aa95ec1cf21844756742390be4e5911e5c7b228383150ee62439af022004a238436e765916019a13eba77e4f57bf5c58fc05b1a0a048cb674a25713a4d41ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a91496b890e460a29d9fdfbf8cdf2507780fe11e63a788ac00000000",
+  "witnessed_funding_block": "0298b8b1a7bdcde7be5ed3fb807f9a86dee5b5c25b157558c32b319f104fa953",
+  "creating_block_wire": "00000020823f9195028732c07f73c9cbbea2c072e209cc44fffae0300fac877ca1cc321ec0d4d6665d58e1ec8dd4e35c5016bda6b827c6a874ca94ea639f1bff03f622371a5e026bffff7f20000000000202000000010000000000000000000000000000000000000000000000000000000000000000ffffffff04016a0101ffffffff011019062a0100000023210248c639c512bdf6ea0a0a925678d23862798829629ab5beca2532a02eeb0576d9ac000000000100000001379b34e160316499f0be39df3509e44b96e9912195c71ec38a8683da5bd7a4e10000000049483045022100a4998ab640aa95ec1cf21844756742390be4e5911e5c7b228383150ee62439af022004a238436e765916019a13eba77e4f57bf5c58fc05b1a0a048cb674a25713a4d41ffffffff02a086010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac5044042a010000001976a91496b890e460a29d9fdfbf8cdf2507780fe11e63a788ac00000000",
+  "parent_header": "0000002053a94f109f312bc35875155bc2b5e5de869a7f80fbd35ebee7cdbda7b1b8980279ef366d8b410ccc22efdffa2e82a56573fb68fe008c697f676cb097bce487cb1a5e026bffff7f2005000000",
+  "parent": "5114f5dbb9b8d6cd499e7bb3900c76dab802b0ccc1aa6cbd1fe0ef2dbb4e62e6",
+  "payment_hex": "0100000001f1b44049b83c72d721e664d66ebc57cef0cdbe3486d029d45c1a2cf14e77735d0000000049483045022100ef69974d53f657808501d0f598fd1f096f8ef47d580058296446089fe9e4afcf0220502bf0bf262db3e593006ec5565a838bb32bded37ac1e529239e0ed3a2d39bc04100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+  "payment_txid": "e2a23bf233385f87489f20929572eebf531b8ec96fa17ee8140b7bd7da4906db",
+  "fee_satoshis": 1100,
+  "subsidy_satoshis": 5000000000,
+  "payout_satoshis": 5000001100,
+  "block_hash": "601cf30a2bb6ad52fe31e817a7320100376f576674ea4383bbd0fd6009edd61f",
+  "solved_block": "00000020e6624ebb2defe01fbd6caac1ccb002b8da760c90b37b9e49cdd6b8b9dbf514514b0d5e15ba949d2a0b717f1713ec966ffbc248ef42a7f848ae24d0383703d7711b5e026bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff39016c0800000001000000000c2f73636172792d6e6f64652f202a963de3f94f558ba9d89cb0755fd6a1a39e62cdb06f82171571a9bd7261535affffffff014cf6052a010000000151000000000100000001f1b44049b83c72d721e664d66ebc57cef0cdbe3486d029d45c1a2cf14e77735d0000000049483045022100ef69974d53f657808501d0f598fd1f096f8ef47d580058296446089fe9e4afcf0220502bf0bf262db3e593006ec5565a838bb32bded37ac1e529239e0ed3a2d39bc04100000000015482010000000000434104abfb12fcf638a28d00503fa524ad947193370be0122c84bb5f7a7557e927f24148680095479edc27065e306eda9d91a395565a361be608e3a7374ace611d25f0ac00000000",
+  "header_hex": "00000020e6624ebb2defe01fbd6caac1ccb002b8da760c90b37b9e49cdd6b8b9dbf514514b0d5e15ba949d2a0b717f1713ec966ffbc248ef42a7f848ae24d0383703d7711b5e026bffff7f2000000000",
+  "block_transaction_ids": [
+    "7ad71100c0c55764e13234b5e8a1011099b57e5bfdc21d29a6d63321018c5dae",
+    "e2a23bf233385f87489f20929572eebf531b8ec96fa17ee8140b7bd7da4906db"
+  ],
+  "sv_successor": "7f5acb9087e4e0d98e0ad47c8103e27b85e092a863ecae78113593ae1a48e344",
+  "sv_successor_header": "000000201fd6ed0960fdd0bb8343ea7466576f37000132a717e831fe52adb62b0af31c60b9605efd84b39d848a79aa008682ccaf516c556655565cdd874e19ba3a4b8c671a5e026bffff7f2002000000"
+}

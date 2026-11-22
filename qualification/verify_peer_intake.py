@@ -199,6 +199,27 @@ def verify(row):
                 + payload[src_script + previous_size :]
             )
         assert payload == payment
+    if "reply_loss" in row:
+        from workload_worker_headers import prepared_header
+
+        exchange = row["reply_loss"]
+        slot = exchange["slot"]
+        candidate = prepared_header(slot)
+        assert slot["outcome"] == "error" and slot["error"] == "Stratum session closed"
+        assert slot["parent"] == row["parent"] and candidate["header"] == raw[:80].hex()
+        assert candidate["hash"] == row["block_hash"]
+        submission, reply = exchange["forwarded_submit"], exchange["upstream_reply"]
+        assert (
+            submission["method"] == "mining.submit" and reply["id"] == submission["id"]
+        )
+        assert reply["result"] is True and reply["error"] is None
+        assert submission["params"][1:] == [
+            candidate["notify"][0],
+            candidate["extranonce2"],
+            candidate["notify"][7],
+            raw[76:80][::-1].hex(),
+        ]
+        verify_p2pk_signature(funding, payment)
     return {
         "source": source,
         "parent": row["parent"],
