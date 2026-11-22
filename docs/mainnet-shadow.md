@@ -178,7 +178,9 @@ python3 qualification/shadow_reader_supervisor.py \
   "$SHADOW_LOG" "$PRIVATE_EVIDENCE" "$PRIVATE_EVIDENCE/reader-argv.json"
 ```
 
-To check the three body commitments, obtain the confirmed native blocks by hash from a stock peer or Teranode Asset service. Save each block's complete wire bytes under its displayed hash in `$CONFIRMED_BLOCK_DIR`, then run the following from the repository root.
+A second retrieval over Teranode Asset returned all three complete bodies. Their combined 14,427,048 bytes matched the original native SV P2P deliveries byte for byte by SHA-256. The reader checked their proof of work and transaction Merkle roots again. [Independent transport readback](evidence/chronicle-shadow-tail-asset-readback.json)
+
+To check those body commitments, obtain the confirmed native blocks by hash from a stock peer or Teranode Asset service. Save each block's complete wire bytes under its displayed hash in `$CONFIRMED_BLOCK_DIR`, then run the following from the repository root.
 
 ```sh
 python3 - "$CONFIRMED_BLOCK_DIR" <<'PY'

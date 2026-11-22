@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "original_receipt_sha256": "0f34e70858b9da26b4f5c08ad3a7a93c3547e9e6eb1e20228cd27690de57aabd",
+  "checks": [
+    {
+      "height": 976536,
+      "confirmed_block_hash": "00000000000000001645853964ffb27de07c8ca66c223c8757eb1b04e33dd18a",
+      "native_asset_read_at_utc": "2026-11-22T00:07:24.190796+00:00",
+      "bytes": 174048,
+      "sha256": "8adccae6fc34fc9cbe37e0a8c5cb19c915feec08ce4e82518fb3f1f0aae9e45c",
+      "observed_transport": "SV P2P",
+      "independent_readback_transport": "Teranode Asset",
+      "merkle_and_pow_verified": true
+    },
+    {
+      "height": 976537,
+      "confirmed_block_hash": "00000000000000001d42b1d59813ea04828468c310f71ad9b615a28fe64fd5de",
+      "native_asset_read_at_utc": "2026-11-22T00:07:27.446832+00:00",
+      "bytes": 14235505,
+      "sha256": "ef13d70cf5aef5862b2b15c7702d84755adfc1628792dbf1f89af00319feb4f2",
+      "observed_transport": "SV P2P",
+      "independent_readback_transport": "Teranode Asset",
+      "merkle_and_pow_verified": true
+    },
+    {
+      "height": 976538,
+      "confirmed_block_hash": "0000000000000000167e2734cfea3e0351896d3147be24aa30b28a16221e6c9a",
+      "native_asset_read_at_utc": "2026-11-22T00:07:27.925866+00:00",
+      "bytes": 17495,
+      "sha256": "5c2425117d2361c470851ec2154fed6f67e8dfa6bd6fbe0e41e6962d66078c62",
+      "observed_transport": "SV P2P",
+      "independent_readback_transport": "Teranode Asset",
+      "merkle_and_pow_verified": true
+    }
+  ]
+}
