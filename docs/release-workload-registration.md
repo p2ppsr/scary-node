@@ -33,3 +33,5 @@ launchctl print "$(cat "$job_dir/service-target")"
 ~~~
 
 The plist stays in the service log directory, with `RunAtLoad` enabled and `KeepAlive` disabled. Closing the submitting terminal leaves the driver owned by the logged-in user’s service manager. After the driver exits, inspect its exit code, `stdout.log` and `stderr.log`, and use the workload verifier above on the actual receipt. A completed timed run also produces `quiesced.json`. If a host interruption leaves partial logs, preserve the original opportunity indices and the unobserved tail. Once the process has finished and its evidence is retained, unload its service with `launchctl bootout "$(cat "$job_dir/service-target")"`.
+
+The release run also retains each submitted worker header through response errors. The independent verifier checks the exact selected header and reports whether the worker received an acknowledgment. The same method applies to the cold arm. [Header attribution and replay](cold-miner-registration.md#attributing-an-accepted-block-when-a-worker-misses-the-reply)

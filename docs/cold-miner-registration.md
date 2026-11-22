@@ -16,3 +16,11 @@ SCARY_SUSTAINED_PROFILE=cold .native/py/bin/python qualification/sustained_repli
 .native/py/bin/python qualification/verify_sustained_native.py .native/cold-changed-run/receipt.json.gz \
   --corpus .native/sustained-signed --blocks .native/cold-changed-run/blocks --parent-ages
 ```
+
+## Attributing an accepted block when a worker misses the reply
+
+For this arm the worker records the job notification, both extranonces and the exact proof-of-work header it prepared for each submission. A worker timeout or rejection stays in the opportunity record. The offline verifier reconstructs the coinbase commitment and header, checks proof of work and matches the complete 80 bytes against the selected headers returned by the three reference nodes. It reports acknowledged solutions and chain-side selections separately. A repeated header counts as one block. If repeated attempts span intervals, the verifier leaves that block out of the per-interval result. This recording change preserves the enrolled binary, slot schedule, time denominator and thresholds.
+
+```sh
+python3 qualification/workload_worker_headers.py .native/cold-changed-run/receipt.json.gz
+```

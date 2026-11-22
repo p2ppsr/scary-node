@@ -91,9 +91,11 @@ def prepare_funding(corpus):
     }
 
 
-def stratum(parent):
+def stratum(parent, slot=None, *, port=None):
     with (
-        socket.create_connection(("127.0.0.1", 19433 + PORT_SHIFT), timeout=4) as conn,
+        socket.create_connection(
+            ("127.0.0.1", 19433 + PORT_SHIFT if port is None else port), timeout=4
+        ) as conn,
         conn.makefile("rwb") as stream,
     ):
         conn.settimeout(4)
@@ -122,8 +124,22 @@ def stratum(parent):
             <= 0x7FFFFF << 232
         )
         hdr = prefix + struct.pack("<I", nonce)
-        result = worker.submit(4, j, x2, nonce)
-        return txid(hdr), hdr.hex(), result
+        # The worker already has the exact PoW before waiting for the reply.
+        # Preserve it on both return and failure without writing ahead of submission.
+        try:
+            result = worker.submit(4, j, x2, nonce)
+        finally:
+            header = hdr.hex()
+            ident = txid(hdr)
+            if slot is not None:
+                slot["worker_candidate"] = {
+                    "notify": j,
+                    "extranonce1": subscribed["extranonce1"],
+                    "extranonce2": x2,
+                    "header": header,
+                    "hash": ident,
+                }
+        return ident, header, result
 
 
 def mine(kind, phase, index, due, start):
@@ -151,7 +167,7 @@ def mine(kind, phase, index, due, start):
             if not r["ready"]:
                 r["outcome"] = "unready"
             else:
-                h, header, result = stratum(r["parent"])
+                h, header, result = stratum(r["parent"], r)
                 r["outcome"] = "solved" if result["result"] is True else "rejected"
                 r["solution_header"] = header
                 if r["outcome"] == "solved":
@@ -503,6 +519,7 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
             json.dumps(
                 {
                     "registration": REGISTRATION,
+                    "worker_header_format": 1,
                     **({"arm": ARM} if ARM in WITNESSED_ARMS else {}),
                     "start_wall_ns": start_wall,
                     "baseline": base,
@@ -632,6 +649,7 @@ def run(corpus, directory, *, setup=None, resume_genesis=False):
         result = {
             "schema": 1,
             "registration": REGISTRATION,
+            "worker_header_format": 1,
             **({"arm": ARM} if ARM in WITNESSED_ARMS else {}),
             "network": "regtest",
             "release_sha256": RELEASE,

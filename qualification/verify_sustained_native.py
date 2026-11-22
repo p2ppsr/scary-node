@@ -579,6 +579,13 @@ def verify(record, executable=None):
         )
         for name in counts
     }
+    worker_proof = None
+    returned_payments = signed_by_miner.copy()
+    if "worker_header_format" in record:
+        from workload_worker_headers import audit as audit_worker_headers
+
+        worker_proof = audit_worker_headers(record)
+        signed_by_miner["scary"] = worker_proof["primary_selected_payments"]
     coverage_observed = all(b["entrant_hash"] == b["hash"] for b in record["blocks"])
     unready = sum(s.get("scary", {}).get("ready") is False for s in sampled)
     origin = {}
@@ -595,6 +602,8 @@ def verify(record, executable=None):
                 )
                 intervals[i // 50]["selected_nonempty"] += 1
                 intervals[i // 50]["payments"] += body["scheduled_payments"]
+        if worker_proof is not None:
+            intervals = worker_proof["primary_intervals"]
         regular = all(x["selected_nonempty"] for x in intervals)
         origin = {
             "arm": arm,
@@ -620,6 +629,9 @@ def verify(record, executable=None):
             and len(record["inventory_final"] or {})
             and inventory["unique_served"] == PAYMENTS
         )
+    if worker_proof is not None:
+        origin["worker_header_attribution"] = worker_proof
+        origin["worker_return_matched_primary_payments_by_miner"] = returned_payments
     return {
         **origin,
         "registered_payments": PAYMENTS,
