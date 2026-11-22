@@ -43,7 +43,7 @@ pub(super) struct Queue {
 
 impl Queue {
     pub fn start(network: String, events: mpsc::Sender<Event>) -> Self {
-        let (queue, inbox) = Self::channel();
+        let (queue, inbox) = Self::channel(MAX_QUEUED_HASHES);
         tokio::spawn(worker(network, inbox, queue.schedule.clone(), events));
         queue
     }
@@ -51,38 +51,59 @@ impl Queue {
     pub fn start_subtrees(
         network: String,
         state: Arc<tokio::sync::Mutex<crate::mining::Mining>>,
+        parallel: usize,
+        capacity: usize,
+        events: mpsc::Sender<Event>,
     ) -> Self {
-        let (queue, mut inbox) = Self::channel();
+        let (queue, mut inbox) = Self::channel(capacity);
         let schedule = queue.schedule.clone();
         tokio::spawn(async move {
-            while let Some(hash) = inbox.recv().await {
-                loop {
-                    let Some(request) = schedule
-                        .lock()
-                        .expect("subtree schedule")
-                        .next_source(&hash)
-                    else {
-                        break;
-                    };
-                    let result = super::subtree::receive(&network, &request, &state).await;
-                    match result {
-                        Ok(()) => {
+            let reads = futures::stream::poll_fn(|cx| inbox.poll_recv(cx))
+                .map(|hash| {
+                    let network = &network;
+                    let schedule = &schedule;
+                    async move {
+                        let data = next_subtree(network, schedule, &hash).await;
+                        (hash, data)
+                    }
+                })
+                .buffered(parallel);
+            tokio::pin!(reads);
+            // Ordered delivery keeps a root's parents ahead of children from a
+            // later root even if that later HTTP request completes first.
+            while let Some((hash, mut verified)) = reads.next().await {
+                let mut processed = None;
+                while let Some(body) = verified {
+                    match super::subtree::admit(&body, &state).await {
+                        Ok(count) => {
+                            processed = Some((count, body.len()));
                             schedule
                                 .lock()
                                 .expect("subtree schedule")
                                 .mark_delivered(hash.clone());
                             break;
                         }
-                        Err(err) => eprintln!("transaction subtree {hash} unavailable: {err}"),
+                        Err(error) => {
+                            eprintln!("transaction subtree {hash} unavailable: {error}");
+                            drop(body);
+                            verified = next_subtree(&network, &schedule, &hash).await;
+                        }
                     }
+                }
+                if events
+                    .send(Event::SubtreeProcessed { hash, processed })
+                    .await
+                    .is_err()
+                {
+                    return;
                 }
             }
         });
         queue
     }
 
-    fn channel() -> (Self, mpsc::Receiver<String>) {
-        let (ready, inbox) = mpsc::channel(MAX_QUEUED_HASHES);
+    fn channel(capacity: usize) -> (Self, mpsc::Receiver<String>) {
+        let (ready, inbox) = mpsc::channel(capacity);
         let schedule = Arc::new(Mutex::new(Schedule::default()));
         (Self { schedule, ready }, inbox)
     }
@@ -114,6 +135,23 @@ impl Queue {
             },
         );
         Ok(())
+    }
+}
+
+async fn next_subtree(
+    network: &str,
+    schedule: &Mutex<Schedule>,
+    hash: &str,
+) -> Option<crate::body::BlockBody> {
+    loop {
+        let request = schedule
+            .lock()
+            .expect("subtree schedule")
+            .next_source(hash)?;
+        match super::subtree::fetch_verified(network, &request).await {
+            Ok(data) => return Some(data),
+            Err(error) => eprintln!("transaction subtree {hash} unavailable: {error}"),
+        }
     }
 }
 
@@ -364,6 +402,83 @@ mod tests {
         queue.offer(request).unwrap();
         drop(queue);
         assert!(receiver.recv().await.is_none());
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn concurrent_subtree_reads_commit_in_announcement_order() {
+        use axum::{extract::Path, http::StatusCode, routing::get, Router};
+        use tokio::{net::TcpListener, sync::Notify};
+
+        let payment = |tag: u8| {
+            let mut tx = vec![1, 0, 0, 0, 1];
+            tx.extend([tag; 32]);
+            tx.extend([0, 0, 0, 0, 0, 255, 255, 255, 255, 1]);
+            tx.extend(1u64.to_le_bytes());
+            tx.extend([1, 0x51, 0, 0, 0, 0]);
+            tx
+        };
+        let (first, second) = (payment(1), payment(2));
+        let (a, b) = (
+            display_hash(hash256(&first)),
+            display_hash(hash256(&second)),
+        );
+        let releases_first = Arc::new(Notify::new());
+        let routes = Router::new().route(
+            "/subtree_data/{hash}",
+            get({
+                let a = a.clone();
+                let b = b.clone();
+                move |Path(hash): Path<String>| {
+                    let barrier = releases_first.clone();
+                    let reply = if hash == a {
+                        Some((true, first.clone()))
+                    } else if hash == b {
+                        Some((false, second.clone()))
+                    } else {
+                        None
+                    };
+                    async move {
+                        let (wait, body) = reply.ok_or(StatusCode::NOT_FOUND)?;
+                        if wait {
+                            barrier.notified().await;
+                        } else {
+                            barrier.notify_one();
+                        }
+                        Ok::<_, StatusCode>(body)
+                    }
+                }
+            }),
+        );
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let base = format!("http://{}", listener.local_addr().unwrap());
+        let server = tokio::spawn(async move { axum::serve(listener, routes).await });
+        let state = Arc::new(tokio::sync::Mutex::new(
+            crate::mining::Mining::new(true, vec![0x51]).unwrap(),
+        ));
+        let (events, mut replies) = mpsc::channel(4);
+        let queue = Queue::start_subtrees("regtest".into(), state, 2, 4, events);
+        let absent = "55".repeat(32);
+        for digest in [&a, &b, &absent] {
+            queue
+                .offer(Request {
+                    hash: digest.clone(),
+                    height: 0,
+                    header: None,
+                    base: base.clone(),
+                })
+                .unwrap();
+        }
+        for (expected, served) in [(a, true), (b, true), (absent, false)] {
+            let msg = tokio::time::timeout(Duration::from_secs(5), replies.recv())
+                .await
+                .unwrap();
+            let Some(Event::SubtreeProcessed { hash, processed }) = msg else {
+                panic!("missing subtree outcome");
+            };
+            assert_eq!(hash, expected);
+            assert_eq!(processed, served.then_some((1, 61)));
+        }
         server.abort();
     }
 

@@ -6,7 +6,6 @@ use anyhow::{ensure, Context, Result};
 use bsv::primitives::hash::hash256;
 use std::{
     borrow::Cow,
-    sync::Arc,
     time::{Duration, Instant},
 };
 use tokio::sync::Mutex;
@@ -122,11 +121,10 @@ fn verify_data(mut cursor: &[u8], root: &str) -> Result<()> {
     Ok(())
 }
 
-pub(super) async fn receive(
+pub(super) async fn fetch_verified(
     network: &str,
     request: &Request,
-    state: &Arc<Mutex<Mining>>,
-) -> Result<()> {
+) -> Result<crate::body::BlockBody> {
     let path = format!("subtree_data/{}", request.hash);
     let data = tokio::time::timeout(
         Duration::from_secs(55 + (body_limit() as u64 >> 20)),
@@ -135,12 +133,16 @@ pub(super) async fn receive(
     .await
     .context("subtree download timed out")??;
     let root = request.hash.clone();
-    let data = tokio::task::spawn_blocking(move || -> Result<_> {
+    tokio::task::spawn_blocking(move || -> Result<_> {
         verify_data(&data, &root)?;
         Ok(data)
     })
-    .await??;
-    let mut cursor = &data[..];
+    .await?
+}
+
+pub(super) async fn admit(data: &[u8], state: &Mutex<Mining>) -> Result<usize> {
+    let mut cursor = data;
+    let mut processed = 0;
     // Bound time under the shared mining lock. Block processing, directives
     // and Stratum can advance between consecutive groups of ordinary offers.
     while !cursor.is_empty() {
@@ -152,6 +154,7 @@ pub(super) async fn receive(
                     break;
                 }
                 mining.peer_tx(TxSource::Subtree, &next_transaction(&mut cursor)?);
+                processed += 1;
                 if began.elapsed() >= Duration::from_millis(4) {
                     break;
                 }
@@ -159,7 +162,7 @@ pub(super) async fn receive(
         }
         tokio::task::yield_now().await;
     }
-    Ok(())
+    Ok(processed)
 }
 
 #[cfg(test)]

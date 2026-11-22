@@ -45,6 +45,8 @@ pub struct Config {
     pub asset_bind: Option<SocketAddr>,
     pub asset_url: Option<String>,
     pub fetch_bodies: bool,
+    pub subtree_fetch_workers: u8,
+    pub subtree_queue_capacity: u16,
 }
 
 #[derive(Debug)]
@@ -77,6 +79,10 @@ pub enum Event {
         peer: String,
         hash: String,
         queue_full: bool,
+    },
+    SubtreeProcessed {
+        hash: String,
+        processed: Option<(usize, usize)>,
     },
     Gap {
         hash: Option<String>,
@@ -509,9 +515,15 @@ pub async fn run(
     } else {
         None
     };
-    let subtrees = config
-        .fetch_bodies
-        .then(|| fetch::Queue::start_subtrees(config.network.clone(), state.clone()));
+    let subtrees = config.fetch_bodies.then(|| {
+        fetch::Queue::start_subtrees(
+            config.network.clone(),
+            state.clone(),
+            usize::from(config.subtree_fetch_workers),
+            usize::from(config.subtree_queue_capacity),
+            events.clone(),
+        )
+    });
     let mut identified = HashSet::<PeerId>::new();
     let mut retry = tokio::time::interval(Duration::from_secs(25));
     retry.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);

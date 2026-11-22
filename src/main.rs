@@ -73,6 +73,12 @@ struct Args {
     /// Retrieve complete block bodies to build the witnessed working set.
     #[arg(long)]
     observe_bodies: bool,
+    /// Number of concurrent unconfirmed Teranode subtree reads.
+    #[arg(long, default_value_t = 4, value_parser = clap::value_parser!(u8).range(1..=16))]
+    subtree_fetch_workers: u8,
+    /// Distinct unconfirmed subtree roots waiting for a read slot.
+    #[arg(long, default_value_t = 256, value_parser = clap::value_parser!(u16).range(1..=4096))]
+    subtree_queue_capacity: u16,
     /// Minimum contiguous observed block bodies before issuing mining work (1..147).
     #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=147))]
     min_observed_blocks: u32,
@@ -109,6 +115,10 @@ struct PeerStats {
     notices: u64,
     subtrees: u64,
     subtree_queue_full: u64,
+    subtree_processed: u64,
+    subtree_failed: u64,
+    subtree_bytes: u64,
+    subtree_transactions: u64,
     gaps: u64,
     last_status: Option<Value>,
     tips: std::collections::BTreeMap<String, Value>,
@@ -120,6 +130,9 @@ struct PeerStats {
 struct App {
     network: &'static str,
     executable_sha256: Option<Arc<str>>,
+    subtree_retrieval_enabled: bool,
+    subtree_fetch_workers: u8,
+    subtree_queue_capacity: u16,
     mining: Arc<Mutex<mining::Mining>>,
     peer: Arc<Mutex<PeerStats>>,
     shadow: Option<Arc<std::sync::Mutex<std::fs::File>>>,
@@ -195,6 +208,10 @@ async fn status(State(app): State<App>) -> Json<Value> {
         "network":app.network, "release":{"version":env!("CARGO_PKG_VERSION"), "executable_sha256":app.executable_sha256}, "mining":mining, "peer":{
             "connected_peer_ids_seen":p.seen.len(), "status_messages":p.statuses,
             "block_notices":p.notices, "subtree_notices":p.subtrees, "subtree_queue_full":p.subtree_queue_full, "coverage_gaps":p.gaps,
+            "subtree_retrieval_enabled":app.subtree_retrieval_enabled,
+            "subtree_fetch_workers":app.subtree_fetch_workers, "subtree_queue_capacity":app.subtree_queue_capacity,
+            "subtree_processed":p.subtree_processed, "subtree_failed":p.subtree_failed,
+            "subtree_processed_bytes":p.subtree_bytes, "subtree_processed_transactions":p.subtree_transactions,
             "last_peer_status":p.last_status, "last_block_notice":p.last_block,
             "last_published":p.last_published
         }
@@ -367,6 +384,20 @@ async fn consume(app: App, mut events: mpsc::Receiver<peer::Event>) -> Result<()
                 log(
                     json!({"event":"subtree_notice","peer":peer,"hash":hash,"queue_full":queue_full}),
                 );
+            }
+            Event::SubtreeProcessed { hash, processed } => {
+                let mut p = app.peer.lock().await;
+                if let Some((transactions, bytes)) = processed {
+                    p.subtree_processed += 1;
+                    p.subtree_bytes += bytes as u64;
+                    p.subtree_transactions += transactions as u64;
+                    log(
+                        json!({"event":"subtree_processed","hash":hash,"transactions":transactions,"bytes":bytes}),
+                    );
+                } else {
+                    p.subtree_failed += 1;
+                    log(json!({"event":"subtree_failed","hash":hash}));
+                }
             }
             Event::Block {
                 source,
@@ -583,7 +614,13 @@ async fn main() -> Result<()> {
         })
         .transpose()?
         .map(|f| Arc::new(std::sync::Mutex::new(f)));
+    let fetch_bodies =
+        args.observe_bodies || args.stratum_bind.is_some() || args.shadow_log.is_some();
+    let native_bodies = fetch_bodies && !args.sv_bodies_only;
     let app = App {
+        subtree_retrieval_enabled: native_bodies,
+        subtree_fetch_workers: args.subtree_fetch_workers,
+        subtree_queue_capacity: args.subtree_queue_capacity,
         executable_sha256: executable_digest()
             .inspect_err(|e| {
                 eprintln!("release fingerprint unavailable: {e}");
@@ -624,8 +661,6 @@ async fn main() -> Result<()> {
             authenticate,
         ))
         .with_state(app.clone());
-    let fetch_bodies =
-        args.observe_bodies || args.stratum_bind.is_some() || args.shadow_log.is_some();
     let cfg = peer::Config {
         network: network.into(),
         allow_sv_only: !args.sv_peer.is_empty() || args.sv_bodies_only,
@@ -634,7 +669,9 @@ async fn main() -> Result<()> {
         key,
         asset_bind: args.asset_bind,
         asset_url: args.asset_url,
-        fetch_bodies: fetch_bodies && !args.sv_bodies_only,
+        fetch_bodies: native_bodies,
+        subtree_fetch_workers: args.subtree_fetch_workers,
+        subtree_queue_capacity: args.subtree_queue_capacity,
     };
     ensure!(
         !regtest || !args.sv_bodies_only || !args.sv_peer.is_empty(),

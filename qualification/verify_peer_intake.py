@@ -184,8 +184,27 @@ def verify(row):
             row["payout_satoshis"],
         )
     if source == "teranode_subtree":
+        from verify_dar_history import verify_owner_signature
+
+        verify_owner_signature(payment, *source_outputs[vout])
         assert row["subtree_hash"] in (payment_id, txid(b"\xff" * 32 + dsha(payment)))
         payload = bytes.fromhex(row["subtree_data_hex"])
+        if "subtree_completion" in row:
+            completion = row["subtree_completion"]
+            assert completion["event"] == {
+                "event": "subtree_processed",
+                "hash": row["subtree_hash"],
+                "transactions": 1,
+                "bytes": len(payload),
+            }
+            assert (
+                1 <= completion["workers"] <= 16
+                and 1 <= completion["waiting_capacity"] <= 4096
+            )
+            assert (
+                completion["successful_root_completions"] >= 1
+                and completion["failed_root_completions"] >= 0
+            )
         if payload[4:10] == b"\x00" * 5 + b"\xef":
             n, start = read_varint(payload, 10)
             assert n == 1

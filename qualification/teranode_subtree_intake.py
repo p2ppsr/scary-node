@@ -76,7 +76,10 @@ def run(binary, directory):
                 proc.send_signal(signal.SIGINT)
                 proc.wait(timeout=30)
 
-        with (directory / "node.log").open("w") as log:
+        with (
+            (directory / "node.log").open("w") as log,
+            (directory / "diagnostics.log").open("w") as diagnostics,
+        ):
             proc = subprocess.Popen(
                 [
                     str(binary),
@@ -99,14 +102,15 @@ def run(binary, directory):
                     "51",
                 ],
                 stdout=log,
-                stderr=log,
+                stderr=diagnostics,
             )
         cleanup.callback(stop, proc)
 
         def status():
             if proc.poll() is not None:
                 raise ValueError(
-                    "entrant exited: " + (directory / "node.log").read_text()[-400:]
+                    "entrant exited: "
+                    + (directory / "diagnostics.log").read_text()[-400:]
                 )
             return response(f"http://127.0.0.1:{api}/status")
 
@@ -158,14 +162,40 @@ def run(binary, directory):
         )
         assert a["sv"] == b["sv"] and a["sv"]["admitted"] == 0
         roots = {payment_id, txid(bytes([255]) * 32 + dsha(payment))}
-        announced = []
-        for line in (directory / "node.log").read_text().splitlines():
-            if line.startswith("{"):
-                row = json.loads(line)
-                if row.get("event") == "subtree_notice" and row["hash"] in roots:
-                    announced.append(row["hash"])
-        assert announced
-        subtree_data = request(f"{pub}/subtree_data/{announced[-1]}")
+
+        def event_for(kind, hashes):
+            lines = (directory / "node.log").read_text().splitlines(keepends=True)
+            for line in reversed(lines):
+                if line.endswith("\n") and line.startswith("{"):
+                    row = json.loads(line)
+                    if row.get("event") == kind and row.get("hash") in hashes:
+                        return row
+            return None
+
+        notice = wait(
+            "signed payment subtree notice", lambda: event_for("subtree_notice", roots)
+        )
+        root = notice["hash"]
+        subtree_data = request(f"{pub}/subtree_data/{root}")
+        completion = None
+        if "subtree_processed" in status()["peer"]:
+            event = wait(
+                "completed signed subtree on the same selected parent",
+                lambda: event_for("subtree_processed", {root}),
+            )
+            peer = status()["peer"]
+            assert event["transactions"] == 1 and event["bytes"] == len(subtree_data)
+            assert (
+                peer["subtree_processed"] >= 1
+                and peer["subtree_processed_transactions"] >= 1
+            )
+            completion = {
+                "event": event,
+                "workers": peer["subtree_fetch_workers"],
+                "waiting_capacity": peer["subtree_queue_capacity"],
+                "successful_root_completions": peer["subtree_processed"],
+                "failed_root_completions": peer["subtree_failed"],
+            }
         with stratum_job(parent, payment, worker, api, "native-subtree-payment") as job:
             solution = nonce(job)
             header = job.header(solution)
@@ -193,7 +223,8 @@ def run(binary, directory):
             "creating_block": creating,
             "creating_block_wire": block(full, creating)[0].hex(),
             "parent_header": block(full, parent)[0][:80].hex(),
-            "subtree_hash": announced[-1],
+            "subtree_hash": root,
+            **({"subtree_completion": completion} if completion else {}),
             "subtree_data_hex": subtree_data.hex(),
             "funding_hex": funding.hex(),
             "parent": parent,
