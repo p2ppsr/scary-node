@@ -182,8 +182,35 @@ def readback(cid, row):
     }
 
 
+def payment_commitments(transactions):
+    from prove import dsha
+
+    ids = [dsha(tx) for tx in transactions]
+    require(len(set(ids)) == len(ids), "duplicate candidate payment")
+    return {
+        "payments": len(ids),
+        "ordinary_wire_sha256": hashlib.sha256(b"".join(transactions)).hexdigest(),
+        "sorted_ordinary_wire_sha256": hashlib.sha256(
+            b"".join(tx for _, tx in sorted(zip(ids, transactions, strict=True)))
+        ).hexdigest(),
+        "ordered_internal_txids_sha256": hashlib.sha256(b"".join(ids)).hexdigest(),
+        "sorted_internal_txids_sha256": hashlib.sha256(
+            b"".join(sorted(ids))
+        ).hexdigest(),
+    }
+
+
+def candidate_commitments(raw):
+    from prove import decode_block, txid
+
+    _, transactions, _ = decode_block(raw, txid(raw[:80]))
+    return {
+        "candidate_wire_sha256": hashlib.sha256(raw).hexdigest(),
+        **payment_commitments(transactions[1:]),
+    }
+
+
 def compare_pending(tnid, candidate, original_wire):
-    from prove import decode_block, dsha, txid
 
     original = original_wire.read_bytes()
     url = (
@@ -200,26 +227,8 @@ def compare_pending(tnid, candidate, original_wire):
         "unpublished candidate parent differs",
     )
 
-    def membership(raw):
-        _, txs, _ = decode_block(raw, txid(raw[:80]))
-        ordinary = txs[1:]
-        ids = [dsha(tx) for tx in ordinary]
-        require(len(set(ids)) == len(ids), "duplicate candidate payment")
-        return {
-            "payments": len(ids),
-            "candidate_wire_sha256": hashlib.sha256(raw).hexdigest(),
-            "ordinary_wire_sha256": hashlib.sha256(b"".join(ordinary)).hexdigest(),
-            "sorted_ordinary_wire_sha256": hashlib.sha256(
-                b"".join(tx for _, tx in sorted(zip(ids, ordinary, strict=True)))
-            ).hexdigest(),
-            "ordered_internal_txids_sha256": hashlib.sha256(b"".join(ids)).hexdigest(),
-            "sorted_internal_txids_sha256": hashlib.sha256(
-                b"".join(sorted(ids))
-            ).hexdigest(),
-        }
-
-    before = membership(original)
-    after = membership(current)
+    before = candidate_commitments(original)
+    after = candidate_commitments(current)
     require(
         after["payments"] == candidate["num_tx"],
         "native RPC and candidate asset differ",
@@ -441,6 +450,31 @@ def verify(proof, receipt):
         and proof["height"] == target["final_height"],
         "retained blocks or boundary differ",
     )
+    if "archived_volume_checks" in proof:
+        stores = proof["archived_volume_checks"]
+        require(
+            set(stores) == {role + "-data", db + "-data", db + "-meta"},
+            "wrong archived roles",
+        )
+        for store in stores.values():
+            metadata = store["source_and_independent_restore"]
+            source = metadata["source"]
+            require(
+                source == metadata["restored"]
+                and source["entries"]
+                >= source["regular"]
+                >= source["nonempty_regular"]
+                >= 0
+                and store["original_allocated_kib"] > 0
+                and all(
+                    len(bytes.fromhex(digest)) == 32
+                    for digest in (
+                        source["metadata_sha256"],
+                        store["canonical_file_data_and_metadata_sha256"],
+                    )
+                ),
+                "restored file metadata differs from its named source",
+            )
     if "pending_recovery" in proof:
         original = proof["pending_recovery"]["original"]
         restored = proof["pending_recovery"]["after_isolated_restart"]
