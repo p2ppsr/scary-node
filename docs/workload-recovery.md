@@ -120,3 +120,16 @@ The archived inventory entrant booted with zero connected peers at h561 from its
 The cadence entrant booted its archived 1,000,497,785-byte checkpoint in a separate isolated process with zero data peers. Its 69,671 witnessed outputs and all 38 complete validation records from h450 through h487 matched the original post-settlement process, including 1,800,000 successful script checks in h485. [Cadence entrant restore](evidence/chronicle-cadence-archived-entrant.json)
 
 An independent confirmed-chain reconstruction cannot recreate an original unconfirmed mempool, validation queue or a timed delivery. Preserve the original runtime or an independently demonstrated restorable copy whenever that state is outstanding. The direct-intake control ended with an outstanding queue. [Original handoff and qualification limits](sustained-native-trial.md)
+
+## Trace the input that anchors a same-block payment chain
+
+The signed workload uses 65,536 independent sequences of spends. Each payment consumes its predecessor on the same sequence. A selected block can contain multiple consecutive payments from one sequence. To test the entrant’s successor requirement, follow those same-block predecessors back to the first input created in an earlier block. If that output was created in the candidate’s parent, it had no successor when the candidate was mined. If at least one intervening block was selected, the output met the age requirement. The operator still needed an observed output, the signed payments and the applicable directive state to offer that work.
+
+The compact archive preserves the original transaction order. Supply its published SHA-256 after checking the signed-wire reconstruction above. The command checks the receipt binding, rejects skipped or repeated generations, and counts direct and external-ancestor ages for every included payment. It groups results by the producer identified from the original solved ledger and independent stock reads. The counts cover payments eventually selected on the measured branch. Other pending transactions and competing branches may have presented different opportunities.
+
+```sh
+.native/py/bin/python qualification/workload_package_inputs.py \
+  docs/evidence/chronicle-sustained-reordered.json.gz reordered-assets/reordered.zip \
+  docs/evidence/chronicle-sustained-reordered-ledger.json \
+  --archive-sha256 e51b3237bca4d521da139ea4288470a1bbf4fc37aa7cefd638120490f3bc4c27
+```
