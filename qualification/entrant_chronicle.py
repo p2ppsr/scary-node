@@ -6,11 +6,12 @@ import gzip
 import hashlib
 import importlib
 import json
-from pathlib import Path
+import os
 import tempfile
+from pathlib import Path
 from urllib.error import HTTPError
 
-from chronicle import ROOT, IMAGE, Reference, ToHex, block, compare
+from chronicle import IMAGE, ROOT, Reference, ToHex, block, compare
 from chronicle_signatures import FAMILIES, evaluate
 from run_cohort import session_lock
 from scary_dar import LabFeed, entrant, get_port, mine_with_worker, response, until
@@ -118,7 +119,7 @@ def run(binary, rust, go):
         for _ in range(3):
             tip = node.rpc("generate", 1)[0]
             until(
-                lambda: response(api + "/status")["mining"]["tip_hash"] == tip,
+                lambda tip=tip: response(api + "/status")["mining"]["tip_hash"] == tip,
                 "entry body from SV",
             )
         checks.selected(tip)
@@ -161,7 +162,17 @@ if __name__ == "__main__":
     )
     parser.add_argument("--go-oracle", type=Path, default=ROOT / ".native/go-oracle")
     a = parser.parse_args()
-    record = run(a.binary, a.rust_oracle, a.go_oracle)
+    programs = []
+    for option, path in (
+        ("--binary", a.binary),
+        ("--rust-oracle", a.rust_oracle),
+        ("--go-oracle", a.go_oracle),
+    ):
+        path = path.resolve()
+        if not path.is_file() or not os.access(path, os.X_OK):
+            parser.error(f"{option} requires an executable file at {path}")
+        programs.append(path)
+    record = run(*programs)
     tmp = a.receipt.with_name(a.receipt.name + ".next")
     tmp.write_bytes(
         gzip.compress(json.dumps(record, separators=(",", ":")).encode(), mtime=0)

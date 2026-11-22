@@ -25,6 +25,8 @@ curl -fsS http://127.0.0.1:8080/status
 
 Use repeated `--peer <multiaddr>` options to select specific peers. A peer identity is stored under `--data-dir`. The node checkpoints its witnessed branch, undo data, directive sequence and solved-block state. Use `--observe-bodies` to fetch and verify block bodies while listening. Network, API and asset configuration are documented in the [operator guide](docs/operations.md).
 
+To check what the node would mine while keeping the workstation passive, configure the signed alert receiver and start the node with `--shadow-log` and a payout script. Its journal records the selected parent, evidence available at that height, readiness decision and any unsigned template. The replay checks the recorded decisions against header work, the directive sequence and independent observations. [Observer setup](docs/chronicle-qualification.md#operating-the-signed-alert-receiver) · [Mainnet results and replay](docs/mainnet-shadow.md)
+
 ## Demonstrate mining locally
 
 Install Docker with Compose v2, Python 3, and OpenSSL with secp256k1 support. The isolated lab contains Scary Node and two Teranode reference nodes. Run these commands in order.
