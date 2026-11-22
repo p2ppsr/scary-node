@@ -1,0 +1,21 @@
+{
+  "stock_role": "tn1",
+  "terminal_parent_height": 551,
+  "terminal_parent_hash": "6bdadaef13a3c69736333fd69a6854454a6fd5cb8cbd11e22b880c94e7d87115",
+  "original_payments": 49151,
+  "recovered_payments": 32767,
+  "original_only_payments": 16384,
+  "cold_only_payments": 0,
+  "recovered_distinct_inputs_in_terminal_parent": 32767,
+  "original_only_distinct_inputs_in_terminal_parent": 16384,
+  "recovered_sorted_source_ordinals_le32_sha256": "5453917d6b221670f4708d60d37fddc52e068b6acc3212708ec2823813d0c935",
+  "recovered_source_ordinal_bounds": [
+    4498432,
+    4531199
+  ],
+  "both_cold_samples_same_ordered_signed_payments": true,
+  "cold_order_matches_original_prefix": [
+    false,
+    false
+  ]
+}

@@ -44,6 +44,12 @@ Each Teranode also served its own unpublished height-552 template. Both committe
 
 A fresh SV Node v1.2.3 and Teranode v0.16.1 with new data stores started at regtest genesis and selected the original height-551 hash. The Teranode returned all 66 complete selected bodies, reproducing all 897,424,918 bytes. The fresh SV Node began with an empty mempool. Reoffering the 50,176 pending signed payments reproduced the original stock mempool membership exactly. The original services remained paused throughout this independent recovery. [Fresh-node block and mempool recovery](evidence/chronicle-sustained-endorsed-fresh-teranode.json)
 
+## What a stock Teranode recovered from its own store
+
+Teranode 1 and its Aerospike database restarted from byte-verified copies of their original service volumes on an isolated bridge. The connected-peer count was zero before and after the service returned all 66 selected blocks. Each block matched the three original readers, from height 486 through 551. Independent restoration matched the file data, ownership and mode fingerprints for 26,830 Teranode entries, three Aerospike data entries and three Aerospike metadata entries. All three source trees contained zero extended attributes or stored access or default ACLs. The original service and database stayed frozen during this experiment. [Stock restart and full-body readbacks](evidence/chronicle-sustained-endorsed-stock-tn1-restore.json) · [Reopen a captured Teranode and Aerospike pair](workload-recovery.md#reopen-an-archived-teranode-and-aerospike-pair)
+
+The stock miner originally exposed 49,151 pending payments in its unpublished template. Its first candidate after restart held 32,767. A second sample after reading all selected bodies contained the same 32,767 signed payments in the same order. The recovered set matches the first 32,767 ordinary entries of the original candidate by both transaction ID and signed bytes, in a different order. Each of those payments spent a distinct height-551 output. The 16,384 original payments absent from both samples also spent distinct height-551 outputs. The cold reader recorded a full-frame digest and ordered payment digest for each sample. The public replay reconstructs their ordinary signed membership from the original source. These snapshots establish what the stock block assembler offered at those two reads. The experiment ended before any later arrivals or template changes. [Source ordinals and parent outputs](evidence/chronicle-sustained-endorsed-stock-tn1-selection.json)
+
 ## Replay
 
 The interruption verifier checks every complete original JSONL record against its source digest. It also checks the offer and opportunity schedules, header proof of work and linkage, three readback commitments per block, and the chronology of the later queue observations. The full wire comparison also decodes every selected transaction against the shared signed wallet corpus, checks Merkle roots, computes fees and parent ages from the actual inputs and outputs, and compares the remainder of the advertised set with the independent stock mempool commitment. Use Python 3.12 or later and the GitHub CLI from the repository root. The commands below check the signed source archive and funding history, then unpack the archived active bodies into a new directory. The compressed stock mempool file preserves all 50,176 IDs in internal byte order. The final command rebuilds the three sibling blocks and both unpublished candidate bodies, checks their headers and commitments, and compares the candidates with that mempool. [Endorsed active bodies and pending IDs](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-endorsed-prefix-v1) · [Common signed source](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
@@ -63,6 +69,11 @@ receipt=docs/evidence/chronicle-sustained-endorsed-interruption.json.gz
 .native/py/bin/python qualification/sustained_block_archive.py unpack "$receipt" "$SIGNED_PAYMENTS" endorsed-assets/active-bodies.zip "$ENDORSED_BLOCKS"
 .native/py/bin/python qualification/interrupted_workload.py verify "$receipt" --corpus "$SIGNED_PAYMENTS" --blocks "$ENDORSED_BLOCKS"
 .native/py/bin/python qualification/terminal_workload_wires.py verify "$receipt" "$SIGNED_PAYMENTS" endorsed-assets/stock-pending.sorted-internal.bin.gz endorsed-assets/terminal-wires.zip
+.native/py/bin/python qualification/restore_teranode_archive.py verify "$receipt" \
+  docs/evidence/chronicle-sustained-endorsed-stock-tn1-restore.json
+.native/py/bin/python qualification/verify_candidate_restart.py "$receipt" \
+  docs/evidence/chronicle-sustained-endorsed-stock-tn1-restore.json "$SIGNED_PAYMENTS" \
+  endorsed-assets/active-bodies.zip endorsed-assets/terminal-wires.zip
 ~~~
 
 
