@@ -1,0 +1,145 @@
+{
+  "source_writer_count": 2,
+  "schema": "scary-checkpoint-upgrade-v1",
+  "source_commit": "a69433bf4d43202b6155561ec4ec0b18aa4d6ce3",
+  "release_binary_sha256": "86f0f7caaa2188b19eed42fcfe47af04e5041d0bf34284a8c91ecdef529a25e2",
+  "image": "sha256:0e61b92676c4b8b52065fc9e2b5e6bbbec0f8cc717c9ddde6bf6c641be6f0c55",
+  "stock_image": "bitcoinsv/bitcoin-sv:1.2.3@sha256:d96fe4786a00e5fc10bc9e0e76a6006376f9472d4eb74d07e4c1e0d019493d33",
+  "worker_transport_image": "busybox@sha256:73aaf090f3d85aa34ee199857f03fa3a95c8ede2ffd4cc2cdb5b94e566b11662",
+  "stock_restore": {
+    "method": "stock reindex of original block files",
+    "reoffered": 0
+  },
+  "original": {
+    "size": 316588547,
+    "file_sha256": "60f769062ff7c6969bc41f1edad1cfed5e842a550255c1fca736743e440a752e",
+    "payload_sha256": "a46c75038049c8194ce235e030bd0c515f955aa8036d88b62256232a01a72a82"
+  },
+  "initial": {
+    "height": 580,
+    "tip_hash": "5754c4a0292ba4c9ea34bb59f721b7b28e39d5806300681823f305890e8783b4",
+    "headers": 131,
+    "witnessed_outputs": 69764,
+    "waiting_for_successor": 0,
+    "pending_transactions": 0,
+    "solved_blocks": 56,
+    "durable_directive_sequence": 0,
+    "recoverable_blocks": 8,
+    "connected_data_peers": 0,
+    "job_preconditions_met": false,
+    "tip_confirmed_since_disconnect": false,
+    "storage_failure": null
+  },
+  "offered": {
+    "height": 580,
+    "tip_hash": "5754c4a0292ba4c9ea34bb59f721b7b28e39d5806300681823f305890e8783b4",
+    "headers": 131,
+    "witnessed_outputs": 69764,
+    "waiting_for_successor": 0,
+    "pending_transactions": 1,
+    "solved_blocks": 56,
+    "durable_directive_sequence": 0,
+    "recoverable_blocks": 8,
+    "connected_data_peers": 1,
+    "job_preconditions_met": true,
+    "tip_confirmed_since_disconnect": true,
+    "storage_failure": null
+  },
+  "reopened": {
+    "height": 580,
+    "tip_hash": "5754c4a0292ba4c9ea34bb59f721b7b28e39d5806300681823f305890e8783b4",
+    "headers": 131,
+    "witnessed_outputs": 69764,
+    "waiting_for_successor": 0,
+    "pending_transactions": 1,
+    "solved_blocks": 56,
+    "durable_directive_sequence": 0,
+    "recoverable_blocks": 8,
+    "connected_data_peers": 0,
+    "job_preconditions_met": false,
+    "tip_confirmed_since_disconnect": false,
+    "storage_failure": null
+  },
+  "settled": {
+    "height": 582,
+    "tip_hash": "25fa9ed10385d2f317a15e8b38d7120062d43a54faa53ee2349573f24d5f4865",
+    "headers": 133,
+    "witnessed_outputs": 69766,
+    "waiting_for_successor": 0,
+    "pending_transactions": 0,
+    "solved_blocks": 57,
+    "durable_directive_sequence": 0,
+    "recoverable_blocks": 8,
+    "connected_data_peers": 1,
+    "job_preconditions_met": false,
+    "tip_confirmed_since_disconnect": true,
+    "storage_failure": null
+  },
+  "initial_restore_ns": 2616416583,
+  "clean_shutdown_ns": 1370078000,
+  "shutdown_file_events": {
+    "events": [
+      {
+        "event": "create",
+        "name": "witness.next",
+        "elapsed_ns": 95990021335
+      },
+      {
+        "event": "rename",
+        "name": "witness.state",
+        "elapsed_ns": 97228908669
+      },
+      {
+        "event": "close_write",
+        "name": "witness.state",
+        "elapsed_ns": 97237679086
+      }
+    ],
+    "create_to_rename_ns": 1238887334,
+    "create_to_close_ns": 1247657751
+  },
+  "peerless_restart_ns": 2370743167,
+  "worker_roundtrip_ns": 1176238292,
+  "stock_selected_by_ns_from_submit": 2491904334,
+  "original_parent": "5754c4a0292ba4c9ea34bb59f721b7b28e39d5806300681823f305890e8783b4",
+  "after_stop_sha256": "62446108f86b74e0d9b13b801da16bb25e1f64881892fa0c301ca35175596dc3",
+  "final_checkpoint_sha256": "6a246b0335247fa6f0ab077df9a6f1c0fe8319d71b7780724d891516cf3739fa",
+  "payment_input": {
+    "txid": "fab2d22f025d2151085c1a733a872eafcfa42ad086a76cd00e345f59fd1fd8fe",
+    "index": 0,
+    "value": 7275,
+    "height": 575,
+    "script": "41048b71a1225ab5bd7a924d28744a1f3c14800773c4290713b157f1b206d876b174e72c7a9dc811a7628f0787674eae6ab7dff0d651dfd51d433edda23901f9e66aac"
+  },
+  "funding_hex": "01000000016a04375d828a2f558a01b33b02238991683f0d3059d01f434197d921e261bd930000000049483045022100c8da22d0f5e484976cb10c732130f5df6d780620af6fc1a2beb471be4154ecfc02205167b4882f24a1e5bd137fd747679abaa1f344c72f3efd1bc94bf0301f6fc12241ffffffff016b1c0000000000004341048b71a1225ab5bd7a924d28744a1f3c14800773c4290713b157f1b206d876b174e72c7a9dc811a7628f0787674eae6ab7dff0d651dfd51d433edda23901f9e66aac00000000",
+  "payment_hex": "0100000001fed81ffd595f340ed06ca786d02aa4cfaf2e873a731a5c0851215d022fd2b2fa0000000049483045022100f65e5b8c0d7edad27995ba5b954fb718d572054f241020b7a75406d1099f61bf02207252127430eb48b74931d680d6722975fe1886293e5f64bb872d0b4a3a60e07941ffffffff0183180000000000004341048b71a1225ab5bd7a924d28744a1f3c14800773c4290713b157f1b206d876b174e72c7a9dc811a7628f0787674eae6ab7dff0d651dfd51d433edda23901f9e66aac00000000",
+  "payment_txid": "baea38fd1fe82a1f9e65fcf7d6b256eced63a5676fc15eabf974ea2368b769c2",
+  "worker": {
+    "name": "checkpoint-upgrade",
+    "extranonce1": "00000401",
+    "extranonce2_bytes": 4,
+    "authorized": true,
+    "share_difficulty": 4.6565423739069247e-10,
+    "first_job": [
+      "11dead",
+      "0e8783b423f30589630068188e39d580f721b7b2ea34bb59292ba4c95754c4a0",
+      "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3a02450208",
+      "0c2f73636172792d6e6f64652f204a6629b0f2dcbaaf66e6751f7afe24a9d286458084ef077767f85acb9fc3d4a2ffffffff0128c24025000000001976a914751e76e8199196d454941c45d1b3a323f1433bd688ac00000000",
+      [
+        "c269b76823ea74f9ab5ec16f67a563edec56b2d6f7fc659e1f2ae81ffd38eaba"
+      ],
+      "20000000",
+      "207fffff",
+      "6b028280",
+      true
+    ]
+  },
+  "extranonce2": "00000000",
+  "nonce": 0,
+  "worker_ack": {
+    "result": true,
+    "error": null
+  },
+  "selected_wire": "00000020b483870e8905f3231868006380d5398eb2b721f759bb34eac9a42b29a0c454579060a5332f17964e94e9300333210b66c3e9acc0b71e0d4a667843ff77ddbcf48082026bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3a0245020800000401000000000c2f73636172792d6e6f64652f204a6629b0f2dcbaaf66e6751f7afe24a9d286458084ef077767f85acb9fc3d4a2ffffffff0128c24025000000001976a914751e76e8199196d454941c45d1b3a323f1433bd688ac000000000100000001fed81ffd595f340ed06ca786d02aa4cfaf2e873a731a5c0851215d022fd2b2fa0000000049483045022100f65e5b8c0d7edad27995ba5b954fb718d572054f241020b7a75406d1099f61bf02207252127430eb48b74931d680d6722975fe1886293e5f64bb872d0b4a3a60e07941ffffffff0183180000000000004341048b71a1225ab5bd7a924d28744a1f3c14800773c4290713b157f1b206d876b174e72c7a9dc811a7628f0787674eae6ab7dff0d651dfd51d433edda23901f9e66aac00000000",
+  "stock_successor_header": "000000203ca839c2779a7bf6d36e57063d7f31cd61aae6a1b294c7b7b2511f1fb6683a492888f38bf13cfad0baf85ef5465001514b6183a4dd3cd02d26b22c244765f7fa8382026bffff7f2001000000"
+}
