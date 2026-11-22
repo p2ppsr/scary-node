@@ -2,10 +2,14 @@
 
 import copy
 import io
+import json
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
-from shadow_pending_restore import compare, dsha, inventory
+from shadow_native import parse_tx, read_varint
+from shadow_pending_restore import compare, dsha, follow_successor, inventory
 
 
 def sample_raw(tag):
@@ -101,6 +105,69 @@ class StopComparison(unittest.TestCase):
             self.assertRaisesRegex(ValueError, "differs from its ID"),
         ):
             inventory(self.path)
+
+
+class SuccessorDisposition(unittest.TestCase):
+    def setUp(self):
+        evidence = Path(__file__).resolve().parents[1] / "docs/evidence"
+        receipt = json.loads(
+            (evidence / "chronicle-mainnet-waiting-restart.json").read_bytes()
+        )
+        wire = bytes.fromhex(receipt["first_successor_wire_hex"])
+        self.body = Path(self.enterContext(tempfile.TemporaryDirectory())) / "block"
+        self.body.write_bytes(wire)
+        row = receipt["first_successor"]
+        self.before = {
+            "height": row["closed_height"],
+            "parent": row["closed_parent"],
+            "directive_sequence": 1,
+        }
+        self.after = {
+            "height": row["successor_height"],
+            "parent": row["successor"],
+            "directive_sequence": 1,
+        }
+        _, start = read_varint(wire, 80)
+        _, _, start = parse_tx(wire, start)
+        payment, _, _ = parse_tx(wire, start)
+        self.in_block = dsha(payment)
+        self.in_pool, self.held, self.absent = [dsha(sample_raw(i)) for i in range(3)]
+        self.waiting = [
+            ("sv", ident, size)
+            for ident, size in (
+                (self.in_block, len(payment)),
+                (self.in_pool, 92),
+                (self.held, 100),
+                (self.absent, 110),
+            )
+        ]
+
+    def assess(self, admitted):
+        states = [
+            (self.before, "before", set(), self.waiting),
+            (self.after, "after", admitted, [self.waiting[2]]),
+        ]
+        with patch("shadow_pending_restore.snapshot_inventory", side_effect=states):
+            return follow_successor(None, None, self.body)
+
+    def test_each_waiting_payment_receives_one_disposition(self):
+        report = self.assess({self.in_pool})
+        keys = (
+            "confirmed_in_successor",
+            "eligible_after_successor",
+            "waiting_after_successor",
+            "absent_from_successor_and_pools",
+        )
+        self.assertEqual([report[k] for k in keys], [1, 1, 1, 1])
+
+    def test_confirmed_payment_cannot_be_counted_as_eligible(self):
+        with self.assertRaisesRegex(ValueError, "more than one"):
+            self.assess({self.in_pool, self.in_block})
+
+    def test_body_must_extend_the_original_observed_tip(self):
+        self.before["parent"] = "00" * 32
+        with self.assertRaisesRegex(ValueError, "does not extend"):
+            self.assess(set())
 
 
 if __name__ == "__main__":

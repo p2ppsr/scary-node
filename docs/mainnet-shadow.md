@@ -1,5 +1,20 @@
 # Passive mainnet observation
 
+## Restart with payments awaiting endorsement
+
+The original 90-block checkpoint below has been extended. At height **976545**, the waiting-queue release reopened 320 eligible payments and the same selected parent. The next measured graceful stop at **976546** saved **12 native offers awaiting a successor**, totaling 36,013 bytes, and two eligible payments. The earlier atomic file at this same parent contained zero in both pools. The restarted observer reported all 12 waiting and both eligible before any data peer connected. Five peers reconfirmed the parent within two seconds. The maintained receiver reported two peers, signed sequence 1 and zero outstanding actions.
+
+A Linux ARM64 process reopened the same closed checkpoint with its Docker network disabled. Its reported 12 waiting offers, 36,013 waiting bytes, two eligible payments, 125 headers, 38,836 witnessed outputs and directive sequence 1 agreed with macOS. The checkpoint binds the exact order, source and bytes of the saved offers. The isolated process reported its live counts and remained unready for work.
+
+The first successor, height **976547**, contained two transactions. Scary received the 351-byte body over SV P2P. A separate Teranode Asset endpoint returned the identical bytes. The header proof of work, parent and complete Merkle root verified. None of the 12 saved offers was mined in that block. The post-block checkpoint placed **all 12 exact transaction IDs in the eligible pool**, kept the two earlier eligible payments, and contained 22 eligible payments in total. Native gossip continued throughout this mainnet observation. The stock regtest isolates the single-offer case by measuring zero retransmission. The public receipt supplies the successor bytes and aggregate commitments. Rechecking individual unconfirmed payments requires the operator’s private snapshots. [Controlled restart, Linux boot and successor](evidence/chronicle-mainnet-waiting-restart.json) · [Single-offer stock regtests](early-peer-intake.md#restart-before-the-funding-block-has-a-successor)
+
+~~~sh
+.native/py/bin/python qualification/shadow_pending_restore.py "$EARLIER_STATE" "$CLOSED_STATE" --awaiting-successor
+.native/py/bin/python qualification/shadow_pending_restore.py "$CLOSED_STATE" "$SUCCESSOR_STATE" --successor-body "$SUCCESSOR_WIRE"
+~~~
+
+## First 90 consecutive blocks
+
 The checkpoint covers **90 consecutive blocks, 976422 through 976511**, observed from November 21, 2026 at 02:23:34 to 18:25:17 UTC. The observer started collecting contemporary bodies with an empty witnessed set. The 1,008-block qualification is in progress. Every decision in this checkpoint withheld work while the 147-header mainnet difficulty window filled. The observer ran with shadow assembly enabled and its Stratum listener disabled. [Machine-readable results](evidence/chronicle-shadow-checkpoint.json) · [Compressed observations and reference readbacks](evidence/chronicle-shadow-journal.json.gz)
 
 | Measurement | Checkpoint result |

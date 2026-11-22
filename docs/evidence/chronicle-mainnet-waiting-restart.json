@@ -1,0 +1,409 @@
+{
+  "upgrade": {
+    "source_commit": "5148c31ae620544c31a61b1710172c4bcc524c54",
+    "release_sha256": "1c653db328c8c5af9b49dc9b1939fb320611097c507be7bac35449f668ced1ef",
+    "started_unix_s": 1795309669,
+    "verified_unix_s": 1795309671,
+    "passive_mainnet": true,
+    "recovered_start_hash": "000000000000000003ccfebf41860dc570a1ac5a7904fa3e5048c0c6a90610c3",
+    "before": {
+      "height": 976545,
+      "tip_hash": "000000000000000003ccfebf41860dc570a1ac5a7904fa3e5048c0c6a90610c3",
+      "coverage_start": 976422,
+      "coverage_end": 976545,
+      "headers": 124,
+      "witnessed_outputs": 38100,
+      "pending_transactions": 320,
+      "waiting_for_successor": 0,
+      "waiting_for_successor_bytes": 0,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 1945,
+          "awaiting_successor": 258,
+          "discarded_after_recheck": 53,
+          "duplicate": 5329,
+          "ineligible": 4629,
+          "promoted_after_successor": 205
+        },
+        "teranode_subtree": {
+          "admitted": 512,
+          "awaiting_successor": 49,
+          "discarded_after_recheck": 8,
+          "duplicate": 276916,
+          "ineligible": 166966,
+          "promoted_after_successor": 41
+        }
+      },
+      "window_chainwork": "3ed177a84d4e2892c30",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": true,
+      "connected_data_peers": 9,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "restored": {
+      "height": 976545,
+      "tip_hash": "000000000000000003ccfebf41860dc570a1ac5a7904fa3e5048c0c6a90610c3",
+      "coverage_start": 976422,
+      "coverage_end": 976545,
+      "headers": 124,
+      "witnessed_outputs": 38100,
+      "pending_transactions": 320,
+      "waiting_for_successor": 0,
+      "waiting_for_successor_bytes": 0,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3ed177a84d4e2892c30",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "awaiting current tip from a connected data peer",
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": false,
+      "connected_data_peers": 0,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "reconfirmed": {
+      "height": 976545,
+      "tip_hash": "000000000000000003ccfebf41860dc570a1ac5a7904fa3e5048c0c6a90610c3",
+      "coverage_start": 976422,
+      "coverage_end": 976545,
+      "headers": 124,
+      "witnessed_outputs": 38100,
+      "pending_transactions": 320,
+      "waiting_for_successor": 0,
+      "waiting_for_successor_bytes": 0,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3ed177a84d4e2892c30",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": true,
+      "connected_data_peers": 3,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "receiver": {
+      "active_peers": 2,
+      "synced": true,
+      "sequence": 1,
+      "unprocessed_alerts": 0
+    }
+  },
+  "live_restart": {
+    "source_commit": "5148c31ae620544c31a61b1710172c4bcc524c54",
+    "release_sha256": "1c653db328c8c5af9b49dc9b1939fb320611097c507be7bac35449f668ced1ef",
+    "started_unix_s": 1795310304,
+    "verified_unix_s": 1795310306,
+    "passive_mainnet": true,
+    "recovered_start_hash": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+    "before": {
+      "height": 976546,
+      "tip_hash": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+      "coverage_start": 976422,
+      "coverage_end": 976546,
+      "headers": 125,
+      "witnessed_outputs": 38836,
+      "pending_transactions": 2,
+      "waiting_for_successor": 12,
+      "waiting_for_successor_bytes": 36013,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 104,
+          "awaiting_successor": 12,
+          "discarded_after_recheck": 0,
+          "duplicate": 149,
+          "ineligible": 136,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 4,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 25744,
+          "ineligible": 4004,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3f4b60dbb25756a2039",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": true,
+      "connected_data_peers": 9,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "restored": {
+      "height": 976546,
+      "tip_hash": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+      "coverage_start": 976422,
+      "coverage_end": 976546,
+      "headers": 125,
+      "witnessed_outputs": 38836,
+      "pending_transactions": 2,
+      "waiting_for_successor": 12,
+      "waiting_for_successor_bytes": 36013,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3f4b60dbb25756a2039",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "awaiting current tip from a connected data peer",
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": false,
+      "connected_data_peers": 0,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "reconfirmed": {
+      "height": 976546,
+      "tip_hash": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+      "coverage_start": 976422,
+      "coverage_end": 976546,
+      "headers": 125,
+      "witnessed_outputs": 38836,
+      "pending_transactions": 2,
+      "waiting_for_successor": 12,
+      "waiting_for_successor_bytes": 36013,
+      "peer_transaction_intake": {
+        "sv": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        },
+        "teranode_subtree": {
+          "admitted": 0,
+          "awaiting_successor": 0,
+          "discarded_after_recheck": 0,
+          "duplicate": 0,
+          "ineligible": 0,
+          "promoted_after_successor": 0
+        }
+      },
+      "window_chainwork": "3f4b60dbb25756a2039",
+      "durable_directive_sequence": 1,
+      "readiness_reasons": [
+        "difficulty history incomplete"
+      ],
+      "storage_failure": null,
+      "tip_confirmed_since_disconnect": true,
+      "connected_data_peers": 5,
+      "alert_ready": true,
+      "alert_connected": true,
+      "alert_verified": 1,
+      "alert_applied": 1
+    },
+    "receiver": {
+      "active_peers": 2,
+      "synced": true,
+      "sequence": 1,
+      "unprocessed_alerts": 0
+    }
+  },
+  "checkpoints": {
+    "earlier_waiting": {
+      "count": 0,
+      "bytes": 0,
+      "sources": {
+        "sv": 0,
+        "subtree": 0
+      },
+      "ordered_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "closed_waiting": {
+      "count": 12,
+      "bytes": 36013,
+      "sources": {
+        "sv": 12,
+        "subtree": 0
+      },
+      "ordered_sha256": "4957395501dfa6ec2aafde6213d6777a370937db9e5805d76e30e3abfd1f330e"
+    },
+    "height": 976546,
+    "parent": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+    "headers": 125,
+    "headers_sha256": "3e09abca4fca19d5ec5d3047ae62d18e9c583b30b4bba55dac3568d355730fe6",
+    "witnessed_outputs": 38836,
+    "witnessed_outputs_sha256": "a30d8bb99cf9067984618687e38a476044c281f0d00314fd40522c0dbcf19220",
+    "directive_sequence": 1,
+    "earlier_payload_sha256": "3beded90c8a8739f5b11b1c9cb87f696a202f4292b60c1f8b74bfbfc991b3399",
+    "closed_payload_sha256": "c9967ae6d1f8246e63c63bf0d435644029d7a4f10d97f12a49a429a55c8bb222",
+    "earlier_eligible": 0,
+    "closed_eligible": 2,
+    "added_eligible": 2,
+    "removed_eligible": 0,
+    "earlier_ids_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "closed_ids_sha256": "b564033f91afd6a006f473d45228cdbce46e3c795c20d8ecab246bb3555e4038"
+  },
+  "isolated_linux": {
+    "checkpoint_waiting": {
+      "count": 12,
+      "bytes": 36013,
+      "sources": {
+        "sv": 12,
+        "subtree": 0
+      },
+      "ordered_sha256": "4957395501dfa6ec2aafde6213d6777a370937db9e5805d76e30e3abfd1f330e"
+    },
+    "restored_waiting_count": 12,
+    "restored_waiting_bytes": 36013,
+    "network": "mainnet",
+    "docker_network_mode": "none",
+    "source_commit": "5148c31ae620544c31a61b1710172c4bcc524c54",
+    "image_id": "sha256:0da9e6af62129fa7385f78ddf190780c3975598c49211b3fbb838837d9ca2d6f",
+    "executable_sha256": "5129b3dea8cecf04d369aa7a7d663024879291799af5424cb0158e8e337b643e",
+    "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+    "checkpoint_sha256": "c73014e1efc057526878b9dd07be917428209049e08f4149f79d3d60e24e5475",
+    "payload_sha256": "c9967ae6d1f8246e63c63bf0d435644029d7a4f10d97f12a49a429a55c8bb222",
+    "height": 976546,
+    "parent": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+    "headers": 125,
+    "headers_sha256": "3e09abca4fca19d5ec5d3047ae62d18e9c583b30b4bba55dac3568d355730fe6",
+    "witnessed_outputs": 38836,
+    "witnessed_outputs_sha256": "a30d8bb99cf9067984618687e38a476044c281f0d00314fd40522c0dbcf19220",
+    "directive_sequence": 1,
+    "expected_eligible": 2,
+    "restored_eligible": 2,
+    "input_eligible_ids_sha256": "b564033f91afd6a006f473d45228cdbce46e3c795c20d8ecab246bb3555e4038",
+    "connected_data_peers": 0,
+    "tip_reconfirmed": false,
+    "directive_connected": false,
+    "directive_ready": false,
+    "peer_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "work_ready": false
+  },
+  "first_successor": {
+    "closed_height": 976546,
+    "closed_parent": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+    "successor_height": 976547,
+    "successor": "00000000000000000afaa872f5a388580912349ffd49c5525369b338699bb66d",
+    "successor_header": "00e04b2c9afc1e463f9e864a26bad7c00983e5cc8db68b3508fade0400000000000000009056906d8c828dc36eb90e71e55622ee9e9ae880733dbabe1c1b2c738047a8289a42026b0ce621183f3cedb1",
+    "successor_wire_sha256": "72a7c9ace711787626f268389c8e15d6f69b37f071278d1ab0af8a85a2e0500e",
+    "successor_transactions": 2,
+    "closed_checkpoint_payload_sha256": "c9967ae6d1f8246e63c63bf0d435644029d7a4f10d97f12a49a429a55c8bb222",
+    "successor_checkpoint_payload_sha256": "91351a7ff5cd0b160767a46303212df66ba900536c659e55c7cfc92d6a45ecc5",
+    "directive_sequence_before": 1,
+    "directive_sequence_after": 1,
+    "saved_waiting": {
+      "count": 12,
+      "bytes": 36013,
+      "sources": {
+        "sv": 12,
+        "subtree": 0
+      },
+      "ordered_sha256": "4957395501dfa6ec2aafde6213d6777a370937db9e5805d76e30e3abfd1f330e"
+    },
+    "confirmed_in_successor": 0,
+    "eligible_after_successor": 12,
+    "waiting_after_successor": 0,
+    "absent_from_successor_and_pools": 0,
+    "earlier_eligible_still_eligible": 2,
+    "total_eligible_after_successor": 22
+  },
+  "first_successor_wire_hex": "00e04b2c9afc1e463f9e864a26bad7c00983e5cc8db68b3508fade0400000000000000009056906d8c828dc36eb90e71e55622ee9e9ae880733dbabe1c1b2c738047a8289a42026b0ce621183f3cedb10201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff1703a3e60e2f43555656452fe9d407a5266b721f0049fb03ffffffff01395fa012000000001976a914d648686cf603c11850f39600e37312738accca8f88ac000000000100000001938ca60760e09cdc4b5e32e31e43514c8b2cdd744d3efbec15e42c69e10b45d9400100002120087f08650f62cd3fec82c0298e2ac2f19901a2cf45d6052d48a0e20964603ae6ffffffff01000000000000000045006a42434f52452d4d7187f266bd62dd1ddcc45bd2e3d6a638ac738878b10d0d2780868b3058576ca7ab8bb3bcc0a74f2badc16780032e051e000000006b02428f0000000800000000",
+  "independent_successor_readback": {
+    "height": 976547,
+    "hash": "00000000000000000afaa872f5a388580912349ffd49c5525369b338699bb66d",
+    "parent": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+    "readback_utc": "2026-11-22T01:32:48.225936+00:00",
+    "bytes": 351,
+    "sha256": "72a7c9ace711787626f268389c8e15d6f69b37f071278d1ab0af8a85a2e0500e",
+    "transaction_count": 2,
+    "observation_source": "SV P2P",
+    "independent_readback": "Teranode Asset",
+    "wire_bytes_equal": true,
+    "pow_and_merkle_verified": true
+  }
+}
