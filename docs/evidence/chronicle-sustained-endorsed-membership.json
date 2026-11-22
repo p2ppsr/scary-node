@@ -3,6 +3,25 @@
   "merkle_verified_bodies": 66,
   "confirmed_distinct_memberships": 4498432,
   "advertised_unmined_matched_stock_mempool": 50176,
+  "stock_pending_source_inputs": {
+    "selected_tip_height": 551,
+    "confirmed_parent_creation_heights": {
+      "551": 50176
+    },
+    "unconfirmed_source_parents": 0
+  },
+  "selected_bodies_above_first_empty_status_height": {
+    "first_empty_status_height": 494,
+    "selected_bodies": 57,
+    "confirmed_payments": 4218307,
+    "inclusion_height_minus_parent_creation_height": {
+      "0": 482755,
+      "1": 3735552
+    }
+  },
+  "payment_counts_by_fee_satoshis": {
+    "200": 4498432
+  },
   "transaction_fees_satoshis_by_origin": {
     "scary": 16842000,
     "sv": 882844400
