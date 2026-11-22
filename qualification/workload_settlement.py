@@ -24,21 +24,35 @@ def trace(record):
     by_hash = {r["hash"]: r for r in record["slots"] if r.get("outcome") == "solved"}
     tail = []
     for b in record["blocks"]:
-        if b["height"] < last:
+        if not checked["distinct_confirmed"] or b["height"] < last:
             continue
         slot = by_hash.get(b["hash"])
-        tail.append(
-            {
-                "height": b["height"],
-                "hash": b["hash"],
-                "payments": b["scheduled_payments"],
-                "wire_bytes": b["wire_bytes"],
-                "matching_wire_reads": b["independent_wire_sha256"],
-                "first_sampled_tip_ns": b["first_observed_ns"],
-                "completed_body_audit_ns": b["readback_ns"],
-                "scheduled_solution_slot": slot["index"] if slot else None,
-            }
-        )
+        row = {
+            "height": b["height"],
+            "hash": b["hash"],
+            "payments": b["scheduled_payments"],
+            "wire_bytes": b["wire_bytes"],
+            "matching_wire_reads": b["independent_wire_sha256"],
+            "first_sampled_tip_ns": b["first_observed_ns"],
+            "completed_body_audit_ns": b["readback_ns"],
+            "scheduled_solution_slot": slot["index"] if slot else None,
+        }
+        if record.get("phase_timing_format") == 1:
+            row["independent_wire_read"] = b["independent_wire_read"]
+        if record.get("worker_header_format") == 1:
+            row["prepared_worker_attempts"] = [
+                {
+                    "phase": worker["phase"],
+                    "index": worker["index"],
+                    "job": worker["worker_candidate"]["notify"][0],
+                    "outcome": worker["outcome"],
+                    "submit_started_ns": worker.get("worker_submit_started_ns"),
+                    "submit_ended_ns": worker.get("worker_submit_ended_ns"),
+                }
+                for worker in record["slots"]
+                if worker.get("worker_candidate", {}).get("hash") == b["hash"]
+            ]
+        tail.append(row)
     return {
         "arm": record.get("arm"),
         "start_wall_ns": record["start_wall_ns"],
