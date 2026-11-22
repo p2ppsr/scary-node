@@ -62,7 +62,7 @@ def build_publisher():
 
 
 @contextlib.contextmanager
-def stock(keys, directory):
+def stock(keys, directory, *, with_sv=False):
     name = "scary-alert-" + secrets.token_hex(5)
     compose = [
         "docker",
@@ -71,9 +71,13 @@ def stock(keys, directory):
         name,
         "-f",
         str(ROOT / "regtest/compose.yaml"),
-        "-f",
-        str(directory / "overlay.json"),
     ]
+    services = ["tn1", "tn2", "alert-ingress"]
+    if with_sv:
+        for overlay_name in ("mixed.compose.yaml", "mixed-native.compose.yaml"):
+            compose.extend(["-f", str(ROOT / "regtest" / overlay_name)])
+        services.append("svref")
+    compose.extend(["-f", str(directory / "overlay.json")])
     defaults = json.loads(
         subprocess.check_output(
             [
@@ -149,7 +153,7 @@ def stock(keys, directory):
     (directory / "overlay.json").write_text(json.dumps(overlay))
     try:
         subprocess.run(
-            [*compose, "up", "-d", "--no-build", "tn1", "tn2", "alert-ingress"],
+            [*compose, "up", "-d", "--no-build", *services],
             check=True,
             stdout=sys.stderr,
         )
@@ -179,6 +183,42 @@ def stock(keys, directory):
             check=True,
             stdout=sys.stderr,
         )
+
+
+def stored_alerts(container, service, directory):
+    container("stop", service)
+    db = directory / f"{service}-readback.db"
+    subprocess.run(
+        [
+            "docker",
+            "cp",
+            container("ps", "-a", "-q", service) + ":/app/data/alert.db",
+            str(db),
+        ],
+        check=True,
+    )
+    with sqlite3.connect(f"file:{db}?mode=ro", uri=True) as conn:
+        table = next(
+            n
+            for (n,) in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+            if n.endswith("alert_messages")
+        )
+        cols = [row[1] for row in conn.execute(f"pragma table_info({table})")]
+        if not {"sequence_number", "processed", "raw"} <= set(cols):
+            raise ValueError("unexpected pinned receiver schema: " + str(cols))
+        stored = [
+            {
+                "sequence_number": s,
+                "processed": bool(ok),
+                "raw": raw.hex() if isinstance(raw, bytes) else raw,
+            }
+            for s, ok, raw in conn.execute(
+                f"select sequence_number,processed,raw from {table} where sequence_number>0 order by sequence_number"
+            )
+        ]
+    return stored
 
 
 def measure(directory, binary, publisher_binary):
@@ -369,38 +409,7 @@ def measure(directory, binary, publisher_binary):
         active_tips["sv_node"] = sv.rpc("getbestblockhash")
         active_tips["scary_node"] = response(api + "/status")["mining"]["tip_hash"]
         assert set(active_tips.values()) == {inclusion}
-        container("stop", "tn1")
-        db = directory / "readback.db"
-        subprocess.run(
-            [
-                "docker",
-                "cp",
-                container("ps", "-a", "-q", "tn1") + ":/app/data/alert.db",
-                str(db),
-            ],
-            check=True,
-        )
-        with sqlite3.connect(f"file:{db}?mode=ro", uri=True) as conn:
-            table = next(
-                n
-                for (n,) in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table'"
-                )
-                if n.endswith("alert_messages")
-            )
-            cols = [row[1] for row in conn.execute(f"pragma table_info({table})")]
-            if not {"sequence_number", "processed", "raw"} <= set(cols):
-                raise ValueError("unexpected pinned receiver schema: " + str(cols))
-            stored = [
-                {
-                    "sequence_number": s,
-                    "processed": bool(ok),
-                    "raw": raw.hex() if isinstance(raw, bytes) else raw,
-                }
-                for s, ok, raw in conn.execute(
-                    f"select sequence_number,processed,raw from {table} where sequence_number>0 order by sequence_number"
-                )
-            ]
+        stored = stored_alerts(container, "tn1", directory)
         if [r["raw"] for r in stored] != [r["raw"] for r in f.records] or not all(
             r["processed"] for r in stored
         ):
