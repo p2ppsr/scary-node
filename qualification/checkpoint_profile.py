@@ -385,6 +385,8 @@ def run(source, build_dir, out, volume):
                 "none",
                 "--read-only",
                 "--env",
+                "TMPDIR=/scratch",
+                "--env",
                 "SCARY_PROFILE_SOURCE=/input/witness.state",
                 "--env",
                 "SCARY_PROFILE_SCRATCH=/scratch",
