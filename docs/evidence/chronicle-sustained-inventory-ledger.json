@@ -1,0 +1,11 @@
+{
+  "binding_file_sha256": "7cd7af68e86b565bc8a21914901a4d32451e0ae2eda871caf346687bbd89a5ea",
+  "checkpoint_bytes": 251355518,
+  "checkpoint_payload_sha256": "0710ff9c15c93691ceea3e98a2dcf4dbf8a9e8da5803544bd68bd58d515982ea",
+  "mining_identity": "3d02b2fbb6ecde194cf948460d0eccb443cc2a5449d0e3d7fe19a1286ab3464a",
+  "tip_height": 561,
+  "tip_hash": "73f04b330ef7f053f466e8f5b500f2725464738a29bc1246a71b7b488e61a599",
+  "solved_blocks": 0,
+  "retained_solution_asset": null,
+  "records": []
+}
