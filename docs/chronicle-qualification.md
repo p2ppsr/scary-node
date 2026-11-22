@@ -23,7 +23,7 @@ python3 qualification/release_build.py 781ddd73ac78bd1887138fad331eeace21488509 
 
 On Linux ARM64, the `af9b605` build and the fresh Cargo target build at `6ad4152` produced the same executable SHA-256, `833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528`. Both running nodes reported BDK 1.4.0 and SV Node 1.2.3, and the build-stage native archive matched the embedded digest. Reproduce either build by passing its commit to the command above. [Fresh target build](evidence/chronicle-qualification-linux-release.json) · [Second image with matching executable](evidence/chronicle-second-linux-build.json)
 
-To build the macOS observer from the same committed Rust source, build the pinned native archive first. Run the following in the repository root with the Rust 1.98.1 toolchain on `PATH`. This uses a fresh Cargo target and independently checks the operator interface on the resulting executable. Its manifest records the platform compiler and archive digest. [Measured macOS build](evidence/chronicle-qualification-macos-release.json)
+To build the macOS observer from the same committed Rust source, build the pinned native archive first. Run the following in the repository root with the Rust 1.98.1 toolchain on `PATH`. For a rustup installation alongside a system compiler, prepend the directory containing `rustup which --toolchain 1.98.1 rustc` to the build process’s `PATH` and verify both `rustc --version` and `cargo --version` report 1.98.1. This uses a fresh Cargo target and independently checks the operator interface on the resulting executable. Its manifest records the platform compiler and archive digest. [Measured macOS build](evidence/chronicle-qualification-macos-release.json)
 
 ```sh
 release_source=$(mktemp -d)

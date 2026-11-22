@@ -6,13 +6,13 @@ The node starts with an empty working set. It sees an output created, observes o
 
 ## Listen on mainnet
 
-Install Rust 1.98.1 and the native build prerequisites. The build fetches the pinned upstream interpreter and links it into the node. [Build and qualification](docs/chronicle-qualification.md)
+Install Rust 1.98.1 and the native build prerequisites. Rustup reads the repository toolchain pin. If a system package manager also supplies Cargo, run the explicit rustup command below or put the 1.98.1 toolchain first on your build path. The build fetches the pinned upstream interpreter and links it into the node. [Build and qualification](docs/chronicle-qualification.md)
 
 ```sh
 git clone https://github.com/p2ppsr/scary-node.git
 cd scary-node
 ./scripts/build-bdk.sh
-cargo build --release --locked
+rustup run 1.98.1 cargo build --release --locked
 ./target/release/scary-node
 ```
 
