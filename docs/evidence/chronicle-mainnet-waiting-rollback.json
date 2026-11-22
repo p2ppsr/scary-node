@@ -1,0 +1,110 @@
+{
+  "rollback_boot": {
+    "checkpoint_waiting": {
+      "count": 12,
+      "bytes": 36013,
+      "sources": {
+        "sv": 12,
+        "subtree": 0
+      },
+      "ordered_sha256": "4957395501dfa6ec2aafde6213d6777a370937db9e5805d76e30e3abfd1f330e"
+    },
+    "restored_waiting_count": 0,
+    "restored_waiting_bytes": 0,
+    "network": "mainnet",
+    "docker_network_mode": "none",
+    "source_commit": "10b93b4f0ff798a7b14813443addf2348beeee41",
+    "image_id": "sha256:1953814b38f891e4f42b9a4ba1df9e87325d5d36e2a848011e42c694ac21fd9d",
+    "executable_sha256": "4b623365dcdc664473156992e6119eb7fe51f92aef838a9f946281ec31b7c536",
+    "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+    "checkpoint_sha256": "c73014e1efc057526878b9dd07be917428209049e08f4149f79d3d60e24e5475",
+    "payload_sha256": "c9967ae6d1f8246e63c63bf0d435644029d7a4f10d97f12a49a429a55c8bb222",
+    "height": 976546,
+    "parent": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+    "headers": 125,
+    "headers_sha256": "3e09abca4fca19d5ec5d3047ae62d18e9c583b30b4bba55dac3568d355730fe6",
+    "witnessed_outputs": 38836,
+    "witnessed_outputs_sha256": "a30d8bb99cf9067984618687e38a476044c281f0d00314fd40522c0dbcf19220",
+    "directive_sequence": 1,
+    "expected_eligible": 2,
+    "restored_eligible": 2,
+    "input_eligible_ids_sha256": "b564033f91afd6a006f473d45228cdbce46e3c795c20d8ecab246bb3555e4038",
+    "connected_data_peers": 0,
+    "tip_reconfirmed": false,
+    "directive_connected": false,
+    "directive_ready": false,
+    "peer_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "work_ready": false
+  },
+  "return_to_release": {
+    "checkpoint_waiting": {
+      "count": 12,
+      "bytes": 36013,
+      "sources": {
+        "sv": 12,
+        "subtree": 0
+      },
+      "ordered_sha256": "4957395501dfa6ec2aafde6213d6777a370937db9e5805d76e30e3abfd1f330e"
+    },
+    "restored_waiting_count": 12,
+    "restored_waiting_bytes": 36013,
+    "network": "mainnet",
+    "docker_network_mode": "none",
+    "source_commit": "5148c31ae620544c31a61b1710172c4bcc524c54",
+    "image_id": "sha256:0da9e6af62129fa7385f78ddf190780c3975598c49211b3fbb838837d9ca2d6f",
+    "executable_sha256": "5129b3dea8cecf04d369aa7a7d663024879291799af5424cb0158e8e337b643e",
+    "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+    "checkpoint_sha256": "c73014e1efc057526878b9dd07be917428209049e08f4149f79d3d60e24e5475",
+    "payload_sha256": "c9967ae6d1f8246e63c63bf0d435644029d7a4f10d97f12a49a429a55c8bb222",
+    "height": 976546,
+    "parent": "000000000000000004defa08358bb68dcce58309c0d7ba264a869e3f461efc9a",
+    "headers": 125,
+    "headers_sha256": "3e09abca4fca19d5ec5d3047ae62d18e9c583b30b4bba55dac3568d355730fe6",
+    "witnessed_outputs": 38836,
+    "witnessed_outputs_sha256": "a30d8bb99cf9067984618687e38a476044c281f0d00314fd40522c0dbcf19220",
+    "directive_sequence": 1,
+    "expected_eligible": 2,
+    "restored_eligible": 2,
+    "input_eligible_ids_sha256": "b564033f91afd6a006f473d45228cdbce46e3c795c20d8ecab246bb3555e4038",
+    "connected_data_peers": 0,
+    "tip_reconfirmed": false,
+    "directive_connected": false,
+    "directive_ready": false,
+    "peer_intake": {
+      "sv": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      },
+      "teranode_subtree": {
+        "admitted": 0,
+        "awaiting_successor": 0,
+        "discarded_after_recheck": 0,
+        "duplicate": 0,
+        "ineligible": 0,
+        "promoted_after_successor": 0
+      }
+    },
+    "work_ready": false
+  }
+}

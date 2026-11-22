@@ -62,6 +62,18 @@ The following commands first replay the recorded signals, signatures and stock s
 .native/py/bin/python qualification/pending_shutdown.py "$BINARY_10B93B4" after-stop.json
 ```
 
+### Roll back with an outstanding waiting queue
+
+Preserve the stopped release’s checkpoint and signed directive journal before downgrading. At mainnet height 976546, the previous Linux release `10b93b4` opened a read-only copy of the corrected release’s checkpoint. It recovered the two eligible transactions, 125 headers, 38,836 witnessed outputs and signed sequence 1. It reported zero unendorsed payments. Reopening the same bytes on `5148c31` recovered all 12 waiting offers and their 36,013 bytes. Both boots had zero network ingress. This test covers recovery from the saved copy. Running an older writer forward can replace that checkpoint.
+
+For a downgrade, stop the writer, retain its private data directory together with the release and interpreter manifests, and compare a copy under both executables. The following probe needs both locally available release images. Review the selected parent, applied signed sequence and counts in both output records. Before production work resumes, restore the intended directory and allow the alert service and data peers to reconfirm the current state. [Two isolated Linux boots](evidence/chronicle-mainnet-waiting-rollback.json)
+
+~~~sh
+.native/py/bin/python qualification/shadow_restore_boot.py "$CLOSED_STATE" "$DATA_DIR/mainnet/alerts" \
+  docs/evidence/chronicle-waiting-shutdown-linux-build.json rollback-check.json \
+  --rollback-build docs/evidence/chronicle-shutdown-linux-build.json
+~~~
+
 ## Inspect what the entrant knows
 
 `--min-observed-blocks N` sets the minimum number of contiguous observed bodies before Stratum issues work. It accepts 1 through 147 and defaults to 1. The realistic regtest sets it to 13. Mainnet still requires the complete difficulty window. A ready observation window by itself supplies neither a payout script nor eligible transactions.

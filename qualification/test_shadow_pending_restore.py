@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 from shadow_native import parse_tx, read_varint
 from shadow_pending_restore import compare, dsha, follow_successor, inventory
+from shadow_restore_boot import restore, rollback
 
 
 def sample_raw(tag):
@@ -168,6 +169,48 @@ class SuccessorDisposition(unittest.TestCase):
         self.before["parent"] = "00" * 32
         with self.assertRaisesRegex(ValueError, "does not extend"):
             self.assess(set())
+
+
+class IsolatedRollback(unittest.TestCase):
+    def setUp(self):
+        self.current = {
+            "checkpoint_sha256": "same-file",
+            "checkpoint_waiting": {"count": 12, "bytes": 36013},
+            "executable_sha256": "current",
+            "restored_waiting_count": 12,
+            "restored_waiting_bytes": 36013,
+        }
+        self.older = dict(
+            self.current,
+            executable_sha256="older",
+            restored_waiting_count=0,
+            restored_waiting_bytes=0,
+        )
+
+    def test_current_restore_still_rejects_a_missing_queue(self):
+        with (
+            patch("shadow_restore_boot.observe", return_value=self.older),
+            self.assertRaisesRegex(ValueError, "inventory differs"),
+        ):
+            restore(None, None, None)
+
+    def test_earlier_boot_reports_the_unavailable_queue(self):
+        with patch(
+            "shadow_restore_boot.observe", side_effect=[self.older, self.current]
+        ):
+            result = rollback(None, None, None, None)
+        self.assertEqual(result["rollback_boot"]["restored_waiting_count"], 0)
+        self.assertEqual(result["return_to_release"]["restored_waiting_count"], 12)
+
+    def test_comparison_rejects_substituting_another_snapshot(self):
+        self.older["checkpoint_sha256"] = "other-file"
+        with (
+            patch(
+                "shadow_restore_boot.observe", side_effect=[self.older, self.current]
+            ),
+            self.assertRaisesRegex(ValueError, "same immutable checkpoint"),
+        ):
+            rollback(None, None, None, None)
 
 
 if __name__ == "__main__":

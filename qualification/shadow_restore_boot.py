@@ -15,7 +15,7 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def restore(checkpoint, ledger, build):
+def observe(checkpoint, ledger, build):
     boundary, checksum, payments, waiting_offers = snapshot_inventory(checkpoint)
     waiting = waiting_summary(waiting_offers)
     release = json.loads(build.read_text())
@@ -108,11 +108,6 @@ def restore(checkpoint, ledger, build):
             m["pending_transactions"] == len(payments),
             "eligible payment loss during restore",
         )
-        require(
-            (m["waiting_for_successor"], m["waiting_for_successor_bytes"])
-            == (waiting["count"], waiting["bytes"]),
-            "unendorsed native offer inventory differs after isolated restore",
-        )
         return {
             "checkpoint_waiting": waiting,
             "restored_waiting_count": m["waiting_for_successor"],
@@ -142,6 +137,28 @@ def restore(checkpoint, ledger, build):
         docker("rm", "-f", cid)
 
 
+def restore(checkpoint, ledger, build):
+    result = observe(checkpoint, ledger, build)
+    saved = result["checkpoint_waiting"]
+    require(
+        (result["restored_waiting_count"], result["restored_waiting_bytes"])
+        == (saved["count"], saved["bytes"]),
+        "unendorsed native offer inventory differs after isolated restore",
+    )
+    return result
+
+
+def rollback(checkpoint, ledger, old_build, current_build):
+    older = observe(checkpoint, ledger, old_build)
+    current = restore(checkpoint, ledger, current_build)
+    require(
+        older["executable_sha256"] != current["executable_sha256"]
+        and older["checkpoint_sha256"] == current["checkpoint_sha256"],
+        "rollback requires distinct executables and the same immutable checkpoint",
+    )
+    return {"rollback_boot": older, "return_to_release": current}
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("checkpoint", type=Path, help="immutable witness.state file")
@@ -152,10 +169,23 @@ if __name__ == "__main__":
         "release_build", type=Path, help="Linux build receipt for an available image"
     )
     p.add_argument("output", type=Path)
+    p.add_argument(
+        "--rollback-build",
+        type=Path,
+        help="first boot this earlier release against the same read-only snapshot",
+    )
     args = p.parse_args()
     if args.output.exists():
         p.error("choose a new output path")
     with session_lock():
-        receipt = restore(args.checkpoint, args.signed_ledger, args.release_build)
+        if args.rollback_build:
+            receipt = rollback(
+                args.checkpoint,
+                args.signed_ledger,
+                args.rollback_build,
+                args.release_build,
+            )
+        else:
+            receipt = restore(args.checkpoint, args.signed_ledger, args.release_build)
     with args.output.open("x") as stream:
         print(json.dumps(receipt, indent=2), file=stream)
