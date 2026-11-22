@@ -13,3 +13,15 @@ Report every timed observation, the median and range of complete paired differen
 ## Integrity checks
 
 Verify the archived file checksum before loading it. Outside each timed sample, compare the complete on-disk checkpoint to the writer’s reference bytes and verify the embedded hash. Reopening a Rust hash map may change its serialization order. Check the typed outputs from both variants for byte equality and compare their decoded, nested MessagePack state to the archived original. Also pass the archived payload, in its existing order, through both file writers and require byte-for-byte equality with the original file, including magic and trailing digest. Only the test fixture uses the alternative writer. [Original checkpoint implementation](https://github.com/p2ppsr/scary-node/blob/af9b605ad8da96d041a540111d46a7c0105209f7/src/mining/store.rs)
+
+## Reproduction
+
+From the repository root, install Python's `msgpack` package and use Docker with a Linux ARM64 backend. The build adds the ignored test module to a clean export of the registered source. The test requires a read-only copy of the closed checkpoint identified above. The output directory and Docker scratch volume must be new. The register and report contain public digests and measurements. The protected node state stays in the lab.
+
+```sh
+python3 qualification/checkpoint_profile.py build "$PROFILE_BUILD"
+python3 qualification/checkpoint_profile.py run "$CHECKPOINT_COPY" "$PROFILE_BUILD" "$PROFILE_RESULTS" --scratch-volume scary-checkpoint-profile-01
+python3 qualification/checkpoint_profile.py verify "$PROFILE_RESULTS/result.json.gz"
+```
+
+The run retains its raw log and the scratch volume, including the first typed reference and last timed file. The verifier recomputes the phase totals, paired differences, ratios and order counts from the retained observations. A full rerun additionally performs the byte and semantic checks against the protected checkpoint.
