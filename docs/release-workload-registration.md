@@ -15,3 +15,21 @@ SCARY_SUSTAINED_PROFILE=release-reordered .native/py/bin/python qualification/su
   .native/release-reordered-run/receipt.json.gz --corpus .native/sustained-signed \
   --blocks .native/release-reordered-run/blocks --parent-ages
 ```
+
+## Keep the host recorder running through a terminal close
+
+The wallet sender, Stratum worker, opportunity recorder and resource sampler run on the host. Docker keeps the full nodes running independently. Losing the host driver stopped the original endorsed-funding measurement at 246 opportunities. The surviving full-node stores preserved the exact blocks and terminal pool, while the final 54 scheduled endpoints remained unobserved. [Recorded interruption](endorsed-workload-interruption.md)
+
+On a logged-in macOS workstation, the following alternative launches the complete driver once under the user service manager. Run it from the repository root. Give the service logs and measured output separate fresh directories. The helper inherits the executable search path. Pass study-specific settings through `/usr/bin/env` as shown.
+
+~~~sh
+job_dir="$PWD/.native/release-reordered-service"
+python3 qualification/launchd_once.py "$job_dir" -- /usr/bin/env \
+  SCARY_SUSTAINED_PROFILE=release-reordered "$PWD/.native/py/bin/python" \
+  qualification/sustained_replication.py .native/paired-corpus .native/sustained-signed \
+  .native/release-reordered-run
+
+launchctl print "$(cat "$job_dir/service-target")"
+~~~
+
+The plist stays in the service log directory, with `RunAtLoad` enabled and `KeepAlive` disabled. Closing the submitting terminal leaves the driver owned by the logged-in user’s service manager. After the driver exits, inspect its exit code, `stdout.log` and `stderr.log`, and use the workload verifier above on the actual receipt. A completed timed run also produces `quiesced.json`. If a host interruption leaves partial logs, preserve the original opportunity indices and the unobserved tail. Once the process has finished and its evidence is retained, unload its service with `launchctl bootout "$(cat "$job_dir/service-target")"`.
