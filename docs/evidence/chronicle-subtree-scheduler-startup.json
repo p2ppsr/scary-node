@@ -1,0 +1,23 @@
+{
+  "registration": "aed924238ab3fd4d9d18ea2c69fd066e5b727a74",
+  "first_scheduled_treatment": {
+    "block": 1,
+    "treatment": "original"
+  },
+  "completed_trials_before_preflight_correction": 0,
+  "reference_probe_sha256": "aa8671997b9a40350e1488a5de17e5cea6b03b51bfbb04ae7b2b4ba422f7496a",
+  "captured_command_stdout_bytes": 0,
+  "command_and_supervisor_stderr_sha256": "f01b4869998d8513e06c479b77ca3de89fbf636103a1e692d7a2cfa547c1a1a5",
+  "partial_sha256": "8f806b5d9ded5d63ededf87708527c955a69ec4848b447e1d9c1f40db85b4357",
+  "termination": {
+    "flags": 66,
+    "code": 1,
+    "namespace": "CODESIGNING",
+    "indicator": "Taskgated Invalid Signature"
+  },
+  "exception_signal": "SIGKILL (Code Signature Invalid)",
+  "list_old_inode_returncode": -9,
+  "list_same_bytes_from_fresh_inode_returncode": 0,
+  "candidate_list_returncode": 0,
+  "replacement_bytes_identical": true
+}

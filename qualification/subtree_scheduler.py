@@ -68,6 +68,26 @@ def fixture():
     }
 
 
+def check_launch(binary):
+    tests = subprocess.check_output([binary, "--list"], text=True)
+    required(
+        TEST + ": test" in tests.splitlines(), "registered test missing from executable"
+    )
+
+
+def install_probe(fresh, destination):
+    # macOS can retain code-signing state for a previously executed inode.
+    # Preserve the exact compiler output and install it on a fresh inode.
+    with tempfile.NamedTemporaryFile(dir=destination.parent, delete=False) as f:
+        temp = Path(f.name)
+    try:
+        shutil.copy2(fresh, temp)
+        check_launch(temp)
+        temp.replace(destination)
+    finally:
+        temp.unlink(missing_ok=True)
+
+
 def build(out, rev, variant):
     out.mkdir(parents=True, exist_ok=True)
     rev = subprocess.check_output(
@@ -149,7 +169,7 @@ def build(out, rev, variant):
             "failed to build archived test executable",
         )
         dest = out / variant
-        shutil.copy2(artifacts[0], dest)
+        install_probe(artifacts[0], dest)
         meta = {
             "source": rev,
             "harness_sha256": sha(PROBE.read_bytes()),
@@ -293,6 +313,7 @@ def run(directory, out):
             sha((directory / v).read_bytes()) == meta["probe_sha256"],
             "probe executable changed",
         )
+        check_launch(directory / v)
     with (
         session_lock(),
         tempfile.TemporaryDirectory(prefix="scary-subtree-trials-") as td,
