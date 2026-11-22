@@ -90,6 +90,12 @@ const MAX_MONEY: u64 = 21_000_000 * 100_000_000;
 const HEADER_WINDOW: usize = 147;
 
 type Outpoint = (Hash, u32);
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum BodyView {
+    Standalone,
+    SelectedParent,
+}
+
 type ParsedBody<'a> = (Vec<(Hash, &'a [u8])>, Option<&'static str>);
 
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
@@ -511,8 +517,9 @@ impl Mining {
                 );
             }
         }
-        let (txs, coinbase_error) = self.inspect_body(height, &header, &raw)?;
-        let applied = match coinbase_error {
+        let (txs, body_error) =
+            self.inspect_body_in(height, &header, &raw, BodyView::SelectedParent)?;
+        let applied = match body_error {
             Some(reason) => Err(validation::InvalidBody(reason).into()),
             None => self.apply_observed(self.block_context(height, timestamp(&header)), hash, txs),
         };
@@ -544,6 +551,16 @@ impl Mining {
         header: &[u8; 80],
         raw: &'a [u8],
     ) -> Result<ParsedBody<'a>> {
+        self.inspect_body_in(height, header, raw, BodyView::Standalone)
+    }
+
+    fn inspect_body_in<'a>(
+        &self,
+        height: u32,
+        header: &[u8; 80],
+        raw: &'a [u8],
+        view: BodyView,
+    ) -> Result<ParsedBody<'a>> {
         let mut r = &raw[80..];
         let n = wire::varint(&mut r)?;
         ensure!(
@@ -551,10 +568,15 @@ impl Mining {
             "invalid block transaction count"
         );
         let mut txs = Vec::with_capacity(n);
-        let mut coinbase_error = None;
+        let mut body_error = None;
+        // SV Node's default regtest still checks BIP30 against the UTXO view
+        // *before* connecting any transaction. Mainnet is past its BIP34 anchor.
+        let check_overwrite =
+            self.regtest && view == BodyView::SelectedParent && !self.coins.is_empty();
         for i in 0..n {
             let mut null_inputs = 0;
             let mut inputs = 0;
+            let mut last_output = 0;
             let mut coinbase_height = false;
             let mut coinbase_size_ok = false;
             let raw_tx = wire::transaction(&mut r, |event| {
@@ -565,29 +587,37 @@ impl Mining {
                         coinbase_size_ok = (2..=100).contains(&script.len());
                         coinbase_height = script.starts_with(&wire::height_push(height));
                     }
+                } else if let Event::Output(index, _, _) = event {
+                    last_output = index;
                 }
             })?;
             if i == 0 {
                 if null_inputs != 1 || inputs != 1 {
-                    coinbase_error = Some("missing first coinbase");
+                    body_error = Some("missing first coinbase");
                 } else if !coinbase_size_ok {
-                    coinbase_error = Some("invalid coinbase script size");
+                    body_error = Some("invalid coinbase script size");
                 } else if (!self.regtest || height >= 100_000_000) && !coinbase_height {
-                    coinbase_error = Some("coinbase height differs from announcement");
+                    body_error = Some("coinbase height differs from announcement");
                 }
             } else if null_inputs != 0 {
-                coinbase_error = Some("extra coinbase input");
+                body_error = Some("extra coinbase input");
             }
             if raw_tx.len() > 1_000_000_000 {
-                coinbase_error = Some("transaction exceeds consensus size");
+                body_error = Some("transaction exceeds consensus size");
             }
-            txs.push((hash256(raw_tx), raw_tx));
+            let id = hash256(raw_tx);
+            if check_overwrite
+                && (0..=last_output).any(|index| self.coins.contains_key(&(id, index)))
+            {
+                body_error = Some("block overwrites a witnessed unspent output");
+            }
+            txs.push((id, raw_tx));
         }
         ensure!(r.is_empty(), "trailing block bytes");
         let (root, _) = wire::merkle(txs.iter().map(|(id, _)| *id).collect())?;
         ensure!(header[36..68] == root, "block merkle root mismatch");
 
-        Ok((txs, coinbase_error))
+        Ok((txs, body_error))
     }
 
     pub(super) fn verify_own_block(&self, height: u32, raw: &[u8], solved: bool) -> Result<()> {
@@ -623,8 +653,10 @@ impl Mining {
         if !solved {
             self.check_header_version(height, &header)?;
         }
-        let (txs, error) = self.inspect_body(height, &header, raw)?;
-        ensure!(error.is_none(), "invalid candidate coinbase");
+        let (txs, error) = self.inspect_body_in(height, &header, raw, BodyView::SelectedParent)?;
+        if let Some(reason) = error {
+            anyhow::bail!("invalid candidate: {reason}");
+        }
         let context = self.block_context(height, timestamp(&header));
         ensure!(
             wire::final_under(txs[0].1, height, context.time_cutoff)? == Some(true),

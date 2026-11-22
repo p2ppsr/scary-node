@@ -39,6 +39,30 @@ fn make_block(previous: Hash, height: u32, more: &[Vec<u8>]) -> Vec<u8> {
     block
 }
 
+#[test]
+fn regtest_checks_existing_outputs_only_against_the_candidate_parent() {
+    let mut m = Mining::new(true, vec![]).unwrap();
+    let block = make_block([0x19; 32], 155, &[]);
+    let header = block[..80].try_into().unwrap();
+    m.observe(155, &block).unwrap();
+    // The retained body is valid in its own context. Its output is now in the
+    // selected tip's view, so that outpoint cannot be created again there.
+    assert!(m
+        .inspect_body_in(155, &header, &block, BodyView::Standalone)
+        .unwrap()
+        .1
+        .is_none());
+    assert_eq!(
+        m.inspect_body_in(155, &header, &block, BodyView::SelectedParent)
+            .unwrap()
+            .1,
+        Some("block overwrites a witnessed unspent output")
+    );
+    let next = make_block(hash256(&header), 156, &[]);
+    m.observe(156, &next).unwrap();
+    assert_eq!(m.height, Some(156));
+}
+
 fn tx(from: &str, amount: u64, script: LockingScript) -> Transaction {
     let mut tx = Transaction::new();
     tx.add_input(TransactionInput {

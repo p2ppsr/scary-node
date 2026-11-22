@@ -346,6 +346,23 @@ fn share(
     Ok(())
 }
 
+// A Stratum V1 worker cannot cancel only a subset of its templates. Ask it to
+// replace its local set when any job is retired. Keep valid server-side jobs
+// so solutions already in flight can still be checked against their exact work.
+fn refresh_jobs(
+    state: &Mining,
+    jobs: &mut HashMap<u64, Arc<Job>>,
+    seen: &mut HashSet<(u64, [u8; 4], u32, u32)>,
+) -> bool {
+    let issued = jobs.len();
+    jobs.retain(|_, job| job.eligible(state));
+    if jobs.len() != issued {
+        seen.retain(|(revision, ..)| jobs.contains_key(revision));
+        return true;
+    }
+    jobs.is_empty()
+}
+
 async fn session(
     stream: TcpStream,
     serial: u32,
@@ -477,10 +494,7 @@ async fn session(
             let first = announced_revision.is_none();
             announced_revision = Some(revision);
             let had_jobs = !jobs.is_empty();
-            jobs.retain(|_, job| job.eligible(&s));
-            if jobs.is_empty() {
-                seen.clear();
-            }
+            let clean = refresh_jobs(&s, &mut jobs, &mut seen);
             if jobs.len() >= RETAINED_JOBS && !s.solved_on_tip {
                 continue;
             }
@@ -489,7 +503,6 @@ async fn session(
                 // Stratum V1 has no cancellation without a replacement job.
                 return Ok(());
             }
-            let clean = jobs.is_empty();
             let regtest = s.regtest;
             drop(s);
             if first {
@@ -578,6 +591,44 @@ mod tests {
             hex::encode(hash256(&hdr)),
             "96e94e5a630b1f03af7fa929b66c2006123270e81106bfff2540bda90acbcfad"
         );
+    }
+
+    #[test]
+    fn partial_same_parent_retirement_cleans_worker_and_keeps_valid_inflight_work() {
+        let mut state = Mining::new(true, vec![0x51]).unwrap();
+        let job = |revision: u64, transactions: usize, pool_commitment: Hash| {
+            Arc::new(Job {
+                revision,
+                parent_epoch: state.parent_epoch,
+                height: 26,
+                previous: [0; 32],
+                bits: 0x207fffff,
+                time: 1_700_000_000,
+                prefix: vec![],
+                suffix: vec![],
+                branches: vec![],
+                transactions,
+                pool_commitment,
+                directive_sequence: 0,
+            })
+        };
+        let first = job(1, 1, [1; 32]);
+        let second = job(2, 2, [2; 32]);
+        let mut issued = HashMap::from([(1, first.clone()), (2, second)]);
+        let mut seen = HashSet::from([(1, [0; 4], 1, 1), (2, [0; 4], 2, 2)]);
+        // Ordinary additional payments preserve both immutable prefixes.
+        state.pending_prefixes = vec![[1; 32], [2; 32], [3; 32]];
+        assert!(!refresh_jobs(&state, &mut issued, &mut seen));
+        // A recheck drops the second payment while preserving the first.
+        state.pending_prefixes.truncate(1);
+        let clean = refresh_jobs(&state, &mut issued, &mut seen);
+        assert_eq!(first.notification(clean)["params"][8], true);
+        assert!(issued[&1].eligible(&state));
+        assert!(!issued.contains_key(&2));
+        assert_eq!(seen, HashSet::from([(1, [0; 4], 1, 1)]));
+        state.parent_epoch += 1;
+        assert!(refresh_jobs(&state, &mut issued, &mut seen));
+        assert!(issued.is_empty() && seen.is_empty());
     }
 
     #[test]
