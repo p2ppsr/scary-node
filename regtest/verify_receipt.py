@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import struct
+import subprocess
 import sys
 from pathlib import Path
 
@@ -39,8 +40,37 @@ def coinbase_height(script):
     return int.from_bytes(script[1:size + 1], "little")
 
 
+def verify_source(build):
+    """Compare the recorded Docker COPY inputs with their exact Git blobs."""
+    revision = build["source_commit"]
+    require(len(revision) == 40 and all(c in "0123456789abcdef" for c in revision),
+            "expected a full source commit")
+    repo = Path(__file__).resolve().parents[1]
+    inputs = ["Dockerfile", "Cargo.toml", "Cargo.lock", "native", "scripts/build-bdk.sh", "src"]
+    names = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", revision, "--", *inputs],
+                                    cwd=repo, text=True).splitlines()
+    expected = build["runtime_input_sha256"]
+    require(bool(names) and set(names) == set(expected), "Docker source input list differs")
+    for name in names:
+        raw = subprocess.check_output(["git", "show", f"{revision}:{name}"], cwd=repo)
+        require(hashlib.sha256(raw).hexdigest() == expected[name], f"source mismatch for {name}")
+
+
 def verify(record):
     require(record["network"] == "regtest", "expected a regtest receipt")
+    require(record["entrant_join_observed_headers"] == 1 and record["entrant_join_witnessed_outputs"] == 1,
+            "unexpected witnessed boundary at entry")
+    require(record["prejoin_funding_input_rejection"] == "input missing from witnessed spendable set"
+            and record["child_before_successor_rejection"] == "creation block has no observed successor",
+            "missing observed input or successor rejection")
+    require(record["native_announcement_verified"] is True and record["candidate_asset_requests"],
+            "missing native announcement or Asset observation")
+    if "release" in record:
+        release = record["release"]
+        digest = release["executable_sha256"]
+        require(len(digest) == 64 and all(c in "0123456789abcdef" for c in digest)
+                and release["container_executable_sha256"] == digest,
+                "reported running executable differs from the container file")
     funding_raw = bytes.fromhex(record["funding_transaction_hex"])
     funding_block = bytes.fromhex(record["funding_block_hex"])
     check_header(funding_block[:80], record["funding_block"], record["entrant_join_tip"])
@@ -78,18 +108,29 @@ def verify(record):
     for r in receipts:
         require((r["height"], r["hash"], r["body_sha256"], r["transaction_count"]) ==
                 (height, record["solved_hash"], digest, len(txs)), f"body receipt mismatch for {r['node']}")
+        if "successor_tip" in r or "release" in record:
+            require((r["successor_tip"], r["successor_height"]) == (record["successor"], height + 1),
+                    f"successor observation mismatch for {r['node']}")
     check_header(bytes.fromhex(record["successor_header_hex"]), record["successor"], record["solved_hash"])
+    if "entrant_successor_observation" in record:
+        entrant = record["entrant_successor_observation"]
+        require((entrant["height"], entrant["hash"]) == (height + 1, record["successor"])
+                and entrant["connected_data_peers"] >= 2, "entrant successor observation mismatch")
     return height, fee
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("receipt", type=Path, help="JSON file saved by regtest/prove.sh")
+    parser.add_argument("--check-source", action="store_true",
+                        help="also compare the published build's input hashes against this Git repository")
     args = parser.parse_args()
     try:
         receipt = json.loads(args.receipt.read_text())
         height, fee = verify(receipt)
-    except (OSError, KeyError, IndexError, TypeError, ValueError, struct.error) as error:
+        if args.check_source:
+            verify_source(receipt["source_build"])
+    except (OSError, KeyError, IndexError, TypeError, ValueError, struct.error, subprocess.CalledProcessError) as error:
         sys.exit(f"Receipt verification failed: {error}")
     print(f"Verified regtest block {receipt['solved_hash']} at height {height}, child fee {fee} satoshis.\n"
           "Funding inclusion, header links, proof of work, Merkle commitments, coinbase reward, and both recorded body digests match.")

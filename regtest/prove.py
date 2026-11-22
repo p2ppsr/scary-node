@@ -199,6 +199,17 @@ def compose(*args, capture=False):
     return result.stdout
 
 
+def runtime_identity(observation):
+    """Compare the HTTP release identity with the executable in this container."""
+    release = observation["release"]
+    image_file = compose("exec", "-T", "scary-node", "sha256sum",
+                         "/usr/local/bin/scary-node", capture=True).split()[0]
+    if image_file != release["executable_sha256"]:
+        raise RuntimeError("running node and container executable digests differ")
+    return {**release, "container_executable_sha256": image_file,
+            "interpreter": observation["mining"]["interpreter"]}
+
+
 def mixed_sv(method, *args):
     if sum(len(str(a)) for a in args) > 32768:
         container = compose("ps", "-q", "svref", capture=True).strip()
@@ -373,7 +384,9 @@ def prove():
             compose("start", "scary-node")
         wait("fresh entrant native peers", lambda: status()["peer"]["connected_peer_ids_seen"] >= 2)
         wait("entrant joins at existing tip", lambda: status()["mining"]["tip_hash"] == matured_tip)
-        joined = status()["mining"]
+        join_status = status()
+        joined = join_status["mining"]
+        release = runtime_identity(join_status) if "release" in join_status else None
         # The first observed block itself pays one P2PKH coinbase. Its output is
         # in the fresh observed set; the much older funding coinbase is absent.
         if joined["headers"] != 1 or joined["witnessed_outputs"] != 1:
@@ -442,6 +455,12 @@ def prove():
              lambda: rpc(b, "getminingcandidate")["prevhash"] == solved_hash)
         descendant = rpc(b, "generate", 1)[0]
         wait("both references adopt successor", lambda: all(assert_tip(n, descendant) for n in NODES))
+        for result, node in zip(results, NODES):
+            chain = rpc(node, "getblockchaininfo")
+            if chain["bestblockhash"] != descendant or chain["blocks"] != result["height"] + 1:
+                raise RuntimeError(f"{result['node']} no longer selects the candidate's successor")
+            result["successor_tip"] = chain["bestblockhash"]
+            result["successor_height"] = chain["blocks"]
         next_block, _, _ = wait("successor body", lambda: block(b, descendant))
         if next_block[4:36][::-1].hex() != solved_hash:
             raise ValueError("successor did not extend exact Rust block")
@@ -470,6 +489,7 @@ def prove():
             raise RuntimeError("no candidate Asset fetch observed at entrant")
         print(json.dumps({"observed_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                           "network": "regtest", "teranode_release": "v0.16.1", "funding_coinbase": coin,
+                          **({"release": release} if release else {}),
                           "entrant_join_height": joined["height"], "entrant_join_tip": matured_tip,
                           "entrant_join_observed_headers": joined["headers"],
                           "entrant_join_witnessed_outputs": joined["witnessed_outputs"],

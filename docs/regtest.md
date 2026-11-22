@@ -9,4 +9,14 @@ Run from the repository root with Docker running and Compose v2 available. The s
 5. Run `python3 regtest/verify_receipt.py receipt.json`. The offline verifier checks the funding outpoint and fee, four headers and their work, transaction Merkle commitments, coinbase reward and both reported body digests. The live driver obtains the acceptance observations from the reference processes.
 6. Run `./regtest/down.sh` to remove this lab’s containers, networks and volumes. A clean rerun creates fresh identifiers.
 
+## Verified on November 22, 2026
+
+The empty entrant joined at height 101 with one observed header and one witnessed output. Its operator endpoint declined the signed funding transaction spending a pre-entry coin. Teranode 1 mined that funding transaction at height 102. The entrant declined its 191-byte signed child until Teranode 2 extended the funding block at height 103. A CPU Stratum worker then solved the entrant’s 414-byte block at height 104 with a 1,000-satoshi child fee. Both stock Teranodes selected `2b86ecea75994403772e4913c1484ffd6d8afb6deff03b9af2ccce9a71b13cef` and independently served its exact bytes. Both reference RPCs reported the same height-105 successor. The entrant reported that successor with two connected data peers. [Wire bytes, reference readbacks and release identity](evidence/chronicle-two-teranode-quickstart.json)
+
+The tested Linux ARM64 executable reported SHA-256 `ddfbac3d6b268bb670cfd50d936598b0b97adee828c2d5e8c4a21c58a28f4d0d`, which matched a separate read of the executable inside its running container. It reported linked BDK 1.4.0 and SV Node 1.2.3. The release build used the 27 Dockerfile and runtime input files recorded in the receipt. Temporary private Docker subnets isolated this run from other local projects. Recompute the recorded block, fee, observed tip identities and Git input digests from the checkout:
+
+```sh
+python3 regtest/verify_receipt.py --check-source docs/evidence/chronicle-two-teranode-quickstart.json
+```
+
 Use `cargo test --locked` to exercise the Rust component tests. A short-target CPU worker is adequate for regtest. The ordinary operator path remains native mainnet listening.

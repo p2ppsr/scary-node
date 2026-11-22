@@ -1,0 +1,137 @@
+{
+  "observed_utc": "2026-11-22T17:43:22Z",
+  "network": "regtest",
+  "teranode_release": "v0.16.1",
+  "funding_coinbase": "dfd7c7e97438fe5fc95163d2b7db71fc8daee45b6f65eda68f2482c109276fef",
+  "release": {
+    "executable_sha256": "ddfbac3d6b268bb670cfd50d936598b0b97adee828c2d5e8c4a21c58a28f4d0d",
+    "version": "0.1.0-alpha.4",
+    "container_executable_sha256": "ddfbac3d6b268bb670cfd50d936598b0b97adee828c2d5e8c4a21c58a28f4d0d",
+    "interpreter": {
+      "bdk_commit": "8a4e1d3ddb16cbb2b3a98f82ea1ee6ff19a297e9",
+      "cmake": "cmake version 3.25.1",
+      "compiler": "c++ (Debian 12.2.0-14+deb12u1) 12.2.0",
+      "cxx_flags": "-O3 -g0 -DNDEBUG",
+      "cxx_standard": 20,
+      "dependencies_sha256": "ba52bbaea6b8c31f44679dad53ca57d3021654779d9e4d9d71da25c3dece8578",
+      "linked_bdk_commit": "8a4e1d3",
+      "linked_bdk_version": "1.4.0",
+      "linked_sv_commit": "6504a3a",
+      "linked_sv_version": "1.2.3",
+      "native_archive_sha256": "d8d7eaeedadcb1d53d0e170e8df4c336ac15dc383845e96a62c4058161a6ab58",
+      "platform": "linux_aarch64",
+      "sv_node_commit": "6504a3aff65ba97c0f6c80962b033e35ecbfed4b",
+      "type": "Release"
+    }
+  },
+  "entrant_join_height": 101,
+  "entrant_join_tip": "735b199d74f3b127d88559ff581185987877041e1379d13ea214d100de6fb49f",
+  "entrant_join_observed_headers": 1,
+  "entrant_join_witnessed_outputs": 1,
+  "prejoin_funding_input_rejection": "input missing from witnessed spendable set",
+  "child_before_successor_rejection": "creation block has no observed successor",
+  "funding_transaction_hex": "0100000001ef6f2709c182248fa6ed656f5be4ae8dfc71dbb7d26351c95ffe3874e9c7d7df000000006a47304402205aca38b248baa0040f4f50434e6eaaabbe665632ee48f2734b8220f29cc5dc4f0220470b4e8553dc390f10138dd68738b6fa4ce7b465f4dbe68becfce079ab399f30412102061282951943acc68430d2e8cbedfaf46b00d35c5f0ddb5fa0c0a0435a6559f0ffffffff0118ee052a010000001976a914b1df37258894e0d1eb99a272319c8ab121be590f88ac00000000",
+  "funding_output_index": 0,
+  "funding_output_value_satoshis": 4999999000,
+  "funding_tx": "4a1129825d5314becaa402797edf7b5d3fab83f550c47a4a8481bf9b23bfb5e9",
+  "funding_block": "7e323a400f1c71b11d14bcce9da446e78735566e4813dd4335824d067d31d29f",
+  "parent": "05d9b871a104ec9dc9df3c5a9b138bf6ce2cf3e408463399d79ca9cd552e3261",
+  "funding_block_hex": "000000209fb46fde00d114a23ed179131e04777898851158ff5985d827b1f3749d195b73abf3acb936a688e4f970d35b6ce74adab69e73789812912a4767544a21dbca6fb729036bffff7f20000000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff1801662f746572616e6f64652f2009e12dbfc47a97a808bde3ffffffff01e8f5052a010000001976a914c362d5af234dd4e1f2a1bfbcab90036d38b0aa9f88ac000000000100000001ef6f2709c182248fa6ed656f5be4ae8dfc71dbb7d26351c95ffe3874e9c7d7df000000006a47304402205aca38b248baa0040f4f50434e6eaaabbe665632ee48f2734b8220f29cc5dc4f0220470b4e8553dc390f10138dd68738b6fa4ce7b465f4dbe68becfce079ab399f30412102061282951943acc68430d2e8cbedfaf46b00d35c5f0ddb5fa0c0a0435a6559f0ffffffff0118ee052a010000001976a914b1df37258894e0d1eb99a272319c8ab121be590f88ac00000000",
+  "parent_header_hex": "000000209fd2317d064d823543dd13486e563587e746a49dcebc141db1711c0f403a327e183240b4835cd750fc78fd7be359de78adef932fae40c469c0f906e18a22dee6b829036bffff7f2001000000",
+  "funding_block_miner": "tn1",
+  "parent_miner": "tn2",
+  "child_transaction_hex": "0100000001e9b5bf239bbf81844a7ac450f583ab3f5d7bdf7e7902a4cabe14535d8229114a000000006a4730440220381ade4dd6209853b6ebc306342c860a8da66328854c448a7360aa68c0a065d80220382dfba1485b088d425fdb0735cb71044293a652dfb6e5691c2d3e704a8c98be412102061282951943acc68430d2e8cbedfaf46b00d35c5f0ddb5fa0c0a0435a6559f0ffffffff0130ea052a010000001976a914b1df37258894e0d1eb99a272319c8ab121be590f88ac00000000",
+  "child_fee_satoshis": 1000,
+  "child": "55b0a240ea73df21c224ae858f1fda65b7cec92cc48aa2861114b611621d5192",
+  "stratum_job": "7",
+  "solved_header": "0000002061322e55cda99cd799334608e4f32ccef68b139b5a3cdfc99dec04a171b8d9054af163293da795e953446f4e8bc6dd59309d9f601cda6b3d93b2d6428ebcbfcfb929036bffff7f2006000000",
+  "solved_hash": "2b86ecea75994403772e4913c1484ffd6d8afb6deff03b9af2ccce9a71b13cef",
+  "native_announcement_verified": true,
+  "candidate_block_hex": "0000002061322e55cda99cd799334608e4f32ccef68b139b5a3cdfc99dec04a171b8d9054af163293da795e953446f4e8bc6dd59309d9f601cda6b3d93b2d6428ebcbfcfb929036bffff7f20060000000201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3901680800000001000000000c2f73636172792d6e6f64652f20d70edcfb9519ebb5ee4500e700800225dbc9e38336308d35f8e38f4563ec039fffffffff01e8f5052a010000001976a914751e76e8199196d454941c45d1b3a323f1433bd688ac000000000100000001e9b5bf239bbf81844a7ac450f583ab3f5d7bdf7e7902a4cabe14535d8229114a000000006a4730440220381ade4dd6209853b6ebc306342c860a8da66328854c448a7360aa68c0a065d80220382dfba1485b088d425fdb0735cb71044293a652dfb6e5691c2d3e704a8c98be412102061282951943acc68430d2e8cbedfaf46b00d35c5f0ddb5fa0c0a0435a6559f0ffffffff0130ea052a010000001976a914b1df37258894e0d1eb99a272319c8ab121be590f88ac00000000",
+  "candidate_asset_requests": [
+    "block",
+    "subtree",
+    "subtree_data"
+  ],
+  "successor_header_hex": "00000020ef3cb1719aceccf29a3bf0ef6dfb8a6dfd4f48c113492e7703449975eaec862b5ffed26684678081e21c55439f345703e4c70d169015801a555d5d68fd1febd0b929036bffff7f2003000000",
+  "independent_receipts": [
+    {
+      "node": "tn1",
+      "height": 104,
+      "hash": "2b86ecea75994403772e4913c1484ffd6d8afb6deff03b9af2ccce9a71b13cef",
+      "native_block_sources": [
+        "http://scary-node:9090/api/v1",
+        "http://tn2:8090/api/v1"
+      ],
+      "body_sha256": "b66423c9a0abfc631c24103b9639622b3a88bd6d6a6a18b5b810948feed07c60",
+      "transaction_count": 2,
+      "successor_tip": "0dc759d3fdba87b71467106c1887560f97a946537111d7e80673418e8664aae5",
+      "successor_height": 105
+    },
+    {
+      "node": "tn2",
+      "height": 104,
+      "hash": "2b86ecea75994403772e4913c1484ffd6d8afb6deff03b9af2ccce9a71b13cef",
+      "native_block_sources": [
+        "http://scary-node:9090/api/v1",
+        "http://tn1:8090/api/v1"
+      ],
+      "body_sha256": "b66423c9a0abfc631c24103b9639622b3a88bd6d6a6a18b5b810948feed07c60",
+      "transaction_count": 2,
+      "successor_tip": "0dc759d3fdba87b71467106c1887560f97a946537111d7e80673418e8664aae5",
+      "successor_height": 105
+    }
+  ],
+  "successor": "0dc759d3fdba87b71467106c1887560f97a946537111d7e80673418e8664aae5",
+  "source_build": {
+    "source_commit": "1ba337e5f630beb4fa943770a48a01ab03465781",
+    "runtime_input_sha256": {
+      "Cargo.lock": "49d8e303e370c713576a774237ae828e874cb85f7e2826e6564047618c9265fa",
+      "Cargo.toml": "93250921aa1f9b0f88ecf045cfa4d7885cbda8475057198297ea2de205844ffa",
+      "Dockerfile": "9132d5eef6c3d17e599bf8e8a7d3224ed31e432c73fae8906b8f59cc174f48f4",
+      "native/bdk.cmake": "aef652dc57f1afe3218d36bf98653fc6cbcba4921b92958b875b63d97dc24be5",
+      "native/verify_spend.cpp": "3ee50b8f532744566a35ee9ad1555b3f3a9e01c57f0cc12383786f9673e67094",
+      "scripts/build-bdk.sh": "8d450a67e8ad79c81ec6d8899985fbfacfd56887d03ef91221d84b07bf1af067",
+      "src/alerts.rs": "c108d8c675e18a9fddb14ffd3582af8995f45d738897dc968044c903fb6deb30",
+      "src/body.rs": "983e78c44d1d3a41954bfe686ef082fc21c3027f0675ddc8daa8300f311739a9",
+      "src/difficulty.rs": "63500749344c857e227b6bd2c8c33bcf32da81face7c13d42606938e9b1c3739",
+      "src/lease.rs": "d4bcf9a993e2e48ced8201eabbaa57e7635fc704f155d31ff5fd5158169804ac",
+      "src/main.rs": "f556eb22ac89b3da9551b7ba29c1177778457f0579214567634467bccba6d22a",
+      "src/mining.rs": "c9a357535d2089cef9ae94039acd4c91be11016ee5f80714adedfd3362162faa",
+      "src/mining/chain.rs": "982436b52839b16d4df8695094ecd6f79a3f0053b153ff99b03f53de60f895b2",
+      "src/mining/clock.rs": "061382b92f768247980110ccd51a765cb34e3978295c797e9fb7be706b35f6c4",
+      "src/mining/interpreter.rs": "5c6302f2b468b8eb10f6029856b160082e6ea26d10d4b25e2567a62f0f43b728",
+      "src/mining/lifecycle.rs": "c90c78b4e44d79d451295995b110e8444471d71d4fd05c3e3f6df89a77583635",
+      "src/mining/store.rs": "dd9df41c9670e0132a5b4f1e844f801e88d015b5ddc10055632bd5193fcc7618",
+      "src/mining/stratum.rs": "aa5d69884ddd248694557107440740da5c7b6ac88f2eb56e7c5e4e87d15be223",
+      "src/mining/tests.rs": "462805da90f49508f7035fc80406629b9c7212dcf40c6f2979b594cda956a436",
+      "src/mining/validation.rs": "15814e31e7a22565251bff7a07f2dadb380a409a289c177e5087e26b7fa8f8eb",
+      "src/mining/waiting.rs": "7657f7fa5f062c2f981a7ae81ef39ffeaf3af59b472e05d05e9beb6d9e8ce95e",
+      "src/mining/wire.rs": "6ecced12d35347de19ab7511de5231fe9b123bfcfc244f846f21fccb93c69320",
+      "src/peer.rs": "848be6a416a3ed43673692ab63b07cb19a00794a6a6cbc0b955aede9ffd1f37f",
+      "src/peer/assets.rs": "5e111e0f7c4b66caf9dcfef04035e289cd4db620fe2d865c6370f27ff5110fb6",
+      "src/peer/fetch.rs": "b2903faeeda607530238165edbca63349c3eb6f9f643a4832639fc43675c9578",
+      "src/peer/subtree.rs": "4e316e84eb68f38e7c8e259509d21c58d5c277f5c6073ca1b00925da221f1979",
+      "src/sv_peer.rs": "f9d66cb5e31f6522712622aaee9de4aabc652a4a2ae8f640e487bf4a80b49eda"
+    },
+    "observed_images": {
+      "scary-node": {
+        "image_id": "sha256:012fe678688d2c9e647681e9bc61c8551b4bb390305df78e6f3c87db33059eac",
+        "platform": "linux/arm64"
+      },
+      "tn1": {
+        "image_id": "sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+        "platform": "linux/arm64"
+      },
+      "tn2": {
+        "image_id": "sha256:84971b2863301c7527382768dbe5a094cd8c4d6e2f426f5557d3c12ba114822a",
+        "platform": "linux/arm64"
+      }
+    }
+  },
+  "entrant_successor_observation": {
+    "height": 105,
+    "hash": "0dc759d3fdba87b71467106c1887560f97a946537111d7e80673418e8664aae5",
+    "connected_data_peers": 2
+  }
+}
