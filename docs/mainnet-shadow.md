@@ -1,5 +1,7 @@
 # Passive mainnet observation
 
+**Archived on November 22, 2026.** The project stopped the passive observer, receiver and evidence collectors before reaching the original 1,008-block requirement. The published checkpoints below preserve the observations and can be replayed offline.
+
 The journal through height **976548** contains **127 consecutive selected heights**. After a local process interruption, data peers reconfirmed 976547 and the next observed block directly extended it. There were 624 seconds between peer reports spanning the interruption. Both surrounding blocks passed independent full-wire and Merkle checks. [Interruption timeline and reproduction](shadow-service-interruption.md)
 
 ## Restart with payments awaiting endorsement
@@ -17,7 +19,7 @@ The first successor, height **976547**, contained two transactions. Scary receiv
 
 ## First 90 consecutive blocks
 
-The checkpoint covers **90 consecutive blocks, 976422 through 976511**, observed from November 21, 2026 at 02:23:34 to 18:25:17 UTC. The observer started collecting contemporary bodies with an empty witnessed set. The 1,008-block qualification is in progress. Every decision in this checkpoint withheld work while the 147-header mainnet difficulty window filled. The observer ran with shadow assembly enabled and its Stratum listener disabled. [Machine-readable results](evidence/chronicle-shadow-checkpoint.json) · [Compressed observations and reference readbacks](evidence/chronicle-shadow-journal.json.gz)
+The checkpoint covers **90 consecutive blocks, 976422 through 976511**, observed from November 21, 2026 at 02:23:34 to 18:25:17 UTC. The observer started collecting contemporary bodies with an empty witnessed set. Every decision in this checkpoint withheld work while the 147-header mainnet difficulty window filled. The observer ran with shadow assembly enabled and its Stratum listener disabled. [Machine-readable results](evidence/chronicle-shadow-checkpoint.json) · [Compressed observations and reference readbacks](evidence/chronicle-shadow-journal.json.gz)
 
 | Measurement | Checkpoint result |
 | --- | --- |
@@ -52,71 +54,26 @@ The gzip archive includes run-local peer labels, tip decisions, timed peer repor
 
 The public chainwork comparison uses an external header for height 976421 as its starting value. At each subsequent height the replay adds `floor(2^256 / (target + 1))`. It verifies the final total and tip hash against the recorded WhatsOnChain response, as well as each intermediate external readback. The three earliest tip records predate local wire-header capture. The archive includes their independently retrieved bytes as retrospective evidence. Their heights remain excluded from the count of locally captured wire headers. [External parent header](https://api.whatsonchain.com/v1/bsv/main/block/00000000000000001076543ba0f684404e1b03b04a38403e531db3f381dced9a/header) · [External checkpoint header](https://api.whatsonchain.com/v1/bsv/main/block/000000000000000000aba8e7b99e254343964efe2347596967945d1aa4ee91c2/header)
 
-## Collect the 1,008-block run
+## Original qualification criteria
 
-Start the passive observer, maintained Alert System receiver, authenticated gateway and controlled failover driver as described in the [qualification runbook](chronicle-qualification.md). While the observer is running, the following command reads its append-only journal and emits the final evidence bundle once it has 1,008 contiguous observed decisions, independently replayable unsigned work, a recovered process boundary and an observed SV-only delivery. Review the output's gaps, readiness losses, forecasts, corroboration and candidate count before making a qualification claim. The live observer alone selects candidates and peers. Readbacks use a separate process and supply no history or state to the node.
-
-```sh
-python3 qualification/shadow_checkpoint.py follow --reference \
-  "$SHADOW_LOG" "$FAILOVER_RECEIPT" .native/shadow-final.json.gz \
-  > .native/shadow-final-summary.json
-```
-
-Use `capture` in place of `follow` to take an immediate checkpoint. Each published evidence bundle is self-contained and the SHA-256 digest in the summary identifies its exact bytes.
-
-A final bundle requires at least one transaction-bearing unsigned candidate built with an independently recomputed CW-144 target and a subsequent observed mainnet header with the predicted target. The active linked run must also contain the recovered failover, sufficient observed body coverage, a ready signed prefix at the endpoint and a recorded template wherever the node reported ready with pending transactions. Each height needs a timed report from another peer or a checked public header. When an Asset endpoint cannot be associated with a peer identity, the verifier uses two reporting peer identifiers or a public header. The public work anchor and final selected hash must reconcile independently.
-
-Run `python3 qualification/shadow_checkpoint.py qualify .native/shadow-final.json.gz` to check these conditions offline. An incomplete checkpoint returns the outstanding evidence and exit status 1. Ordinary `replay` continues to reproduce the published 90-block checkpoint exactly. The collector keeps observing after the first 1,008 tips if a condition is outstanding. A transaction-bearing candidate on the last tip needs another observed block. A peer-report gap can be checked with a public header at that hash. A reference outage or a reference reporting an inactive hash causes the collector to read the journal again and retry. Reference readbacks add zero prospective tip observations and cannot fill a missing local decision.
-
-A missing ready template, deficient recorded body coverage, a lost restore boundary or a recorded incorrect prediction starts a new qualifying interval. The final archive retains the preceding records, excluded count and reasons. An independently computed difficulty or cryptographic contradiction fails replay and requires investigation. A fresh interval needs 1,008 further contiguous local tip decisions and its own successful transport drill. Run the failover driver with a fresh receipt against the same durable state and shadow journal. Append that attempt’s completed receipt to the collector’s existing receipt file in order, retaining failed and partial attempts. The verifier matches all three stages to one drill and the corresponding journal transitions. The offline collector regression extends the archived 90-block prefix with simulated events, exercises a delayed successor and a reference outage, and verifies that only local observations increase the block count.
+The study required 1,008 consecutive local decisions, corroborated work and difficulty, a ready directive prefix, a recovered transport failover and an independently checked transaction-bearing candidate followed by a successor. The archived interval fell short. The offline `qualify` command lists the missing conditions for each published checkpoint. Reference readbacks add corroboration to an existing journal entry and cannot supply a missing local decision. [Archived collection protocol](https://github.com/p2ppsr/scary-node/blob/3eac2e9/docs/mainnet-shadow.md#collect-the-1008-block-run)
 
 ## Compare unsigned choices with transactions mined by an independent miner
 
-For the first 16 nonempty unsigned templates on the linked series in a checkpoint, compare the ordinary transaction IDs Scary chose at its parent with every transaction in the independently mined immediate successor. This selection rule was recorded before the mainnet observer reached its first 147-header difficulty window. The numerator counts candidate entries included by the next miner. The denominator counts all candidate entries for those 16 parents. A payment appearing in templates at two different heights contributes two opportunities. A zero overlap is a measured result. An unfinished sample keeps its observed denominator.
+The prespecified comparison would count matches between the ordinary transaction IDs Scary chose at its parent and every transaction in the independently mined immediate successor for the first 16 nonempty unsigned templates. This selection rule was recorded before the mainnet observer reached its first 147-header difficulty window. The numerator counts candidate entries included by the next miner. The denominator counts all candidate entries for those 16 parents. A payment appearing in templates at two different heights contributes two opportunities. A zero overlap is a measured result. An unfinished sample keeps its observed denominator.
 
 The reference reader requests public block hashes only. For paginated blocks it combines the initial transaction IDs and the advertised pages in order, checking the full transaction count. The offline verifier reconstructs the complete Merkle root against the locally observed successor header and binds the report to the exact checkpoint archive. Other miners choose their own transactions, fee policies and arrival times. Absence from a successor therefore gives no verdict on the payment’s validity. [Reference block API](https://docs.taal.com/core-products/whatsonchain/block)
-
-```sh
-python3 qualification/shadow_inclusion.py capture .native/shadow-final.json.gz .native/shadow-successors.json.gz
-python3 qualification/shadow_inclusion.py verify .native/shadow-final.json.gz .native/shadow-successors.json.gz
-```
-
-A finite collector can save each independently read successor as soon as the observed pair exists. It verifies the full ordered transaction list against the observed header before writing it to the local cache. A later outage or a collector restart can then retry the missing block without downloading previously verified blocks again. `progress.json` lists outstanding heights and `attempts.jsonl` retains failed and successful readbacks. The collector rereads the live journal before fixing the final sample and replays every cached list against its selected header.
-
-```sh
-python3 qualification/shadow_inclusion_follow.py "$SHADOW_LOG" "$FAILOVER_RECEIPT" "$PRIVATE_SUCCESSOR_DIR"
-python3 qualification/shadow_inclusion.py verify \
-  "$PRIVATE_SUCCESSOR_DIR/checkpoint.json.gz" "$PRIVATE_SUCCESSOR_DIR/successors.json.gz"
-```
 
 The published 90-block entry checkpoint yields zero candidate-bearing pairs. It predates the first unsigned template. Two independent reference reads returned all 668 transactions at height 976467 and all four at height 976511. Both sets reconstruct the locally observed header commitments. The regression test uses a synthetic transaction choice at the second height to check the counting procedure. [Public reference readbacks](evidence/chronicle-shadow-reference-transactions.json.gz)
 
 
-The November 21 passive upgrade at height **976520** recovered the same selected hash, 99 contiguous headers from 976422, 30,553 witnessed outputs and durable directive sequence 1. Two data peers were connected when tip reconfirmation was recorded. The signed receiver reported two alert peers and zero outstanding actions. These 99 observations remain a prefix of the 1,008-block acceptance interval. [Restart and reconfirmation](evidence/chronicle-shadow-recovery-upgrade.json) · [macOS release provenance](evidence/chronicle-recovery-macos-build.json) · [Linux build from the same source](evidence/chronicle-recovery-linux-build.json)
+The November 21 passive upgrade at height **976520** recovered the same selected hash, 99 contiguous headers from 976422, 30,553 witnessed outputs and durable directive sequence 1. Two data peers were connected when tip reconfirmation was recorded. The signed receiver reported two alert peers and zero outstanding actions. The published prefix contained 99 of the required 1,008 observations. [Restart and reconfirmation](evidence/chronicle-shadow-recovery-upgrade.json) · [macOS release provenance](evidence/chronicle-recovery-macos-build.json) · [Linux build from the same source](evidence/chronicle-recovery-linux-build.json)
 
 At height **976525**, the entrant had 104 consecutive local headers, 31,339 witnessed outputs and 111 pending transactions. Since the height-976520 restart, native admission counted 314 accepted SV-peer offers and 33 accepted Teranode subtree offers. Both paths also delivered repeats and ineligible transactions. Five SV network groups corroborated local time within one second. The signed directive prefix was current. The 147-header difficulty window was still incomplete, and the node recorded no unsigned candidate or local solution at that parent. An independent readback matched the local header, parent and increment in chainwork. Admission counters measure events received through each transport. A transaction can appear more than once. [Mainnet observation and reference headers](evidence/chronicle-mainnet-native-offers.json)
 
-## Independently replay the first unsigned candidate's fees
+## Confirmed fee and inclusion check
 
-The native evidence reader selects the **first transaction-bearing unsigned decision** in the prospectively written station journal. It verifies the 147 linked proof-of-work headers, computes the next CW-144 target, checks the candidate's parent, median time, coinbase height and Merkle root, then compares the very next observed header with the selected parent, height and target. It also checks the signed-prefix status at the decision and samples the running station's clock report for the same parent. The time check requires a corroborated offset from at least three SV network groups and a sample within 120 seconds of the decision.
-
-For each ordinary input the reader retains the exact funding outpoint, value and locking script. It checks funding transaction bytes and their Merkle branches against the selected chain, and resolves outputs from earlier transactions in the same template in order. It compares every independently calculated fee with the node's admitted fee and reconciles the sum plus subsidy with the coinbase payout. Coinbase and confiscation outputs have independent age checks. The source proofs establish creation and value. The station’s witnessed spend journal and shared BDK supply spend and script validation. The signed-prefix check reads the node’s receipt. Full signed-message verification is exercised in the [receiver and DAR qualification](chronicle-results.md).
-
-Start the reader before the first eligible decision, using a private directory on the same filesystem as the node state. The live decoder requires Python and MessagePack. The verifier for an existing receipt uses the Python standard library.
-
-```sh
-python3 -m venv .native/shadow-reader
-.native/shadow-reader/bin/pip install 'msgpack==1.1.2'
-.native/shadow-reader/bin/python qualification/shadow_first_candidate.py follow \
-  "$SHADOW_LOG" "$DATA_DIR/mainnet/witness.state" "$PRIVATE_EVIDENCE" \
-  --status-url "$LOCAL_API" --token-file "$OPERATOR_TOKEN_FILE" \
-  --asset-list "$APPROVED_ASSET_URL_FILE"
-python3 qualification/shadow_first_candidate.py verify "$PRIVATE_EVIDENCE/first.json.gz"
-```
-
-Each line of the optional Asset file is an operator-selected native Asset base URL, including the API prefix. The reader requests a previously witnessed, confirmed block by hash when its body has left the local evidence cache. The node receives no chain data from the reader. The reader retains up to four immutable checkpoint links, the first candidate's exact bytes and funding proofs. Its compressed body cache defaults to 2 GiB. The `--cache-bytes` and `--max-block-bytes` options set archive and remote read limits. A missing source or clock sample leaves the public count incomplete. A conflicting immediate successor is reported against the original decision. Keep the candidate receipt private while its signed payments are unconfirmed. The summary contains counts, fees, difficulty and the confirmed parent hash.
-
-At height **976529**, the station had observed 108 consecutive contemporary tips, zero unsigned candidates and 68 pending payments in that tip decision. A separate preflight used a confirmed transaction at height **976522**. Its single input came from **976521**, and the difference between that funding output and the spending outputs was **64 satoshis**. Both raw transactions have Merkle paths under their respective proof-of-work headers. A subsequent native Asset read of the funding block reproduced the same proof. The first passive candidate and the 1,008-block qualification remain open at this checkpoint. [Confirmed fee and inclusion evidence](evidence/chronicle-shadow-native-fee-warmup.json.gz)
+At height **976529**, the station had observed 108 consecutive contemporary tips, zero unsigned candidates and 68 pending payments in that tip decision. A separate preflight used a confirmed transaction at height **976522**. Its single input came from **976521**, and the difference between that funding output and the spending outputs was **64 satoshis**. Both raw transactions have Merkle paths under their respective proof-of-work headers. A subsequent native Asset read of the funding block reproduced the same proof. [Confirmed fee and inclusion evidence](evidence/chronicle-shadow-native-fee-warmup.json.gz)
 
 ```sh
 python3 qualification/shadow_native_warmup.py docs/evidence/chronicle-shadow-native-fee-warmup.json.gz
@@ -124,22 +81,6 @@ python3 -m unittest discover -s qualification -p 'test_shadow*.py'
 ```
 
 On November 21, the passive observer upgraded to the same successor-aware release that had passed the complete live Chronicle corpus and DAR replay. The protected restart restored the same 110-header range, 32,668 witnessed outputs, cumulative work and applied directive sequence at height 976531. Five data peers reconfirmed the tip within three seconds. The receiver had two synchronized peers and no outstanding actions. The restored snapshot contained 125 eligible pending transactions, down from 335 in memory just before the stop. The last disk snapshot predates some peer admissions. The independently reconciled chain boundary survived. [Restart receipt](evidence/chronicle-waiting-mainnet-restart.json) · [Release validation](chronicle-results.md)
-
-### Cross-check the first candidate on macOS and Linux ARM64
-
-Wait for the native reader to report a complete receipt for the first candidate, its observed successor and its funding proofs. The macOS command below runs the distributed and exact-source GoBDK oracles on that same capture. On a Linux ARM64 Docker host, place the identical private receipt and paired macOS result in the private evidence directory. Supply the four Linux binaries and corresponding manifest built for the selected release image. The Linux oracles receive transactions over standard input inside a read-only container with external networking disabled. The container sees only the mounted oracle directory. [Building the two native variants](chronicle-qualification.md#compare-distributed-and-freshly-compiled-gobdk)
-
-```sh
-umask 077
-python3 qualification/shadow_bdk.py "$PRIVATE_EVIDENCE/first.json.gz" \
-  --go-oracles .native/go-oracles > "$PRIVATE_EVIDENCE/first-go-result.json"
-python3 qualification/linux_shadow_candidate.py \
-  "$PRIVATE_EVIDENCE/first.json.gz" "$PRIVATE_EVIDENCE/first-go-result.json" \
-  .native/linux-arm64-go-oracles "$PRIVATE_EVIDENCE/linux-summary.json" \
-  --journal "$SHADOW_LOG"
-```
-
-The summary contains the committed receipt digest, confirmed parent and successor, fees, transaction counts, interpreter identities, agreement and ordinary validation outcomes. The journal identifies the originating station executable separately from the Linux image used for the independent replay. The driver compares policy and consensus outcomes and individual script-rejection details between platforms, then counts confiscations separately. The optional `--private-decisions` path retains detailed results locally if investigation is required. An incomplete candidate, mismatched receipt or unrecognized executable fails verification.
 
 ## Recover eligible payments across a controlled stop
 
@@ -181,18 +122,11 @@ python3 qualification/shadow_checkpoint.py qualify docs/evidence/chronicle-mainn
 
 At height 976536 the separate first-candidate reader exited with a JSON decoding error while the observer continued recording. A reader can encounter the old end of a file between the writer's JSON payload and its newline. If it advances beyond that fragment and the writer finishes before its next read, it can receive a newline by itself. The readers now stop that scan at the first unterminated byte sequence. The next scan reads the complete row from its start. A malformed newline-terminated record raises an error. The binary read also handles a pause in the middle of a UTF-8 character.
 
-The independently reconciled prefix through height 976538 contains **117 consecutive prospective tips** and **zero unsigned transaction-bearing candidates**. The external receipt confirms the accumulated work against the active tip and observation anchor. The native bodies at heights 976536, 976537 and 976538 contain 12, 506 and 3 transactions. Each complete body matched its confirmed header and Merkle root. The reader obtained a five-group clock sample at every one of those heights. Both the 1,008-block span and the first unsigned candidate remained open. [Recovered observations and external work](evidence/chronicle-mainnet-h976538.json.gz) · [Original diagnostic and the three independently rehashed bodies](evidence/chronicle-shadow-tail-recovery.json)
+The independently reconciled prefix through height 976538 contains **117 consecutive prospective tips** and **zero unsigned transaction-bearing candidates**. The external receipt confirms the accumulated work against the active tip and observation anchor. The native bodies at heights 976536, 976537 and 976538 contain 12, 506 and 3 transactions. Each complete body matched its confirmed header and Merkle root. The reader obtained a five-group clock sample at every one of those heights. [Recovered observations and external work](evidence/chronicle-mainnet-h976538.json.gz) · [Original diagnostic and the three independently rehashed bodies](evidence/chronicle-shadow-tail-recovery.json)
 
 ```sh
 python3 qualification/shadow_checkpoint.py replay docs/evidence/chronicle-mainnet-h976538.json.gz
 python3 -m unittest discover -s qualification -p test_shadow_journal.py
-```
-
-For a finite supervised reader, place the argument array for the documented `shadow_first_candidate.py follow` command in a private JSON file and run the following command. The supervisor keeps the original output directory and appends each recovery to `reader-recoveries.jsonl`. It retries a failed child after checking every complete journal record. A malformed complete record produces a durable hold with its line number. Completion requires a fresh verification of the saved candidate against the native reader's terminal summary.
-
-```sh
-python3 qualification/shadow_reader_supervisor.py \
-  "$SHADOW_LOG" "$PRIVATE_EVIDENCE" "$PRIVATE_EVIDENCE/reader-argv.json"
 ```
 
 A second retrieval over Teranode Asset returned all three complete bodies. Their combined 14,427,048 bytes matched the original native SV P2P deliveries byte for byte by SHA-256. The reader checked their proof of work and transaction Merkle roots again. [Independent transport readback](evidence/chronicle-shadow-tail-asset-readback.json)
@@ -218,11 +152,10 @@ PY
 
 ## Attribute observed tips to the running executable
 
-Run the release report on the final archive or a dated checkpoint. It replays the existing qualification contract and groups the selected window's consecutive prospective tip records by the executable SHA-256 in the preceding journal start. A restore keeps its own event and contributes zero blocks. A start without an executable digest leaves subsequent tips unattributed until a later start supplies one. The report records the first and last heights, block hashes, UTC observation times and journal positions for each segment. An archive can contain several segments from the same binary after another binary has run.
+The release report can replay a dated checkpoint offline. It replays the existing qualification contract and groups the selected window's consecutive prospective tip records by the executable SHA-256 in the preceding journal start. A restore keeps its own event and contributes zero blocks. A start without an executable digest leaves subsequent tips unattributed until a later start supplies one. The report records the first and last heights, block hashes, UTC observation times and journal positions for each segment. An archive can contain several segments from the same binary after another binary has run.
 
 ```sh
 python3 qualification/shadow_release_segments.py docs/evidence/chronicle-mainnet-h976538.json.gz
-python3 qualification/shadow_release_segments.py "$FINAL_SHADOW_ARCHIVE"
 ```
 
 The 117-tip checkpoint includes 14 process starts and zero transaction-bearing unsigned templates. Two same-binary starts restored height 976535. The first produced zero subsequent tip observations before the second start. The second produced the three observations at 976536–976538. The native transport drill at 976424–976425 matches journal records 7, 8, 24 and 28. Those legacy records contain no executable SHA. [Full segment, restart and transport attribution](evidence/chronicle-mainnet-release-segments-117.json) · [Observed archive](evidence/chronicle-mainnet-h976538.json.gz)
@@ -236,4 +169,4 @@ The 117-tip checkpoint includes 14 process starts and zero transaction-bearing u
 | 976536–976538 | `0aab15b07c70` | [10b93b4](evidence/chronicle-shutdown-macos-build.json) | 3 |
 | **Total** | | | **117** |
 
-The four named builds account for 20 observed tips. The checkpoint remains below the 1,008-block target. Reporting executable attribution leaves the qualification window and its acceptance conditions unchanged.
+The four identified builds accounted for 20 of the 117 observed tips.
