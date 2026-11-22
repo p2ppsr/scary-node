@@ -25,10 +25,11 @@ def collect(journal, directory, base):
     ):
         raise ValueError("supply a public HTTPS Asset base")
     tips = {}
-    for line in journal.open("rb"):
-        row = json.loads(line)
-        if row.get("height") in range(976547, 976556) and row.get("header_hex"):
-            tips[row["height"]] = row
+    with journal.open("rb") as source:
+        for line in source:
+            row = json.loads(line)
+            if row.get("height") in range(976547, 976556) and row.get("header_hex"):
+                tips[row["height"]] = row
     observations = {}
     for height in range(976547, 976556):
         tip = tips[height]

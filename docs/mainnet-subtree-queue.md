@@ -41,6 +41,12 @@ We also compared each advertised root with the commitments for each individual c
 
 The separate operator snapshot at height 976556 recorded 6,752 subtree notices, 6,190 full offers, nine connected data peers and zero block-coverage gaps. Subtree intake had counted 121 admitted offers, 86,990 duplicates, 60,171 ineligible offers and four held for a successor. SV intake had counted 1,029 admitted offers over the same process lifetime. These transaction-level counts cover repeated offers and independent transports. They do not identify which root delivered an admitted payment. [Ordinary peer-admission accounting](https://github.com/p2ppsr/scary-node/blob/5148c31ae620544c31a61b1710172c4bcc524c54/src/mining/waiting.rs#L137)
 
+## Prospective file-read timing
+
+A separate read-only process tailed the enrolled log for the next 512 complete notices. It recorded 221 full offers over 596.110 seconds. The records arrived in 440 occupied polling windows, with a maximum of four notices visible in one read. For the 291 non-full offers with a following notice, the median lower and upper estimates for the next record becoming visible were 574 and 787 milliseconds. Sampling requested a 20 ms interval. Occupied windows had a median width of 92 ms, a 95th percentile of 168 ms and a maximum of 174 ms. These estimates describe local file visibility. The observer does not expose arrival or fetch-completion clocks for these roots. [Timing receipt](evidence/chronicle-shadow-subtree-timing.json)
+
+Checking the original log at the recorded byte offset reproduced all 512 flags, corresponding to notices 6,907 through 7,418 in that process. The timing collector read 230,961 local bytes with 0.433 seconds of CPU and a peak resident set of 23.7 MiB. Its only input was the existing log. [Passive timing collector](../qualification/shadow_subtree_tail.py)
+
 ## Reproduction
 
 The public receipt uses encounter-order publisher numbers, ordinal root numbers and one-way commitments to advertised roots. It contains ordered confirmed transaction IDs. The verifier reconstructs the root commitments for known confirmed content. Original peer identifiers, unconfirmed transaction IDs and signed transaction bytes are absent.
@@ -48,6 +54,8 @@ The public receipt uses encounter-order publisher numbers, ordinal root numbers 
 ```sh
 .native/py/bin/python qualification/shadow_subtree_queue.py verify \
   docs/evidence/chronicle-shadow-subtree-queue.json.gz
+.native/py/bin/python qualification/shadow_subtree_tail.py verify \
+  docs/evidence/chronicle-shadow-subtree-timing.json
 ```
 
 An operator with the retained mixed stdout/stderr capture can recreate the trace using process start 18. Twenty-nine notices in the original interval shared a physical log line with diagnostic output. The parser extracts complete event frames and reconciles their count against the original status. Parsing only standalone JSON lines misses those notices. To repeat the independent comparison, supply the recorded mainnet journal, the local cache of confirmed wire bodies keyed by block hash, and an approved public HTTPS Asset base ending in `/api/v1`.
@@ -57,6 +65,10 @@ An operator with the retained mixed stdout/stderr capture can recreate the trace
   "$journal" "$confirmed_body_directory" "$public_asset_base" confirmed.json
 .native/py/bin/python qualification/shadow_subtree_queue.py capture repeated-trace.json.gz \
   --log "$observer_log" --confirmed confirmed.json --operator "$sanitized_status"
+.native/py/bin/python qualification/shadow_subtree_tail.py verify \
+  docs/evidence/chronicle-shadow-subtree-timing.json --log "$observer_log"
+.native/py/bin/python qualification/shadow_subtree_tail.py capture fresh-timing.json \
+  --log "$observer_log"
 ```
 
 Reading the combined 7,003 notices scanned 36,115,357 bytes in the existing process log. Reconstructing and writing the trace with all confirmed-content comparisons took 0.66 seconds of wall time and 0.65 seconds of CPU with a peak resident set of 29.9 MiB. The collector issued nine bounded requests for confirmed block metadata totaling 17,345 response bytes. It read 53,970,704 bytes of confirmed block bodies from the local cache. Repeating the collection took 12.21 seconds of wall time including request pacing, 0.23 seconds of CPU and a peak resident set of 156.3 MiB. It opened no mainnet P2P sessions and submitted no transactions. The enrolled release remained active throughout.
