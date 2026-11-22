@@ -149,6 +149,23 @@ def tip_disposition(row):
     )
 
 
+def write_order(row):
+    chosen = row["plan"]["successor_receiver"]
+    if any(len(lane.get("legs", ())) <= chosen for lane in row["lanes"]):
+        return "unavailable"
+    left, right = [lane["legs"][chosen] for lane in row["lanes"]]
+    if any(
+        "write_end_ns" not in leg or "write_begin_ns" not in leg
+        for leg in (left, right)
+    ):
+        return "unavailable"
+    if left["write_end_ns"] < right["write_begin_ns"]:
+        return "left"
+    if right["write_end_ns"] < left["write_begin_ns"]:
+        return "right"
+    return "overlapping_writes"
+
+
 def receiver_tips(receipts, labels, primary):
     groups = {
         key: {
@@ -158,6 +175,7 @@ def receiver_tips(receipts, labels, primary):
             "same_tip_at_all_three_reads_on_each_receiver": 0,
             "depth_two_winner_in_final_ancestry": 0,
             "joint_counts": Counter(),
+            "local_writes_when_ingress_interval_contains_zero": Counter(),
         }
         for key in labels
     }
@@ -173,6 +191,10 @@ def receiver_tips(receipts, labels, primary):
             joint, chosen, stable, final = tip_disposition(row)
             g["two_discoveries"] += 1
             g["joint_counts"][joint] += 1
+            if joint[1] == "interval_contains_zero":
+                g["local_writes_when_ingress_interval_contains_zero"][
+                    (write_order(row), joint[2])
+                ] += 1
             g["settled_on_chosen_receivers_candidate"] += int(chosen)
             g["same_tip_at_all_three_reads_on_each_receiver"] += int(stable)
             g["depth_two_winner_in_final_ancestry"] += int(final)
@@ -181,6 +203,16 @@ def receiver_tips(receipts, labels, primary):
             g["scheduled_parents"] == primary["pooled"][key]["parents"],
             "missing assigned parents",
         )
+        g["local_writes_when_ingress_interval_contains_zero"] = [
+            {
+                "earlier_disjoint_local_write": order,
+                "settled_at_depth_two": won,
+                "parents": n,
+            }
+            for (order, won), n in sorted(
+                g["local_writes_when_ingress_interval_contains_zero"].items()
+            )
+        ]
         g["joint_counts"] = [
             {
                 "active_tips_before_continuation": tips,

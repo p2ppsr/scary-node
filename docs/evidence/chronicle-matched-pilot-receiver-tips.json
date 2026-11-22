@@ -17,7 +17,8 @@
           "settled_at_depth_two": "left",
           "parents": 34
         }
-      ]
+      ],
+      "local_writes_when_ingress_interval_contains_zero": []
     },
     "witnessed/full:0ns": {
       "scheduled_parents": 96,
@@ -74,6 +75,28 @@
           "settled_at_depth_two": "right",
           "parents": 2
         }
+      ],
+      "local_writes_when_ingress_interval_contains_zero": [
+        {
+          "earlier_disjoint_local_write": "left",
+          "settled_at_depth_two": "left",
+          "parents": 6
+        },
+        {
+          "earlier_disjoint_local_write": "overlapping_writes",
+          "settled_at_depth_two": "left",
+          "parents": 7
+        },
+        {
+          "earlier_disjoint_local_write": "right",
+          "settled_at_depth_two": "left",
+          "parents": 8
+        },
+        {
+          "earlier_disjoint_local_write": "right",
+          "settled_at_depth_two": "right",
+          "parents": 4
+        }
       ]
     },
     "witnessed/full:184000000ns": {
@@ -89,7 +112,8 @@
           "settled_at_depth_two": "right",
           "parents": 24
         }
-      ]
+      ],
+      "local_writes_when_ingress_interval_contains_zero": []
     },
     "full/full:-184000000ns": {
       "scheduled_parents": 96,
@@ -104,7 +128,8 @@
           "settled_at_depth_two": "left",
           "parents": 30
         }
-      ]
+      ],
+      "local_writes_when_ingress_interval_contains_zero": []
     },
     "full/full:0ns": {
       "scheduled_parents": 96,
@@ -155,6 +180,28 @@
           "settled_at_depth_two": "right",
           "parents": 2
         }
+      ],
+      "local_writes_when_ingress_interval_contains_zero": [
+        {
+          "earlier_disjoint_local_write": "left",
+          "settled_at_depth_two": "left",
+          "parents": 5
+        },
+        {
+          "earlier_disjoint_local_write": "overlapping_writes",
+          "settled_at_depth_two": "left",
+          "parents": 10
+        },
+        {
+          "earlier_disjoint_local_write": "overlapping_writes",
+          "settled_at_depth_two": "right",
+          "parents": 1
+        },
+        {
+          "earlier_disjoint_local_write": "right",
+          "settled_at_depth_two": "right",
+          "parents": 9
+        }
       ]
     },
     "full/full:184000000ns": {
@@ -170,7 +217,8 @@
           "settled_at_depth_two": "right",
           "parents": 35
         }
-      ]
+      ],
+      "local_writes_when_ingress_interval_contains_zero": []
     }
   }
 }

@@ -4,7 +4,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from matched_subgroups import GROUPS, analyze, group_counts, record, tip_disposition
+from matched_subgroups import (
+    GROUPS,
+    analyze,
+    group_counts,
+    record,
+    tip_disposition,
+    write_order,
+)
 
 
 class MatchedSubgroups(unittest.TestCase):
@@ -103,6 +110,22 @@ class MatchedSubgroups(unittest.TestCase):
         row["postdeadline_readbacks"][1]["active_query_ns"][1] = 126
         with self.assertRaisesRegex(ValueError, "crosses continuation"):
             tip_disposition(row)
+
+    def test_application_write_order_uses_both_ends_on_the_designated_socket(self):
+        row = {
+            "lanes": [
+                {"legs": [{}, {"write_begin_ns": 10, "write_end_ns": 20}]},
+                {"legs": [{}, {"write_begin_ns": 21, "write_end_ns": 35}]},
+            ],
+            "plan": {"successor_receiver": 1},
+        }
+        self.assertEqual(write_order(row), "left")
+        row["lanes"].reverse()
+        self.assertEqual(write_order(row), "right")
+        row["lanes"][0]["legs"][1]["write_begin_ns"] = 20
+        self.assertEqual(write_order(row), "overlapping_writes")
+        row["plan"]["successor_receiver"] = 0
+        self.assertEqual(write_order(row), "unavailable")
 
     def test_incomplete_phase_cannot_be_read_or_reported(self):
         with (
