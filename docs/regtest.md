@@ -19,4 +19,4 @@ The tested Linux ARM64 executable reported SHA-256 `ddfbac3d6b268bb670cfd50d9365
 python3 regtest/verify_receipt.py --check-source docs/evidence/chronicle-two-teranode-quickstart.json
 ```
 
-Use `cargo test --locked` to exercise the Rust component tests. A short-target CPU worker is adequate for regtest. The ordinary operator path remains native mainnet listening.
+For a local Rust build, run `./scripts/build-bdk.sh` before `cargo test --locked` so Cargo can find the pinned interpreter sources and archive. A short-target CPU worker is adequate for regtest. The ordinary operator path remains native mainnet listening.

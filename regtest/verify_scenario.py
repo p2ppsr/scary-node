@@ -440,7 +440,7 @@ def verify_process_evidence(record, final):
     return digest
 
 
-def verify(record):
+def verify(record, *, expect_admission_order=False):
     require(record['network'] == 'regtest' and record['teranode_release'] == 'v0.16.1', 'wrong network or reference release')
     blocks = record['blocks']
     join = record['join_height']
@@ -503,6 +503,9 @@ def verify(record):
             if candidate:
                 require(fees == expected_fees, 'offer fees disagree with block fees')
                 job = verify_candidate(candidate, block, txs, raw, admitted, fees)
+                if expect_admission_order:
+                    offered_order = [offer['txid'] for offer in candidate['offered'] if offer['decision'] == 'admitted']
+                    require(candidate['mined_txids'] == offered_order, 'mined transactions differ from admission order')
                 job['deferred_by_reason'] = reasons
                 job_results.append(job)
             if height == join:
@@ -576,9 +579,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('receipt', type=Path, help='scenario JSON or gzip-compressed JSON')
     parser.add_argument('--json', action='store_true', help='emit verified per-block measurements')
+    parser.add_argument('--expect-admission-order', action='store_true',
+                        help='require each mined package to follow the order of its admitted offers')
     args = parser.parse_args()
     try:
-        report = verify(load_record(args.receipt))
+        report = verify(load_record(args.receipt), expect_admission_order=args.expect_admission_order)
     except (OSError, KeyError, ValueError, TypeError, IndexError, struct.error, EOFError) as exc:
         sys.exit(f'Scenario verification failed: {exc}')
     if args.json:

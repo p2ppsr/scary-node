@@ -262,6 +262,19 @@ def assert_tip(node, expected):
     return rpc(node, "getblockchaininfo")["bestblockhash"] == expected
 
 
+def coinbase_branches(ids):
+    # The zero placeholder is the first leaf. Its path siblings depend only
+    # on the ordinary transactions, in their actual admission order.
+    layer = [bytes(32), *(bytes.fromhex(t)[::-1] for t in ids)]
+    branches = []
+    while len(layer) > 1:
+        if len(layer) % 2:
+            layer.append(layer[-1])
+        branches.append(layer[1].hex())
+        layer = [dsha(layer[i] + layer[i + 1]) for i in range(0, len(layer), 2)]
+    return branches
+
+
 def solve(worker, parent, child, *, refresh_payment=None):
     with socket.create_connection(("127.0.0.1", 19433 + PORT_SHIFT), timeout=60) as sock, sock.makefile("rwb") as stream:
         def send(i, method, params):
@@ -290,16 +303,8 @@ def solve(worker, parent, child, *, refresh_payment=None):
         prev = b"".join(prev[i:i + 4][::-1] for i in range(0, 32, 4))
         if prev[::-1].hex() != parent:
             raise ValueError("job parent differs from witnessed tip")
-        # Rust's ordered pending map uses raw SHA digest bytes as its key.
         ids = [child] if isinstance(child, str) else child
-        layer = [bytes(32)] + sorted(bytes.fromhex(t)[::-1] for t in ids)
-        expected_branches = []
-        while len(layer) > 1:
-            if len(layer) % 2:
-                layer.append(layer[-1])
-            expected_branches.append(layer[1].hex())
-            layer = [dsha(layer[i] + layer[i + 1]) for i in range(0, len(layer), 2)]
-        if branches != expected_branches:
+        if branches != coinbase_branches(ids):
             raise ValueError(f"unexpected job Merkle branch: {branches}")
         _, extranonce1, size = subscription
         extra = bytes(size).hex()
@@ -328,8 +333,7 @@ def solve(worker, parent, child, *, refresh_payment=None):
                     break
             if replacement[0] == job_id or replacement[1] != prev_words or replacement[8] is not False:
                 raise ValueError("same-parent refresh did not preserve old work")
-            expected = sorted((bytes.fromhex(t)[::-1] for t in [child, replacement_txid]))
-            if replacement[4] != [expected[0].hex(), dsha(expected[1] * 2).hex()]:
+            if replacement[4] != coinbase_branches([*ids, replacement_txid]):
                 raise ValueError("refresh job does not commit to both independent payments")
         send(3, "mining.submit", [worker, job_id, extra, ntime, f"{nonce:08x}"])
         while True:

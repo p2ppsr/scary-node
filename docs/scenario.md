@@ -10,11 +10,11 @@ Use Docker with Compose v2 supporting `!override` (2.24.4 or newer), Python 3, a
 
 ```sh
 ./regtest/scenario.sh --seed 7 > scenario-7.json
-python3 regtest/verify_scenario.py scenario-7.json
+python3 regtest/verify_scenario.py --expect-admission-order scenario-7.json
 python3 regtest/verify_scenario.py scenario-7.json --json > summary-7.json
 ./regtest/scenario.sh --down
 ./regtest/scenario.sh --seed 19 > scenario-19.json
-python3 regtest/verify_scenario.py scenario-19.json
+python3 regtest/verify_scenario.py --expect-admission-order scenario-19.json
 ./regtest/scenario.sh --down
 ```
 
@@ -22,14 +22,20 @@ The launcher writes progress to stderr and the receipt to stdout. It requires fr
 
 ## Verify the shipped records
 
-Both seeds have compressed copies of the full run receipts. The verifier accepts gzip directly and uses Python plus OpenSSL for the independent signature checks. The `--json` option emits a per-height timeline, mining opportunities and the matched observer comparison.
+The current Chronicle seed-7 run records both observers' executable SHA-256 and the payments admitted for each Stratum job. The worker constructs its expected coinbase branch in admission order. The offline check also compares that order with the exact block bytes returned by the two references.
+
+```sh
+python3 regtest/verify_scenario.py --expect-admission-order docs/evidence/chronicle-scenario-seed7.json.gz
+```
+
+The historical seed-7 and seed-19 runs used an earlier template ordering. Both seeds have compressed copies of their original receipts. The verifier accepts gzip directly and uses Python plus OpenSSL for the independent signature checks. The `--json` option emits a per-height timeline, mining opportunities and the matched observer comparison.
 
 ```sh
 python3 regtest/verify_scenario.py docs/evidence/scenario-7.json.gz --json > summary-7.json
 python3 regtest/verify_scenario.py docs/evidence/scenario-19.json.gz --json > summary-19.json
 ```
 
-To exercise the local block-level rejection, rollback and partial-check cases, run the Rust suite. To check that altered evidence fails verification, run the receipt regression against either seed. It uses in-memory copies of the saved record.
+To exercise the local block-level rejection, rollback and partial-check cases, first build the pinned BDK archive with `./scripts/build-bdk.sh`, then run the Rust suite. To check that altered evidence fails verification, run the receipt regression against either seed. It uses in-memory copies of the saved record.
 
 ```sh
 cargo test --locked

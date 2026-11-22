@@ -1,6 +1,6 @@
 services:
   cold-observer:
-    image: scary-node:local
+    image: ${SCARY_NODE_IMAGE:-scary-node:local}
     networks: [regtest]
     tmpfs: [/data]
     command:

@@ -10,6 +10,12 @@ The figure follows seed 7. The middle panel pools numerator and denominator over
 
 At entry, **105 of 320** historical payment transactions had no live outputs. **210** had some live outputs, and **5** still had all their outputs. Thus **215 transactions** in this interval belonged to the still-live category. The 320 payments had created **533 outputs**, of which **218** remained live at entry. The experiment measures exactly which outpoints still existed at that height. Running an archive-deletion policy would be a different experiment.
 
+## Chronicle release replay
+
+On November 22, 2026, a fresh two-Teranode seed-7 run repeated the three payment-bearing blocks on the Chronicle executable. The entrant joined at height 143. At heights 156, 159 and 162 it mined 3, 8 and 12 of 16 offers, in admission order. Its blocks were 798, 1,752 and 2,521 bytes and earned 3,000, 8,000 and 12,000 satoshis in fees. Both stock peers selected and served all three blocks, and a stock miner extended each. At height 164 the established observer verified all three ordinary inputs while the observer that joined at height 163 deferred all three. The offline verifier checked 443 P2PKH signatures across the run. The two observers reported the same executable SHA-256, `ddfbac3d6b268bb670cfd50d936598b0b97adee828c2d5e8c4a21c58a28f4d0d`. [Full Chronicle seed-7 receipt](evidence/chronicle-scenario-seed7.json.gz) · [Replay and verification commands](scenario.md#verify-the-shipped-records)
+
+On this workstation Docker's default subnet pool was full. The first setup stopped before creating a container or writing a payment. The completed run used two unused project-scoped subnets, the same node image for both observers and the regular launcher. The scenario project was removed after verification. The figure and tables below retain the historical runs.
+
 ## How much the entrant learned
 
 | Chain position | Whole-chain UTXOs witnessed | Wallet UTXOs witnessed | Witnessed UTXOs eligible for the next job |
