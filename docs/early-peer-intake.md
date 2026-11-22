@@ -59,3 +59,16 @@ manifest=docs/evidence/chronicle-waiting-shutdown-macos-build.json
 .native/py/bin/python qualification/waiting_freeze.py verify "$manifest" docs/evidence/chronicle-waiting-freeze.json.gz
 .native/py/bin/python qualification/waiting_freeze.py run "$SCARY_BINARY" "$manifest" .native/waiting-freeze-fresh.json.gz
 ~~~
+
+## Ordered subtree fetches on a stock Teranode
+
+On regtest, a fresh stock Teranode v0.16.1 received a signed payment from its wallet RPC and announced the subtree over native gossip. Scary Node `9901c89` received the 191-byte subtree with four fetch workers and a 256-root waiting queue. Its completion event contained the exact advertised root and one payment. The SV intake count stayed at zero. On the same parent, a Stratum worker solved Scary's candidate. Stock selected block `7fb9ca4bc770466f7c4a59c8c7b27fb6c3a813ed5ec7e048a08d98943073f6c9`, which included the payment and its 1,000-satoshi fee, and mined direct successor `4f672bfd55a68ce0660a6e6995eaa7cf006e13eaed5cdcc0eeac197dc3900ee4`. The receipt contains the creating block, subtree bytes, intake counters, solved block and successor header. The offline verifier checks the payment signature against its witnessed funding output, both Merkle commitments, coinbase amount and proof of work. [Stock run and exact bytes](evidence/chronicle-ordered-subtree-stock.json) · [Controlled scheduler trials](subtree-scheduler-study.md)
+
+Build the release and install the qualification Python dependencies. Run the live fixture with a new output path or verify the published receipt offline.
+
+~~~sh
+.native/py/bin/python qualification/teranode_subtree_intake.py \
+  --binary "$PWD/target/release/scary-node" .native/ordered-subtree.json
+.native/py/bin/python qualification/verify_peer_intake.py \
+  docs/evidence/chronicle-ordered-subtree-stock.json
+~~~
