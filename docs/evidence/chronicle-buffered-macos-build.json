@@ -1,0 +1,16 @@
+{
+  "source_commit": "a69433bf4d43202b6155561ec4ec0b18aa4d6ce3",
+  "source_archive_sha256": "ae49460ac243cfe99eaa7396d85a4dd0644e6e08f3cc0edb79e9b7d4bdfb5b9a",
+  "rustc": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: aarch64-apple-darwin",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "executable_sha256": "61587de9c88b38d09443af13c6858769fce8c14ac9c48aecc6c4c38e1109cb90",
+  "rust_oracle_sha256": "92cf1693d5e20d29d088d0cd4ea2362f022fecfa96b4b755ba814b0e1c84fe43",
+  "go_oracle_sha256": "60f9a5df922898862c3d0753cd9636a3cdd65449cbc01eab6a4555894537a216"
+}
