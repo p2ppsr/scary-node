@@ -198,3 +198,25 @@ for row in receipt["affected_and_following"]:
     print(row["height"], row["transactions"], "transactions verified")
 PY
 ```
+
+## Attribute observed tips to the running executable
+
+Run the release report on the final archive or a dated checkpoint. It replays the existing qualification contract and groups the selected window's consecutive prospective tip records by the executable SHA-256 in the preceding journal start. A restore keeps its own event and contributes zero blocks. A start without an executable digest leaves subsequent tips unattributed until a later start supplies one. The report records the first and last heights, block hashes, UTC observation times and journal positions for each segment. An archive can contain several segments from the same binary after another binary has run.
+
+```sh
+python3 qualification/shadow_release_segments.py docs/evidence/chronicle-mainnet-h976538.json.gz
+python3 qualification/shadow_release_segments.py "$FINAL_SHADOW_ARCHIVE"
+```
+
+The 117-tip checkpoint includes 14 process starts and zero transaction-bearing unsigned templates. Two same-binary starts restored height 976535. The first produced zero subsequent tip observations before the second start. The second produced the three observations at 976536–976538. The native transport drill at 976424–976425 matches journal records 7, 8, 24 and 28. Those legacy records contain no executable SHA. [Full segment, restart and transport attribution](evidence/chronicle-mainnet-release-segments-117.json) · [Observed archive](evidence/chronicle-mainnet-h976538.json.gz)
+
+| Observed heights | Executable SHA-256 prefix | Release source | Tip observations |
+| --- | --- | --- | ---: |
+| 976422–976518 | Unknown | Unattributed legacy records | 97 |
+| 976519–976520 | `5c1fbe433746` | [af9b605](evidence/chronicle-qualification-macos-release.json) | 2 |
+| 976521–976531 | `8f99871ba04a` | [8c41f89](evidence/chronicle-recovery-macos-build.json) | 11 |
+| 976532–976535 | `da0703697a19` | [c2a36d5](evidence/chronicle-waiting-macos-build.json) | 4 |
+| 976536–976538 | `0aab15b07c70` | [10b93b4](evidence/chronicle-shutdown-macos-build.json) | 3 |
+| **Total** | | | **117** |
+
+The four named builds account for 20 observed tips. The checkpoint remains below the 1,008-block target. Reporting executable attribution leaves the qualification window and its acceptance conditions unchanged.

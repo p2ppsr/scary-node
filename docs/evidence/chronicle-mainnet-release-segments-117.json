@@ -1,0 +1,350 @@
+{
+  "schema": 1,
+  "qualified": false,
+  "required_observed_tips": 1008,
+  "observed_tips": 117,
+  "excluded_prefix_in_current_run": 0,
+  "unknown_executable_tips": 97,
+  "transaction_bearing_unsigned_templates": 0,
+  "templates_with_verified_successor": 0,
+  "segments": [
+    {
+      "executable_sha256": null,
+      "first_tip": {
+        "record": 1,
+        "height": 976422,
+        "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+        "observed_utc": "2026-11-21T02:23:34Z"
+      },
+      "start_record_for_first_tip": null,
+      "observed_tips": 97,
+      "transaction_bearing_unsigned_templates": 0,
+      "last_tip": {
+        "record": 1230,
+        "height": 976518,
+        "hash": "000000000000000013301bf287ad68741bd4c341a8b22522a85a329a85a7ac32",
+        "observed_utc": "2026-11-21T19:29:59Z"
+      },
+      "start_record_for_last_tip": 1196
+    },
+    {
+      "executable_sha256": "5c1fbe433746e338a47afa38001aa697dea989ad620db86c999e54104d6ed5ef",
+      "first_tip": {
+        "record": 1262,
+        "height": 976519,
+        "hash": "0000000000000000092297e28af0b99af95493578799aef9d81aa697812ded26",
+        "observed_utc": "2026-11-21T19:44:58Z"
+      },
+      "start_record_for_first_tip": 1237,
+      "observed_tips": 2,
+      "transaction_bearing_unsigned_templates": 0,
+      "last_tip": {
+        "record": 1276,
+        "height": 976520,
+        "hash": "000000000000000020217797ae62501d6d3127c261116eba58f5e643e577919a",
+        "observed_utc": "2026-11-21T19:58:21Z"
+      },
+      "start_record_for_last_tip": 1237
+    },
+    {
+      "executable_sha256": "8f99871ba04a9f0c234d1b9520fc021396689ac7924c02a28666db9c9f3b52c9",
+      "first_tip": {
+        "record": 1303,
+        "height": 976521,
+        "hash": "00000000000000000725a64e1d57bf6aab6bacb90ea6ff31eb9e8831b64cdf58",
+        "observed_utc": "2026-11-21T20:06:36Z"
+      },
+      "start_record_for_first_tip": 1278,
+      "observed_tips": 11,
+      "transaction_bearing_unsigned_templates": 0,
+      "last_tip": {
+        "record": 1420,
+        "height": 976531,
+        "hash": "00000000000000001fe246123d8bb9ffbe39a419508aa5ddafbcb58727fe3dfa",
+        "observed_utc": "2026-11-21T22:03:04Z"
+      },
+      "start_record_for_last_tip": 1278
+    },
+    {
+      "executable_sha256": "da0703697a1974574fddcbf54d5c1dfcec74f53bb93313a90b352a3ad764e882",
+      "first_tip": {
+        "record": 1449,
+        "height": 976532,
+        "hash": "00000000000000001bb20e89c93bf05db7ef4c0a08e15346c6ead921e4ae8c90",
+        "observed_utc": "2026-11-21T22:07:59Z"
+      },
+      "start_record_for_first_tip": 1426,
+      "observed_tips": 4,
+      "transaction_bearing_unsigned_templates": 0,
+      "last_tip": {
+        "record": 1489,
+        "height": 976535,
+        "hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+        "observed_utc": "2026-11-21T23:31:51Z"
+      },
+      "start_record_for_last_tip": 1426
+    },
+    {
+      "executable_sha256": "0aab15b07c706b9cbf49d26b68b4ce3675eb0ee308fb92fc8d294675157b0b36",
+      "first_tip": {
+        "record": 1525,
+        "height": 976536,
+        "hash": "00000000000000001645853964ffb27de07c8ca66c223c8757eb1b04e33dd18a",
+        "observed_utc": "2026-11-21T23:46:55Z"
+      },
+      "start_record_for_first_tip": 1507,
+      "observed_tips": 3,
+      "transaction_bearing_unsigned_templates": 0,
+      "last_tip": {
+        "record": 1559,
+        "height": 976538,
+        "hash": "0000000000000000167e2734cfea3e0351896d3147be24aa30b28a16221e6c9a",
+        "observed_utc": "2026-11-21T23:47:52Z"
+      },
+      "start_record_for_last_tip": 1507
+    }
+  ],
+  "starts": [
+    {
+      "record": 2,
+      "started_utc": "2026-11-21T02:31:57Z",
+      "executable_sha256": null,
+      "body_transport": null,
+      "preceding_tip": {
+        "record": 1,
+        "height": 976422,
+        "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+        "observed_utc": "2026-11-21T02:23:34Z"
+      },
+      "restored_tip_hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 0
+    },
+    {
+      "record": 3,
+      "started_utc": "2026-11-21T02:33:12Z",
+      "executable_sha256": null,
+      "body_transport": null,
+      "preceding_tip": {
+        "record": 1,
+        "height": 976422,
+        "hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+        "observed_utc": "2026-11-21T02:23:34Z"
+      },
+      "restored_tip_hash": "000000000000000013f094c21f4ca9132162425fa4e3e905f88166a564f88528",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 1
+    },
+    {
+      "record": 5,
+      "started_utc": "2026-11-21T02:46:08Z",
+      "executable_sha256": null,
+      "body_transport": null,
+      "preceding_tip": {
+        "record": 4,
+        "height": 976423,
+        "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+        "observed_utc": "2026-11-21T02:36:55Z"
+      },
+      "restored_tip_hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 0
+    },
+    {
+      "record": 6,
+      "started_utc": "2026-11-21T02:47:17Z",
+      "executable_sha256": null,
+      "body_transport": null,
+      "preceding_tip": {
+        "record": 4,
+        "height": 976423,
+        "hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+        "observed_utc": "2026-11-21T02:36:55Z"
+      },
+      "restored_tip_hash": "000000000000000004662dd5800c7bc79af395a506e4453c4d19169993be32ed",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 1
+    },
+    {
+      "record": 8,
+      "started_utc": "2026-11-21T02:53:05Z",
+      "executable_sha256": null,
+      "body_transport": "sv_only",
+      "preceding_tip": {
+        "record": 7,
+        "height": 976424,
+        "hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+        "observed_utc": "2026-11-21T02:52:26Z"
+      },
+      "restored_tip_hash": "000000000000000018b0403ce41942acf1aeaa288e4dd50d31e72c09ad49da15",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 1
+    },
+    {
+      "record": 28,
+      "started_utc": "2026-11-21T02:55:46Z",
+      "executable_sha256": null,
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 24,
+        "height": 976425,
+        "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+        "observed_utc": "2026-11-21T02:55:45Z"
+      },
+      "restored_tip_hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 0
+    },
+    {
+      "record": 40,
+      "started_utc": "2026-11-21T03:00:33Z",
+      "executable_sha256": null,
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 24,
+        "height": 976425,
+        "hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+        "observed_utc": "2026-11-21T02:55:45Z"
+      },
+      "restored_tip_hash": "00000000000000000a1275536835b91d3d36ce99e48db16b84da2338a6839308",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 87
+    },
+    {
+      "record": 1131,
+      "started_utc": "2026-11-21T18:35:25Z",
+      "executable_sha256": null,
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 1130,
+        "height": 976512,
+        "hash": "00000000000000000f2fbf3c77d9bad84d0cb3b446445c9014e754b3b22c3260",
+        "observed_utc": "2026-11-21T18:30:43Z"
+      },
+      "restored_tip_hash": "00000000000000000f2fbf3c77d9bad84d0cb3b446445c9014e754b3b22c3260",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 4
+    },
+    {
+      "record": 1196,
+      "started_utc": "2026-11-21T18:56:34Z",
+      "executable_sha256": null,
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 1184,
+        "height": 976516,
+        "hash": "0000000000000000193ca53296cb3cc4137d0c91b8dcac49e8b9ad3a537de0f5",
+        "observed_utc": "2026-11-21T18:53:39Z"
+      },
+      "restored_tip_hash": "0000000000000000193ca53296cb3cc4137d0c91b8dcac49e8b9ad3a537de0f5",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 2
+    },
+    {
+      "record": 1237,
+      "started_utc": "2026-11-21T19:33:57Z",
+      "executable_sha256": "5c1fbe433746e338a47afa38001aa697dea989ad620db86c999e54104d6ed5ef",
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 1230,
+        "height": 976518,
+        "hash": "000000000000000013301bf287ad68741bd4c341a8b22522a85a329a85a7ac32",
+        "observed_utc": "2026-11-21T19:29:59Z"
+      },
+      "restored_tip_hash": "000000000000000013301bf287ad68741bd4c341a8b22522a85a329a85a7ac32",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 2
+    },
+    {
+      "record": 1278,
+      "started_utc": "2026-11-21T20:06:19Z",
+      "executable_sha256": "8f99871ba04a9f0c234d1b9520fc021396689ac7924c02a28666db9c9f3b52c9",
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 1276,
+        "height": 976520,
+        "hash": "000000000000000020217797ae62501d6d3127c261116eba58f5e643e577919a",
+        "observed_utc": "2026-11-21T19:58:21Z"
+      },
+      "restored_tip_hash": "000000000000000020217797ae62501d6d3127c261116eba58f5e643e577919a",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 11
+    },
+    {
+      "record": 1426,
+      "started_utc": "2026-11-21T22:06:25Z",
+      "executable_sha256": "da0703697a1974574fddcbf54d5c1dfcec74f53bb93313a90b352a3ad764e882",
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 1420,
+        "height": 976531,
+        "hash": "00000000000000001fe246123d8bb9ffbe39a419508aa5ddafbcb58727fe3dfa",
+        "observed_utc": "2026-11-21T22:03:04Z"
+      },
+      "restored_tip_hash": "00000000000000001fe246123d8bb9ffbe39a419508aa5ddafbcb58727fe3dfa",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 4
+    },
+    {
+      "record": 1490,
+      "started_utc": "2026-11-21T23:31:55Z",
+      "executable_sha256": "0aab15b07c706b9cbf49d26b68b4ce3675eb0ee308fb92fc8d294675157b0b36",
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 1489,
+        "height": 976535,
+        "hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+        "observed_utc": "2026-11-21T23:31:51Z"
+      },
+      "restored_tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 0
+    },
+    {
+      "record": 1507,
+      "started_utc": "2026-11-21T23:35:28Z",
+      "executable_sha256": "0aab15b07c706b9cbf49d26b68b4ce3675eb0ee308fb92fc8d294675157b0b36",
+      "body_transport": "all",
+      "preceding_tip": {
+        "record": 1489,
+        "height": 976535,
+        "hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+        "observed_utc": "2026-11-21T23:31:51Z"
+      },
+      "restored_tip_hash": "00000000000000001d83315fa82707e1ff28ab7f72d8b241a4a7b5a4b08d02d6",
+      "restores_preceding_tip": true,
+      "observed_tips_until_next_start_in_window": 3
+    }
+  ],
+  "failover_attempts": [
+    {
+      "first_receipt_record": 1,
+      "last_receipt_record": 3,
+      "restricted_height": 976424,
+      "verified_in_window": true,
+      "matched_tip_and_start_records": [
+        {
+          "record": 7,
+          "event": "tip",
+          "executable_sha256": null
+        },
+        {
+          "record": 8,
+          "event": "start",
+          "executable_sha256": null
+        },
+        {
+          "record": 24,
+          "event": "tip",
+          "executable_sha256": null
+        },
+        {
+          "record": 28,
+          "event": "start",
+          "executable_sha256": null
+        }
+      ]
+    }
+  ],
+  "archive_sha256": "b3716e8478c2bd8cd8a17b0a1e6082421183b64356e71275353e9b2f48f1654e"
+}
