@@ -1,5 +1,7 @@
 # Passive mainnet observation
 
+The journal through height **976548** contains **127 consecutive selected heights**. After a local process interruption, data peers reconfirmed 976547 and the next observed block directly extended it. There were 624 seconds between peer reports spanning the interruption. Both surrounding blocks passed independent full-wire and Merkle checks. [Interruption timeline and reproduction](shadow-service-interruption.md)
+
 ## Restart with payments awaiting endorsement
 
 The original 90-block checkpoint below has been extended. At height **976545**, the waiting-queue release reopened 320 eligible payments and the same selected parent. The next measured graceful stop at **976546** saved **12 native offers awaiting a successor**, totaling 36,013 bytes, and two eligible payments. The earlier atomic file at this same parent contained zero in both pools. The restarted observer reported all 12 waiting and both eligible before any data peer connected. Five peers reconfirmed the parent within two seconds. The maintained receiver reported two peers, signed sequence 1 and zero outstanding actions.
