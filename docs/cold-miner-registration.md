@@ -17,6 +17,14 @@ SCARY_SUSTAINED_PROFILE=cold .native/py/bin/python qualification/sustained_repli
   --corpus .native/sustained-signed --blocks .native/cold-changed-run/blocks --parent-ages
 ```
 
+### Measuring admission after a successor
+
+The entrant reports cumulative counters for transactions received over SV P2P and from Teranode subtrees. The command below subtracts successive sampled counter values across the six five-minute offer intervals and the drain, and checks their sum against the full sampled change. Each row includes the actual entrant read times and selected heights. An interval with no new observations has no measured change. A counter that falls during an interval has an unknown change. Counts describe intake events on each route. The same signed payment can arrive more than once. `discarded_after_recheck` combines reasons and cannot establish whether a given input was spent. The independently checked source membership and parent ages supply the chain-side outcomes.
+
+```sh
+.native/py/bin/python qualification/workload_waiting_offers.py .native/cold-changed-run/receipt.json.gz
+```
+
 ## Attributing an accepted block when a worker misses the reply
 
 For this arm the worker records the job notification, both extranonces and the exact proof-of-work header it prepared for each submission. A worker timeout or rejection stays in the opportunity record. The offline verifier reconstructs the coinbase commitment and header, checks proof of work and matches the complete 80 bytes against the selected headers returned by the three reference nodes. It reports acknowledged solutions and chain-side selections separately. A repeated header counts as one block. If repeated attempts span intervals, the verifier leaves that block out of the per-interval result. This recording change preserves the enrolled binary, slot schedule, time denominator and thresholds.
