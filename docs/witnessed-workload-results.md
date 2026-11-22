@@ -79,6 +79,8 @@ receipt=docs/evidence/chronicle-sustained-reordered.json.gz
 
 A new stock SV Node began at regtest genesis with zero peers, accepted the funding history and independently selected the 96 recorded blocks and final height-580 hash. Its resulting chainwork was `0x48a`. Its mempool and validation queue were empty. [Isolated SV Node restoration and all 96 full body readbacks](evidence/chronicle-sustained-reordered-fresh-sv.json)
 
+A second SV Node and a fresh Teranode v0.16.1 started from genesis on a separate regtest network. They selected the same height-580 hash. From its native Asset API the Teranode returned all 96 selected blocks, totaling 1,103,144,251 bytes. Every full-body digest matched the original three readers. The genesis-to-tip replay, including setup, took 553.50 seconds. [Mixed-reference restoration and full native reads](evidence/chronicle-sustained-reordered-fresh-teranode.json)
+
 The 8,277,033-byte reordered archive reconstructs all 1,103,144,251 observed block bytes from the common signed corpus. Its SHA-256 is `e51b3237bca4d521da139ea4288470a1bbf4fc37aa7cefd638120490f3bc4c27`. The wallet bitmaps each contain one byte per offered ID after decompression. [Reordered archive and wallet bitmaps](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-witnessed-arms-v1) · [Common signed corpus](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
 
 ~~~sh
@@ -96,6 +98,14 @@ gzip -dc reordered-assets/reordered-requested.bits.gz > reordered-assets/request
 gzip -dc reordered-assets/reordered-served.bits.gz > reordered-assets/served.bits
 .native/py/bin/python qualification/verify_sustained_native.py "$receipt" \
   --corpus "$SIGNED_PAYMENTS" --blocks "$RECONSTRUCTED_BLOCKS" --parent-ages
+~~~
+
+To repeat the stock mixed-node recovery from the signed archive, run the isolated Docker network and check the resulting proof against the original receipt.
+
+~~~sh
+.native/py/bin/python qualification/recover_teranode_chain.py sustained "$receipt" recovered-teranode.json \
+  --history workload/paired-corpus --corpus "$SIGNED_PAYMENTS" --archive reordered-assets/reordered.zip
+.native/py/bin/python qualification/recover_teranode_chain.py verify "$receipt" recovered-teranode.json
 ~~~
 
 After a local regtest run, use the data directory from the paused original entrant or an isolated byte-for-byte restoration. The extractor reads the checksum-protected `witness.state` and its sibling `mining-domain-<digest>` binding. The shared identity value lives in the filename and is independently committed in each originated coinbase. The command exports only solution fields and anonymized peer event times. Keep the original node’s private keys and full checkpoint under operator custody.
