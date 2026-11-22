@@ -1,0 +1,2600 @@
+{
+  "binding_file_sha256": "dcd096abbd779913af1d9105f17969fe73ff35487464b1ebaeb40762e5415e8b",
+  "checkpoint_bytes": 265582535,
+  "checkpoint_payload_sha256": "ff64f90265b0d90c37e2764f57ccb2aba0cc629fdc24ae15fd5d3f86b9837d5a",
+  "mining_identity": "67ad5e330d9ac500f06d206f647f3dca22ec9aa62cec99994c5b8af7035572c8",
+  "tip_height": 618,
+  "tip_hash": "58d75823b137b205d44ce8bfd91f852d6cea8a14c7e292e94e766358135ed9bf",
+  "solved_blocks": 74,
+  "retained_solution_asset": {
+    "height": 605,
+    "hash": "03282d6fe4f5639f5fa5f6b9f5f136d45a893f2bf1bceae3f2839a597eb2a41d",
+    "header": "00000020423742d46995f1992183f7e2f95bc97624d65525fc2ab06e023702065a9d58409b6694605669796c0ed89460ae03c8e8e4853925dd9f89e9a225dca9461fefe07f00026bffff7f2001000000",
+    "wire_bytes": 139863,
+    "wire_sha256": "a992edf8591e22a84491db8e0f80d82927cbe7f746517731631df8bbd50cef40"
+  },
+  "records": [
+    {
+      "hash": "2e5bc5237ff4c0bd15cfefe8c1c9b0cfd97fb25914dd53d8eeb5c9dfa7adee77",
+      "parent": "10cdbaa780197c342e1cee41d6bb28d43e7d4217ba3b094a3c6335f0c607ff4e",
+      "height": 489,
+      "job": "85d",
+      "queued_at_ms": 1795291631552,
+      "published_at_ms": 1795291632145,
+      "first_inclusion_at_ms": 1795291634514,
+      "first_settlement_at_ms": 1795291657601,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291636836,
+          "sent_body": 1795291632862
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291634514,
+          "state": "observed_active",
+          "height": 489
+        },
+        {
+          "at_ms": 1795291657601,
+          "state": "settled",
+          "height": 491
+        }
+      ]
+    },
+    {
+      "hash": "6591876b68bea5c23f469900766494d8acaa69e17366989628a47a8db802df66",
+      "parent": "2e5bc5237ff4c0bd15cfefe8c1c9b0cfd97fb25914dd53d8eeb5c9dfa7adee77",
+      "height": 490,
+      "job": "bb9",
+      "queued_at_ms": 1795291649853,
+      "published_at_ms": 1795291650406,
+      "first_inclusion_at_ms": 1795291651607,
+      "first_settlement_at_ms": 1795291667807,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291654836,
+          "sent_body": 1795291652043
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291651607,
+          "state": "observed_active",
+          "height": 490
+        },
+        {
+          "at_ms": 1795291667807,
+          "state": "settled",
+          "height": 492
+        }
+      ]
+    },
+    {
+      "hash": "05ddf6f86be84cab78dbba51f11c2108c925a58282d6d29029a779ffd05d523d",
+      "parent": "6591876b68bea5c23f469900766494d8acaa69e17366989628a47a8db802df66",
+      "height": 491,
+      "job": "1444",
+      "queued_at_ms": 1795291655633,
+      "published_at_ms": 1795291656238,
+      "first_inclusion_at_ms": 1795291657601,
+      "first_settlement_at_ms": 1795291681342,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {},
+      "transitions": [
+        {
+          "at_ms": 1795291657601,
+          "state": "observed_active",
+          "height": 491
+        },
+        {
+          "at_ms": 1795291681342,
+          "state": "settled",
+          "height": 493
+        }
+      ]
+    },
+    {
+      "hash": "14041d9dcf701b804530543a512fea7cfa7944b972b92565e051df7b0a041033",
+      "parent": "338d653c7d53f80d275ffcb2cf76db03ea4fb18599bf04f237319fb905e0a20f",
+      "height": 493,
+      "job": "19c1",
+      "queued_at_ms": 1795291679576,
+      "published_at_ms": 1795291679936,
+      "first_inclusion_at_ms": 1795291681342,
+      "first_settlement_at_ms": 1795291722731,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291681630,
+          "sent_body": 1795291680382
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291681342,
+          "state": "observed_active",
+          "height": 493
+        },
+        {
+          "at_ms": 1795291722731,
+          "state": "settled",
+          "height": 495
+        }
+      ]
+    },
+    {
+      "hash": "02665c4e0ee754caa3b5255d0747db9d953df10a3d40e56963e518f543a1acac",
+      "parent": "066a84939cb5b8a5ca61a404a2ff052c5d7cf8f6f3c288df1504b9f29abf6810",
+      "height": 496,
+      "job": "2a2f",
+      "queued_at_ms": 1795291751555,
+      "published_at_ms": 1795291751925,
+      "first_inclusion_at_ms": 1795291752690,
+      "first_settlement_at_ms": 1795291771726,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291753540,
+          "sent_body": 1795291752357
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291752690,
+          "state": "observed_active",
+          "height": 496
+        },
+        {
+          "at_ms": 1795291771726,
+          "state": "settled",
+          "height": 498
+        }
+      ]
+    },
+    {
+      "hash": "2057b4cf1024f82e5d99678973dffa7aad9103ac8d59293a1e0a5ef9957f2c75",
+      "parent": "02665c4e0ee754caa3b5255d0747db9d953df10a3d40e56963e518f543a1acac",
+      "height": 497,
+      "job": "34ee",
+      "queued_at_ms": 1795291763652,
+      "published_at_ms": 1795291764157,
+      "first_inclusion_at_ms": 1795291765721,
+      "first_settlement_at_ms": 1795291776738,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291768871,
+          "sent_body": 1795291766007
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291765721,
+          "state": "observed_active",
+          "height": 497
+        },
+        {
+          "at_ms": 1795291776738,
+          "state": "settled",
+          "height": 499
+        }
+      ]
+    },
+    {
+      "hash": "0e3c863cbe8628c242dd410ff00bf07249f6336df53a227e91b495e963d36ce6",
+      "parent": "2057b4cf1024f82e5d99678973dffa7aad9103ac8d59293a1e0a5ef9957f2c75",
+      "height": 498,
+      "job": "43f1",
+      "queued_at_ms": 1795291769723,
+      "published_at_ms": 1795291770318,
+      "first_inclusion_at_ms": 1795291771726,
+      "first_settlement_at_ms": 1795291801643,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291772913,
+          "sent_body": 1795291772613
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291771726,
+          "state": "observed_active",
+          "height": 498
+        },
+        {
+          "at_ms": 1795291801643,
+          "state": "settled",
+          "height": 500
+        }
+      ]
+    },
+    {
+      "hash": "7f030b2d5fa2c5a2dc07b060834cd7120c4662c49f8982d578b4ec0ce8d5f32d",
+      "parent": "0e3c863cbe8628c242dd410ff00bf07249f6336df53a227e91b495e963d36ce6",
+      "height": 499,
+      "job": "4768",
+      "queued_at_ms": 1795291775558,
+      "published_at_ms": 1795291775944,
+      "first_inclusion_at_ms": 1795291776738,
+      "first_settlement_at_ms": 1795291833306,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291777614,
+          "sent_body": 1795291776391
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291776738,
+          "state": "observed_active",
+          "height": 499
+        },
+        {
+          "at_ms": 1795291833306,
+          "state": "settled",
+          "height": 501
+        }
+      ]
+    },
+    {
+      "hash": "2098d5355422f0cc3b0833ba7349a15fde5486efa7a73696567bc5c52f4743d7",
+      "parent": "7f030b2d5fa2c5a2dc07b060834cd7120c4662c49f8982d578b4ec0ce8d5f32d",
+      "height": 500,
+      "job": "4f9f",
+      "queued_at_ms": 1795291799629,
+      "published_at_ms": 1795291800083,
+      "first_inclusion_at_ms": 1795291801643,
+      "first_settlement_at_ms": 1795291836740,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291804542,
+          "sent_body": 1795291801935
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291801643,
+          "state": "observed_active",
+          "height": 500
+        },
+        {
+          "at_ms": 1795291836740,
+          "state": "settled",
+          "height": 502
+        }
+      ]
+    },
+    {
+      "hash": "5f6000f90e54be6f28808c4f4bbf112eeb3680213568eec4da1a6fefbd103f05",
+      "parent": "6de5f449eb92fafcbff22d1fdeb03335a2560f3e199d9411663e489cbcb64a78",
+      "height": 502,
+      "job": "551b",
+      "queued_at_ms": 1795291835558,
+      "published_at_ms": 1795291835941,
+      "first_inclusion_at_ms": 1795291836740,
+      "first_settlement_at_ms": 1795291870515,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291837602,
+          "sent_body": 1795291836402
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291836740,
+          "state": "observed_active",
+          "height": 502
+        },
+        {
+          "at_ms": 1795291870515,
+          "state": "settled",
+          "height": 504
+        }
+      ]
+    },
+    {
+      "hash": "22849e3dd711e70e83c511ff81d0c3146f15803a8eb1c3f19f15c088d494a2d6",
+      "parent": "5f6000f90e54be6f28808c4f4bbf112eeb3680213568eec4da1a6fefbd103f05",
+      "height": 503,
+      "job": "57da",
+      "queued_at_ms": 1795291847550,
+      "published_at_ms": 1795291847924,
+      "first_inclusion_at_ms": 1795291848715,
+      "first_settlement_at_ms": 1795291872678,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291849575,
+          "sent_body": 1795291848380
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291848715,
+          "state": "observed_active",
+          "height": 503
+        },
+        {
+          "at_ms": 1795291872678,
+          "state": "settled",
+          "height": 505
+        }
+      ]
+    },
+    {
+      "hash": "5ae8d5e86d96daee10455dbb660147deabb61bd9a810a8eed5c16b5903004b0d",
+      "parent": "238962259b4f71a3e315111682cfd7e89aa3251a4dc4b936a0178033c5a5c290",
+      "height": 505,
+      "job": "6b91",
+      "queued_at_ms": 1795291871543,
+      "published_at_ms": 1795291871909,
+      "first_inclusion_at_ms": 1795291872678,
+      "first_settlement_at_ms": 1795291916518,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291873562,
+          "sent_body": 1795291872345
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291872678,
+          "state": "observed_active",
+          "height": 505
+        },
+        {
+          "at_ms": 1795291916518,
+          "state": "settled",
+          "height": 507
+        }
+      ]
+    },
+    {
+      "hash": "05cd2eb3bda8a07e96a0b5aaf9647018be20c3334fce8016bfaebbde4ee86f36",
+      "parent": "5ae8d5e86d96daee10455dbb660147deabb61bd9a810a8eed5c16b5903004b0d",
+      "height": 506,
+      "job": "6e50",
+      "queued_at_ms": 1795291889552,
+      "published_at_ms": 1795291889926,
+      "first_inclusion_at_ms": 1795291890664,
+      "first_settlement_at_ms": 1795291920707,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291891542,
+          "sent_body": 1795291890327
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291890664,
+          "state": "observed_active",
+          "height": 506
+        },
+        {
+          "at_ms": 1795291920707,
+          "state": "settled",
+          "height": 508
+        }
+      ]
+    },
+    {
+      "hash": "76919391217d6179c6fb108ffd8385cdff78916fdc6a277cb731567bd29585f7",
+      "parent": "1fda6bfa0f9010e2bae6d0146d803df79f6f72a76197bae049d1b4f1e3adda2d",
+      "height": 508,
+      "job": "7944",
+      "queued_at_ms": 1795291919554,
+      "published_at_ms": 1795291919923,
+      "first_inclusion_at_ms": 1795291920707,
+      "first_settlement_at_ms": 1795291953304,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291921597,
+          "sent_body": 1795291920367
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291920707,
+          "state": "observed_active",
+          "height": 508
+        },
+        {
+          "at_ms": 1795291953304,
+          "state": "settled",
+          "height": 510
+        }
+      ]
+    },
+    {
+      "hash": "41a1dc9d052b8351175344a3737ac74986a8cb3fd80fd03b148f90c88483d5b3",
+      "parent": "0767f4c6660e3681decf2071ade11734e1b290d486e76388d9d5d1b04e50a6a7",
+      "height": 511,
+      "job": "86f6",
+      "queued_at_ms": 1795291967556,
+      "published_at_ms": 1795291967937,
+      "first_inclusion_at_ms": 1795291968736,
+      "first_settlement_at_ms": 1795291992713,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291969621,
+          "sent_body": 1795291968396
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291968736,
+          "state": "observed_active",
+          "height": 511
+        },
+        {
+          "at_ms": 1795291992713,
+          "state": "settled",
+          "height": 513
+        }
+      ]
+    },
+    {
+      "hash": "52f393a82383f9972e5be30fb93a50a84c1cbf1728d449523169f1f18b502796",
+      "parent": "6afa234760db5f71880c9ea93eeace577a98f762a3cf3bbcbee2d1f5defa1aa3",
+      "height": 513,
+      "job": "8c79",
+      "queued_at_ms": 1795291991557,
+      "published_at_ms": 1795291991922,
+      "first_inclusion_at_ms": 1795291992713,
+      "first_settlement_at_ms": 1795292010950,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795291993583,
+          "sent_body": 1795291992378
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795291992713,
+          "state": "observed_active",
+          "height": 513
+        },
+        {
+          "at_ms": 1795292010950,
+          "state": "settled",
+          "height": 515
+        }
+      ]
+    },
+    {
+      "hash": "01ea1cb38c2c84fd1ca24071255d36abe979e2217aab7c31000fd6da31b1022b",
+      "parent": "52f393a82383f9972e5be30fb93a50a84c1cbf1728d449523169f1f18b502796",
+      "height": 514,
+      "job": "8f38",
+      "queued_at_ms": 1795292003546,
+      "published_at_ms": 1795292003900,
+      "first_inclusion_at_ms": 1795292004653,
+      "first_settlement_at_ms": 1795292026992,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292007544,
+          "sent_body": 1795292004337
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292004653,
+          "state": "observed_active",
+          "height": 514
+        },
+        {
+          "at_ms": 1795292026992,
+          "state": "settled",
+          "height": 516
+        }
+      ]
+    },
+    {
+      "hash": "1a8be5279f42ff7eab163a324687af1b1069a12a93b10790a9b3863df32a9b79",
+      "parent": "01ea1cb38c2c84fd1ca24071255d36abe979e2217aab7c31000fd6da31b1022b",
+      "height": 515,
+      "job": "91f7",
+      "queued_at_ms": 1795292009559,
+      "published_at_ms": 1795292009905,
+      "first_inclusion_at_ms": 1795292010950,
+      "first_settlement_at_ms": 1795292040371,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292013544,
+          "sent_body": 1795292010345
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292010950,
+          "state": "observed_active",
+          "height": 515
+        },
+        {
+          "at_ms": 1795292040371,
+          "state": "settled",
+          "height": 517
+        }
+      ]
+    },
+    {
+      "hash": "485da01d96b10db67ab304192d686705c96b6f071e30b9841fa4edd0a03edcfa",
+      "parent": "5143dc8b76e34d21d318569e0511140d4e11deebfe19de5e525e779a21f24599",
+      "height": 517,
+      "job": "9a30",
+      "queued_at_ms": 1795292039549,
+      "published_at_ms": 1795292039911,
+      "first_inclusion_at_ms": 1795292040371,
+      "first_settlement_at_ms": 1795292073367,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292042544,
+          "sent_body": 1795292040657
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292040371,
+          "state": "observed_active",
+          "height": 517
+        },
+        {
+          "at_ms": 1795292073367,
+          "state": "settled",
+          "height": 519
+        }
+      ]
+    },
+    {
+      "hash": "4826b628c07c3d90df5bbc2ec2cfe4af76a4d82866cf35ca32dbe691ae3807dc",
+      "parent": "485da01d96b10db67ab304192d686705c96b6f071e30b9841fa4edd0a03edcfa",
+      "height": 518,
+      "job": "9cef",
+      "queued_at_ms": 1795292063556,
+      "published_at_ms": 1795292063902,
+      "first_inclusion_at_ms": 1795292064639,
+      "first_settlement_at_ms": null,
+      "chain_state": "stale_at_depth",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292067544,
+          "sent_body": 1795292064332
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292064639,
+          "state": "observed_active",
+          "height": 518
+        },
+        {
+          "at_ms": 1795292073367,
+          "state": "competing_branch",
+          "height": 519
+        },
+        {
+          "at_ms": 1795292088739,
+          "state": "stale_at_depth",
+          "height": 520
+        }
+      ]
+    },
+    {
+      "hash": "3c7010b1543ddd7f78b1e6cea291ec1e7172e0959523ce8bcb98cf34c9e13b88",
+      "parent": "43bcb05b678d4f5d53d40f19d3d923d5baf778fc148bfa35cc9c6684531efce5",
+      "height": 520,
+      "job": "9fb5",
+      "queued_at_ms": 1795292087552,
+      "published_at_ms": 1795292087918,
+      "first_inclusion_at_ms": 1795292088739,
+      "first_settlement_at_ms": 1795292118654,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292089589,
+          "sent_body": 1795292088398
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292088739,
+          "state": "observed_active",
+          "height": 520
+        },
+        {
+          "at_ms": 1795292118654,
+          "state": "settled",
+          "height": 522
+        }
+      ]
+    },
+    {
+      "hash": "7cf8d53d6d03eb14cdd08bde5ba9044936d8e9d7b618f34a5ee2ce5b086454ae",
+      "parent": "22d2313b221545cc41673ea3c4fced2840bba04fbb663055652987c36dff3228",
+      "height": 523,
+      "job": "ad68",
+      "queued_at_ms": 1795292129548,
+      "published_at_ms": 1795292129915,
+      "first_inclusion_at_ms": 1795292130680,
+      "first_settlement_at_ms": 1795292154326,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292133546,
+          "sent_body": 1795292130358
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292130680,
+          "state": "observed_active",
+          "height": 523
+        },
+        {
+          "at_ms": 1795292154326,
+          "state": "settled",
+          "height": 525
+        }
+      ]
+    },
+    {
+      "hash": "34974b835bed455a5a1be6de78fde139068bcd83cb48f224e72e1446628e314f",
+      "parent": "7cf8d53d6d03eb14cdd08bde5ba9044936d8e9d7b618f34a5ee2ce5b086454ae",
+      "height": 524,
+      "job": "b027",
+      "queued_at_ms": 1795292147548,
+      "published_at_ms": 1795292147914,
+      "first_inclusion_at_ms": 1795292148650,
+      "first_settlement_at_ms": 1795292161933,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292150545,
+          "sent_body": 1795292148323
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292148650,
+          "state": "observed_active",
+          "height": 524
+        },
+        {
+          "at_ms": 1795292161933,
+          "state": "settled",
+          "height": 526
+        }
+      ]
+    },
+    {
+      "hash": "440370e355694b9bcb69e8f89d8ae24b9b4be933f6ce2e5fe62f0c46e1b9d184",
+      "parent": "34974b835bed455a5a1be6de78fde139068bcd83cb48f224e72e1446628e314f",
+      "height": 525,
+      "job": "b2e6",
+      "queued_at_ms": 1795292153560,
+      "published_at_ms": 1795292153910,
+      "first_inclusion_at_ms": 1795292154326,
+      "first_settlement_at_ms": 1795292178620,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292156545,
+          "sent_body": 1795292154619
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292154326,
+          "state": "observed_active",
+          "height": 525
+        },
+        {
+          "at_ms": 1795292178620,
+          "state": "settled",
+          "height": 527
+        }
+      ]
+    },
+    {
+      "hash": "52aa5ecdc1c649329136355f42c0df228ac69ae0de885fcbd7a035ec6029d4ee",
+      "parent": "440370e355694b9bcb69e8f89d8ae24b9b4be933f6ce2e5fe62f0c46e1b9d184",
+      "height": 526,
+      "job": "c19f",
+      "queued_at_ms": 1795292159719,
+      "published_at_ms": 1795292160322,
+      "first_inclusion_at_ms": 1795292161933,
+      "first_settlement_at_ms": 1795292201826,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292167522,
+          "sent_body": 1795292165524
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292161933,
+          "state": "observed_active",
+          "height": 526
+        },
+        {
+          "at_ms": 1795292201826,
+          "state": "settled",
+          "height": 528
+        }
+      ]
+    },
+    {
+      "hash": "38464418a7f6d506a0b641ccca636dfcf52a7592ae4ff958f70b7377e1b368b0",
+      "parent": "52aa5ecdc1c649329136355f42c0df228ac69ae0de885fcbd7a035ec6029d4ee",
+      "height": 527,
+      "job": "c676",
+      "queued_at_ms": 1795292177580,
+      "published_at_ms": 1795292177975,
+      "first_inclusion_at_ms": 1795292178620,
+      "first_settlement_at_ms": 1795292208718,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292181522,
+          "sent_body": 1795292179185
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292178620,
+          "state": "observed_active",
+          "height": 527
+        },
+        {
+          "at_ms": 1795292208718,
+          "state": "settled",
+          "height": 529
+        }
+      ]
+    },
+    {
+      "hash": "68e3ae49e9618c9ebcb7cc2eb41dce6c3cfd5ab1285562ad6af3d7448496b395",
+      "parent": "4acca381d2884551d0f473b06c319067f7e48646d2f4c5748d5127e8a738df98",
+      "height": 529,
+      "job": "d426",
+      "queued_at_ms": 1795292207553,
+      "published_at_ms": 1795292207910,
+      "first_inclusion_at_ms": 1795292208718,
+      "first_settlement_at_ms": 1795292238778,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292209572,
+          "sent_body": 1795292208382
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292208718,
+          "state": "observed_active",
+          "height": 529
+        },
+        {
+          "at_ms": 1795292238778,
+          "state": "settled",
+          "height": 531
+        }
+      ]
+    },
+    {
+      "hash": "67f6366dbc2ef01d94ac1564f8401a355b2bd6f78db5b978ac2001b961694ed2",
+      "parent": "34c723912c015add4aa667b488117cc875e1f16e7cb23922aaff4c265f2ebf26",
+      "height": 532,
+      "job": "e1d9",
+      "queued_at_ms": 1795292249563,
+      "published_at_ms": 1795292249916,
+      "first_inclusion_at_ms": 1795292250372,
+      "first_settlement_at_ms": 1795292281063,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292251547,
+          "sent_body": 1795292250670
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292250372,
+          "state": "observed_active",
+          "height": 532
+        },
+        {
+          "at_ms": 1795292281063,
+          "state": "settled",
+          "height": 534
+        }
+      ]
+    },
+    {
+      "hash": "18ba16f2a4d6c6bd617adb503cd5704e8c027b7673d942ff983cd0bccbef4db2",
+      "parent": "43d81e804236afda179c77acd9bc937c30833dd4921fae538db5ddeeee1b8f41",
+      "height": 534,
+      "job": "ea11",
+      "queued_at_ms": 1795292279552,
+      "published_at_ms": 1795292279917,
+      "first_inclusion_at_ms": 1795292281063,
+      "first_settlement_at_ms": 1795292304921,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292281655,
+          "sent_body": 1795292280401
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292281063,
+          "state": "observed_active",
+          "height": 534
+        },
+        {
+          "at_ms": 1795292304921,
+          "state": "settled",
+          "height": 536
+        }
+      ]
+    },
+    {
+      "hash": "0d9d29c1e34302c208e197db447bcd876c1b999b2516e4d905c27663bc669c02",
+      "parent": "18ba16f2a4d6c6bd617adb503cd5704e8c027b7673d942ff983cd0bccbef4db2",
+      "height": 535,
+      "job": "ecd0",
+      "queued_at_ms": 1795292297556,
+      "published_at_ms": 1795292297917,
+      "first_inclusion_at_ms": 1795292298407,
+      "first_settlement_at_ms": 1795292322302,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292299582,
+          "sent_body": 1795292298699
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292298407,
+          "state": "observed_active",
+          "height": 535
+        },
+        {
+          "at_ms": 1795292322302,
+          "state": "settled",
+          "height": 537
+        }
+      ]
+    },
+    {
+      "hash": "6d463e136e896d7feb560a888c5e4e4818a4b903e4d5ddb58b444b349c0ab45e",
+      "parent": "0d9d29c1e34302c208e197db447bcd876c1b999b2516e4d905c27663bc669c02",
+      "height": 536,
+      "job": "f24b",
+      "queued_at_ms": 1795292303594,
+      "published_at_ms": 1795292304004,
+      "first_inclusion_at_ms": 1795292304921,
+      "first_settlement_at_ms": 1795292349644,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292314588,
+          "sent_body": 1795292312589
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292304921,
+          "state": "observed_active",
+          "height": 536
+        },
+        {
+          "at_ms": 1795292349644,
+          "state": "settled",
+          "height": 538
+        }
+      ]
+    },
+    {
+      "hash": "4d3ae6ec06782eb3636d123d6cdd97ab8c36da8b9e5459048f80ccce6d99a1f2",
+      "parent": "6d463e136e896d7feb560a888c5e4e4818a4b903e4d5ddb58b444b349c0ab45e",
+      "height": 537,
+      "job": "f50a",
+      "queued_at_ms": 1795292321555,
+      "published_at_ms": 1795292321894,
+      "first_inclusion_at_ms": 1795292322302,
+      "first_settlement_at_ms": 1795292364601,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292324588,
+          "sent_body": 1795292322585
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292322302,
+          "state": "observed_active",
+          "height": 537
+        },
+        {
+          "at_ms": 1795292364601,
+          "state": "settled",
+          "height": 539
+        }
+      ]
+    },
+    {
+      "hash": "00095f98fdcd23b73035b11643c1ec58a7869687305a14dea8309751f221025a",
+      "parent": "092a3789bc789c2157dcc3814b0ccfe9be593de0c0218d11c74dce92bc511c88",
+      "height": 539,
+      "job": "10c8e",
+      "queued_at_ms": 1795292363590,
+      "published_at_ms": 1795292363999,
+      "first_inclusion_at_ms": 1795292364601,
+      "first_settlement_at_ms": null,
+      "chain_state": "stale_at_depth",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292367588,
+          "sent_body": 1795292365466
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292364601,
+          "state": "observed_active",
+          "height": 539
+        },
+        {
+          "at_ms": 1795292386486,
+          "state": "competing_branch",
+          "height": 540
+        },
+        {
+          "at_ms": 1795292400752,
+          "state": "stale_at_depth",
+          "height": 541
+        }
+      ]
+    },
+    {
+      "hash": "60a5a7abc3a36cc5e19f70d88e29ca2523ac9276a2908fd812e16a8596a95357",
+      "parent": "1c2dacbf1dcb024b60fd1821d4790ed503a30fa4f867ad8f8836ccc496b49d7d",
+      "height": 541,
+      "job": "115e3",
+      "queued_at_ms": 1795292399561,
+      "published_at_ms": 1795292399947,
+      "first_inclusion_at_ms": 1795292400752,
+      "first_settlement_at_ms": 1795292424777,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292401637,
+          "sent_body": 1795292400398
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292400752,
+          "state": "observed_active",
+          "height": 541
+        },
+        {
+          "at_ms": 1795292424777,
+          "state": "settled",
+          "height": 543
+        }
+      ]
+    },
+    {
+      "hash": "3023408c9d049a98cbeb057c709199aa3b720613292f6f85a6f85f85144a7601",
+      "parent": "43d201dbd73a51b033bf961d35dc8738817b52de3e7452a38f61985149df7b50",
+      "height": 543,
+      "job": "11e1b",
+      "queued_at_ms": 1795292423557,
+      "published_at_ms": 1795292423948,
+      "first_inclusion_at_ms": 1795292424777,
+      "first_settlement_at_ms": 1795292473610,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292425716,
+          "sent_body": 1795292424422
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292424777,
+          "state": "observed_active",
+          "height": 543
+        },
+        {
+          "at_ms": 1795292473610,
+          "state": "settled",
+          "height": 545
+        }
+      ]
+    },
+    {
+      "hash": "418cdd330e565ab3ac33bb024efe9f60644144b4602dde1e752cb470fc5ec6f5",
+      "parent": "3023408c9d049a98cbeb057c709199aa3b720613292f6f85a6f85f85144a7601",
+      "height": 544,
+      "job": "12396",
+      "queued_at_ms": 1795292441601,
+      "published_at_ms": 1795292442062,
+      "first_inclusion_at_ms": 1795292443024,
+      "first_settlement_at_ms": 1795292478761,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292445588,
+          "sent_body": 1795292442666
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292443024,
+          "state": "observed_active",
+          "height": 544
+        },
+        {
+          "at_ms": 1795292478761,
+          "state": "settled",
+          "height": 546
+        }
+      ]
+    },
+    {
+      "hash": "56d8f7abf663c4dbf461716cfbceaf61605a3a7b88590cd00d39606e542818e7",
+      "parent": "418cdd330e565ab3ac33bb024efe9f60644144b4602dde1e752cb470fc5ec6f5",
+      "height": 545,
+      "job": "12f8b",
+      "queued_at_ms": 1795292471681,
+      "published_at_ms": 1795292472247,
+      "first_inclusion_at_ms": 1795292473610,
+      "first_settlement_at_ms": null,
+      "chain_state": "stale_at_depth",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {},
+      "transitions": [
+        {
+          "at_ms": 1795292473610,
+          "state": "observed_active",
+          "height": 545
+        },
+        {
+          "at_ms": 1795292478761,
+          "state": "competing_branch",
+          "height": 546
+        },
+        {
+          "at_ms": 1795292491382,
+          "state": "stale_at_depth",
+          "height": 547
+        }
+      ]
+    },
+    {
+      "hash": "74b1b159986f9802a9b8ae72ce5c53254c2bf9c8f3ebc97cc498889ac7a6effd",
+      "parent": "38b0d00e636471936844ccf0af468ae17c9f12cbc285439e6eadde6590756ebe",
+      "height": 547,
+      "job": "1324c",
+      "queued_at_ms": 1795292489565,
+      "published_at_ms": 1795292489943,
+      "first_inclusion_at_ms": 1795292491382,
+      "first_settlement_at_ms": 1795292520714,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292491697,
+          "sent_body": 1795292490394
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292491382,
+          "state": "observed_active",
+          "height": 547
+        },
+        {
+          "at_ms": 1795292520714,
+          "state": "settled",
+          "height": 549
+        }
+      ]
+    },
+    {
+      "hash": "696283afcb0c8a2c63d4204fb8b366cfbc49b2b051ec93236c55f5da4b77591d",
+      "parent": "0782b252ee2334fa45e2926f885593b6e65901356d4af54607a313c737c346c2",
+      "height": 549,
+      "job": "13a84",
+      "queued_at_ms": 1795292519548,
+      "published_at_ms": 1795292519921,
+      "first_inclusion_at_ms": 1795292520714,
+      "first_settlement_at_ms": 1795292544740,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292523520,
+          "sent_body": 1795292520378
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292520714,
+          "state": "observed_active",
+          "height": 549
+        },
+        {
+          "at_ms": 1795292544740,
+          "state": "settled",
+          "height": 551
+        }
+      ]
+    },
+    {
+      "hash": "35783bbbe71cb4c35dccd42667bb81f98d841b0f38e195674b5f8edef39bfd1e",
+      "parent": "702d05d1cbc5fb022d67475e337c5530346b833bcf0d3ebff1d8a26d1f1d9177",
+      "height": 551,
+      "job": "142bd",
+      "queued_at_ms": 1795292543557,
+      "published_at_ms": 1795292543920,
+      "first_inclusion_at_ms": 1795292544740,
+      "first_settlement_at_ms": 1795292562726,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292545654,
+          "sent_body": 1795292544390
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292544740,
+          "state": "observed_active",
+          "height": 551
+        },
+        {
+          "at_ms": 1795292562726,
+          "state": "settled",
+          "height": 553
+        }
+      ]
+    },
+    {
+      "hash": "5661c457d17906fc01099b5c88fdcfa4659099248578a60b6ce6e8d3d9cd8b40",
+      "parent": "35783bbbe71cb4c35dccd42667bb81f98d841b0f38e195674b5f8edef39bfd1e",
+      "height": 552,
+      "job": "1457c",
+      "queued_at_ms": 1795292555563,
+      "published_at_ms": 1795292555926,
+      "first_inclusion_at_ms": 1795292556416,
+      "first_settlement_at_ms": 1795292588960,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292557633,
+          "sent_body": 1795292556722
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292556416,
+          "state": "observed_active",
+          "height": 552
+        },
+        {
+          "at_ms": 1795292588960,
+          "state": "settled",
+          "height": 554
+        }
+      ]
+    },
+    {
+      "hash": "62b4a1deb0af043abd2ef6db8cc3725532aa9b5f5b77e955b8cc021ac6febe69",
+      "parent": "5661c457d17906fc01099b5c88fdcfa4659099248578a60b6ce6e8d3d9cd8b40",
+      "height": 553,
+      "job": "1483b",
+      "queued_at_ms": 1795292561550,
+      "published_at_ms": 1795292561894,
+      "first_inclusion_at_ms": 1795292562726,
+      "first_settlement_at_ms": 1795292592341,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292563597,
+          "sent_body": 1795292562381
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292562726,
+          "state": "observed_active",
+          "height": 553
+        },
+        {
+          "at_ms": 1795292592341,
+          "state": "settled",
+          "height": 555
+        }
+      ]
+    },
+    {
+      "hash": "61db6971302209dc5f66fcb7851ab51ca4032a97f484f99ccbcfb9abda43c499",
+      "parent": "12180451ef93c6cb7ac7f8d676bc064d3d28ea2beeab975a429432c5e89019cd",
+      "height": 555,
+      "job": "15074",
+      "queued_at_ms": 1795292591556,
+      "published_at_ms": 1795292591911,
+      "first_inclusion_at_ms": 1795292592341,
+      "first_settlement_at_ms": 1795292625757,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292593532,
+          "sent_body": 1795292592636
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292592341,
+          "state": "observed_active",
+          "height": 555
+        },
+        {
+          "at_ms": 1795292625757,
+          "state": "settled",
+          "height": 557
+        }
+      ]
+    },
+    {
+      "hash": "762c0be129d3359a2eb1db458715039bbf4879c09c307ce361f0db0d66da5b75",
+      "parent": "61db6971302209dc5f66fcb7851ab51ca4032a97f484f99ccbcfb9abda43c499",
+      "height": 556,
+      "job": "15333",
+      "queued_at_ms": 1795292609563,
+      "published_at_ms": 1795292609920,
+      "first_inclusion_at_ms": 1795292610674,
+      "first_settlement_at_ms": null,
+      "chain_state": "stale_at_depth",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292612525,
+          "sent_body": 1795292610362
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292610674,
+          "state": "observed_active",
+          "height": 556
+        },
+        {
+          "at_ms": 1795292625757,
+          "state": "competing_branch",
+          "height": 557
+        },
+        {
+          "at_ms": 1795292640685,
+          "state": "stale_at_depth",
+          "height": 558
+        }
+      ]
+    },
+    {
+      "hash": "0f1b4227166f1b8058e1e91224c4ed6cfd460a8fdaf77b66f485dcdd6dbb0887",
+      "parent": "773acae92d055a9b2d2df646e8334d7f8562acae78632624755389e98d056e73",
+      "height": 558,
+      "job": "16170",
+      "queued_at_ms": 1795292639551,
+      "published_at_ms": 1795292639916,
+      "first_inclusion_at_ms": 1795292640685,
+      "first_settlement_at_ms": 1795292664748,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292643524,
+          "sent_body": 1795292640360
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292640685,
+          "state": "observed_active",
+          "height": 558
+        },
+        {
+          "at_ms": 1795292664748,
+          "state": "settled",
+          "height": 560
+        }
+      ]
+    },
+    {
+      "hash": "6fec67d0e3d71b6592e0507bd78afe3717130c58f0106b6af3f47875377d90e1",
+      "parent": "23f47b37bc726e3339b72e59ba1ceb63339cebb03aafcbc938a1a96596eed0d1",
+      "height": 560,
+      "job": "169a8",
+      "queued_at_ms": 1795292663564,
+      "published_at_ms": 1795292663931,
+      "first_inclusion_at_ms": 1795292664748,
+      "first_settlement_at_ms": 1795292682738,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292665675,
+          "sent_body": 1795292664402
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292664748,
+          "state": "observed_active",
+          "height": 560
+        },
+        {
+          "at_ms": 1795292682738,
+          "state": "settled",
+          "height": 562
+        }
+      ]
+    },
+    {
+      "hash": "284ae337ff50ddd97f44c0903e28db7cff57210cfd27b027db5ffd89a5beb78c",
+      "parent": "6fec67d0e3d71b6592e0507bd78afe3717130c58f0106b6af3f47875377d90e1",
+      "height": 561,
+      "job": "16c67",
+      "queued_at_ms": 1795292675558,
+      "published_at_ms": 1795292675925,
+      "first_inclusion_at_ms": 1795292676741,
+      "first_settlement_at_ms": 1795292708232,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292677656,
+          "sent_body": 1795292676392
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292676741,
+          "state": "observed_active",
+          "height": 561
+        },
+        {
+          "at_ms": 1795292708232,
+          "state": "settled",
+          "height": 563
+        }
+      ]
+    },
+    {
+      "hash": "54d687c1bfe3ef529d83dd14d52a26528592ca4eef7fac886b443984e48ed828",
+      "parent": "284ae337ff50ddd97f44c0903e28db7cff57210cfd27b027db5ffd89a5beb78c",
+      "height": 562,
+      "job": "16f26",
+      "queued_at_ms": 1795292681559,
+      "published_at_ms": 1795292681926,
+      "first_inclusion_at_ms": 1795292682738,
+      "first_settlement_at_ms": 1795292712745,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292683598,
+          "sent_body": 1795292682399
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292682738,
+          "state": "observed_active",
+          "height": 562
+        },
+        {
+          "at_ms": 1795292712745,
+          "state": "settled",
+          "height": 564
+        }
+      ]
+    },
+    {
+      "hash": "191eff042db5e1b052addc38c37c1821af52fa1ce48673839e3b1dd763a3b420",
+      "parent": "2745e01f5d1a2f17aadb0128e2198292bc7854b5e50d300ec39e0e571e644eb4",
+      "height": 564,
+      "job": "1775e",
+      "queued_at_ms": 1795292711558,
+      "published_at_ms": 1795292711924,
+      "first_inclusion_at_ms": 1795292712745,
+      "first_settlement_at_ms": 1795292745073,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292713628,
+          "sent_body": 1795292712405
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292712745,
+          "state": "observed_active",
+          "height": 564
+        },
+        {
+          "at_ms": 1795292745073,
+          "state": "settled",
+          "height": 566
+        }
+      ]
+    },
+    {
+      "hash": "12a5983139f00d31a75412386aa593b41eddb9dfddf462c42216e70959621dd0",
+      "parent": "185c20050e863b1596fa1c751582a5c1364b68f11c87f2a43e734d1e128321a1",
+      "height": 567,
+      "job": "18510",
+      "queued_at_ms": 1795292759564,
+      "published_at_ms": 1795292759928,
+      "first_inclusion_at_ms": 1795292761003,
+      "first_settlement_at_ms": 1795292784726,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292763525,
+          "sent_body": 1795292760377
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292761003,
+          "state": "observed_active",
+          "height": 567
+        },
+        {
+          "at_ms": 1795292784726,
+          "state": "settled",
+          "height": 569
+        }
+      ]
+    },
+    {
+      "hash": "23a1b68edb7ec99474c3472b43ded7f91d4f470462e34fdd26bd8a19058c8c20",
+      "parent": "7b7591b9edca448cc55400e217bdebd0569691a4381c822bd97e204ca1596e07",
+      "height": 569,
+      "job": "18a8d",
+      "queued_at_ms": 1795292783559,
+      "published_at_ms": 1795292783920,
+      "first_inclusion_at_ms": 1795292784726,
+      "first_settlement_at_ms": 1795292821634,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292785628,
+          "sent_body": 1795292784384
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292784726,
+          "state": "observed_active",
+          "height": 569
+        },
+        {
+          "at_ms": 1795292821634,
+          "state": "settled",
+          "height": 571
+        }
+      ]
+    },
+    {
+      "hash": "60385869ee5a0b72359256de0066962ed9c59b7a7ee76dec041f1ecc0d39f475",
+      "parent": "23a1b68edb7ec99474c3472b43ded7f91d4f470462e34fdd26bd8a19058c8c20",
+      "height": 570,
+      "job": "18d4c",
+      "queued_at_ms": 1795292801559,
+      "published_at_ms": 1795292801919,
+      "first_inclusion_at_ms": 1795292802719,
+      "first_settlement_at_ms": 1795292832620,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292803614,
+          "sent_body": 1795292802374
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292802719,
+          "state": "observed_active",
+          "height": 570
+        },
+        {
+          "at_ms": 1795292832620,
+          "state": "settled",
+          "height": 572
+        }
+      ]
+    },
+    {
+      "hash": "2b9903f577d90ea71a441d0a1b7cb4c961db19e5742fc8567cf67b5a7f507de0",
+      "parent": "60385869ee5a0b72359256de0066962ed9c59b7a7ee76dec041f1ecc0d39f475",
+      "height": 571,
+      "job": "192c7",
+      "queued_at_ms": 1795292819598,
+      "published_at_ms": 1795292820015,
+      "first_inclusion_at_ms": 1795292821634,
+      "first_settlement_at_ms": 1795292846719,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292824525,
+          "sent_body": 1795292820642
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292821634,
+          "state": "observed_active",
+          "height": 571
+        },
+        {
+          "at_ms": 1795292846719,
+          "state": "settled",
+          "height": 573
+        }
+      ]
+    },
+    {
+      "hash": "424fed85f712206db11bba670096eb1581fdd576f2489470294e86e0a7c451dd",
+      "parent": "2b9903f577d90ea71a441d0a1b7cb4c961db19e5742fc8567cf67b5a7f507de0",
+      "height": 572,
+      "job": "19842",
+      "queued_at_ms": 1795292831593,
+      "published_at_ms": 1795292831997,
+      "first_inclusion_at_ms": 1795292832620,
+      "first_settlement_at_ms": 1795292856636,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292835526,
+          "sent_body": 1795292833219
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292832620,
+          "state": "observed_active",
+          "height": 572
+        },
+        {
+          "at_ms": 1795292856636,
+          "state": "settled",
+          "height": 574
+        }
+      ]
+    },
+    {
+      "hash": "77941ebd946187c600dca890cfd7c8fdd428aee96732561d7ab28b66691e268e",
+      "parent": "72621d8fa0da93970bc0996b97c972cfc132cac02b0e896a7aafe3b57927a0b8",
+      "height": 574,
+      "job": "19a8c",
+      "queued_at_ms": 1795292855548,
+      "published_at_ms": 1795292855891,
+      "first_inclusion_at_ms": 1795292856636,
+      "first_settlement_at_ms": 1795292880658,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292857526,
+          "sent_body": 1795292856318
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292856636,
+          "state": "observed_active",
+          "height": 574
+        },
+        {
+          "at_ms": 1795292880658,
+          "state": "settled",
+          "height": 576
+        }
+      ]
+    },
+    {
+      "hash": "0d36fd5df10b4efbdbbf2aa87e47f3c5de1f0f773bc29a4eee1ad9fdc49c6ad7",
+      "parent": "77941ebd946187c600dca890cfd7c8fdd428aee96732561d7ab28b66691e268e",
+      "height": 575,
+      "job": "19dd2",
+      "queued_at_ms": 1795292867570,
+      "published_at_ms": 1795292867931,
+      "first_inclusion_at_ms": 1795292869038,
+      "first_settlement_at_ms": 1795292892890,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292869624,
+          "sent_body": 1795292868413
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292869038,
+          "state": "observed_active",
+          "height": 575
+        },
+        {
+          "at_ms": 1795292892890,
+          "state": "settled",
+          "height": 577
+        }
+      ]
+    },
+    {
+      "hash": "1ec933ceeeaae1ff2f9610c8d83f58a6897bf6d14e27f0e18aab26f3f9b394aa",
+      "parent": "0d36fd5df10b4efbdbbf2aa87e47f3c5de1f0f773bc29a4eee1ad9fdc49c6ad7",
+      "height": 576,
+      "job": "1a091",
+      "queued_at_ms": 1795292879561,
+      "published_at_ms": 1795292879913,
+      "first_inclusion_at_ms": 1795292880658,
+      "first_settlement_at_ms": 1795292911183,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292883526,
+          "sent_body": 1795292880347
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292880658,
+          "state": "observed_active",
+          "height": 576
+        },
+        {
+          "at_ms": 1795292911183,
+          "state": "settled",
+          "height": 578
+        }
+      ]
+    },
+    {
+      "hash": "7b7e4cb0a1ada895051c4a85c077fdee0d5f0d2006a46766e178727c14870ba5",
+      "parent": "4ac1061e39937f738a68cdd4731d7717418285156f8adb8c9b6668c7b041a39d",
+      "height": 579,
+      "job": "1aded",
+      "queued_at_ms": 1795292921560,
+      "published_at_ms": 1795292921925,
+      "first_inclusion_at_ms": 1795292922734,
+      "first_settlement_at_ms": 1795292953036,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292923634,
+          "sent_body": 1795292922386
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292922734,
+          "state": "observed_active",
+          "height": 579
+        },
+        {
+          "at_ms": 1795292953036,
+          "state": "settled",
+          "height": 581
+        }
+      ]
+    },
+    {
+      "hash": "5fd88b0d76904a22fb057fb01a34b28f77fc1d5d5f5478c6dcf864d435e10580",
+      "parent": "3fb7299ec78856ba02d329d1eaeb3d91988c15c8af47f480fb4bb886f1b555b1",
+      "height": 581,
+      "job": "1b625",
+      "queued_at_ms": 1795292951560,
+      "published_at_ms": 1795292951932,
+      "first_inclusion_at_ms": 1795292953036,
+      "first_settlement_at_ms": 1795292976747,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292955528,
+          "sent_body": 1795292952386
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292953036,
+          "state": "observed_active",
+          "height": 581
+        },
+        {
+          "at_ms": 1795292976747,
+          "state": "settled",
+          "height": 583
+        }
+      ]
+    },
+    {
+      "hash": "2a227b1a4d2c55c35fdb55279dedaa47d5f39d28e7bc39981ce17b31385503bf",
+      "parent": "3313962896d0e83288a6ea3b2ff8478527e39cce2ce78aea4e943172a78e5408",
+      "height": 583,
+      "job": "1be5e",
+      "queued_at_ms": 1795292975558,
+      "published_at_ms": 1795292975926,
+      "first_inclusion_at_ms": 1795292976747,
+      "first_settlement_at_ms": 1795293000410,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292977673,
+          "sent_body": 1795292976399
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292976747,
+          "state": "observed_active",
+          "height": 583
+        },
+        {
+          "at_ms": 1795293000410,
+          "state": "settled",
+          "height": 585
+        }
+      ]
+    },
+    {
+      "hash": "34b43f9ced984e1a3d6f58d2de31298482791791c8a2c3597c868b45b4a654b2",
+      "parent": "2a227b1a4d2c55c35fdb55279dedaa47d5f39d28e7bc39981ce17b31385503bf",
+      "height": 584,
+      "job": "1c11d",
+      "queued_at_ms": 1795292987561,
+      "published_at_ms": 1795292987932,
+      "first_inclusion_at_ms": 1795292988425,
+      "first_settlement_at_ms": 1795293021643,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795292989654,
+          "sent_body": 1795292988738
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795292988425,
+          "state": "observed_active",
+          "height": 584
+        },
+        {
+          "at_ms": 1795293021643,
+          "state": "settled",
+          "height": 586
+        }
+      ]
+    },
+    {
+      "hash": "2d596978863b27c05bd354e25c97021f445da2df3fe2ee5c9076a3967b0e1889",
+      "parent": "34b43f9ced984e1a3d6f58d2de31298482791791c8a2c3597c868b45b4a654b2",
+      "height": 585,
+      "job": "1c3dc",
+      "queued_at_ms": 1795292999571,
+      "published_at_ms": 1795292999938,
+      "first_inclusion_at_ms": 1795293000410,
+      "first_settlement_at_ms": 1795293030723,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293001586,
+          "sent_body": 1795293000702
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293000410,
+          "state": "observed_active",
+          "height": 585
+        },
+        {
+          "at_ms": 1795293030723,
+          "state": "settled",
+          "height": 587
+        }
+      ]
+    },
+    {
+      "hash": "6bad804ab4e0af476d9cc33065333d9c7a2cc7203e7b25dd6b523fc2dca63345",
+      "parent": "1f2b99852f829f1f14170fde4e1fa780d09cdac717a4420bebd990da5da970ee",
+      "height": 588,
+      "job": "1d18f",
+      "queued_at_ms": 1795293041561,
+      "published_at_ms": 1795293041932,
+      "first_inclusion_at_ms": 1795293043041,
+      "first_settlement_at_ms": 1795293072715,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293043618,
+          "sent_body": 1795293042405
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293043041,
+          "state": "observed_active",
+          "height": 588
+        },
+        {
+          "at_ms": 1795293072715,
+          "state": "settled",
+          "height": 590
+        }
+      ]
+    },
+    {
+      "hash": "699b8d1650ebdaddbf2874b48a34c749393206dfc2b172e62e2795195cb9754a",
+      "parent": "146f36a44948bb2377664ff7e82170f9057eff4c0088222e556545588f28deb2",
+      "height": 590,
+      "job": "1d9c7",
+      "queued_at_ms": 1795293071553,
+      "published_at_ms": 1795293071921,
+      "first_inclusion_at_ms": 1795293072715,
+      "first_settlement_at_ms": 1795293104787,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293073594,
+          "sent_body": 1795293072370
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293072715,
+          "state": "observed_active",
+          "height": 590
+        },
+        {
+          "at_ms": 1795293104787,
+          "state": "settled",
+          "height": 592
+        }
+      ]
+    },
+    {
+      "hash": "2492225be19a2e2d7bccc9d78faa4fd6c7232d8e6b05bb9ff2834098e10afa5f",
+      "parent": "699b8d1650ebdaddbf2874b48a34c749393206dfc2b172e62e2795195cb9754a",
+      "height": 591,
+      "job": "1dc86",
+      "queued_at_ms": 1795293095561,
+      "published_at_ms": 1795293095915,
+      "first_inclusion_at_ms": 1795293096688,
+      "first_settlement_at_ms": null,
+      "chain_state": "stale_at_depth",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293097567,
+          "sent_body": 1795293096352
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293096688,
+          "state": "observed_active",
+          "height": 591
+        },
+        {
+          "at_ms": 1795293104787,
+          "state": "competing_branch",
+          "height": 592
+        },
+        {
+          "at_ms": 1795293114753,
+          "state": "stale_at_depth",
+          "height": 593
+        }
+      ]
+    },
+    {
+      "hash": "307351804cc7f88ec9b74875d920f975ac1707c62ee7fd410dd53b73e581d48e",
+      "parent": "59193d332410babf7852789e765df5f35e73d96d1d7bfd82a7112b8a813c93ac",
+      "height": 593,
+      "job": "1df49",
+      "queued_at_ms": 1795293113556,
+      "published_at_ms": 1795293113921,
+      "first_inclusion_at_ms": 1795293114753,
+      "first_settlement_at_ms": 1795293144780,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293115704,
+          "sent_body": 1795293114393
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293114753,
+          "state": "observed_active",
+          "height": 593
+        },
+        {
+          "at_ms": 1795293144780,
+          "state": "settled",
+          "height": 595
+        }
+      ]
+    },
+    {
+      "hash": "2e48772b06b1d994676eedea92c2160637250656d538e41d3bb076e9dc825b16",
+      "parent": "027eca91810cc232fb86016c193f4493adaf37c411e1be04eb9924afe678fda7",
+      "height": 595,
+      "job": "1e781",
+      "queued_at_ms": 1795293143556,
+      "published_at_ms": 1795293143929,
+      "first_inclusion_at_ms": 1795293144780,
+      "first_settlement_at_ms": 1795293187156,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293145701,
+          "sent_body": 1795293144424
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293144780,
+          "state": "observed_active",
+          "height": 595
+        },
+        {
+          "at_ms": 1795293187156,
+          "state": "settled",
+          "height": 597
+        }
+      ]
+    },
+    {
+      "hash": "270beffc63323b30a0574aa9e26658e8c0029ff4e862a7fde3d7f930e5bad35d",
+      "parent": "2e48772b06b1d994676eedea92c2160637250656d538e41d3bb076e9dc825b16",
+      "height": 596,
+      "job": "1ecfc",
+      "queued_at_ms": 1795293161606,
+      "published_at_ms": 1795293161986,
+      "first_inclusion_at_ms": 1795293162660,
+      "first_settlement_at_ms": 1795293193021,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293165528,
+          "sent_body": 1795293163278
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293162660,
+          "state": "observed_active",
+          "height": 596
+        },
+        {
+          "at_ms": 1795293193021,
+          "state": "settled",
+          "height": 598
+        }
+      ]
+    },
+    {
+      "hash": "0f9ab65cda31ea04ed7fb215c195aee3619509c05bef2fd68168bfe9ea989947",
+      "parent": "7e41a8649183b5c0e6731af969e47ce2227cf8a9bb51febdaf3e7662e1ce2eb9",
+      "height": 598,
+      "job": "1fe00",
+      "queued_at_ms": 1795293191556,
+      "published_at_ms": 1795293191928,
+      "first_inclusion_at_ms": 1795293193021,
+      "first_settlement_at_ms": 1795293216750,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293195529,
+          "sent_body": 1795293192384
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293193021,
+          "state": "observed_active",
+          "height": 598
+        },
+        {
+          "at_ms": 1795293216750,
+          "state": "settled",
+          "height": 600
+        }
+      ]
+    },
+    {
+      "hash": "7b7eca5ebabe8d1156fc65f0cc6340bb3469733c15c96630895459cd78109701",
+      "parent": "4b76c216f37b70d91d5e8aabad28f052d389cef7331ee5a758543f40e2c69d6a",
+      "height": 600,
+      "job": "20638",
+      "queued_at_ms": 1795293215563,
+      "published_at_ms": 1795293215930,
+      "first_inclusion_at_ms": 1795293216750,
+      "first_settlement_at_ms": 1795293240547,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293217647,
+          "sent_body": 1795293216399
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293216750,
+          "state": "observed_active",
+          "height": 600
+        },
+        {
+          "at_ms": 1795293240547,
+          "state": "settled",
+          "height": 602
+        }
+      ]
+    },
+    {
+      "hash": "6091d1f35da1abd40446b662ba40fe83d3cbfae5131423e7b9bd7d960a1922df",
+      "parent": "7b7eca5ebabe8d1156fc65f0cc6340bb3469733c15c96630895459cd78109701",
+      "height": 601,
+      "job": "20bb3",
+      "queued_at_ms": 1795293233606,
+      "published_at_ms": 1795293234021,
+      "first_inclusion_at_ms": 1795293234650,
+      "first_settlement_at_ms": 1795293270367,
+      "chain_state": "settled",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {},
+      "transitions": [
+        {
+          "at_ms": 1795293234650,
+          "state": "observed_active",
+          "height": 601
+        },
+        {
+          "at_ms": 1795293270367,
+          "state": "settled",
+          "height": 603
+        }
+      ]
+    },
+    {
+      "hash": "1c4764c18adf7d5c7246b0baf5fd3d8ae65db6dac0840a73fda1867498a48f16",
+      "parent": "6091d1f35da1abd40446b662ba40fe83d3cbfae5131423e7b9bd7d960a1922df",
+      "height": 602,
+      "job": "21219",
+      "queued_at_ms": 1795293239611,
+      "published_at_ms": 1795293240018,
+      "first_inclusion_at_ms": 1795293240547,
+      "first_settlement_at_ms": 1795293282405,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293244613,
+          "sent_body": 1795293242616
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293240547,
+          "state": "observed_active",
+          "height": 602
+        },
+        {
+          "at_ms": 1795293282405,
+          "state": "settled",
+          "height": 604
+        }
+      ]
+    },
+    {
+      "hash": "40589d5a060237026eb02afc2555d62476c95bf9e2f7832199f19569d4423742",
+      "parent": "5adafe92a01d975ca7cf1ec5ca18012d9c616390bc958c61c43c059981ebc4fe",
+      "height": 604,
+      "job": "21fca",
+      "queued_at_ms": 1795293281562,
+      "published_at_ms": 1795293281931,
+      "first_inclusion_at_ms": 1795293282405,
+      "first_settlement_at_ms": 1795293326874,
+      "chain_state": "settled",
+      "independent_tip_reporters": 3,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2",
+        "sv-peer-3"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293284614,
+          "sent_body": 1795293282716
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293282405,
+          "state": "observed_active",
+          "height": 604
+        },
+        {
+          "at_ms": 1795293326874,
+          "state": "settled",
+          "height": 606
+        }
+      ]
+    },
+    {
+      "hash": "03282d6fe4f5639f5fa5f6b9f5f136d45a893f2bf1bceae3f2839a597eb2a41d",
+      "parent": "40589d5a060237026eb02afc2555d62476c95bf9e2f7832199f19569d4423742",
+      "height": 605,
+      "job": "22289",
+      "queued_at_ms": 1795293311564,
+      "published_at_ms": 1795293311932,
+      "first_inclusion_at_ms": 1795293312717,
+      "first_settlement_at_ms": null,
+      "chain_state": "stale_at_depth",
+      "independent_tip_reporters": 2,
+      "tip_reporters": [
+        "native-peer-1",
+        "native-peer-2"
+      ],
+      "deliveries": {
+        "sv-peer-3": {
+          "requested_active_headers": 1795293315614,
+          "sent_body": 1795293312382
+        }
+      },
+      "transitions": [
+        {
+          "at_ms": 1795293312717,
+          "state": "observed_active",
+          "height": 605
+        },
+        {
+          "at_ms": 1795293326874,
+          "state": "competing_branch",
+          "height": 606
+        },
+        {
+          "at_ms": 1795293351698,
+          "state": "stale_at_depth",
+          "height": 607
+        }
+      ]
+    }
+  ]
+}
