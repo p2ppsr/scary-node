@@ -1,5 +1,9 @@
 # Measuring propagation separately from native publication
 
+## Evaluation closed on November 22, 2026
+
+The matched-ingress evaluation stopped with 25 of its 6,765 planned sessions sealed and one partial session retained. Enrollment ended and the runner was disabled. The evaluation records remain sealed. The receiver-choice and stale-rate results below describe the completed 16-session sizing pilot. [Disposition of all three unfinished evaluations](production-cohort.md#evaluation-closed-on-november-22-2026)
+
 The two frozen native studies start both submissions at a barrier and hash ready jobs in matched logical ticks. Their paths from a discovery to a receiver differ. A witnessed solution goes through the worker’s Stratum connection, candidate verification, durable storage, native announcement and the host-to-container SV peer connection. A stock miner receives an RPC solution and relays through its container peer link. Rotating container assignments changes physical sides. It leaves the implementation-specific paths intact. Sequential polls of the two receiver tips also include scheduling and validation latency. A competing block can reach a receiver without ever becoming its polled active tip. [Frozen opportunity driver](https://github.com/p2ppsr/scary-node/blob/783214923d1c90faf8b4428c561ceaa194b83926/qualification/native_cohort.py) · [Published paired relay study](production-cohort.md#publication-latency-comparison)
 
 The four closed paired engineering sessions illustrate the distinction. With polled publication the witnessed miner won 2 of 21 tied discoveries. With immediate notification it won 11 of 11. Among ties, the witnessed median submission-to-first-polled-active time used just two observations on the polled build. The full competitor’s corresponding immediate-wake median used one. These observations support studying publication timing and are insufficient to establish equal wire arrival or an intrinsic stale-rate difference attributable to partial state. [Closed per-arm timing counts](evidence/chronicle-relay-comparison.json)
@@ -119,7 +123,7 @@ In the equal-assigned witnessed/full condition, stale rates were **14.04% and 36
 
 In each probe window, all 1,152 active-tip queries returned. Of 1,530 by-hash body lookups across the two receivers in that window, 320 exhausted both attempts and remained unknown. Their discoveries and scheduled parents stayed in the analysis. [Raw deadline measurements](evidence/chronicle-matched-observer-v2-pilot/sessions-00000.jsonl.gz)
 
-The sizing half-width was **20.56 percentage points**. The preregistered formula uses the observed between-session influence standard deviation of **0.38586** to fix **6,765 fresh independent sessions**, or **243,540 scheduled parents**. Each of the six producer/delay conditions receives 40,590 scheduled parents. The evaluation targets a one-percentage-point half-width and will report the precision actually achieved. These 16 sizing sessions and the interrupted first pilot are excluded from that evaluation. [Published sizing inputs](evidence/chronicle-matched-observer-v2-pilot/summary.json)
+The sizing half-width was **20.56 percentage points**. The preregistered formula uses the observed between-session influence standard deviation of **0.38586** to fix **6,765 fresh independent sessions**, or **243,540 scheduled parents**. The design allocated 40,590 scheduled parents to each of the six producer/delay conditions and targeted a one-percentage-point half-width. These 16 sizing sessions and the interrupted first pilot are excluded from that evaluation. [Published sizing inputs](evidence/chronicle-matched-observer-v2-pilot/summary.json)
 
 ## Which tip did each stock receiver choose?
 
