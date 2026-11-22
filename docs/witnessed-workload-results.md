@@ -30,7 +30,7 @@ All four headers below appear in the original entrant’s checksum-verified solv
 
 Both original Teranode service logs independently name the entrant’s public Ed25519 libp2p peer. Hashing its public-key protobuf twice with SHA-256 reproduces the mining-domain digest in the entrant’s local fencing directory and in all 30 selected Scary coinbases. The native peer appeared on 151 log lines at the first Teranode and 157 at the second. The identity corroborates the header and journal matches above. [Independent peer identity and log commitments](evidence/chronicle-sustained-reordered-identity.json)
 
-The frozen journal retained all 56 solutions generated in the session. It recorded 30 settled and 26 stale at depth. The three other error slots, 104, 144 and 272, had no locally journaled child on their sampled parent. Each of the four selected timeout entries records a stock body send, a later active-header request, two tip reporters and eventual settlement. The last locally retained full solution body was a different height-578 sibling. The original R timing cannot distinguish whether a Stratum reply was delayed or lost in transit. A separate controlled regtest deliberately dropped the worker reply and verified selection of the exact pre-recorded header. [Lost-reply experiment](evidence/chronicle-stratum-lost-reply.json)
+The original checkpoint contained 316,588,547 bytes. Its MessagePack payload SHA-256 was `a46c75038049c8194ce235e030bd0c515f955aa8036d88b62256232a01a72a82`, matching its on-disk trailer. The public journal exports the solution records and checkpoint commitment. The operator retains the source checkpoint for direct re-extraction. The frozen journal retained all 56 solutions generated in the session. It recorded 30 settled and 26 stale at depth. The three other error slots, 104, 144 and 272, had no locally journaled child on their sampled parent. Each of the four selected timeout entries records a stock body send, a later active-header request, two tip reporters and eventual settlement. The last locally retained full solution body was a different height-578 sibling. The original R timing cannot distinguish whether a Stratum reply was delayed or lost in transit. A separate controlled regtest deliberately dropped the worker reply and verified selection of the exact pre-recorded header. [Lost-reply experiment](evidence/chronicle-stratum-lost-reply.json)
 
 ### Which miner collected the fees
 
@@ -76,6 +76,8 @@ receipt=docs/evidence/chronicle-sustained-reordered.json.gz
   --handoff docs/evidence/chronicle-sustained-reordered-handoff.json
 ~~~
 
+
+A new stock SV Node began at regtest genesis with zero peers, accepted the funding history and independently selected the 96 recorded blocks and final height-580 hash. Its resulting chainwork was `0x48a`. Its mempool and validation queue were empty. [Isolated SV Node restoration and all 96 full body readbacks](evidence/chronicle-sustained-reordered-fresh-sv.json)
 
 The 8,277,033-byte reordered archive reconstructs all 1,103,144,251 observed block bytes from the common signed corpus. Its SHA-256 is `e51b3237bca4d521da139ea4288470a1bbf4fc37aa7cefd638120490f3bc4c27`. The wallet bitmaps each contain one byte per offered ID after decompression. [Reordered archive and wallet bitmaps](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-witnessed-arms-v1) · [Common signed corpus](https://github.com/p2ppsr/scary-node/releases/tag/native-workload-regtest-v1)
 

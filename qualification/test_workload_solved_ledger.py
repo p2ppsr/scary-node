@@ -9,11 +9,17 @@ from workload_solved_ledger import audit, extract, public_ledger
 
 class WorkloadSolvedLedgerTests(unittest.TestCase):
     def test_selected_timeout_solutions_and_paid_origin(self):
+        from verify_sustained_native import dsha
         from workload_block_fees import economics
+        from workload_peer_identity import protobuf
 
         data = Path(__file__).resolve().parents[1] / "docs/evidence"
         receipt = read(data / "chronicle-sustained-reordered.json.gz")
         ledger = read(data / "chronicle-sustained-reordered-ledger.json")
+        peer = read(data / "chronicle-sustained-reordered-identity.json")
+        key = protobuf(peer["public_peer_id"].encode())
+        self.assertEqual(key.hex(), peer["public_identity_protobuf_hex"])
+        self.assertEqual(dsha(key).hex(), ledger["mining_identity"])
         proof = audit(receipt, ledger)
         self.assertEqual(proof["checkpoint_solutions"], 56)
         self.assertEqual(proof["scary_primary"], {"blocks": 29, "payments": 235809})
