@@ -25,6 +25,13 @@ The entrant reports cumulative counters for transactions received over SV P2P an
 .native/py/bin/python qualification/workload_waiting_offers.py .native/cold-changed-run/receipt.json.gz
 ```
 
+The fee verifier also follows each selected payment's same-block ancestors back to the first input created outside that block. It records the number of blocks between that input's creation and the payment's inclusion. A distance of one means the input was created by the candidate's parent and had no successor there. Every payment descending from that input in the same candidate inherits that limit. Distances of two or greater satisfy this particular age requirement if the entrant witnessed the output and received all of the required payments in time. The calculation describes the final selected chain. It does not reconstruct transaction arrival times, previous competing templates, or the cause of individual admission decisions.
+
+```sh
+.native/py/bin/python qualification/workload_block_fees.py wires .native/cold-changed-run/receipt.json.gz \
+  .native/sustained-signed .native/cold-changed-run/blocks > cold-block-fees.json
+```
+
 ## Attributing an accepted block when a worker misses the reply
 
 For this arm the worker records the job notification, both extranonces and the exact proof-of-work header it prepared for each submission. A worker timeout or rejection stays in the opportunity record. The offline verifier reconstructs the coinbase commitment and header, checks proof of work and matches the complete 80 bytes against the selected headers returned by the three reference nodes. It reports acknowledged solutions and chain-side selections separately. A repeated header counts as one block. If repeated attempts span intervals, the verifier leaves that block out of the per-interval result. This recording change preserves the enrolled binary, slot schedule, time denominator and thresholds.

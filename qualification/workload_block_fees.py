@@ -23,6 +23,15 @@ from verify_sustained_native import (
 )
 
 
+def external_input_age(height, parent_height, rail, root_ages):
+    """Follow a payment rail back to its first input outside this selected block."""
+    distance = height - parent_height
+    if distance > 0:
+        root_ages[rail] = distance
+    require(distance >= 0 and rail in root_ages, "missing same-block source ancestor")
+    return root_ages[rail]
+
+
 def check(record, corpus, blocks):
     summary = verify(record)
     funding = record.get("setup", {}).get("funding", record["baseline"])
@@ -56,6 +65,8 @@ def check(record, corpus, blocks):
         )
         fees = 0
         parent_ages = Counter()
+        external_ages = Counter()
+        root_ages = {}
         for tx, out in zip(txs[1:], outputs[1:], strict=True):
             index = ordinals[dsha(tx)]
             require(len(out) == 1, "ordinary payment has multiple outputs")
@@ -72,6 +83,10 @@ def check(record, corpus, blocks):
             created[index], amounts[index] = block["height"], value
             fee = input_value - value
             parent_ages[block["height"] - parent_height] += 1
+            root_age = external_input_age(
+                block["height"], parent_height, index % len(initial), root_ages
+            )
+            external_ages[root_age] += 1
             fee_counts[fee] += 1
             fees += fee
         coinbase_value = sum(value for value, _ in outputs[0])
@@ -91,6 +106,9 @@ def check(record, corpus, blocks):
                 "coinbase_value_satoshis": coinbase_value,
                 "unclaimed_satoshis": subsidy + fees - coinbase_value,
                 "payment_parent_age_in_blocks": dict(sorted(parent_ages.items())),
+                "payment_external_ancestor_age_in_blocks": dict(
+                    sorted(external_ages.items())
+                ),
             }
         )
     require(sum(seen) == summary["distinct_confirmed"], "different distinct payments")
@@ -115,6 +133,13 @@ def economics(record, proof, ledger):
         proof["registration"] == record["registration"]
         and len(proof["blocks"]) == len(selected),
         "fee receipt differs",
+    )
+    external_age_fields = [
+        "payment_external_ancestor_age_in_blocks" in row for row in proof["blocks"]
+    ]
+    require(
+        all(external_age_fields) or not any(external_age_fields),
+        "incomplete external ancestor receipt",
     )
     totals = {}
     nonces = set()
@@ -192,6 +217,20 @@ def economics(record, proof, ledger):
             "parent age counts differ",
         )
         miner["payment_parent_age_in_blocks"].update(ages)
+        if all(external_age_fields):
+            roots = {
+                int(k): v
+                for k, v in row["payment_external_ancestor_age_in_blocks"].items()
+            }
+            require(
+                all(k >= 1 and v > 0 for k, v in roots.items())
+                and sum(roots.values()) == row["payments"]
+                and all(roots.get(k, 0) >= v for k, v in ages.items() if k),
+                "external ancestor age counts differ",
+            )
+            miner.setdefault(
+                "payment_external_ancestor_age_in_blocks", Counter()
+            ).update(roots)
     return {
         "selected_by_owner": totals,
         "distinct_selected_scary_extranonces": len(nonces),
