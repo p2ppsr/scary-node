@@ -339,15 +339,13 @@ def boot(
             )
 
         info = wait_ready(tnid, ready, 240)
-        candidate = (
-            native_rpc(tnid, "getminingcandidate", True)
-            if original_candidate is not None
-            else native_rpc(tnid, "getminingcandidate")
-        )
-        require(
-            candidate["prevhash"] == info["bestblockhash"],
-            "recovered native candidate has different parent",
-        )
+
+        def current_candidate():
+            args = (True,) if original_candidate is not None else ()
+            value = native_rpc(tnid, "getminingcandidate", *args)
+            return value if value["prevhash"] == info["bestblockhash"] else None
+
+        candidate = wait_ready(tnid, current_candidate, 240)
 
         def isolation():
             net = json.loads(docker("network", "inspect", network))[0]
@@ -371,6 +369,13 @@ def boot(
             else {}
         )
         rows = [readback(tnid, row) for row in receipt["blocks"]]
+        if original_candidate is not None:
+            # A restarted block assembler can lag its service's selected header.
+            pending["first_pending_recovery"] = pending["pending_recovery"]
+            candidate = wait_ready(tnid, current_candidate, 240)
+            pending["pending_recovery"] = compare_pending(
+                tnid, candidate, original_candidate
+            )
         after = isolation()
         return {
             "network": "isolated regtest",
