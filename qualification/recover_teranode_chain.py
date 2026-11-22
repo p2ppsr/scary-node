@@ -172,6 +172,16 @@ def read_asset(endpoint, h, size, digest):
 def run(args):
     cadence = args.action == "cadence"
     measured = observation(args.measured)
+    interrupted = measured.get("schema") == "scary-sustained-interruption-v1"
+    if interrupted:
+        from interrupted_workload import verify as verify_interruption
+
+        verify_interruption(measured)
+        require(
+            args.pending_ids,
+            "supply the original stock mempool IDs for this interrupted trial",
+        )
+    pool_recovery = {}
     elapsed = time.monotonic()
     hits = []
     redials = []
@@ -265,10 +275,18 @@ def run(args):
                         ),
                     }
                 )
-            height, terminal = (
-                measured["completion"]["final_height"],
-                measured["completion"]["final_hash"],
-            )
+            if interrupted:
+                from interrupted_workload import restore_stock_mempool
+
+                height, terminal = hits[-1]["height"], hits[-1]["hash"]
+                pool_recovery["interrupted_stock_mempool"] = restore_stock_mempool(
+                    stock, measured, args.corpus, args.pending_ids
+                )
+            else:
+                height, terminal = (
+                    measured["completion"]["final_height"],
+                    measured["completion"]["final_hash"],
+                )
         tn = rpc(endpoint, "getblockchaininfo")
         sv = stock.rpc("getblockchaininfo")
         require(
@@ -279,6 +297,7 @@ def run(args):
             "terminal chain differs",
         )
         return {
+            **pool_recovery,
             "action": args.action,
             "network": "regtest",
             "transport": "fresh SV Node to fresh Teranode legacy peer; native Asset full readback",
@@ -385,7 +404,28 @@ def verify(proof, original):
         == (expected[-1]["height"], expected[-1]["hash"]),
         "Teranode receipts differ",
     )
+    verified_pool = {}
+    if measured.get("schema") == "scary-sustained-interruption-v1":
+        from interrupted_workload import verify as verify_interruption
+
+        prefix = verify_interruption(measured)
+        count = prefix["final_stock_mempool_after_interruption"]
+        pool = proof["interrupted_stock_mempool"]
+        require(
+            pool
+            == {
+                "fresh_initial_count": 0,
+                "reoffered": count,
+                "restored_count": count,
+                "sorted_internal_txids_sha256": prefix[
+                    "sorted_internal_mempool_txids_sha256"
+                ],
+            },
+            "independent stock mempool recovery differs",
+        )
+        verified_pool["restored_stock_mempool"] = count
     return {
+        **verified_pool,
         "height": proof["height"],
         "tip_hash": proof["tip_hash"],
         "full_native_readbacks": len(expected),
@@ -398,6 +438,11 @@ if __name__ == "__main__":
     p.add_argument("action", choices=("cadence", "sustained", "verify"))
     p.add_argument("measured", type=Path)
     p.add_argument("proof", type=Path)
+    p.add_argument(
+        "--pending-ids",
+        type=Path,
+        help="Gzip of the original stock mempool IDs, sorted in internal byte order",
+    )
     p.add_argument("--history", type=Path)
     p.add_argument("--corpus", type=Path)
     p.add_argument("--body", type=Path)

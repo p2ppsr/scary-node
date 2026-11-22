@@ -13,6 +13,7 @@ from cadence_transport import MAGIC
 from recover_sustained_chain import (
     FUNDING,
     HISTORY,
+    confirmed_boundary,
     observed_wire_stream,
     path_at,
     read,
@@ -303,7 +304,7 @@ def clean_working_copy(stock):
 def reoffer(stock, receipt, measured, history, corpus, archive, blocks):
     beginning = stock.rpc("getblockcount")
     require(
-        beginning < receipt["completion"]["final_height"],
+        beginning < confirmed_boundary(receipt)["final_height"],
         "unexpected initial restored height",
     )
     previous = stock.rpc("getbestblockhash")
@@ -362,7 +363,7 @@ def boot(
 ):
     receipt = read(measured)
     expected = expected_chain(receipt, history, corpus)
-    target = receipt["completion"]["final_hash"]
+    target = confirmed_boundary(receipt)["final_hash"]
     name = "scary-archived-sv-" + uuid.uuid4().hex[:12]
     with contextlib.ExitStack() as cleanup:
         cid = docker(
@@ -438,7 +439,7 @@ def boot(
         )
         require(
             info["hash"] == target
-            and info["height"] == receipt["completion"]["final_height"]
+            and info["height"] == confirmed_boundary(receipt)["final_height"]
             and stock.rpc("getconnectioncount")
             == pool
             == activity["transactions"]
@@ -467,7 +468,7 @@ def boot(
 
 
 def verify(proof, receipt):
-    final = receipt["completion"]
+    final = confirmed_boundary(receipt)
     stages = proof["first_tips_and_progress"]
     disk = proof["durable_block_files"]
     require(
@@ -610,7 +611,8 @@ if __name__ == "__main__":
         private = read(a.private_wallet_summary) if a.private_wallet_summary else None
         if private:
             require(
-                private["source_tip"] == read(a.measured)["completion"]["final_hash"],
+                private["source_tip"]
+                == confirmed_boundary(read(a.measured))["final_hash"],
                 "private manifest belongs to another observed tip",
             )
         with session_lock():

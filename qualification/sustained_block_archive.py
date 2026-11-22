@@ -87,7 +87,12 @@ def checked(wire, row):
 def read_receipt(receipt):
     with gzip.open(receipt, "rt") as f:
         record = json.load(f)
-    verify(record)
+    if record.get("schema") == "scary-sustained-interruption-v1":
+        from interrupted_workload import verify as verify_interruption
+
+        verify_interruption(record)
+    else:
+        verify(record)
     rows = observed_bodies(record)
     require(
         rows and all(HASH.fullmatch(h) for h in rows),

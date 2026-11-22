@@ -12,7 +12,7 @@ import time
 import uuid
 from pathlib import Path
 
-from recover_sustained_chain import read
+from recover_sustained_chain import confirmed_boundary, read
 from run_cohort import session_lock
 from verify_receipt import require
 
@@ -40,7 +40,7 @@ def expected(observation):
     if "restored" in observation:
         # A live-cadence checkpoint has the complete independently observed window.
         return observation["release"], observation["restored"], {}
-    end = observation["completion"]
+    end = confirmed_boundary(observation)
     blocks = {r["hash"]: r for r in observation["blocks"]}
     return (
         observation["release_sha256"],

@@ -17,6 +17,10 @@ In the mixed-reuse arm, retain original batches 0–1023 in order. For each succ
 
 For an ongoing miner demonstration, preregister at least one Scary-originated, nonempty, independently selected block in **each** five-minute opportunity interval. Retain the existing 3,000/s four-node adoption target and every missed, unready or rejected opportunity. For each selected solution publish the issued parent, incoming native transaction provenance, earliest valid witness context, body hash, payment count and later settlement. Report Scary-originated distinct payments per complete observation second, selected block share and each five-minute cohort separately. Meeting the mixed-miner target establishes regular origin and system-wide adoption at the measured load; a claim of 3,000 payments/s originated by Scary requires that rate in Scary's own measured numerator.
 
+### Endorsed arm results
+
+The eight selected Scary blocks in the observed prefix contained 84,210 payments. They all came in the first 50 work opportunities. Three later complete windows contained zero Scary blocks. The original enrollment was interrupted with 246 of its 300 opportunities recorded. [Measured outcomes, evidence limits and replay](endorsed-workload-interruption.md)
+
 ## Separately measuring one large body
 
 A 600-second arrival interval at 3,000 payments/s represents 1,800,000 ordinary transactions. Their exact signed bytes occupy 359,090,161 bytes. The built height-485 fixture uses a 130-byte coinbase paying a 67-byte locking script. Its 80-byte header and five-byte transaction count bring the full body to **359,090,376 bytes**. It spans 27 complete funding generations plus 30,528 subsequent payments. It requires 65,536 witnessed starting inputs and contains 1,734,464 same-block spends of earlier payments. This is a standard length-framed Bitcoin block below the extended-message threshold. Its burst validation, temporary storage and delivery demands differ from the 14.9 MB maximum in the sustained inventory trial. [Separate large-body registration and executable proof](live-cadence-block.md)

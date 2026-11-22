@@ -30,6 +30,19 @@ def read(path):
         return json.load(f)
 
 
+def confirmed_boundary(receipt):
+    """Read the last audited active block, including an explicitly interrupted attempt."""
+    if receipt.get("schema") == "scary-sustained-interruption-v1":
+        from interrupted_workload import verify as verify_interruption
+
+        prefix = verify_interruption(receipt)
+        return {
+            "final_height": prefix["final_audited_height"],
+            "final_hash": prefix["final_audited_hash"],
+        }
+    return receipt["completion"]
+
+
 def custody(receipt, handoff):
     stock = handoff["post_window_stock_observation"]
     done = receipt["completion"]
