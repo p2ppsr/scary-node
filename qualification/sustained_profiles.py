@@ -20,13 +20,23 @@ ENDORSED_SHA = "9cfde55565505d52e6b3c3e78e9811bb43745f0f3bddbb6c7798bddc199e5549
 COLD = "44e4d8eab6aab427453b23e1f7f098a9ba36d2fe"
 FROZEN_RELEASE = "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528"
 CHANGED_RELEASE = "4c9ef032f2ebf4c806331fbbbc53464c517da04cc497209bb9cdb5e4cc572faf"
-WITNESSED_ARMS = ("endorsed", "reordered", "cold")
+RELEASE_REGISTRATION = "91444cdc0d304230b83d99138a07fda9b567d9f9"
+RELEASE_ELF = "5129b3dea8cecf04d369aa7a7d663024879291799af5424cb0158e8e337b643e"
+REORDERED_ARMS = ("reordered", "release-reordered")
+WITNESSED_ARMS = ("endorsed", "reordered", "cold", "release-reordered")
+
+BASELINE_BUILD = ("af9b605ad8da96d041a540111d46a7c0105209f7", FROZEN_RELEASE)
+CHANGED_BUILDS = {
+    "cold": ("c2a36d5c6a83f2262dffd596f5eecb421db6b132", CHANGED_RELEASE),
+    "release-reordered": ("5148c31ae620544c31a61b1710172c4bcc524c54", RELEASE_ELF),
+}
 REGISTRATIONS = {
     "direct": DIRECT,
     "production": INVENTORY,
     "endorsed": WITNESSED,
     "reordered": WITNESSED,
     "cold": COLD,
+    "release-reordered": RELEASE_REGISTRATION,
 }
 
 PROJECTS = {
@@ -36,6 +46,7 @@ PROJECTS = {
     "endorsed": ("scary-node-sustained-endorsed", 5000),
     "reordered": ("scary-node-sustained-reordered", 6000),
     "cold": ("scary-node-sustained-cold", 7000),
+    "release-reordered": ("scary-node-sustained-release-reordered", 8000),
 }
 
 
@@ -43,8 +54,12 @@ def profile():
     return os.getenv("SCARY_SUSTAINED_PROFILE", "direct")
 
 
+def pinned_build(arm):
+    return CHANGED_BUILDS.get(arm, BASELINE_BUILD)
+
+
 def batch_order(arm):
-    if arm != "reordered":
+    if arm not in REORDERED_ARMS:
         return range(10800)
     return [
         *range(1024),

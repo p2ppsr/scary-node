@@ -16,6 +16,7 @@ from sustained_profiles import (
     ENDORSED_SHA,
     ORIGINAL_IDS,
     REORDERED_IDS,
+    REORDERED_ARMS,
     batch_order,
     profile,
 )
@@ -45,6 +46,10 @@ IMAGE_ID = "sha256:5d3fe94ee11ed4170cc39a074967c220757ed6078b0df623d7054b35afc55
 if ARM == "cold":
     IMAGE = IMAGE_ID = (
         "sha256:12e959a8368b5f4cc561eb754d1588e62f6a5f68bbc38d238174eaa40b8b827a"
+    )
+elif ARM == "release-reordered":
+    IMAGE = IMAGE_ID = (
+        "sha256:0da9e6af62129fa7385f78ddf190780c3975598c49211b3fbb838837d9ca2d6f"
     )
 FUNDING = "3fb3a456448fd6d91801a35c04112ffab3f30dc0a6a14e426effff4f91660ba9"
 SOURCE = "243170edb3df9bea289c32207732d988f6e4b92f67b17634a72e709ae8b735a2"
@@ -209,7 +214,7 @@ def setup(
                 if len(data) != 512 * 32:
                     raise ValueError("scheduled input digest is incomplete")
                 digest.update(data)
-        expected = REORDERED_IDS if ARM == "reordered" else ORIGINAL_IDS
+        expected = REORDERED_IDS if ARM in REORDERED_ARMS else ORIGINAL_IDS
         if digest.hexdigest() != expected:
             raise ValueError("offered inventory order differs from registration")
         record.update(arm=ARM, scheduled_order_id_sha256=expected)

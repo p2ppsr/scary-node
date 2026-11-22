@@ -15,14 +15,14 @@ from prove import decode_block, dsha
 from verify_receipt import check_header, require
 from sustained_resources import DOCKER_MIN, HOST_MIN, SERVICES
 from sustained_profiles import (
-    COLD,
-    CHANGED_RELEASE,
+    FROZEN_RELEASE,
+    REORDERED_ARMS,
+    pinned_build,
     ENDORSED_HASH,
     ENDORSED_SHA,
     ENDORSEMENT,
     PROJECTS,
     REGISTRATIONS,
-    WITNESSED,
     WITNESSED_ARMS,
     REORDERED_IDS,
     batch_order,
@@ -35,7 +35,7 @@ PAYMENTS = BATCH_SIZE * BATCHES
 SLOTS = 300
 COHORTS = 6
 NS = 10**9
-REFERENCE_RELEASE = "833fbeecc17a45de9edc8777123708ecd2e390d522c436b867a74a208318a528"
+REFERENCE_RELEASE = FROZEN_RELEASE
 MAGIC = bytes.fromhex("dab5bffa")
 TX_COMMAND = b"tx".ljust(12, b"\x00")
 REGISTRATION = "11e60074fbdde9587e1652d4de272a24bd4ac68b"
@@ -266,7 +266,7 @@ def replication_setup(record):
         "replication funding differs",
     )
     if arm in WITNESSED_ARMS:
-        expected_ids = REORDERED_IDS if arm == "reordered" else ORDERED_SOURCE
+        expected_ids = REORDERED_IDS if arm in REORDERED_ARMS else ORDERED_SOURCE
         require(
             setup["arm"] == arm and setup["scheduled_order_id_sha256"] == expected_ids,
             "offered schedule differs",
@@ -365,16 +365,12 @@ def verify(record, executable=None):
         arm in REGISTRATIONS and REGISTRATIONS[arm] == record["registration"],
         "unregistered arm",
     )
-    pinned = CHANGED_RELEASE if arm == "cold" else REFERENCE_RELEASE
+    _, pinned = pinned_build(arm)
     require(
         executable is None or executable == pinned, "binary differs from registration"
     )
     require(record["schema"] == 1, "unsupported sustained receipt")
-    require(
-        record["registration"] in (REGISTRATION, REPLICATION, WITNESSED, COLD)
-        and record["network"] == "regtest",
-        "unexpected trial or network",
-    )
+    require(record["network"] == "regtest", "unexpected trial network")
     require(
         record["release_sha256"] == pinned, "release differs from the build receipt"
     )
@@ -839,7 +835,7 @@ def verify_wires(record, corpus, blocks, *, parent_graph=False):
     arm = record.get(
         "arm", "production" if record["registration"] == REPLICATION else "direct"
     )
-    source_cohorts = cohort_by_batch(arm) if arm == "reordered" else None
+    source_cohorts = cohort_by_batch(arm) if arm in REORDERED_ARMS else None
     if arm in WITNESSED_ARMS:
         signed_order = hashlib.sha256()
         with (corpus / "ids.bin").open("rb") as f:
@@ -948,17 +944,11 @@ def main():
         parser.error("--corpus and --blocks must be supplied together")
     with (gzip.open if args.receipt.suffix == ".gz" else open)(args.receipt, "rt") as f:
         record = json.load(f)
-    expected = CHANGED_RELEASE if record.get("arm") == "cold" else REFERENCE_RELEASE
+    registered_source, expected = pinned_build(record.get("arm", "direct"))
     if args.build_receipt:
         b = json.loads(args.build_receipt.read_text())
         require(
-            b["source_commit"]
-            == (
-                "c2a36d5c6a83f2262dffd596f5eecb421db6b132"
-                if record.get("arm") == "cold"
-                else "af9b605ad8da96d041a540111d46a7c0105209f7"
-            )
-            and b["platform"] == "linux/arm64",
+            b["source_commit"] == registered_source and b["platform"] == "linux/arm64",
             "unexpected reproduction source or target",
         )
         expected = b["release"]["executable_sha256"]

@@ -20,8 +20,7 @@ from native_workers import Worker
 from prove import PORT_SHIFT, decode_block, dsha, request, txid
 from run_cohort import session_lock
 from sustained_profiles import (
-    CHANGED_RELEASE,
-    FROZEN_RELEASE,
+    pinned_build,
     REGISTRATIONS,
     WITNESSED_ARMS,
     cohort_by_batch,
@@ -31,10 +30,10 @@ from sustained_corpus import BATCH, COUNT
 from sustained_wallet import produce, wait_until, Wallet
 from verify_native_workers import previous_hash
 
-RELEASE = CHANGED_RELEASE if profile() == "cold" else FROZEN_RELEASE
 DURATION = 1800
 INTERVAL = 6
 ARM = profile()
+_, RELEASE = pinned_build(ARM)
 REGISTRATION = REGISTRATIONS.get(ARM)
 
 

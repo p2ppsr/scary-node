@@ -11,6 +11,8 @@ from sustained_profiles import (
     FUNDING,
     PROJECTS,
     REGISTRATIONS,
+    RELEASE_ELF,
+    pinned_build,
     batch_order,
     cohort_by_batch,
 )
@@ -63,6 +65,26 @@ class WitnessedWorkloadTests(unittest.TestCase):
         record["branch_events"].pop(1)
         with self.assertRaisesRegex(ValueError, "height"):
             verify_branch_history(record)
+
+    def test_release_uses_r_order_and_an_independent_image_and_namespace(self):
+        profile = "release-reordered"
+        self.assertEqual(batch_order(profile), batch_order("reordered"))
+        self.assertEqual(cohort_by_batch(profile), cohort_by_batch("reordered"))
+        self.assertNotEqual(batch_order(profile), list(batch_order("cold")))
+        self.assertEqual(
+            pinned_build(profile),
+            ("5148c31ae620544c31a61b1710172c4bcc524c54", RELEASE_ELF),
+        )
+        self.assertNotIn(
+            RELEASE_ELF, {pinned_build(k)[1] for k in ("cold", "reordered", "endorsed")}
+        )
+        self.assertNotIn(
+            REGISTRATIONS[profile],
+            {REGISTRATIONS[k] for k in ("cold", "reordered", "endorsed")},
+        )
+        self.assertEqual(
+            PROJECTS[profile], ("scary-node-sustained-release-reordered", 8000)
+        )
 
     def test_endorsed_wire_parent_merkle_and_registered_builds(self):
         self.assertEqual(hashlib.sha256(ENDORSEMENT).hexdigest(), ENDORSED_SHA)
